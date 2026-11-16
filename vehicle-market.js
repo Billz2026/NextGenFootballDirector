@@ -10,24 +10,24 @@
  */
 (() => {
   const rows = Object.freeze({
-    // Starter: older, higher-mileage runabouts plus affordable newer stock.
+    // Starter: predominantly sub-100k-mile cars; a minority of high-mileage bargains.
     starter: [
-      ['2016 Ford Focus Zetec',118300,'Diesel','Manual','1.5 TDCi',1950,4250,450,4,'Partial'],
-      ['2020 Vauxhall Corsa SE Premium',103600,'Petrol','Manual','1.2 Turbo 100',4550,7850,395,3,'Partial'],
-      ['2018 Volkswagen Polo SE',98000,'Petrol','Manual','1.0 TSI',3650,6300,355,3,'Partial'],
-      ['2019 Honda Jazz SE',108000,'Petrol','Manual','1.3 i-VTEC',3450,5900,325,3,'Full'],
-      ['2017 Ford Fiesta Zetec',104500,'Petrol','Manual','1.0 EcoBoost',1750,3950,425,4,'Partial'],
-      ['2018 Toyota Yaris Icon Hybrid',114300,'Hybrid','Automatic','1.5 VVT-i hybrid e-CVT',4550,7250,360,3,'Partial'],
-      ['2018 Vauxhall Corsa Energy',112200,'Petrol','Manual','1.4 16v',1850,4000,390,4,'Partial'],
+      ['2016 Ford Focus Zetec',88500,'Diesel','Manual','1.5 TDCi',2550,5150,450,4,'Partial'],
+      ['2020 Vauxhall Corsa SE Premium',64500,'Petrol','Manual','1.2 Turbo 100',5650,9250,395,3,'Partial'],
+      ['2018 Volkswagen Polo SE',70200,'Petrol','Manual','1.0 TSI',4250,7250,355,3,'Partial'],
+      ['2019 Honda Jazz SE',75500,'Petrol','Manual','1.3 i-VTEC',4450,7200,325,3,'Full'],
+      ['2017 Ford Fiesta Zetec',84500,'Petrol','Manual','1.0 EcoBoost',2350,4950,425,4,'Partial'],
+      ['2018 Toyota Yaris Icon Hybrid',77500,'Hybrid','Automatic','1.5 VVT-i hybrid e-CVT',5650,8600,360,3,'Partial'],
+      ['2018 Vauxhall Corsa Energy',71500,'Petrol','Manual','1.4 16v',2700,5150,390,4,'Partial'],
       ['2017 Nissan Qashqai Acenta',127000,'Diesel','Manual','1.5 dCi',3400,6350,550,4,'Partial'],
-      ['2019 Kia Rio 2',99600,'Petrol','Manual','1.25 CVVT',3750,6500,375,3,'Full'],
-      ['2019 Hyundai i20 SE',106500,'Petrol','Manual','1.2 MPI',3450,6150,375,3,'Partial'],
-      ['2018 Peugeot 208 Active',113800,'Petrol','Manual','1.2 PureTech',1850,4150,475,4,'Partial'],
-      ['2020 Nissan Leaf Acenta',89600,'Electric','Automatic','40 kWh EV',4300,7350,560,3,'Partial'],
-      ['2018 Volkswagen Golf SE',131100,'Diesel','Manual','1.6 TDI',4400,7600,535,4,'Partial'],
-      ['2017 Toyota Yaris Icon',96000,'Petrol','Manual','1.5 VVT-iE',3600,6000,310,3,'Full'],
+      ['2019 Kia Rio 2',58500,'Petrol','Manual','1.25 CVVT',4450,7450,375,3,'Full'],
+      ['2019 Hyundai i20 SE',66500,'Petrol','Manual','1.2 MPI',4400,7300,375,3,'Partial'],
+      ['2018 Peugeot 208 Active',82000,'Petrol','Manual','1.2 PureTech',2500,5050,475,4,'Partial'],
+      ['2020 Nissan Leaf Acenta',48000,'Electric','Automatic','40 kWh EV',5800,9000,560,3,'Partial'],
+      ['2018 Volkswagen Golf SE',86500,'Diesel','Manual','1.6 TDI',5450,8950,535,4,'Partial'],
+      ['2017 Toyota Yaris Icon',64000,'Petrol','Manual','1.5 VVT-iE',4500,7150,310,3,'Full'],
       // Older part-ex and low-budget auction stock can still be serviceable.
-      ['2016 Honda Jazz SE',157800,'Petrol','Manual','1.3 i-VTEC',1450,3500,250,3,'Partial']
+      ['2016 Honda Jazz SE',137800,'Petrol','Manual','1.3 i-VTEC',1450,3500,250,3,'Partial']
     ],
     modern: [
       ['2021 Vauxhall Corsa SE Premium',57100,'Petrol','Manual','1.2 Turbo 100',6350,10350,385,2,'Full'],
@@ -69,14 +69,27 @@
       ['2022 Mercedes-Benz S350d AMG Line',42100,'Diesel','Automatic','2.9 S350d',50500,65000,1450,2,'Full'],
       ['2023 Land Rover Defender 110 D250',36200,'Diesel','Automatic','3.0 D250 MHEV',48600,62500,1475,2,'Full'],
       ['2023 Range Rover Sport P440e',33800,'Plug-in Hybrid','Automatic','3.0 petrol PHEV',50800,66000,1625,2,'Full']
+    ],
+    // High-reputation dealer allocations. Delivery mileage, not free cars.
+    new: [
+      ['2026 Vauxhall Corsa GS',45,'Petrol','Manual','1.2 Turbo 100',17100,19250,275,1,'Full'],
+      ['2026 Volkswagen Polo Life',70,'Petrol','Manual','1.0 TSI',18750,21000,275,1,'Full'],
+      ['2026 Toyota Yaris Design Hybrid',85,'Hybrid','Automatic','1.5 hybrid e-CVT',22600,25000,300,1,'Full'],
+      ['2026 Kia Sportage GT-Line',60,'Petrol','Automatic','1.6 T-GDi',30700,34300,350,1,'Full'],
+      ['2026 Tesla Model 3 RWD',40,'Electric','Automatic','Rear-wheel-drive EV',33700,37300,325,1,'Full'],
+      ['2026 BMW 320i M Sport',75,'Petrol','Automatic','2.0 turbo',40200,44900,400,1,'Full'],
+      ['2026 Mercedes-Benz A200 AMG Line',90,'Petrol','Automatic','1.3 turbo',35600,39800,375,1,'Full'],
+      ['2026 Hyundai Ioniq 5 Premium',55,'Electric','Automatic','Long-range EV',36600,41400,350,1,'Full'],
+      ['2026 Nissan Qashqai N-Connecta e-Power',95,'Hybrid','Automatic','1.5 e-Power',31800,36000,350,1,'Full']
     ]
   });
-  const KEYS=Object.freeze(['starter','modern','premium','luxury']);
+  const KEYS=Object.freeze(['starter','modern','premium','luxury','new']);
   const TIERS=Object.freeze([
     {key:'starter',label:'STARTER DEALER',minCash:0,minRep:0},
     {key:'modern',label:'MODERN STOCK',minCash:18500,minRep:15},
     {key:'premium',label:'PREMIUM DEALER',minCash:42000,minRep:40},
-    {key:'luxury',label:'LUXURY SPECIALIST',minCash:110000,minRep:65}
+    {key:'luxury',label:'LUXURY SPECIALIST',minCash:110000,minRep:65},
+    {key:'new',label:'NEW CAR ALLOCATION',minCash:180000,minRep:85}
   ]);
   const hash=value=>{
     let h=2166136261;
@@ -92,7 +105,8 @@
       fee:Math.round((210+guide*.015)/5)*5,
       ask:guide+Math.max(300,Math.round(guide*.08/25)*25),
       floor:guide-125,
-      note:fuel==='Electric'?'Battery condition and charging history require verification; no live battery report.':
+      note:tier==='new'?'Delivery-mileage 2026 trade allocation; registration and manufacturer warranty must be verified.':
+        fuel==='Electric'?'Battery condition and charging history require verification; no live battery report.':
         fuel==='Hybrid'||fuel==='Plug-in Hybrid'?
           'Hybrid system history and battery condition require inspection.':
           'Service, tyres, brakes and cosmetic condition require inspection.',
@@ -120,7 +134,8 @@
     const weighting=tier==='starter'?['starter']:
       tier==='modern'?['starter','modern','modern','modern']:
       tier==='premium'?['starter','modern','modern','premium','premium','premium']:
-      ['modern','premium','premium','luxury','luxury','luxury'];
+      tier==='luxury'?['modern','premium','premium','luxury','luxury','luxury']:
+      ['premium','luxury','luxury','new','new','new','new'];
     const desired=weighting[hash(group+'|'+day+'|'+index)%weighting.length];
     // Direct seller leads skew toward retailable, middle-grade cars; auctions
     // retain genuinely high-risk grade-4 bargains. Retail care can therefore
