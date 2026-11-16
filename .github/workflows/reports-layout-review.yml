@@ -1,0 +1,41 @@
+name: Management Reports desktop fold and phone visual review
+on:
+  pull_request:
+    paths:
+      - 'monthly-view.js'
+      - 'reports-polish.css'
+      - 'index.html'
+      - 'tests/reports-visual-browser.mjs'
+      - '.github/workflows/reports-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate review script
+        run: node --check tests/reports-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve actual game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/reports-layout-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Review live and archived reporting at desktop fold and phone sizes
+        run: node tests/reports-visual-browser.mjs
+      - name: Upload genuine Chromium review screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: management-reports-desktop-fold-phone
+          path: review/reports-*.png
+          retention-days: 7
+          if-no-files-found: warn
