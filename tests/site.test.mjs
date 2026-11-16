@@ -5634,3 +5634,100 @@ test('v0.9.35 one-page desktop polish is scoped to My Dealership and retains mob
   assert.match(css,/\.hq-upgrade-details summary:focus-visible/);
   assert.match(css,/@media\(max-width:560px\)/);
 });
+
+
+test('new UI careers start with one paid employee per essential role and full capital cover',()=>{
+  const storage=new Map(),app=browser(storage),E=app.productionEngine,P=E.people;
+  app.click('new-career');app.submitCareer('Fair Start Dealership');
+  const state=JSON.parse(storage.get(STORAGE_KEY));
+  assert.equal(state.cash,45000);
+  assert.equal(state.startingCapital,45000);
+  assert.equal(state.staff.length,4);
+  assert.deepEqual(state.staff.map(e=>e.role).sort(),
+    ['buyer','sales','supervisor','technician']);
+  assert.equal(new Set(state.staff.map(e=>e.name)).size,4);
+  assert.equal(state.nextStaffId,5);
+  for(const e of state.staff){
+    assert.equal(e.origin,'opening-team');
+    assert.equal(e.hiredDay,1);
+    assert.equal(e.startDay,1);
+    assert.ok(P.isActive(state,e));
+  }
+  assert.equal(state.ledger.length,0,'Founding employees do not trigger fake onboarding costs');
+  assert.equal(state.monthPlan.unitTarget,4,'Staffed dealers need a realistic unit-volume goal');
+  assert.equal(state.monthPlan.staffTargets.length,1);
+  assert.equal(state.monthPlan.staffTargets[0].unitTarget,4);
+  assert.equal(state.monthPlan.openingCash,45000);
+  assert.equal(app.bindings.get('staff-count')[0].textContent,'4');
+  assert.equal(app.bindings.get('monthly-target')[0].textContent,'0 / 4');
+  assert.equal(app.bindings.get('starting-capital')[0].textContent,'£45,000');
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
+  app.go('staff');
+  assert.match(app.nodes.get('people-board').innerHTML,/OPENING TEAM/);
+  assert.match(app.nodes.get('people-board').innerHTML,/YOUR TEAM/);
+});
+
+test('opening team has paid 30-day runway, real ledger charges, and legacy careers stay unchanged',()=>{
+  const E=browser(new Map()).productionEngine,P=E.people;
+  const s=E.createStaffed('Opening Runway Test',[]);
+  const daily=s.staff.reduce((n,e)=>n+P.dailyCost(e),0);
+  assert.equal(daily,246);
+  assert.equal(s.staff.reduce((n,e)=>n+e.monthlySalary,0),7320);
+  assert.equal(E.premises.costs(s).total,25);
+  for(let day=2;day<=30;day++){
+    s.day=day;
+    const wages=E.staffDay(s),property=E.premisesDay(s);
+    assert.equal(wages.payroll,daily);
+    assert.equal(wages.arrears,0);
+    assert.equal(property.arrears,0);
+  }
+  const expected=45000-29*(daily+25);
+  assert.equal(s.cash,expected);
+  assert.equal(s.monthPlan.openingCash,45000);
+  assert.equal(s.ledger.reduce((sum,x)=>sum+x.delta,0),s.cash-45000);
+  assert.equal(E.monthly.statement(s).operatingContribution,-29*(daily+25));
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  // Release/migration must never hand historical owner-operated players
+  // a four-person team or rewrite their original £12,500 cash basis.
+  const legacy=E.create('Historical Trader',[]);
+  assert.equal(legacy.cash,12500);
+  assert.equal(legacy.staff.length,0);
+  assert.equal(legacy.startingCapital,undefined);
+  assert.equal(E.normalize(JSON.parse(JSON.stringify(legacy))).cash,12500);
+  assert.deepEqual(E.normalize(JSON.parse(JSON.stringify(legacy))).staff,[]);
+  const invalid={...s,startingCapital:500000,cash:500000};
+  assert.equal(E.normalize(JSON.parse(JSON.stringify(invalid))),null,
+    'Players cannot inject arbitrary starting capital through the career marker');
+});
+
+test('starting staff can be expanded, trained and released with actual cash obligations',()=>{
+  const E=browser(new Map()).productionEngine,P=E.people;
+  const s=E.createStaffed('Growing Dealer Team',[]);
+  const technician=P.applicants(1).find(c=>c.role==='technician'&&
+    !s.staff.some(e=>e.name===c.name));
+  assert.ok(technician);
+  const balance=s.cash;
+  const hire=E.hireStaff(s,technician.id);
+  assert.ok(hire.ok);
+  assert.equal(s.staff.length,5);
+  assert.equal(s.staff.at(-1).startDay,2);
+  assert.equal(s.cash,balance-P.HIRING_FEE);
+  assert.equal(s.nextStaffId,6);
+  assert.equal(P.activeTeam(s,'technician').length,1,
+    'New recruit cannot work on the hiring day');
+  const nextDaily=s.staff.reduce((n,e)=>n+P.dailyCost(e),0);
+  s.day=2;
+  E.staffDay(s);E.premisesDay(s);
+  assert.equal(s.cash,balance-P.HIRING_FEE-nextDaily-25);
+  assert.equal(P.activeTeam(s,'technician').length,2);
+  const restored=E.normalize(JSON.parse(JSON.stringify(s)));
+  assert.ok(restored);
+  assert.equal(restored.staff.length,5);
+  const departed=restored.staff.find(e=>e.id===1);
+  const notice=P.dailyCost(departed)*7;
+  const cashBefore=restored.cash;
+  assert.ok(P.release(restored,departed.id).ok);
+  assert.equal(restored.cash,cashBefore-notice);
+  assert.equal(restored.staff.length,4);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(restored))));
+});
