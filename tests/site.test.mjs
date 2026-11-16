@@ -77,7 +77,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /customers\.js\?v=5/);
   assert.match(html, /vehicle-photos\.js\?v=5/);
   assert.match(html, /vehicle-market\.js\?v=2/);
-  assert.match(html, /auction-hall-view\.js\?v=2/);
+  assert.match(html, /auction-hall-view\.js\?v=3/);
   assert.match(html, /buying-desk-view\.js\?v=2/);
   assert.match(html, /stock-view\.js\?v=1/);
   assert.match(html, /finance-view\.js\?v=2/);
@@ -5762,4 +5762,58 @@ test('opening team and two purchased cars survive three quiet months without fic
   assert.equal(s.premises.arrears,0);
   assert.ok(s.cash<openingAfterStock,'Quiet periods consume cash; no invented injections');
   assert.equal(s.cash,45000+s.ledger.reduce((n,row)=>n+row.delta,0));
+});
+
+test('compact Auction Hall uses one heading and a streamlined status and fee workspace',()=>{
+  const app=browser(new Map());
+  app.click('new-career');app.submitCareer('Compact Rostrum QA');
+  app.go('auctionHall');
+  const markup=app.nodes.get('auction-hall-view').innerHTML;
+  assert.match(html,/class="career-panel auction-hall-control"/);
+  assert.match(html,/WEEKLY <em>ROSTRUM\.<\/em>/);
+  assert.doesNotMatch(html,/THE AUCTION <em>HALL/);
+  assert.doesNotMatch(markup,/<h2>AUCTION <em>HALL/);
+  assert.match(markup,/class="auction-session-marker"/);
+  assert.match(markup,/NUMBERED LOT CATALOGUE/);
+  assert.match(markup,/data-action="start-auction"/);
+  assert.match(markup,/data-action="preview-auction"/);
+  assert.match(markup,/<details class="auction-rules">/);
+  assert.match(markup,/A winning bid becomes binding/);
+  assert.ok(markup.indexOf('auction-catalogue')<markup.indexOf('auction-active-grid'));
+  assert.ok(markup.indexOf('auction-active-grid')<markup.indexOf('auction-rules'));
+  assert.ok(!markup.includes('<span>RIVAL DEALER LEADS</span></div>'),
+    'Current leader status must appear once, not in both rostrum and bid panel');
+});
+
+test('compact Auction Hall keeps settlement, history and closed-day actions accessible',()=>{
+  const app=browser(new Map()),E=app.productionEngine;
+  const s=E.createStaffed('Compact State QA',[]);
+  const lot=E.marketFor(s).auctions[0];
+  assert.ok(E.startAuction(s).ok);
+  for(let i=0;i<30&&s.auctionHall.phase==='bidding';i++){
+    const outcome=E.bidLiveAuction(s,500);
+    assert.ok(outcome.ok);
+  }
+  assert.equal(s.auctionHall.phase,'payment');
+  const AV=app.productionEngine&&app.nodes.get('auction-hall-view');
+  assert.ok(AV);
+  // Exercise the actual browser renderer in its payment state via a valid save.
+  const storage=new Map();
+  storage.set(STORAGE_KEY,JSON.stringify(s));
+  const resumed=browser(storage);resumed.click('resume');resumed.go('auctionHall');
+  const payment=resumed.nodes.get('auction-hall-view').innerHTML;
+  assert.match(payment,/PAYMENT DUE/);
+  assert.match(payment,/FINALISE PAYMENT/);
+  assert.match(payment,/HAMMER DOWN/);
+  assert.match(payment,/data-action="settle-auction"/);
+  assert.ok(E.settleAuction(s).ok);
+  const next=E.nextAuctionLot(s);
+  assert.ok(next.ok);
+  const latest=browser(new Map());
+  latest.click('new-career');latest.submitCareer('Closed Day QA');
+  latest.click('continue');
+  const closed=latest.nodes.get('auction-hall-view').innerHTML;
+  assert.match(closed,/AUCTION HOUSE CLOSED TODAY/);
+  assert.match(closed,/OPEN BUYING DESK/);
+  assert.match(closed,/<details class="auction-rules">/);
 });
