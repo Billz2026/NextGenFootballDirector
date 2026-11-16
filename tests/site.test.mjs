@@ -5215,7 +5215,8 @@ test('v0.9.31 recruitment separates employed staff, weekly candidates and role f
   const salesUI=app.nodes.get('people-board').innerHTML;
   assert.match(salesUI,/SALES EXECUTIVE/);
   assert.match(salesUI,/4 SHOWN/);
-  assert.doesNotMatch(salesUI,/VEHICLE BUYER/);
+  assert.equal((salesUI.match(/data-action="select-person"/g)||[]).length,4,
+    'Sales filter shows four applicants while the persistent team overview remains visible');
   app.click('staff-desk-role',{role:'technician'});
   const techUI=app.nodes.get('people-board').innerHTML;
   assert.match(techUI,/8 SHOWN/);
@@ -5326,7 +5327,7 @@ test('v0.9.32 staff and recruitment preserve readable skills while collapsing se
 test('v0.9.32 compact Staff & Recruitment desktop styles retain labels and responsive grid',()=>{
   assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/people-view\.js\?v=7/);
+  assert.match(html,/people-view\.js\?v=8/);
   assert.match(css,/\.career-main:has\(\[data-panel="staff"\]:not\(\[hidden\]\)\) \.career-topbar/);
   assert.match(css,/\.sd-kpis>div\{min-height:56px/);
   assert.match(css,/\.sd-person\{padding:6px 8px/);
@@ -5441,7 +5442,7 @@ test('v0.9.33 Reputation uses compact responsive layout without removing complet
   assert.match(css,/\.rep-history-preview\{display:grid/);
   assert.match(css,/@media\(max-width:760px\)/);
   assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/people-view\.js\?v=7/);
+  assert.match(html,/people-view\.js\?v=8/);
 });
 
 
@@ -6301,4 +6302,133 @@ test('Archived Management Reports stay frozen when the live month changes',()=>{
   assert.match(live,/MONTH 2 SCORECARD/);
   assert.match(live,/CURRENT CASH/);
   assert.equal(JSON.stringify(s.monthlyReports[0]),frozen);
+});
+
+test('Staff & Recruitment always identifies the complete opening team and exact payroll',()=>{
+  const app=browser(new Map()),E=app.productionEngine,P=E.people,PV=app.peopleView;
+  const state=E.createStaffed('Team Visibility QA',[]);
+  assert.match(html,/class="career-panel staff-page-control"/);
+  assert.match(html,/TEAM & <em>HIRING\.<\/em>/);
+  assert.match(html,/staff-polish\.css\?v=1/);
+  assert.doesNotMatch(html,/DEALERSHIP OPERATIONS \/ EMPLOYMENT/);
+  const desk=PV.staffDesk(state,P,{mode:'team'});
+  assert.equal(desk.mode,'team');
+  assert.equal(desk.counts.employed,4);
+  assert.equal(desk.counts.active,4);
+  assert.equal(desk.counts.daily,246);
+  assert.equal(desk.counts.monthly,7320);
+  assert.equal(desk.counts.rolesTotal,7);
+  assert.equal(desk.counts.candidates,16);
+  assert.equal(desk.counts.hireable,7);
+  assert.match(desk.html,/YOUR EMPLOYED TEAM/);
+  assert.match(desk.html,/7 CAN HIRE NOW/);
+  assert.match(desk.html,/REFRESHES GAME DAY 8/);
+  for(const employee of [
+    ['Lewis Carter','SALES EXECUTIVE','£1,550'],
+    ['Sophie Reed','VEHICLE BUYER','£1,750'],
+    ['Chloe Baker','PREP TECHNICIAN','£1,820'],
+    ['Tom Fletcher','STAFF SUPERVISOR','£2,200']
+  ]){
+    for(const text of employee)assert.ok(desk.html.includes(text),text+' should appear');
+  }
+  assert.match(desk.html,/1 \/ 4 FILLED/);
+  assert.match(desk.html,/3 VACANCIES AVAILABLE/);
+  assert.match(desk.html,/ROLE AT CAPACITY/);
+  assert.match(desk.html,/£246 \/ £7,320/);
+  assert.match(desk.html,/OPENING TEAM/);
+  assert.match(desk.html,/data-action="staff-desk-mode" data-mode="candidates"/);
+  assert.equal(state.cash,45000,'Rendering an overview never charges wages');
+  assert.equal(state.staff.length,4);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
+});
+
+test('Recruitment sorts hireable candidates first and makes blocked roles explanatory',()=>{
+  const app=browser(new Map()),E=app.productionEngine,P=E.people,PV=app.peopleView;
+  const state=E.createStaffed('Recruitment Clear QA',[]);
+  const eligible=P.applicants(state.day).filter(c=>PV.recruitStatus(state,P,c).canHire);
+  assert.equal(eligible.length,7);
+  const cheapest=eligible.sort((a,b)=>a.monthlySalary-b.monthlySalary)[0];
+  const desk=PV.staffDesk(state,P,{mode:'candidates'});
+  assert.equal(desk.selectedId,'c:'+cheapest.id,
+    'Default selected applicant must actually be recruitable');
+  assert.match(desk.html,/APPLICANTS SORTED: ELIGIBLE FIRST/);
+  assert.match(desk.html,/ONE-OFF FEE £150/);
+  assert.match(desk.html,/FULL HIRING CASH & WAGE BREAKDOWN/);
+  assert.match(desk.html,/TOTAL CASH NEEDED TO HIRE/);
+  assert.match(desk.html,/MINIMUM CASH BALANCE/);
+  assert.match(desk.html,/HIRE /);
+  assert.match(desk.html,/ALREADY EMPLOYED/);
+  assert.match(desk.html,/ROLE CAPACITY FULL/);
+  const employedCandidate=P.applicants(1).find(c=>c.name==='Lewis Carter');
+  const employed=PV.staffDesk(state,P,{mode:'candidates',selectedId:'c:'+employedCandidate.id});
+  assert.match(employed.html,/already works at your dealership/);
+  assert.match(employed.html,/CANNOT HIRE · ALREADY EMPLOYED/);
+  const blocked=PV.staffDesk(state,P,{mode:'candidates',role:'buyer'});
+  assert.equal(blocked.counts.hireable,7);
+  assert.match(blocked.html,/Only one vehicle buyer/);
+  const before=state.cash,ledger=state.ledger.length;
+  const failure=P.hire(state,employedCandidate.id);
+  assert.equal(failure.ok,false);
+  assert.equal(state.cash,before);
+  assert.equal(state.ledger.length,ledger);
+});
+
+test('Recruiting a fifth employee charges onboarding, starts next day and changes actual payroll',()=>{
+  const app=browser(new Map()),E=app.productionEngine,P=E.people,PV=app.peopleView;
+  const state=E.createStaffed('Test Recruitment Hire',[]);
+  const first=PV.staffDesk(state,P,{mode:'candidates'});
+  const candidate=P.applicants(1).find(c=>'c:'+c.id===first.selectedId);
+  assert.equal(candidate.role,'technician');
+  const pre=P.hireQuote(state,candidate);
+  assert.equal(pre.required,P.HIRING_FEE+(246+P.dailyCost(candidate))*3);
+  const before=state.cash,ledger=state.ledger.length;
+  const outcome=P.hire(state,candidate.id);
+  assert.ok(outcome.ok);
+  assert.equal(state.staff.length,5);
+  assert.equal(state.staff[4].name,candidate.name);
+  assert.equal(state.staff[4].hiredDay,1);
+  assert.equal(state.staff[4].startDay,2);
+  assert.equal(P.isActive(state,state.staff[4]),false);
+  assert.equal(state.cash,before-150);
+  assert.equal(state.ledger.length,ledger+1);
+  const team=PV.staffDesk(state,P,{mode:'team',selectedId:'e:5'});
+  assert.match(team.html,new RegExp(candidate.name));
+  assert.match(team.html,/STARTS DAY 2/);
+  assert.equal(team.counts.employed,5);
+  assert.equal(team.counts.active,4);
+  assert.equal(team.counts.daily,246+P.dailyCost(candidate));
+  state.day=2;
+  const wages=E.staffDay(state);
+  E.premisesDay(state);
+  assert.equal(P.isActive(state,state.staff[4]),true);
+  assert.equal(state.cash,before-150-team.counts.daily-25);
+  assert.equal(state.payrollArrears,0);
+  assert.equal(PV.staffDesk(state,P,{mode:'team'}).counts.active,5);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
+});
+
+test('Staff training and release decisions show real charges and still respect career-save rules',()=>{
+  const app=browser(new Map()),E=app.productionEngine,P=E.people,PV=app.peopleView;
+  const state=E.createStaffed('Staff Training QA',[]);
+  const e=state.staff[0],oldCash=state.cash;
+  const training=P.train(state,e.id);
+  assert.ok(training.ok);
+  assert.equal(state.cash,oldCash-P.TRAINING_FEE);
+  assert.equal(e.trainingUntil,3);
+  assert.equal(PV.employeeStatus(state,P,e).name,'TRAINING TO DAY 3');
+  const during=PV.staffDesk(state,P,{mode:'team',selectedId:'e:'+e.id}).html;
+  assert.match(during,/ALREADY TRAINING/);
+  assert.match(during,/AUTHORISE TRAINING[^<]*<\/button>/);
+  state.day=3;
+  assert.equal(PV.employeeStatus(state,P,e).name,'AVAILABLE');
+  const notice=P.dailyCost(e)*7;
+  const beforeRelease=state.cash;
+  assert.ok(P.release(state,e.id).ok);
+  assert.equal(state.cash,beforeRelease-notice);
+  assert.equal(state.staff.length,3);
+  assert.ok(!state.staff.some(x=>x.name===e.name));
+  const after=PV.staffDesk(state,P,{mode:'team'});
+  assert.match(after.html,/NO EMPLOYEE ASSIGNED/);
+  assert.match(after.html,/1 VACANCY AVAILABLE/);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
 });
