@@ -63,8 +63,8 @@
       '<div><small>PREVIOUS KEEPERS (SIMULATED)</small><strong>'+p.owners+'</strong></div>'+
       '<div><small>CONDITION GRADE</small><strong>'+p.grade+' / 5</strong></div>'+
       '<div><small>SERVICE HISTORY</small><strong>'+esc(car.history)+'</strong></div>'+
-      '<div><small>MOT (SIMULATED)</small><strong>'+esc(p.mot.result)+' · '+p.mot.monthsRemaining+' MONTHS LEFT</strong></div>'+
-      '<div><small>LAST RECORDED MOT MILEAGE</small><strong>'+miles(p.mot.recordedMiles)+'</strong></div>'+
+      '<div><small>MOT (SIMULATED)</small><strong>'+(p.mot.result==='NOT DUE'?'FIRST MOT NOT DUE · 36 MONTHS':esc(p.mot.result)+' · '+p.mot.monthsRemaining+' MONTHS LEFT')+'</strong></div>'+
+      '<div><small>LAST RECORDED MOT MILEAGE</small><strong>'+(p.mot.result==='NOT DUE'?'NO MOT REQUIRED YET':miles(p.mot.recordedMiles))+'</strong></div>'+
       '<div><small>LOCAL DEMAND</small><strong>'+esc(p.demand)+'</strong></div>'+
       '<div><small>RETAIL ASKING GUIDE</small><strong>'+money(p.retail)+'</strong></div></div>'+
       proof+
