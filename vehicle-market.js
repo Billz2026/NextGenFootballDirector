@@ -72,15 +72,15 @@
     ],
     // High-reputation dealer allocations. Delivery mileage, not free cars.
     new: [
-      ['2026 Vauxhall Corsa GS',45,'Petrol','Manual','1.2 Turbo 100',17100,19250,275,1,'Full'],
-      ['2026 Volkswagen Polo Life',70,'Petrol','Manual','1.0 TSI',18750,21000,275,1,'Full'],
-      ['2026 Toyota Yaris Design Hybrid',85,'Hybrid','Automatic','1.5 hybrid e-CVT',22600,25000,300,1,'Full'],
-      ['2026 Kia Sportage GT-Line',60,'Petrol','Automatic','1.6 T-GDi',30700,34300,350,1,'Full'],
-      ['2026 Tesla Model 3 RWD',40,'Electric','Automatic','Rear-wheel-drive EV',33700,37300,325,1,'Full'],
-      ['2026 BMW 320i M Sport',75,'Petrol','Automatic','2.0 turbo',40200,44900,400,1,'Full'],
-      ['2026 Mercedes-Benz A200 AMG Line',90,'Petrol','Automatic','1.3 turbo',35600,39800,375,1,'Full'],
-      ['2026 Hyundai Ioniq 5 Premium',55,'Electric','Automatic','Long-range EV',36600,41400,350,1,'Full'],
-      ['2026 Nissan Qashqai N-Connecta e-Power',95,'Hybrid','Automatic','1.5 e-Power',31800,36000,350,1,'Full']
+      ['2026 Vauxhall Corsa GS',45,'Petrol','Manual','1.2 Turbo 100',17100,19250,275,1,'Pre-delivery'],
+      ['2026 Volkswagen Polo Life',70,'Petrol','Manual','1.0 TSI',18750,21000,275,1,'Pre-delivery'],
+      ['2026 Toyota Yaris Design Hybrid',85,'Hybrid','Automatic','1.5 hybrid e-CVT',22600,25000,300,1,'Pre-delivery'],
+      ['2026 Kia Sportage GT-Line',60,'Petrol','Automatic','1.6 T-GDi',30700,34300,350,1,'Pre-delivery'],
+      ['2026 Tesla Model 3 RWD',40,'Electric','Automatic','Rear-wheel-drive EV',33700,37300,325,1,'Pre-delivery'],
+      ['2026 BMW 320i M Sport',75,'Petrol','Automatic','2.0 turbo',40200,44900,400,1,'Pre-delivery'],
+      ['2026 Mercedes-Benz A200 AMG Line',90,'Petrol','Automatic','1.3 turbo',35600,39800,375,1,'Pre-delivery'],
+      ['2026 Hyundai Ioniq 5 Premium',55,'Electric','Automatic','Long-range EV',36600,41400,350,1,'Pre-delivery'],
+      ['2026 Nissan Qashqai N-Connecta e-Power',95,'Hybrid','Automatic','1.5 e-Power',31800,36000,350,1,'Pre-delivery']
     ]
   });
   const KEYS=Object.freeze(['starter','modern','premium','luxury','new']);
