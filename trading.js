@@ -74,8 +74,10 @@
       const offset=day===1?0:nearest25((sample(day,i,91)%851)-425);
       const guide=Math.max(850,base.guide+offset);
       const delta=guide-base.guide;
-      const miles=Math.max(3500,base.miles+
-        (day===1?0:((sample(day,i,54)%250)-125)*100));
+      const miles=base.marketTier==='new'?Math.max(5,Math.min(200,
+        base.miles+((sample(day,i,54)%141)-70))):
+        Math.max(3500,base.miles+
+          (day===1?0:((sample(day,i,54)%250)-125)*100));
       const fee=base.fee+(day===1?0:25*((sample(day,i,82)%3)-1));
       return {...base,guide,reserve:base.reserve+delta,rival:base.rival+delta,
         retail:base.retail+delta,miles,fee,
@@ -86,8 +88,10 @@
       const offset=day===1?0:nearest25((sample(day,i,51)%601)-300);
       const ask=Math.max(950,base.ask+offset);
       const delta=ask-base.ask;
-      const miles=Math.max(3500,base.miles+
-        (day===1?0:((sample(day,i,44)%250)-125)*100));
+      const miles=base.marketTier==='new'?Math.max(5,Math.min(200,
+        base.miles+((sample(day,i,44)%141)-70))):
+        Math.max(3500,base.miles+
+          (day===1?0:((sample(day,i,44)%250)-125)*100));
       return {...base,ask,floor:Math.max(100,base.floor+delta),
         retail:base.retail+delta,miles,
         id:'S-'+day+'-'+i,kind:'seller',day};
@@ -721,8 +725,10 @@
     const limit=Math.max(500,Math.min(vehicle.asking-90,
       fair+Math.round(support/3)+reputationAdvantage+
       Math.round(motivation*.65)+meetingPush));
-    const start=Math.max(500,Math.min(limit,vehicle.asking-400+support+
-      motivation+meetingPush,fair-125+support+motivation+meetingPush));
+    // Leave credible negotiating room for five smaller owner/customer
+    // exchanges without exaggerating the eventual realistic sale ceiling.
+    const start=Math.max(500,Math.min(limit,vehicle.asking-650+support+
+      motivation+meetingPush,fair-525+support+motivation+meetingPush));
     const standardPx=pxTemplate(vehicle);
     const customer=state?C.caseFor(state,vehicle.id):null;
     const px=customer?
@@ -745,12 +751,12 @@
       exchange:px
     };
   }
-  function counter(state,id){
+  function counter(state,id,proposal){
     const v=own(state.vehicles,id);
     if(!v||v.status!=='listed')return fail('missing','Advertise the vehicle first.');
     const buyer=buyers(v,state);
     if(!buyer)return fail('no-buyer','No interested customer is currently available.');
-    return C.negotiate(state,v,buyer.cashOffer,buyer.cashLimit);
+    return C.negotiate(state,v,buyer.cashOffer,buyer.cashLimit,proposal);
   }
   const openCustomer=(state,id)=>C.open(state,id);
   const bookCustomer=(state,id)=>C.book(state,id);
