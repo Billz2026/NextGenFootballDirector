@@ -377,7 +377,6 @@
   function candidateDetail(state,P,c){
     const info=recruitStatus(state,P,c),q=info.quote;
     const todayCash=state.cash;
-    const currentDaily=state.staff.reduce((n,e)=>n+P.dailyCost(e),0);
     const staffDaily=P.dailyCost(c);
     const used=state.staff.filter(e=>e.role===c.role).length;
     const limit=P.roleLimit(state,c.role);
@@ -412,6 +411,18 @@
       '<div class="sd-person-detail"><div>'+skillSection(c,P)+
       '</div><div class="sd-control"><div class="sd-section-head"><h4>HIRING DECISION</h4>'+
       '<span>STARTS DAY '+(state.day+1)+'</span></div>'+
+      '<div class="sd-hire-brief"><div><small>CHARGED ON HIRE</small><strong>'+
+      gbp(P.HIRING_FEE)+'</strong></div>'+
+      '<div><small>MINIMUM CASH BALANCE</small><strong>'+gbp(q.required)+'</strong></div></div>'+
+      (q.shortfall?'<p class="sd-issue">SHORT BY '+gbp(q.shortfall)+
+        '. Increase cash before taking on this salary.</p>':'')+
+      (!info.canHire&&!q.shortfall?'<p class="sd-issue">'+esc(info.reason)+
+        '. This role or candidate cannot be hired right now.</p>':'')+
+      '<button type="button" class="trade-button sd-primary-hire" data-action="hire-staff" data-id="'+
+      esc(c.id)+'"'+(info.canHire?'':' disabled')+'>'+
+      (info.canHire?'HIRE '+esc(c.name.toUpperCase())+' · '+gbp(P.HIRING_FEE):
+        'CANNOT HIRE · '+esc(info.reason))+'</button>'+
+      '<details class="sd-hire-breakdown"><summary>FULL HIRING CASH & WAGE BREAKDOWN</summary>'+
       '<div class="sd-hire-figures">'+
       '<div><span>DEALERSHIP CASH TODAY</span><strong>'+gbp(todayCash)+'</strong></div>'+
       '<div><span>ONE-OFF ONBOARDING FEE</span><strong>'+gbp(P.HIRING_FEE)+'</strong></div>'+
@@ -423,18 +434,10 @@
         gbp(state.payrollArrears)+'</strong></div>':'')+
       '<div class="sd-required"><span>TOTAL CASH NEEDED TO HIRE · NOT THE FEE</span><strong>'+
       gbp(q.required)+'</strong></div></div>'+
-      (q.shortfall?'<p class="sd-issue">SHORT BY '+gbp(q.shortfall)+
-        '. Increase cash before taking on this salary.</p>':'')+
-      (!info.canHire&&!q.shortfall?'<p class="sd-issue">'+esc(info.reason)+
-        '. This role or candidate cannot be hired right now.</p>':'')+
-      '<button type="button" class="trade-button" data-action="hire-staff" data-id="'+
-      esc(c.id)+'"'+(info.canHire?'':' disabled')+'>'+
-      (info.canHire?'HIRE '+esc(c.name.toUpperCase())+' · '+gbp(P.HIRING_FEE):
-        'CANNOT HIRE · '+esc(info.reason))+'</button>'+
       '<p class="sd-fine">Hiring charges only the onboarding fee now. '+gbp(staffDaily)+
-      ' daily wages begin thereafter. Cash is reserved for three days of total payroll, '+
-      'existing arrears and outstanding vehicle preparation.</p>'+
-      '</div></div></div>';
+      ' daily wages begin the next game day. Three days of total payroll, '+
+      'existing arrears and outstanding vehicle preparation must remain affordable.</p>'+
+      '</details></div></div></div>';
   }
   function staffDesk(state,P,{mode=null,role='all',selectedId=null}={}){
     const counts=deskCounts(state,P);
