@@ -27,8 +27,9 @@
         '. Review price and stock age; nothing is guaranteed.</p></div>';
     }
     const rep=E.people.salesRep(state,c);
-    const who='<div class="sales-customer-meta"><span>'+esc(c.name)+'</span>'+ 
-      '<span>'+esc(c.channel)+'</span><span>'+esc(statuses[c.status])+'</span>'+ 
+    // Customer name and case status are already in the selected-case header.
+    // Keep channel and responsible adviser in the compact metadata line.
+    const who='<div class="sales-customer-meta"><span>'+esc(c.channel)+'</span>'+
       '<span>SALES ADVISER: '+esc(rep?.name||'Owner-managed')+
       (rep?' · '+Math.round(E.people.salesProfile(rep).commissionRate*100)+'% GROSS MARGIN COMMISSION':'')+
       '</span></div>';
@@ -200,7 +201,7 @@
       '<div><span>LIKELY ACHIEVED SALE</span><strong>'+cash(indicative)+'</strong></div>'+
       (c?.price!==null&&c?.price!==undefined?
         '<div class="so-figures-strong"><span>AGREED SALE PRICE</span><strong>'+cash(c.price)+'</strong></div>':'')+
-      '</div><p class="so-caveat">Valuations are fictional. An agreed price is not a completed sale until handover.</p>'+
+      '</div><p class="so-caveat">Valuations are fictional. A sale is recorded only after handover.</p>'+
       '</section><section class="so-customer"><div class="so-customer-heading">'+
       '<div><small>SALES CASE MANAGEMENT</small><h4>NEXT CUSTOMER ACTION</h4></div>'+
       (c?'<span>'+esc(c.name)+'</span>':'')+'</div>'+
@@ -220,13 +221,14 @@
     const s=snapshot(state,E),f=FILTERS.includes(filter)?filter:'all';
     const stats=E.customers.stats(state,state.monthPlan.startDay,state.day);
     const top='<div class="so-kpis">'+[
-      ['ADVERTISED VEHICLES',s.rows.length],['ACTIVE CUSTOMER CASES',s.live],
+      ['ADVERTISED VEHICLES',s.rows.length],
       ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
     ].map(([name,value])=>
       '<div><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
-      '<div class="so-activity">THIS MONTH · '+stats.enquiries+' RECORDED ENQUIRIES · '+
+      '<details class="so-activity"><summary>MONTHLY RETAIL ACTIVITY</summary>'+
+      '<p>THIS MONTH · '+stats.enquiries+' RECORDED ENQUIRIES · '+
       stats.appointments+' VIEWINGS BOOKED · '+stats.testDrives+' TEST DRIVES · '+
-      stats.completedSales+' COMPLETED HANDOVERS</div>';
+      stats.completedSales+' COMPLETED HANDOVERS</p></details>';
     if(!s.rows.length)return {selectedId:null,html:top+
       '<div class="trade-empty so-empty"><h2>NO CARS ADVERTISED.</h2>'+
       '<p>Prepare a vehicle, pass workshop quality control, then set the retail price in Vehicle Stock.</p>'+
@@ -258,7 +260,7 @@
       ' — Walk-in enquiries can change between sessions.</div>':'';
     return {selectedId:selected?.vehicle.id??null,html:top+deadline+toolbar+
       '<div class="so-layout"><aside class="so-register" aria-label="Advertised vehicle and customer cases">'+
-      '<header>ADVERTISED STOCK <span>'+filtered.length+' SHOWN</span></header>'+
+      '<header>VEHICLES <span>'+filtered.length+' SHOWN</span></header>'+
       '<div class="so-register-list">'+list+'</div></aside>'+
       (selected?details(state,E,selected):
         '<div class="so-file so-empty-filter">No selected customer case.</div>')+'</div>'+
