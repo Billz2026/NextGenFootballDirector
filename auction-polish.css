@@ -460,6 +460,10 @@
   .auction-hall-control .auction-head-metrics>div:first-child{border-left:0}
   /* Single swipeable catalogue row on narrow screens: keep the current lot
      and payment controls high without making text or buttons tiny. */
+  .auction-hall-control .auction-catalogue-head>span::after{
+    content:' · SWIPE';
+    color:#dfbf8c;
+  }
   .auction-hall-control .auction-catalogue-list{
     display:flex;
     flex-wrap:nowrap;
