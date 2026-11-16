@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="./events-polish.css?v=1">
   <link rel="stylesheet" href="./reports-polish.css?v=1">
   <link rel="stylesheet" href="./staff-polish.css?v=1">
+  <link rel="stylesheet" href="./premises-polish.css?v=1">
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -46,7 +47,7 @@
   <script src="./events-view.js?v=7" defer></script>
   <script src="./workshop-view.js?v=7" defer></script>
   <script src="./customers-view.js?v=9" defer></script>
-  <script src="./premises-view.js?v=3" defer></script>
+  <script src="./premises-view.js?v=4" defer></script>
   <script src="./auction-hall-view.js?v=3" defer></script>
   <script src="./dashboard-view.js?v=2" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
@@ -364,8 +365,8 @@
               <div id="reputation-view" class="rep-view" aria-live="polite"></div>
             </section>
 
-            <section class="career-panel" data-panel="business" hidden aria-labelledby="business-title">
-              <div class="page-heading"><div><p class="section-overline">OWNER'S OFFICE / BUSINESS OPERATIONS</p><h1 id="business-title">MY <em>DEALERSHIP.</em></h1><p>Your business identity, operating commitments and next investment decisions in one place.</p></div><button type="button" class="secondary-button hq-save" data-action="save">SAVE CAREER</button></div>
+            <section class="career-panel premises-page-control" data-panel="business" hidden aria-labelledby="business-title">
+              <header class="premises-page-heading"><div><h1 id="business-title">PREMISES & <em>FACILITIES.</em></h1><p>Space, workshop capacity, operating costs and upgrade decisions.</p></div><button type="button" class="secondary-button hq-save" data-action="save">SAVE CAREER</button></header>
               <div class="hq-identity"><div class="hq-identity-title"><small>INDEPENDENT MOTOR TRADER · STARTING CAPITAL <span data-bind="starting-capital">£45,000</span></small><h2 data-bind="company">First Lot Motors</h2><p>DEALERSHIP CAREER PROFILE</p></div><div class="hq-identity-facts">
                 <div><small>CAREER</small><strong data-bind="day-label">DAY 01</strong></div>
                 <div><small>REPUTATION</small><strong data-bind="reputation-score">5 / 100</strong></div>
