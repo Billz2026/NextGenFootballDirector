@@ -5,6 +5,7 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n);
   const D=()=>window.MotorTradeEvents;
+  const CAL=window.MotorTradeCalendar;
   function banner(state){
     const d=D();
     if(d.isDealDay(state.day)){
@@ -12,7 +13,7 @@
       return '<div class="event-banner event-deadline-banner"><div><small>FINAL DAY OF MONTH '+d.monthOf(state.day)+
         ' · '+esc(p.time)+' · '+(state.deadlineSession+1)+' OF 5</small>'+
         '<h3>DEAL DAY · '+esc(climate.label)+'</h3>'+
-        '<p>Auctions are closed. '+esc(climate.description)+
+        '<p>Month-end auction lots are open. '+esc(climate.description)+
         ' New enquiries and better terms are never guaranteed. Advance each session to check trading conditions.</p></div>'+
         '<button type="button" class="secondary-button" data-page="events">'+
         (state.deadlineSession>=d.PHASES.length-1?'CLOSE MONTH ↗':'OPEN DEAL DAY ↗')+
@@ -23,14 +24,14 @@
         d.monthOf(state.day)+(state.day===1?' · START-UP BRIEFING':' · ACTION REQUIRED')+
         '</small><h3>MONTHLY MANAGEMENT MEETING</h3><p>'+
         (state.day===1?'Set your opening priorities and review your first sales objective.':
-          'Review the last 30 days, your staff and cash position, then choose a new management focus before advancing.')+
+          'Review the last calendar month, your staff and cash position, then choose a new management focus before advancing.')+
         '</p></div><button type="button" class="secondary-button" data-page="events">ENTER MEETING ↗</button></div>';
     }
-    const days=30-state.day%30;
+    const days=CAL.dayEnd(state.day)-state.day;
     return '<div class="event-banner event-neutral-banner"><div><small>MONTHLY EVENTS</small>'+
-      '<h3>NEXT DEAL DAY IN '+days+' GAME DAYS</h3><p>On day '+
-      (Math.floor((state.day-1)/30)+1)*30+
-      ', a customer-only Deal Day takes place. The result varies: some months may be very quiet, while others are busy. No auctions run that day.</p></div>'+
+      '<h3>NEXT DEAL DAY IN '+days+' GAME DAYS</h3><p>On '+
+      esc(CAL.label(CAL.dayEnd(state.day)))+' (game day '+CAL.dayEnd(state.day)+
+      '), Deal Day and the month-end auction take place together. Enquiries and demand vary by month.</p></div>'+
       '<button type="button" class="secondary-button" data-page="events">VIEW CALENDAR ↗</button></div>';
   }
   function deadline(state){
@@ -52,7 +53,7 @@
     const next=last?'CLOSE MONTH':'NEXT SESSION';
     return '<div class="eo-desk eo-deal-day">'+
       '<header class="eo-heading"><div><small>MONTH '+d.monthOf(state.day)+
-      ' · FINAL TRADING DAY · NO AUCTIONS</small>'+
+      ' · FINAL TRADING DAY · AUCTION OPEN</small>'+
       '<h2>DEAL DAY</h2><p>'+esc(climate.label)+' · '+esc(climate.description)+'</p></div>'+
       '<div class="eo-heading-status"><span>SESSION '+(phase+1)+' / '+d.PHASES.length+
       '</span><strong>'+esc(p.time)+'</strong><small>'+esc(p.name)+'</small></div></header>'+
@@ -81,14 +82,17 @@
         ' available in this session. Check margins, prep costs and capacity.':
         'No seller leads have arrived. Another session may be different.')+
       '</p></div><button type="button" class="trade-button" data-page="auctions">'+
-      'OPEN BUYING DESK</button></section></div>'+
+      'OPEN BUYING DESK</button></section>'+
+      '<section class="eo-activity"><div><small>MONTH-END ROSTRUM</small>'+
+      '<h3>BID AT AUCTION</h3><p>Five numbered lots are open today, alongside the retail Deal Day sessions. Inspect, bid or pass without artificial timers.</p>'+
+      '</div><button type="button" class="trade-button" data-page="auctionHall">OPEN AUCTION HALL</button></section></div>'+
       '<div class="eo-next-action"><strong>NEXT: '+next+'</strong>'+
       '<span>'+(last?
         'Final chance to trade at 17:00. Close the month using the top game controls.':
         'Advance from the top game controls; this changes the session, not the game day or daily expenses.')+
       '</span></div>'+
       '<details class="eo-details"><summary>DEAL DAY RULES & SESSION EXPIRY</summary>'+
-      '<p>Auctions are closed today. Retail demand and direct-seller enquiries vary: no sales are guaranteed. '+
+      '<p>Month-end auction lots remain open in the Auction Hall. Retail demand and direct-seller enquiries vary: no sales are guaranteed. '+
       'Unresolved offers and seller leads expire when you move to the next session; paid inspection fees are not refunded. '+
       'Cash, repairs and forecourt capacity still matter. The final 17:00 session leads into month-end reporting.</p>'+
       '</details></div>';
@@ -210,7 +214,7 @@
     if(d.isDealDay(state.day))return deadline(state);
     if(d.isMeetingDay(state.day))return meeting(state);
     const month=d.monthOf(state.day);
-    const next=month*30,until=next-state.day,meetingDay=next+1;
+    const next=CAL.dayEnd(state.day),until=next-state.day,meetingDay=next+1;
     const current=state.monthPlan;
     const sold=state.sold.filter(x=>x.day>=current.startDay&&x.day<=state.day).length;
     const listed=state.vehicles.filter(x=>x.status==='listed').length;
@@ -230,7 +234,7 @@
       '<section class="eo-schedule"><div><small>UPCOMING · GAME DAY '+next+'</small>'+
       '<h3>MONTH-END DEAL DAY</h3><strong>FIVE SESSIONS · 09:00–17:00</strong>'+
       '<p>Customer and private-seller enquiries may arrive, but demand is never guaranteed. '+
-      'Auctions close on Deal Day.</p></div>'+
+      'The month-end auction is also open on this date.</p></div>'+
       '<div class="eo-schedule-foot">PREPARE: '+listed+' LISTED · '+
       preparing+' AWAITING PREPARATION</div>'+
       '<button type="button" class="trade-button" data-page="stock">CHECK VEHICLE STOCK</button></section>'+
