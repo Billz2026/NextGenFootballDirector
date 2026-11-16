@@ -580,8 +580,8 @@
       render();
       return;
     }
-    const enteringDealDay=(career.day+1)%30===0;
-    // Close the completed 30-day period BEFORE charging the next day's wage.
+    const enteringDealDay=D.isDealDay(career.day+1);
+    // Close the actual calendar month BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
     const beforeDayReputation=career.reputationScore;
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
@@ -627,7 +627,8 @@
       eventNotice = 'New inbox message received. Your game calendar has advanced by one day.';
     } else {
       eventNotice = E.auctionDay(career.day)?
-        'WEEKLY AUCTION DAY: this week’s numbered lots are open.':
+        (D.isDealDay(career.day)?'MONTH-END AUCTION: five numbered lots are open alongside Deal Day.':
+        'WEEKLY AUCTION DAY: this week’s numbered lots are open.'):
         'One game day completed. Private sellers have refreshed; next weekly auction is game day '+
           E.nextAuctionDay(career.day)+'.';
     }
@@ -1211,7 +1212,9 @@
         completeCustomerSale(Number(button.dataset.id),button.dataset.mode,null);
         break;
       case 'counter-sale':
-        if (career) saveResult(E.counter(career,Number(button.dataset.id)));
+        if(career)saveResult(E.counter(career,Number(button.dataset.id),
+          inputNumber('customer-counter-'+button.dataset.id)));
+
         break;
       case 'sell-cash':
         completeCustomerSale(Number(button.dataset.id),'cash',null);
