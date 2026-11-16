@@ -33,25 +33,26 @@
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
-  <script src="./vehicle-market.js?v=2" defer></script>
+  <script src="./vehicle-market.js?v=3" defer></script>
   <script src="./premises.js?v=1" defer></script>
   <script src="./people.js?v=8" defer></script>
-  <script src="./monthly.js?v=8" defer></script>
+  <script src="./calendar.js?v=1" defer></script>
+  <script src="./monthly.js?v=9" defer></script>
   <script src="./career-progression.js?v=1" defer></script>
-  <script src="./events.js?v=2" defer></script>
+  <script src="./events.js?v=3" defer></script>
   <script src="./workshop.js?v=4" defer></script>
-  <script src="./customers.js?v=5" defer></script>
-  <script src="./trading.js?v=20" defer></script>
+  <script src="./customers.js?v=6" defer></script>
+  <script src="./trading.js?v=21" defer></script>
   <script src="./vehicle-cards.js?v=4" defer></script>
   <script src="./vehicle-view.js?v=4" defer></script>
   <script src="./people-view.js?v=9" defer></script>
   <script src="./monthly-view.js?v=9" defer></script>
-  <script src="./events-view.js?v=7" defer></script>
+  <script src="./events-view.js?v=8" defer></script>
   <script src="./workshop-view.js?v=7" defer></script>
-  <script src="./customers-view.js?v=9" defer></script>
+  <script src="./customers-view.js?v=10" defer></script>
   <script src="./premises-view.js?v=4" defer></script>
-  <script src="./auction-hall-view.js?v=3" defer></script>
-  <script src="./dashboard-view.js?v=2" defer></script>
+  <script src="./auction-hall-view.js?v=4" defer></script>
+  <script src="./dashboard-view.js?v=3" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
   <script src="./buying-desk-view.js?v=3" defer></script>
   <script src="./stock-view.js?v=2" defer></script>
@@ -61,7 +62,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=37" defer></script>
+  <script src="./simulator.js?v=38" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -69,7 +70,7 @@
   <div class="top-stripe" aria-hidden="true"></div>
   <div id="app" role="main">
     <section class="menu-screen" id="screen-menu" aria-labelledby="menu-title">
-      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.39</span></header>
+      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.40</span></header>
       <div class="menu-layout">
         <div class="menu-lead">
           <div class="brand-lockup brand-lockup-large">
@@ -260,8 +261,8 @@
                   <small data-bind="reputation">NEW TRADER</small>
                 </button>
                 <button type="button" class="stat-tile dashboard-kpi" data-page="auctionHall" aria-label="Open weekly auction calendar">
-                  <span>WEEKLY AUCTION</span><strong data-bind="dashboard-auction">DAY 01</strong>
-                  <small data-bind="dashboard-auction-note">Monday · auction available</small>
+                  <span>NEXT AUCTION</span><strong data-bind="dashboard-auction">DAY 01</strong>
+                  <small data-bind="dashboard-auction-note">Next Monday or month-end sale</small>
                 </button>
               </div>
 
@@ -310,7 +311,7 @@
             </section>
 
             <section class="career-panel auction-hall-control" data-panel="auctionHall" hidden aria-labelledby="auction-hall-title">
-              <header class="auction-page-heading"><div><h1 id="auction-hall-title">WEEKLY <em>ROSTRUM.</em></h1><p>Review each vehicle, assess the full cost and bid with confidence.</p></div><span class="career-chip">ONE LOT AT A TIME</span></header>
+              <header class="auction-page-heading"><div><h1 id="auction-hall-title">AUCTION <em>ROSTRUM.</em></h1><p>Review each vehicle, assess the full cost and bid with confidence.</p></div><span class="career-chip">ONE LOT AT A TIME</span></header>
               <div id="auction-hall-view" aria-live="polite"></div>
             </section>
 
@@ -355,7 +356,7 @@
             <section class="career-panel reports-page-control" data-panel="reports" hidden aria-labelledby="reports-title">
               <header class="reports-page-heading"><div><h1 id="reports-title">MANAGEMENT <em>REPORTS.</em></h1><p>Monthly targets, trading results, cash and operational risks.</p></div></header>
               <div id="monthly-report-view" class="mr-control" aria-live="polite"></div>
-              <details class="mr-guide"><summary>HOW MONTHLY TARGETS AND ARCHIVED REPORTS WORK</summary><p>Sales targets are set at the start of each 30-day game month. Success requires the unit sales target and positive operating contribution after staff and premises costs. Salesperson targets adjust for tenure. Completed reports remain archived in your saved career, and are not recalculated from the live business.</p></details>
+              <details class="mr-guide"><summary>HOW MONTHLY TARGETS AND ARCHIVED REPORTS WORK</summary><p>Sales targets are set at the start of each real calendar month; the first partial month begins on 9 November 2026. Success requires the unit sales target and positive operating contribution after staff and premises costs. Salesperson targets adjust for tenure. Completed reports remain archived in your saved career, and are not recalculated from the live business.</p></details>
             </section>
 
             <section class="career-panel staff-page-control" data-panel="staff" hidden aria-labelledby="staff-title">
