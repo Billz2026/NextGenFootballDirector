@@ -1,0 +1,41 @@
+name: Staff roster recruitment and payroll browser review
+on:
+  pull_request:
+    paths:
+      - 'people-view.js'
+      - 'staff-polish.css'
+      - 'index.html'
+      - 'tests/staff-visual-browser.mjs'
+      - '.github/workflows/staff-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  staff-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate test syntax
+        run: node --check tests/staff-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve actual game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/staff-browser-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Verify named employees real recruitment and desktop fold phone layouts
+        run: node tests/staff-visual-browser.mjs
+      - name: Upload genuine Chromium screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: staff-recruitment-desktop-fold-phone
+          path: review/staff-*.png
+          retention-days: 7
+          if-no-files-found: warn
