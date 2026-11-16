@@ -39,7 +39,9 @@
     const age=vehicles.filter(v=>v.status==='listed'&&state.day-v.acquiredDay>=14).length;
     const auctionOpen=E.auctionDay(state.day)&&state.auctionHall?.phase!=='finished';
     const auctionDay=auctionOpen?state.day:E.nextAuctionDay(state.day);
-    const auctionWeekday=(auctionDay-1)%7===0?'MON':'TUE';
+    const auctionWeekday=window.MotorTradeCalendar.date(auctionDay).toLocaleDateString('en-GB',
+      {weekday:'short',timeZone:'UTC'}).toUpperCase();
+    const auctionKind=events.isDealDay(auctionDay)?'MONTH-END':'WEEKLY';
     const daysToGo=Math.max(0,state.monthPlan.endDay-state.day);
     const unitsLeft=Math.max(0,report.targetUnits-report.soldUnits);
     const tasks=[];
@@ -103,7 +105,7 @@
         daysToGo+' game day'+(daysToGo===1?'':'s')+' remaining. The operating contribution must also be positive.',
         'reports','REVIEW TARGET','attention');
     if(auctionOpen&&state.auctionHall?.phase!=='payment')
-      add(12,'auction-live','Weekly auction session is open',
+      add(12,'auction-live',auctionKind==='MONTH-END'?'Month-end auction is open':'Weekly auction session is open',
         'Review numbered lots and bidding limits before purchasing.',
         'auctionHall','ENTER AUCTION');
     if(tasks.length<3&&booked)
@@ -121,7 +123,7 @@
        auctionDay>state.day&&state.auctionHall?.phase!=='payment'){
       const gap=auctionDay-state.day;
       add(14,'next-auction','Prepare for Day '+auctionDay+' auction',
-        (auctionWeekday==='TUE'?'Tuesday':'Monday')+' session in '+gap+
+        (auctionKind==='MONTH-END'?'Month-end':auctionWeekday==='MON'?'Monday':auctionWeekday)+' auction session in '+gap+
           ' game day'+(gap===1?'':'s')+'. Plan your maximum bid, fees and repair budget.',
         'auctionHall','VIEW AUCTION SCHEDULE');
     }
@@ -129,7 +131,7 @@
     return {
       day:state.day,report,listed,awaitingPrep,unassessed,prepared,booked,unread,
       reserved,arrears,age,unitsLeft,daysToGo,auctionOpen,auctionDay,
-      auctionWeekday,tasks:tasks.slice(0,3)
+      auctionWeekday,auctionKind,tasks:tasks.slice(0,3)
     };
   }
   function priorities(model){
