@@ -355,28 +355,47 @@
 }
 @media(max-width:760px){
   .stock-page-control .stock-page-heading h1{font-size:27px}
+  /* Compact three-item mobile status bar rather than two stacked rows. */
   .stock-page-control .stock-kpi-strip{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
   .stock-page-control .stock-kpi{
-    min-height:44px;padding:7px 8px;
+    min-height:49px;align-items:flex-start;
+    flex-direction:column;justify-content:center;
+    gap:3px;padding:6px 7px;
+    border-top:0;
   }
-  .stock-page-control .stock-kpi:nth-child(2){border-right:0}
+  .stock-page-control .stock-kpi:nth-child(2){border-right:1px solid #37505a}
   .stock-page-control .stock-kpi:nth-child(3){
-    grid-column:1/-1;
-    border-top:1px solid #37505a;
-    border-right:0;
+    grid-column:auto;border-right:0;border-top:0;
   }
-  .stock-page-control .stock-kpi strong{font-size:19px}
-  .stock-page-control .stock-toolbar{padding:7px 9px}
-  .stock-page-control .stock-toolbar-heading strong{font-size:14px}
-  .stock-page-control .stock-filters{width:100%;gap:5px}
+  .stock-page-control .stock-kpi small{font-size:8px;line-height:1.25}
+  .stock-page-control .stock-kpi strong{font-size:17px;line-height:1.1}
+  .stock-page-control .stock-toolbar{padding:5px 7px}
+  .stock-page-control .stock-toolbar-heading{display:none}
+  .stock-page-control .stock-filters{
+    width:100%;display:flex;flex-wrap:nowrap;
+    gap:5px;overflow-x:auto;scrollbar-width:thin;
+    overscroll-behavior-x:contain;
+  }
   .stock-page-control .stock-filters button{
-    flex:1 1 auto;min-height:33px;
-    padding:6px;font-size:8px;
+    flex:0 0 auto;min-height:32px;
+    padding:6px 8px;font-size:8px;
   }
-  .stock-page-control .stock-register-title{min-height:32px;padding:7px 10px}
-  .stock-page-control .stock-unit{flex-basis:235px}
+  .stock-page-control .stock-register-title{display:none}
+  .stock-page-control .stock-register-list{
+    min-height:70px;
+  }
+  .stock-page-control .stock-unit{
+    flex:0 0 210px;min-height:68px;
+    grid-template-columns:1fr;
+    gap:3px;padding:7px 9px;
+  }
+  .stock-page-control .stock-unit-thumb{display:none}
+  .stock-page-control .stock-unit-kicker{display:none}
+  .stock-page-control .stock-unit-select>strong{font-size:13px}
+  .stock-page-control .stock-unit-bottom{margin-top:0}
+  .stock-page-control .stock-unit-cost{font-size:8px}
   .stock-page-control .stock-dossier-grid{
     display:flex;flex-direction:column;
   }
@@ -386,6 +405,18 @@
   .stock-page-control .stock-dossier-vehicle{
     order:1;width:100%;
     border-right:0;border-top:1px solid #39515c;border-bottom:0;
+  }
+  .stock-page-control .stock-finance-heading h3{margin:0 0 6px;font-size:15px}
+  .stock-page-control .stock-finance-summary{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;
+  }
+  .stock-page-control .stock-finance-summary>div{padding:7px}
+  .stock-page-control .stock-finance-summary small{font-size:8px;line-height:1.3}
+  .stock-page-control .stock-finance-summary strong{font-size:17px}
+  .stock-page-control .stock-finance-summary>.stock-summary-contribution{
+    grid-column:auto;display:flex;
+    flex-direction:column;align-items:flex-start;
+    justify-content:space-between;gap:4px;
   }
   .stock-page-control .stock-dossier-vehicle .vehicle-photo-frame{
     height:205px;
@@ -402,11 +433,9 @@
   .stock-page-control .stock-page-heading p{font-size:10px}
   .stock-page-control .stock-kpi small{font-size:8px}
   .stock-page-control .stock-kpi strong{font-size:18px}
-  .stock-page-control .stock-unit{flex-basis:223px}
-  .stock-page-control .stock-finance-summary strong{font-size:21px}
-  .stock-page-control .stock-finance-summary>.stock-summary-contribution{
-    align-items:flex-start;flex-direction:column;gap:4px;
-  }
+  .stock-page-control .stock-unit{flex-basis:195px}
+  .stock-page-control .stock-finance-summary strong{font-size:16px}
+  .stock-page-control .stock-finance-summary small{font-size:7px}
   .stock-page-control .stock-price-action{grid-template-columns:minmax(0,1fr) auto}
   .stock-page-control .stock-price-action .trade-button{
     white-space:normal;max-width:150px;
