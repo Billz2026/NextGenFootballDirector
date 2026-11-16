@@ -63,14 +63,14 @@
     const fair=vehicle.profile?.likelySale||vehicle.retail;
     const overpriced=Math.max(0,(vehicle.asking-fair)/Math.max(fair,1));
     const grade=vehicle.profile?.grade||3;
-    let percent=65-Math.round(overpriced*100)-(grade>=4?12:0)+
+    let percent=82-Math.round(overpriced*100)-(grade>=4?12:0)+
       Math.floor(state.reputationScore/8)+P.salesImpact(state,vehicle.id).enquiryLift;
     if(D.isDealDay(state.day)){
       const c=D.outlook(state);
       percent+=c.type==='quiet'?-13:c.type==='subdued'?-5:
         c.type==='busy'?9:c.type==='exceptional'?13:0;
     }
-    return chance('buyer|'+leadKey(state,vehicle),clamp(percent,8,91));
+    return chance('buyer|'+leadKey(state,vehicle),clamp(percent,20,96));
   }
   function open(state,id){
     const vehicle=state.vehicles.find(v=>v.id===id);
@@ -81,14 +81,18 @@
     const mode=hash('mode|'+key)%100;
     const preferPX=mode<38&&
       (!D.isDealDay(state.day)||D.partExchangeAvailable(state,vehicle));
-    const walkIn=D.isDealDay(state.day);
+    // Most retail leads now walk into the showroom in person, not only
+    // during month-end events. Traffic remains seeded per vehicle and day.
+    const walkIn=D.isDealDay(state.day)||
+      chance('walk-in|'+key,65);
     const c={
       id:'C-'+state.day+'-'+slot(state)+'-'+vehicle.id+'-'+
         (hash('lead-identity|'+key)%1000000),
       vehicleId:id,createdDay:state.day,createdSession:slot(state),
       name:FIRST[hash('first|'+key)%FIRST.length]+' '+
         LAST[hash('last|'+key)%LAST.length],
-      channel:walkIn?'MONTH-END WALK-IN':(hash('channel|'+key)%2?'ONLINE':'TELEPHONE'),
+      channel:walkIn?(D.isDealDay(state.day)?'MONTH-END WALK-IN':'SHOWROOM WALK-IN'):
+        (hash('channel|'+key)%2?'ONLINE':'TELEPHONE'),
       status:walkIn?'arrived':'enquiry',preferredMode:preferPX?'part-ex':'cash',
       appointmentDay:null,agreedDay:null,price:null,allowance:null,
       collectionDay:null,held:0,counters:0,reason:'',
@@ -99,19 +103,19 @@
     vehicle.cashOffer=null;
     append(state,c,'enquiry',c.channel);
     return ok(c.name+' contacted the dealership about '+vehicle.title+
-      (walkIn?'. The customer is here now for a viewing.':
+      (walkIn?'. The customer has walked into the showroom, asked about the asking price and is ready for a viewing and test drive.':
         '. Book a viewing before proceeding to a test drive.'));
   }
   function book(state,id){
     const c=caseFor(state,id);
     if(!c||c.status!=='enquiry')return fail('stage','A new enquiry is required to book a viewing.');
-    // A normal viewing must take place within 48 game-hours.
-    c.appointmentDay=state.day+1+
-      (P.salesImpact(state,c).fastViewing?0:hash('appointment|'+c.id)%2);
+    // Appointment is fixed for the next game day (within 24 hours).
+    // It is not a reservation; the car remains available for sale.
+    c.appointmentDay=state.day+1;
     c.status='booked';
     append(state,c,'appointment','Day '+c.appointmentDay);
     return ok(c.name+' has booked a viewing for day '+c.appointmentDay+
-      ' (within 48 game-hours). No deposit was paid: the vehicle stays advertised and available to other buyers.');
+      ' (within 24 game-hours). No deposit was paid: the vehicle stays advertised and available to other buyers.');
   }
   function competingInterest(state,id){
     const c=caseFor(state,id),vehicle=state.vehicles.find(v=>v.id===id);
@@ -128,17 +132,11 @@
   }
   function attendBooked(state,c,notices){
     if(state.day<c.appointmentDay)return;
-    // A short-notice viewing is a much stronger indicator of intent.
-    const turnsUp=chance('show|'+c.id,clamp(96+Math.floor(state.reputationScore/15)+
-      P.salesImpact(state,c).arrivalLift,90,99));
-    if(turnsUp){
-      c.status='arrived';
-      append(state,c,'arrived','Attended appointment within 48 game-hours');
-      if(notices)notices.push(c.name+' arrived for the viewing of stock '+c.vehicleId+'.');
-    }else{
-      const detail=failCase(state,c,'no-show','Customer failed to attend their appointment.');
-      if(notices)notices.push(detail);
-    }
+    // A confirmed showroom appointment is honoured. The customer arrives
+    // for their test drive; the outcome of the drive remains uncertain.
+    c.status='arrived';
+    append(state,c,'arrived','Attended next-day appointment within 24 game-hours');
+    if(notices)notices.push(c.name+' arrived for the booked viewing and test drive of stock '+c.vehicleId+'.');
   }
   function restoreBooked(state,c,notices){
     if(!c.standby)return false;
@@ -199,35 +197,47 @@
     c.status='discussing';
     return ok(c.name+' completed a satisfactory test drive. You can now discuss cash or part-exchange terms.');
   }
-  function negotiate(state,vehicle,current,limit){
+  function negotiate(state,vehicle,current,limit,proposal){
     const c=caseFor(state,vehicle.id);
-    if(!c||c.status!=='discussing')return fail('stage','A completed test drive is required before negotiations.');
-    if(c.counters>=2)return fail('limit','This customer will not consider another counteroffer.');
-    const next=current+150;
-    c.counters++;
-    if(next>limit){
-      append(state,c,'counter-rejected','Beyond customer budget');
-      return {ok:false,changed:true,code:'rejected',message:c.name+
-        ' cannot increase their offer beyond their budget.'};
+    if(!c||c.status!=='discussing')
+      return fail('stage','A completed test drive is required before negotiations.');
+    if(c.counters>=5)return fail('limit','Five negotiation rounds completed. Agree the latest offer or let the customer leave.');
+    const requested=proposal===undefined?Math.min(vehicle.asking-25,current+100):proposal;
+    if(!ints(requested)||requested<=current||requested>vehicle.asking||requested>100000)
+      return fail('offer','Enter a counter price above the current offer and no higher than your advertised price.');
+    const round=++c.counters;
+    const difference=requested-current;
+    const room=Math.max(0,limit-current);
+    const affordable=requested<=limit;
+    // Persistent, seeded buyer personality: reasonable requests are more
+    // likely to be accepted; rejected requests can prompt a smaller counter.
+    const chanceToAccept=clamp(89-Math.floor(difference/12)-
+      (round-1)*4+P.salesImpact(state,c).counterLift+
+      (state.reputationScore>=40?5:0),20,92);
+    if(affordable&&chance('negotiation-accept|'+c.id+'|'+round+'|'+requested,chanceToAccept)){
+      vehicle.cashOffer=requested;
+      append(state,c,'counter-accepted','Round '+round+': agreed £'+requested);
+      return ok(c.name+' accepts your £'+requested.toLocaleString('en-GB')+
+        ' counteroffer (round '+round+' of 5). You can agree the sale or negotiate further.');
     }
-    const receptive=chance('counter|'+c.id+'|'+c.counters,
-      clamp(82+(state.reputationScore>=40?6:0)-(c.counters-1)*12+
-      P.salesImpact(state,c).counterLift,35,96));
-    if(!receptive){
-      const walk=chance('walk|'+c.id+'|'+c.counters,25);
-      append(state,c,'counter-rejected',walk?'Customer walked away':'Customer declined increase');
-      if(walk){
-        c.status='lost';
-        c.reason='Customer walked away after a counteroffer.';
-        restoreBooked(state,c);
-      }
-      return {ok:false,changed:true,code:walk?'walked':'rejected',
-        message:c.name+(walk?' walked away after the higher counteroffer.':
-          ' declined the increase. Their last offer remains available.')};
+    const concession=room>=25?Math.min(room,
+      Math.max(25,Math.floor((Math.min(difference,room)*.55)/25)*25)):0;
+    if(concession>=25){
+      const revised=current+concession;
+      vehicle.cashOffer=revised;
+      append(state,c,'counter-rejected','Round '+round+': requested £'+requested+
+        ', buyer counters £'+revised);
+      return {ok:true,changed:true,message:c.name+' cannot meet £'+
+        requested.toLocaleString('en-GB')+' but counters at £'+
+        revised.toLocaleString('en-GB')+' (round '+round+' of 5).'+
+        (round===5?' This is their final offer.':' You may counter again or accept.')};
     }
-    vehicle.cashOffer=next;
-    append(state,c,'counter-accepted','Increase of £150');
-    return ok(c.name+' has agreed to increase the cash offer to £'+next+'.');
+    append(state,c,'counter-rejected','Round '+round+': declined £'+requested);
+    return {ok:false,changed:true,code:'rejected',
+      message:c.name+' declines £'+requested.toLocaleString('en-GB')+
+        ' and holds at £'+current.toLocaleString('en-GB')+
+        ' (round '+round+' of 5).'+
+        (round===5?' Final offer reached.':' You can make another proposal or accept the current price.')};
   }
   function agree(state,id,mode,price,allowance,exchange){
     const c=caseFor(state,id);
@@ -423,7 +433,7 @@
         c[k]===null||(no(c[k],36505)&&c[k]>=c.createdDay))&&
       ['price','allowance'].every(k=>c[k]===null||no(c[k]))&&
       no(c.held,250)&&[0,250].includes(c.held)&&
-      no(c.counters,2)&&typeof c.reason==='string'&&c.reason.length<200&&
+      no(c.counters,5)&&typeof c.reason==='string'&&c.reason.length<200&&
       (c.exchange===null||(c.exchange&&typeof c.exchange==='object'&&
         typeof c.exchange.title==='string'&&no(c.exchange.ask)&&no(c.exchange.floor)))&&
       (!['reserved','collectable'].includes(c.status)||c.held===250)&&
@@ -471,6 +481,9 @@
       [key,{...c,terms:saved.version>=9?c.terms:'legacy-refundable',
         prepCost:saved.version>=9?c.prepCost:0,
         exchange:c.exchange?{...c.exchange}:null,
+        appointmentDay:saved.version<15&&c.status==='booked'?
+          Math.max(state.day,Math.min(c.appointmentDay??(c.createdDay+1),c.createdDay+1)):
+          c.appointmentDay,
         standby:c.standby?{...c.standby,standby:null}:null}]));
     state.customerHistory=history.map(h=>({...h}));
     state.customerFunds=existingFunds.map(v=>({...v}));
