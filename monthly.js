@@ -6,10 +6,12 @@
  */
 (() => {
   const PERIOD=30, HISTORY_LIMIT=120;
+  const CAL=window.MotorTradeCalendar;
+  if(!CAL)throw new Error('calendar.js must load before monthly.js');
   const unitBase=score=>score>=80?6:score>=60?5:score>=40?4:score>=20?3:2;
   const money=n=>Math.round(n/100)*100;
-  const dayStart=day=>Math.floor((day-1)/PERIOD)*PERIOD+1;
-  const monthOf=day=>Math.floor((day-1)/PERIOD)+1;
+  const dayStart=CAL.dayStart;
+  const monthOf=CAL.monthOf;
   const whole=n=>Number.isSafeInteger(n);
   const sum=(list,field)=>list.reduce((n,item)=>n+item[field],0);
   const limit=(n,min,max)=>Math.max(min,Math.min(max,n));
@@ -44,15 +46,15 @@
       .reduce((n,x)=>n+x.delta,0);
     return state.cash-movements;
   }
-  function plan(state,{migrating=false}={}){
-    const start=migrating?state.day:dayStart(state.day);
-    const end=dayStart(state.day)+PERIOD-1;
+  function plan(state,{migrating=false,startOverride=null}={}){
+    const start=migrating?(startOverride??state.day):dayStart(state.day);
+    const end=CAL.dayEnd(state.day);
     const days=end-start+1;
     const baseline=targetFor(state.reputationScore,days);
     // An established four-person payroll needs a stronger volume goal than
     // an owner-operated microdealer. This remains a *unit* target, not a
     // guarantee of operating profit (reported separately).
-    const staffingTarget=Math.ceil(Math.min(4,(state.staff||[]).length)*days/PERIOD);
+    const staffingTarget=Math.min(4,Math.ceil(Math.min(4,(state.staff||[]).length)*days/PERIOD));
     const unitTarget=Math.max(baseline.unitTarget,staffingTarget);
     const factor=unitTarget/baseline.unitTarget;
     const target=unitTarget===baseline.unitTarget?baseline:{
@@ -156,7 +158,7 @@
     const operatingContribution=grossMargin-payrollCost-premisesExpense;
     const met=saleCount>=p.unitTarget && grossMargin>0&&operatingContribution>0;
     const report={
-      month:p.month,monthLabel:'MONTH '+p.month,
+      month:p.month,monthLabel:CAL.monthLabel(state.day).toUpperCase(),
       startDay:p.startDay,endDay:p.endDay,partial:p.partial,
       startingReputation:p.startingReputation,
       closingReputation:state.reputationScore,
@@ -255,12 +257,15 @@
     state.monthPlan=plan(state);
   }
   const nonneg=n=>whole(n)&&n>=0&&n<=100000000;
-  function validPlan(p,day){
+  function validPlan(p,day,{legacy=false}={}){
+    const first=legacy?Math.floor((day-1)/PERIOD)*PERIOD+1:dayStart(day);
+    const last=legacy?first+PERIOD-1:CAL.dayEnd(day);
+    const month=legacy?Math.floor((day-1)/PERIOD)+1:monthOf(day);
     return p&&typeof p==='object'&&!Array.isArray(p)&&
-      whole(p.month)&&p.month===monthOf(day)&&
-      whole(p.startDay)&&p.startDay>=dayStart(day)&&p.startDay<=day&&
-      whole(p.endDay)&&p.endDay===dayStart(day)+PERIOD-1&&
-      whole(p.standardStartDay)&&p.standardStartDay===dayStart(day)&&
+      whole(p.month)&&p.month===month&&
+      whole(p.startDay)&&p.startDay>=first&&p.startDay<=day&&
+      whole(p.endDay)&&p.endDay===last&&
+      whole(p.standardStartDay)&&p.standardStartDay===first&&
       typeof p.partial==='boolean'&&p.partial===(p.startDay!==p.standardStartDay)&&
       whole(p.openingCash)&&p.openingCash>=0&&p.openingCash<=100000000&&
       whole(p.startingReputation)&&p.startingReputation>=0&&p.startingReputation<=100&&
@@ -270,7 +275,7 @@
       p.staffTargets.every(s=>s&&whole(s.id)&&s.id>0&&
         typeof s.name==='string'&&s.name.length<60&&s.role==='sales'&&
         whole(s.startDay)&&s.startDay>=p.startDay&&s.startDay<=p.endDay+1&&
-        whole(s.expectedDays)&&s.expectedDays>=0&&s.expectedDays<=30&&
+        whole(s.expectedDays)&&s.expectedDays>=0&&s.expectedDays<=31&&
         whole(s.unitTarget)&&s.unitTarget>=0&&s.unitTarget<=6)&&
       new Set(p.staffTargets.map(x=>x.id)).size===p.staffTargets.length;
   }
@@ -324,7 +329,7 @@
       initialize(state,{migrating:true});
       return true;
     }
-    if(!validPlan(saved.monthPlan,state.day)||
+    if(!validPlan(saved.monthPlan,state.day,{legacy:saved.version<15})||
       !Array.isArray(saved.monthlyReports)||
       saved.monthlyReports.length>HISTORY_LIMIT||
       !saved.monthlyReports.every(validReport))return false;
@@ -332,8 +337,14 @@
     const cashSince=state.ledger.filter(l=>l.day>=p.startDay&&l.day<=state.day)
       .reduce((n,l)=>n+l.delta,0);
     if(p.openingCash+cashSince!==state.cash)return false;
-    state.monthPlan=JSON.parse(JSON.stringify(p));
     state.monthlyReports=JSON.parse(JSON.stringify(saved.monthlyReports));
+    if(saved.version<15){
+      // Legacy 30-day plans can cross calendar boundaries. Preserve actual
+      // transactions and archived reports; rebuild the current partial
+      // calendar month from its first tracked day without guessing past cash.
+      const start=Math.max(p.startDay,CAL.dayStart(state.day));
+      state.monthPlan=plan(state,{migrating:true,startOverride:start});
+    }else state.monthPlan=JSON.parse(JSON.stringify(p));
     return true;
   }
   window.MotorTradeMonthly=Object.freeze({
