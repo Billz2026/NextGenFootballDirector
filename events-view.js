@@ -83,9 +83,9 @@
       '</p></div><button type="button" class="trade-button" data-page="auctions">'+
       'OPEN BUYING DESK</button></section></div>'+
       '<div class="eo-next-action"><strong>NEXT: '+next+'</strong>'+
-      '<span>Use the top-right '+next+' control. '+
-      (last?'The 17:00 session is the final chance to trade before the month closes.':
-        'The next session changes the clock, not the game day or daily expenses.')+
+      '<span>'+(last?
+        'Final chance to trade at 17:00. Close the month using the top game controls.':
+        'Advance from the top game controls; this changes the session, not the game day or daily expenses.')+
       '</span></div>'+
       '<details class="eo-details"><summary>DEAL DAY RULES & SESSION EXPIRY</summary>'+
       '<p>Auctions are closed today. Retail demand and direct-seller enquiries vary: no sales are guaranteed. '+
@@ -219,7 +219,7 @@
     return '<div class="eo-desk eo-calendar"><header class="eo-heading">'+
       '<div><small>MANAGEMENT DIARY · MONTH '+month+
       '</small><h2>UPCOMING EVENTS</h2>'+
-      '<p>Two fixed milestones every 30-game-day operating month.</p></div>'+
+      '<p>Plan ahead for the next two required milestones.</p></div>'+
       '<span class="eo-heading-chip">NORMAL TRADING</span></header>'+
       '<div class="eo-kpis">'+
       '<div><small>DAYS UNTIL DEAL DAY</small><strong>'+until+'</strong></div>'+
@@ -229,14 +229,14 @@
       '</div><div class="eo-calendar-grid">'+
       '<section class="eo-schedule"><div><small>UPCOMING · GAME DAY '+next+'</small>'+
       '<h3>MONTH-END DEAL DAY</h3><strong>FIVE SESSIONS · 09:00–17:00</strong>'+
-      '<p>Five sessions from 09:00 to 17:00. Buyers and private sellers may appear, '+
-      'but demand is never guaranteed. Auction houses are closed on Deal Day.</p></div>'+
+      '<p>Customer and private-seller enquiries may arrive, but demand is never guaranteed. '+
+      'Auctions close on Deal Day.</p></div>'+
       '<div class="eo-schedule-foot">PREPARE: '+listed+' LISTED · '+
       preparing+' AWAITING PREPARATION</div>'+
       '<button type="button" class="trade-button" data-page="stock">CHECK VEHICLE STOCK</button></section>'+
       '<section class="eo-schedule"><div><small>NEXT MONTH · GAME DAY '+meetingDay+'</small>'+
       '<h3>MONTHLY BOARD MEETING</h3><strong>REVIEW & SET THE NEXT PRIORITY</strong>'+
-      '<p>The first day of the next month is for reviewing results and choosing a sales, buying or customer-care focus.</p></div>'+
+      '<p>Review trading results and select a new sales, buying or customer-care priority before trading continues.</p></div>'+
       '<div class="eo-schedule-foot">CURRENT PRIORITY: '+
       esc(focus?.label||'NOT YET SELECTED')+'</div>'+
       '<button type="button" class="trade-button" data-page="reports">REVIEW MONTHLY REPORT</button></section>'+
