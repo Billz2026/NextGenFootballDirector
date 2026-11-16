@@ -84,7 +84,9 @@
         'TRAINING UNTIL DAY '+employee.trainingUntil:
         active?(assigned?'ASSIGNED TO STOCK '+assigned.id:'AVAILABLE'):'UNAVAILABLE';
       return '<article class="people-card">'+header(employee)+
-        '<div class="people-meta"><span>'+esc(status)+'</span>'+
+        '<div class="people-meta">'+
+        (employee.origin==='opening-team'?'<span>OPENING TEAM</span>':'')+
+        '<span>'+esc(status)+'</span>'+
         '<span>MORALE '+employee.morale+'/100</span>'+
         '<span>'+employee.deals+' DEALS · '+employee.workDone+' PREP JOBS</span></div>'+
         '<div class="people-traits">'+traits[employee.role].map(([a,k])=>bar(a,employee.skills[k])).join('')+'</div>'+
