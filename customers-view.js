@@ -16,11 +16,15 @@
     const C=E.customers,c=C.caseFor(state,vehicle.id),id=vehicle.id;
     if(!c){
       const interest=C.demand(state,vehicle);
+      const walkIn=interest&&C.walkInInterest(state,vehicle);
       return interest?
-        '<div class="sales-case-highlight"><strong>CONTACT POTENTIAL BUYER</strong>'+
-        '<p>A potential buyer is interested in this vehicle. Contact them to log an enquiry and establish their requirements.</p>'+
+        '<div class="sales-case-highlight"><strong>'+
+        (walkIn?'CUSTOMER AT THE SHOWROOM':'NEW BUYER ENQUIRY')+'</strong>'+
+        '<p>'+(walkIn?
+          'A customer has arrived to ask about this car and its advertised price. Welcome them in, arrange the test drive and negotiate.':
+          'A potential buyer has contacted the dealership. Register the enquiry and book a viewing within 24 hours.')+'</p>'+
         '<button type="button" class="trade-button" data-action="open-customer" data-id="'+id+
-        '">CONTACT BUYER / OPEN ENQUIRY →</button></div>':
+        '">'+(walkIn?'WELCOME SHOWROOM CUSTOMER':'CONTACT BUYER / OPEN ENQUIRY')+' →</button></div>':
         '<div class="sales-case-quiet"><strong>NO ACTIVE RETAIL ENQUIRIES</strong>'+
         '<p>No customer wants to proceed with this particular car right now. Interest may change on another game day'+
         (E.events.isDealDay(state.day)?' or Deal Day session':'')+
@@ -145,7 +149,8 @@
   function lead(state,v,E){
     const c=E.customers.caseFor(state,v.id),available=!c&&E.customers.demand(state,v);
     const title=c?statuses[c.status]||'CUSTOMER CASE':
-      available?'BUYER INTEREST TO CONTACT':'AWAITING BUYER INTEREST';
+      available?(E.customers.walkInInterest(state,v)?
+        'SHOWROOM CUSTOMER WAITING':'BUYER INTEREST TO CONTACT'):'AWAITING BUYER INTEREST';
     const step=!c?(available?0:-1):{
       enquiry:0,booked:1,arrived:1,discussing:2,agreed:3,
       reserved:4,collectable:4,lost:-1
