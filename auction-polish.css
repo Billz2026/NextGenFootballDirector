@@ -458,7 +458,22 @@
   .auction-hall-control .auction-session-marker{flex:1 1 100%}
   .auction-hall-control .auction-head-metrics{flex:1 1 100%;max-width:none}
   .auction-hall-control .auction-head-metrics>div:first-child{border-left:0}
-  .auction-hall-control .auction-catalogue-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* Single swipeable catalogue row on narrow screens: keep the current lot
+     and payment controls high without making text or buttons tiny. */
+  .auction-hall-control .auction-catalogue-list{
+    display:flex;
+    flex-wrap:nowrap;
+    gap:7px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    scrollbar-width:thin;
+    padding:0 2px 5px;
+  }
+  .auction-hall-control .auction-catalogue-item{
+    flex:0 0 clamp(185px,67vw,255px);
+    scroll-snap-align:start;
+  }
   .auction-hall-control .auction-rostrum{flex-direction:row;align-items:center;flex-wrap:wrap}
   .auction-hall-control .auction-car-content .vehicle-photo-frame{height:205px}
 }
@@ -488,8 +503,7 @@
   .auction-hall-control .auction-closed{padding:16px}
 }
 @media(max-width:380px){
-  .auction-hall-control .auction-catalogue-list{grid-template-columns:1fr}
-  .auction-hall-control .auction-catalogue-item{min-height:0}
+  .auction-hall-control .auction-catalogue-item{min-height:105px}
   .auction-hall-control .auction-head-metrics{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:9px}
   .auction-hall-control .auction-head-metrics>div:nth-child(3){border-left:0}
 }
