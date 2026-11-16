@@ -6502,7 +6502,8 @@ test('Premises investment cards show projected money, cost and protective buffer
   assert.equal(site.costs(s).total,35);
   assert.equal(site.capacity(s),6);
   const afterView=app.premisesView.render(s,site);
-  assert.match(afterView,/6 forecourt spaces/);
+  assert.match(afterView,/0 \/ 6/);
+  assert.match(afterView,/6 spaces available for buying/);
   assert.match(afterView,/£35 premises/);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
 });
@@ -6515,6 +6516,9 @@ test('Premises upgrades reject poor reputation and insufficient protected cash w
   assert.equal(site.upgrade(s,'workshop').code,'reputation');
   assert.equal(s.cash,beforeCash);
   assert.equal(s.ledger.length,beforeLedger);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  // The low-cash fixture deliberately forces a shortage and does not pretend
+  // that unrecorded cash loss represents a real, restorable career.
   s.reputationScore=40;s.cash=2500;
   const quote=site.quote(s,'workshop');
   assert.ok(quote.requiredCash>2500);
@@ -6528,7 +6532,6 @@ test('Premises upgrades reject poor reputation and insufficient protected cash w
   assert.equal(s.cash,2500);
   assert.equal(s.premises.workshopLevel,0);
   assert.equal(s.ledger.length,beforeLedger);
-  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
 });
 
 test('30 game-day finance baseline retains full salaried team, rent, true cash and frozen report',()=>{
@@ -6567,7 +6570,13 @@ test('30 game-day finance baseline retains full salaried team, rent, true cash a
   assert.ok(closed);
   assert.equal(closed.operatingContribution,-7859);
   s.day=31;
+  E.rollAuctionHall(s);
+  s.deadlineSession=0;
   E.monthly.next(s);
+  E.staffDay(s);
+  E.premisesDay(s);
+  E.advanceWorkshop(s);
+  E.advanceCustomers(s);
   assert.equal(s.monthlyReports.length,1);
   assert.equal(s.monthlyReports[0].closingCash,37141);
   assert.equal(s.staff.length,4);
