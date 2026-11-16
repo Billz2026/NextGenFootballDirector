@@ -1,0 +1,41 @@
+name: Premises and full-month career browser review
+on:
+  pull_request:
+    paths:
+      - 'premises-view.js'
+      - 'premises-polish.css'
+      - 'index.html'
+      - 'tests/premises-30day-browser.mjs'
+      - '.github/workflows/premises-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  facilities-and-30day:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate browser regression syntax
+        run: node --check tests/premises-30day-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve live game files
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/premises-layout.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Test real facility investment, month-one costs, 30 day progression and saves
+        run: node tests/premises-30day-browser.mjs
+      - name: Upload actual browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: premises-facilities-and-30-day-playtest
+          path: review/premises-*.png
+          retention-days: 7
+          if-no-files-found: warn
