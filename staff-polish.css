@@ -1,0 +1,451 @@
+/* Staff & Recruitment: exact employee roster and truthful hiring eligibility.
+ * Only presentation: no modifications to wages, recruitment, training or saves. */
+#screen-career:has(.staff-page-control:not([hidden])) .career-topbar{
+  min-height:60px;padding:8px clamp(16px,2.35vw,32px);
+}
+#screen-career:has(.staff-page-control:not([hidden])) .career-content{
+  padding:11px clamp(16px,2.35vw,32px) 21px;
+}
+#screen-career:has(.staff-page-control:not([hidden])) .game-notice{
+  margin:8px clamp(16px,2.35vw,32px) 0;
+  padding:8px 11px;font-size:10px;line-height:1.45;
+}
+#screen-career:has(.staff-page-control:not([hidden]))
+  #events-banner:has(.event-neutral-banner){display:none}
+.staff-page-control .staff-page-heading{
+  display:flex;align-items:center;min-height:37px;margin:0 0 9px;
+}
+.staff-page-control .staff-page-heading h1{
+  margin:0;color:#f1eadd;
+  font:900 clamp(25px,2.45vw,32px)/1.05 var(--title);
+  letter-spacing:.012em;
+}
+.staff-page-control .staff-page-heading h1 em{font-style:normal;color:#e7be82}
+.staff-page-control .staff-page-heading p{
+  margin:3px 0 0;font:550 10px/1.4 var(--body);color:#b2c3c6;
+}
+.staff-page-control .sd-kpis{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;margin:0 0 9px;
+}
+.staff-page-control .sd-kpis>div{
+  min-height:62px;gap:6px;padding:9px 11px;
+  border-radius:6px;border-color:#3c5760;
+  background:#1a333e;
+}
+.staff-page-control .sd-kpis small{
+  font:800 9px/1.3 var(--mono);color:#b5c8c9;
+}
+.staff-page-control .sd-kpis strong{
+  color:#f1d3a4;
+  font:900 clamp(17px,1.8vw,23px)/1.1 var(--title);
+}
+.staff-page-control .sd-cash-alert{
+  margin:0 0 8px;padding:8px 11px;
+  border-radius:5px;
+}
+.staff-page-control .sd-coverage{
+  margin:0 0 8px;
+  border:1px solid #3b5761;
+  border-radius:6px;
+  background:#142c36;
+  overflow:hidden;
+}
+.staff-page-control .sd-overview-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+  min-height:36px;padding:8px 11px;
+  background:#1b3641;border-bottom:1px solid #37515b;
+}
+.staff-page-control .sd-overview-head h2{
+  margin:0;color:#e8cda5;
+  font:900 16px/1.2 var(--title);
+}
+.staff-page-control .sd-overview-head>span{
+  color:#b4c7c8;font:800 9px/1.3 var(--mono);
+}
+.staff-page-control .sd-coverage-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+}
+.staff-page-control .sd-cover-role{
+  display:flex;flex-direction:column;
+  min-width:0;gap:7px;padding:9px 10px;
+  border-right:1px solid #3a535d;background:#162e38;
+}
+.staff-page-control .sd-cover-role:last-child{border-right:0}
+.staff-page-control .sd-cover-role>header{
+  display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:space-between;gap:5px;
+}
+.staff-page-control .sd-cover-role>header>strong{
+  color:#e9d5b8;
+  font:850 9px/1.3 var(--mono);
+}
+.staff-page-control .sd-cover-role>header>span{
+  font:800 8px/1.25 var(--mono);
+  white-space:nowrap;
+}
+.staff-page-control .sd-cover-open{color:#a9dfc3}
+.staff-page-control .sd-cover-full{color:#b6c6ca}
+.staff-page-control .sd-cover-people{
+  display:flex;flex:1;flex-direction:column;gap:5px;
+}
+.staff-page-control .sd-cover-person{
+  display:flex;flex-direction:column;gap:3px;
+  border-left:2px solid #b99361;padding-left:7px;
+}
+.staff-page-control .sd-cover-person>strong{
+  color:#f3ede2;font:850 13px/1.2 var(--body);
+}
+.staff-page-control .sd-cover-person>span{
+  color:#b5c5c8;
+  font:650 9px/1.35 var(--body);
+}
+.staff-page-control .sd-cover-vacant{
+  color:#9fb7bf;
+  font:700 9px/1.4 var(--mono);
+}
+.staff-page-control .sd-cover-role>footer{
+  padding-top:5px;border-top:1px solid #304b55;
+  color:#aabdc2;font:800 8px/1.3 var(--mono);
+}
+.staff-page-control .sd-hiring-overview{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:10px 11px;margin:0 0 9px;
+  border:1px solid #647e70;border-left:3px solid #c2a275;
+  border-radius:6px;background:#213b39;
+}
+.staff-page-control .sd-hiring-overview>div{min-width:0}
+.staff-page-control .sd-hiring-overview h2{
+  margin:0 0 4px;
+  color:#ead5ad;font:900 15px/1.15 var(--title);
+}
+.staff-page-control .sd-hiring-overview p{
+  color:#cad7d1;margin:0 0 3px;
+  font:700 9px/1.4 var(--mono);
+}
+.staff-page-control .sd-hiring-overview p strong{color:#b3edc9}
+.staff-page-control .sd-hiring-overview small{
+  display:block;color:#b4c7c5;
+  font:550 9px/1.4 var(--body);
+}
+.staff-page-control .sd-hiring-overview .trade-button{
+  flex:0 0 auto;min-height:37px;
+  padding:8px 10px;
+  white-space:normal;
+  font:800 9px/1.3 var(--mono);
+  max-width:205px;
+}
+.staff-page-control .sd-toolbar{
+  gap:8px;margin:0;
+  padding:7px 10px;border-radius:6px 6px 0 0;
+  background:#1c3741;
+}
+.staff-page-control .sd-tabs button{
+  min-height:32px;padding:7px 9px;
+  font-size:9px;
+}
+.staff-page-control .sd-roles{
+  gap:5px;
+}
+.staff-page-control .sd-roles button{
+  min-height:32px;padding:7px 8px;
+  font-size:9px;
+}
+.staff-page-control .sd-context{
+  padding:7px 10px;
+  background:#132b35;
+}
+.staff-page-control .sd-context span{
+  font:700 9px/1.35 var(--mono);
+}
+.staff-page-control .sd-layout{
+  display:grid;grid-template-columns:minmax(245px,270px) minmax(0,1fr);
+  gap:9px;margin:8px 0 0;
+}
+.staff-page-control .sd-register,.staff-page-control .sd-dossier{
+  min-width:0;
+  border:1px solid #38545d;
+  border-radius:6px;
+  background:#152d38;
+}
+.staff-page-control .sd-register-head{
+  min-height:36px;padding:9px 10px;
+  background:#1c3742;
+  font-size:10px;
+}
+.staff-page-control .sd-register-head span{font-size:9px}
+.staff-page-control .sd-register-list{
+  max-height:510px;
+  overflow-y:auto;
+}
+.staff-page-control .sd-person{
+  min-height:74px;gap:6px;padding:9px 10px;
+  border-bottom-color:#334e59;
+}
+.staff-page-control .sd-person-main{
+  gap:3px;
+}
+.staff-page-control .sd-person-main small{font-size:8px}
+.staff-page-control .sd-person-main strong{
+  font:850 15px/1.17 var(--body);
+}
+.staff-page-control .sd-person-main>span{
+  font:650 9px/1.35 var(--body);
+}
+.staff-page-control .sd-person-main .sd-row-extra{
+  color:#dfc39a;font:750 8px/1.3 var(--mono);
+}
+.staff-page-control .sd-person .sd-tag{
+  max-width:108px;padding:4px 5px;
+  font-size:8px;
+}
+.staff-page-control .sd-file-head{
+  min-height:48px;padding:8px 11px;
+  background:#1c3843;
+}
+.staff-page-control .sd-file-head h3{
+  font:900 clamp(19px,1.9vw,23px)/1.1 var(--title);
+}
+.staff-page-control .sd-staff-summary{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;padding:8px;
+}
+.staff-page-control .sd-staff-summary>div{
+  gap:4px;padding:8px;
+}
+.staff-page-control .sd-staff-summary small{font-size:8px}
+.staff-page-control .sd-staff-summary strong{font-size:16px}
+.staff-page-control .sd-hire-reason{
+  margin:8px 10px 0;
+  border:1px solid #435d62;border-radius:5px;
+  padding:8px 10px;background:#203c43;
+}
+.staff-page-control .sd-hire-reason strong{
+  display:block;color:#ead2ab;font:850 9px/1.35 var(--mono);
+}
+.staff-page-control .sd-hire-reason p{
+  margin:4px 0 0;
+  color:#c1d2d0;font:550 10px/1.45 var(--body);
+}
+.staff-page-control .sd-person-detail{
+  display:grid;
+  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
+}
+.staff-page-control .sd-person-detail>div{
+  padding:10px;min-width:0;
+}
+.staff-page-control .sd-section-head h4{font-size:15px}
+.staff-page-control .sd-competence .sd-skills{gap:7px}
+.staff-page-control .sd-skills .people-trait{
+  grid-template-columns:104px minmax(0,1fr) 32px;
+  font-size:9px;
+}
+.staff-page-control .sd-action-panel{
+  padding:9px;
+}
+.staff-page-control .sd-action-panel h5{font-size:14px}
+.staff-page-control .sd-action-panel p{
+  font-size:10px;line-height:1.45;
+}
+.staff-page-control .sd-action-panel .trade-button,
+.staff-page-control .sd-control .trade-button{
+  min-height:40px;
+  padding:9px;
+  font-size:10px;
+}
+.staff-page-control .sd-hire-brief{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;margin:0 0 8px;
+}
+.staff-page-control .sd-hire-brief>div{
+  min-width:0;display:flex;flex-direction:column;
+  gap:4px;padding:8px 9px;
+  background:#213e42;
+  border:1px solid #49655f;border-radius:5px;
+}
+.staff-page-control .sd-hire-brief small{
+  font:800 8px/1.3 var(--mono);color:#b8c9ca;
+}
+.staff-page-control .sd-hire-brief strong{
+  color:#f0d4a7;font:900 20px/1.1 var(--title);
+}
+.staff-page-control .sd-control .sd-primary-hire{
+  margin:0;
+  background:#d8b478;color:#182b2b;
+  border-color:#e8c589;
+}
+.staff-page-control .sd-control .sd-primary-hire:disabled{
+  opacity:.55;cursor:not-allowed;
+  background:#36434a;color:#b2c3c7;border-color:#536873;
+}
+.staff-page-control .sd-control>.sd-issue{
+  margin:6px 0 8px;
+  font:800 10px/1.45 var(--body);
+}
+.staff-page-control .sd-hire-breakdown{
+  margin:9px 0 0;border:1px solid #40585f;
+  background:#172e38;border-radius:5px;
+}
+.staff-page-control .sd-hire-breakdown summary{
+  padding:9px 10px;cursor:pointer;
+  list-style:none;
+  color:#dfcaa5;
+  font:800 9px/1.4 var(--mono);
+}
+.staff-page-control .sd-hire-breakdown summary::-webkit-details-marker{
+  display:none;
+}
+.staff-page-control .sd-hire-breakdown summary::after{
+  content:'⌄';float:right;
+  color:#f2ca8c;font-size:13px;
+}
+.staff-page-control .sd-hire-breakdown[open] summary::after{
+  transform:rotate(180deg);
+}
+.staff-page-control .sd-hire-figures{
+  margin:0 8px 8px;
+}
+.staff-page-control .sd-hire-figures>div{
+  padding:7px 9px;
+}
+.staff-page-control .sd-hire-figures span{font-size:9px}
+.staff-page-control .sd-hire-figures strong{font-size:11px}
+.staff-page-control .sd-fine{
+  margin:0;padding:0 9px 9px;
+  font-size:10px;line-height:1.5;
+}
+.staff-page-control .sd-release{
+  margin:9px 0 0;padding:9px 0 0;
+}
+.staff-page-control .sd-policy{
+  margin:8px 0 0;border-radius:5px;
+}
+.staff-page-control .sd-policy summary{
+  padding:9px 11px;
+}
+.staff-page-control .sd-hire-breakdown summary:focus-visible,
+.staff-page-control .sd-hiring-overview .trade-button:focus-visible{
+  outline:2px solid #f0ca8d;outline-offset:2px;
+}
+@media(max-width:1250px){
+  .staff-page-control .sd-layout{
+    grid-template-columns:minmax(215px,235px) minmax(0,1fr);
+  }
+  .staff-page-control .sd-person-detail{
+    grid-template-columns:1fr;
+  }
+  .staff-page-control .sd-person-detail>div:first-child{
+    border-right:0;border-bottom:1px solid #38535b;
+  }
+}
+@media(max-width:1030px){
+  .staff-page-control .sd-layout{grid-template-columns:1fr}
+  .staff-page-control .sd-register-list{
+    display:flex;flex-direction:row;flex-wrap:nowrap;
+    overflow-x:auto;overflow-y:hidden;
+    max-height:none;
+    scrollbar-width:thin;scroll-snap-type:x proximity;
+    overscroll-behavior-x:contain;
+  }
+  .staff-page-control .sd-person{
+    flex:0 0 235px;min-height:103px;
+    align-items:flex-start;flex-direction:column;
+    border-bottom:0;border-right:1px solid #344e58;
+    scroll-snap-align:start;
+  }
+  .staff-page-control .sd-person:last-child{border-right:0}
+  .staff-page-control .sd-person .sd-tag{max-width:100%}
+  .staff-page-control .sd-person-detail{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .staff-page-control .sd-person-detail>div:first-child{
+    border-right:1px solid #38535b;border-bottom:0;
+  }
+  .staff-page-control .sd-toolbar{
+    flex-direction:column;align-items:stretch;
+  }
+  .staff-page-control .sd-roles{
+    flex-wrap:nowrap;overflow-x:auto;
+    overscroll-behavior-x:contain;scrollbar-width:thin;
+  }
+  .staff-page-control .sd-roles button{flex:0 0 auto}
+}
+@media(max-width:760px){
+  .staff-page-control .staff-page-heading h1{font-size:26px}
+  .staff-page-control .sd-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .staff-page-control .sd-kpis>div{min-height:53px;padding:7px 9px}
+  .staff-page-control .sd-kpis small{font-size:8px}
+  .staff-page-control .sd-kpis strong{font-size:18px}
+  .staff-page-control .sd-coverage-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .staff-page-control .sd-cover-role:nth-child(2){border-right:0}
+  .staff-page-control .sd-cover-role:nth-child(-n+2){
+    border-bottom:1px solid #3a535d;
+  }
+  .staff-page-control .sd-hiring-overview{flex-wrap:wrap;gap:7px}
+  .staff-page-control .sd-hiring-overview .trade-button{
+    flex:1 1 100%;max-width:none;
+  }
+  .staff-page-control .sd-person-detail{
+    display:flex;flex-direction:column;
+  }
+  .staff-page-control .sd-person-detail>div.sd-control{
+    order:0;border-bottom:1px solid #38535b;
+  }
+  .staff-page-control .sd-person-detail>div:first-child{
+    order:1;border-right:0;border-bottom:0;
+  }
+  .staff-page-control .sd-staff-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:490px){
+  #screen-career:has(.staff-page-control:not([hidden])) .career-content{
+    padding:10px 13px 19px;
+  }
+  #screen-career:has(.staff-page-control:not([hidden])) .game-notice{
+    margin:7px 13px 0;
+  }
+  .staff-page-control .staff-page-heading h1{font-size:25px}
+  .staff-page-control .staff-page-heading p{display:none}
+  .staff-page-control .sd-kpis>div{min-height:48px}
+  .staff-page-control .sd-overview-head{padding:7px 9px}
+  .staff-page-control .sd-overview-head h2{font-size:14px}
+  .staff-page-control .sd-overview-head>span{font-size:8px}
+  .staff-page-control .sd-cover-role{padding:8px}
+  .staff-page-control .sd-cover-role>header>strong{font-size:8px}
+  .staff-page-control .sd-cover-person>strong{font-size:12px}
+  .staff-page-control .sd-cover-person>span{font-size:8px}
+  .staff-page-control .sd-hiring-overview{padding:8px 9px}
+  .staff-page-control .sd-hiring-overview h2{font-size:14px}
+  .staff-page-control .sd-hiring-overview small{font-size:8px}
+  .staff-page-control .sd-tabs{width:100%;gap:5px}
+  .staff-page-control .sd-tabs button{
+    flex:1;min-width:0;padding:7px;
+  }
+  .staff-page-control .sd-person{
+    flex-basis:205px;min-height:96px;padding:8px 9px;
+  }
+  .staff-page-control .sd-register-head{min-height:32px;padding:7px 9px}
+  .staff-page-control .sd-staff-summary strong{font-size:17px}
+  .staff-page-control .sd-hire-reason{margin:7px 9px 0}
+  .staff-page-control .sd-hire-brief strong{font-size:19px}
+  .staff-page-control .sd-skills .people-trait{
+    grid-template-columns:94px minmax(0,1fr) 30px;
+  }
+}
+@media(max-width:360px){
+  .staff-page-control .sd-kpis strong{font-size:16px}
+  .staff-page-control .sd-cover-role>header{
+    flex-direction:column;align-items:flex-start;
+  }
+  .staff-page-control .sd-cover-person>strong{font-size:11px}
+  .staff-page-control .sd-hire-brief strong{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){
+  .staff-page-control .sd-person{transition:none}
+}
