@@ -92,7 +92,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   }
   assert.match(html, /simulator\.js\?v=36/);
   assert.match(html, /premises\.js\?v=1/);
-  assert.match(html, /premises-view\.js\?v=3/);
+  assert.match(html, /premises-view\.js\?v=4/);
   assert.match(html, /id="premises-view"/);
   assert.match(html, /dashboard-view\.js\?v=2/);
   assert.match(html, /inbox-office\.js\?v=3/);
@@ -3094,7 +3094,7 @@ test('v0.9.8 dynamic forecourt capacity and premises results appear in saved car
   const storage=new Map(),app=browser(storage);
   app.click('new-career');
   app.submitCareer('Expansion Screen');
-  assert.match(app.nodes.get('premises-view').innerHTML,/EXPANSION & RUNNING COSTS/);
+  assert.match(app.nodes.get('premises-view').innerHTML,/AVAILABLE EXPANSIONS/);
   assert.match(app.nodes.get('premises-view').innerHTML,/REQUIRES 20 REPUTATION/);
   let s=JSON.parse(storage.get(STORAGE_KEY));
   s.reputationScore=20;
@@ -5460,15 +5460,15 @@ test('v0.9.34 My Dealership shows a live business identity, occupied spaces and 
   assert.equal(f.arrears,0);
   assert.equal(f.cashAfterRepairReserves,12500);
   const screen=app.premisesView.render(state,site);
-  assert.match(screen,/RUNNING YOUR DEALERSHIP/);
+  assert.match(screen,/FACILITY POSITION/);
   assert.match(screen,/FORECOURT OCCUPANCY/);
   assert.match(screen,/WORKSHOP CAPACITY/);
   assert.match(screen,/DEALERSHIP CASH/);
   assert.match(screen,/DAILY RUNNING COST/);
   assert.match(screen,/OPERATING COMMITMENTS/);
-  assert.match(screen,/EXPANSION & RUNNING COSTS/);
+  assert.match(screen,/AVAILABLE EXPANSIONS/);
   assert.match(screen,/ONE-OFF INVESTMENT/);
-  assert.match(screen,/CASH NEEDED INCL. BUFFERS/);
+  assert.match(screen,/MINIMUM CASH TO APPROVE/);
   assert.match(screen,/REQUIRES 20 REPUTATION/);
   assert.match(screen,/data-page="stock"/);
   assert.match(screen,/data-page="workshop"/);
@@ -5502,7 +5502,7 @@ test('v0.9.34 facility options are gated on reputation and total protected cash'
   state.cash=20;
   assert.match(app.premisesView.render(state,site),/CASH RUNWAY ALERT/);
   state.cash=202;
-  assert.match(screen,/CASH NEEDED INCL. BUFFERS/);
+  assert.match(screen,/MINIMUM CASH TO APPROVE/);
   assert.match(screen,/REPUTATION LOCKED/);
   assert.match(screen,/data-kind="forecourt" disabled/);
   state.cash=12500;
@@ -5595,7 +5595,7 @@ test('v0.9.35 My Dealership upgrades keep purchase actions above optional detail
   assert.match(card,/EXTRA COST PER GAME DAY/);
   assert.match(card,/APPROVE £1,800 INVESTMENT/);
   assert.match(card,/VIEW INVESTMENT REQUIREMENTS/);
-  assert.match(card,/CASH NEEDED INCL. BUFFERS/);
+  assert.match(card,/MINIMUM CASH TO APPROVE/);
   assert.match(card,/REPUTATION REQUIRED/);
   assert.equal((card.match(/class="hq-upgrade-headline-costs"/g)||[]).length,0);
   assert.match(card,/class="hq-upgrade-costs hq-upgrade-headline-costs"/);
@@ -5627,7 +5627,7 @@ test('v0.9.35 blocked and maximum upgrades still retain accurate eligibility',()
 test('v0.9.35 one-page desktop polish is scoped to My Dealership and retains mobile layout',()=>{
   assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/premises-view\.js\?v=3/);
+  assert.match(html,/premises-view\.js\?v=4/);
   assert.match(css,/v0\.9\.35 — Final My Dealership single-screen desktop polish/);
   assert.match(css,/\.career-layout:has\(\[data-panel="business"\]:not\(\[hidden\]\)\) \.career-topbar/);
   assert.match(css,/\.hq-upgrade-headline-costs\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
@@ -6433,4 +6433,144 @@ test('Staff training and release decisions show real charges and still respect c
   assert.match(after.html,/NO EMPLOYEE ASSIGNED/);
   assert.match(after.html,/1 VACANCY AVAILABLE/);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
+});
+
+test('Premises & Facilities identifies actual physical bays versus active technicians',()=>{
+  const app=browser(new Map()),E=app.productionEngine,P=E.people,site=E.premises;
+  const s=E.createStaffed('Facilities Working Team',[]);
+  const before=JSON.stringify(s);
+  const f=app.premisesView.figures(s,site);
+  assert.match(html,/class="career-panel premises-page-control"/);
+  assert.match(html,/PREMISES & <em>FACILITIES\.<\/em>/);
+  assert.match(html,/premises-polish\.css\?v=1/);
+  assert.equal(f.forecourt,4);
+  assert.equal(f.workshop,4);
+  assert.equal(f.techWorking,1);
+  assert.equal(f.techniciansFree,1);
+  assert.equal(f.dailyWages,246);
+  assert.equal(f.runningDaily,271);
+  const view=app.premisesView.render(s,site);
+  assert.match(view,/FACILITY POSITION/);
+  assert.match(view,/4 PHYSICAL BAYS/);
+  assert.match(view,/1 active technician · 1 free · 0 jobs running/);
+  assert.match(view,/TOTAL COST \/ DAY/);
+  assert.match(view,/£271/);
+  assert.match(view,/ACCRUED COSTS & CASH EXPLANATION/);
+  assert.equal(JSON.stringify(s),before,'Facility screen is read only');
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  const worker=s.staff.find(e=>e.role==='technician');
+  assert.ok(P.train(s,worker.id).ok);
+  const training=app.premisesView.figures(s,site);
+  assert.equal(training.techWorking,0);
+  assert.equal(training.techniciansFree,0);
+  assert.match(app.premisesView.render(s,site),/0 active technicians/);
+});
+
+test('Premises investment cards show projected money, cost and protective buffers correctly',()=>{
+  const app=browser(new Map()),E=app.productionEngine,site=E.premises;
+  const s=E.createStaffed('Upgrade Card Accuracy',[]);
+  s.reputationScore=40;
+  const before=JSON.stringify(s);
+  const forQ=site.quote(s,'forecourt'),workQ=site.quote(s,'workshop');
+  assert.equal(forQ.current,4);
+  assert.equal(forQ.next,6);
+  assert.equal(forQ.cost,1800);
+  assert.equal(forQ.currentDaily,25);
+  assert.equal(forQ.newDaily,35);
+  assert.equal(forQ.dailyIncrease,10);
+  assert.equal(workQ.current,4);
+  assert.equal(workQ.next,6);
+  assert.equal(workQ.cost,2600);
+  assert.equal(workQ.currentDaily,25);
+  assert.equal(workQ.newDaily,39);
+  assert.equal(workQ.dailyIncrease,14);
+  const card=app.premisesView.card(s,site,'forecourt');
+  assert.match(card,/CURRENT PREMISES \/ DAY/);
+  assert.match(card,/AFTER UPGRADE \/ DAY/);
+  assert.match(card,/CASH AFTER INVESTMENT/);
+  assert.match(card,/£43,200/);
+  assert.match(card,/£35/);
+  assert.match(card,/PROTECTED CASH BUFFER/);
+  assert.match(card,/CURRENT REPUTATION/);
+  assert.match(card,/MINIMUM CASH TO APPROVE/);
+  assert.match(card,/APPROVE £1,800 INVESTMENT/);
+  assert.equal(JSON.stringify(s),before);
+  const preCash=s.cash,preLedger=s.ledger.length;
+  assert.ok(site.upgrade(s,'forecourt').ok);
+  assert.equal(s.cash,preCash-1800);
+  assert.equal(s.ledger.length,preLedger+1);
+  assert.equal(site.costs(s).total,35);
+  assert.equal(site.capacity(s),6);
+  const afterView=app.premisesView.render(s,site);
+  assert.match(afterView,/6 forecourt spaces/);
+  assert.match(afterView,/£35 premises/);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('Premises upgrades reject poor reputation and insufficient protected cash without charging',()=>{
+  const app=browser(new Map()),E=app.productionEngine,site=E.premises;
+  const s=E.createStaffed('Locked Facility Upgrade',[]);
+  const beforeCash=s.cash,beforeLedger=s.ledger.length;
+  assert.equal(site.upgrade(s,'forecourt').code,'reputation');
+  assert.equal(site.upgrade(s,'workshop').code,'reputation');
+  assert.equal(s.cash,beforeCash);
+  assert.equal(s.ledger.length,beforeLedger);
+  s.reputationScore=40;s.cash=2500;
+  const quote=site.quote(s,'workshop');
+  assert.ok(quote.requiredCash>2500);
+  assert.ok(quote.shortfall>0);
+  const ui=app.premisesView.render(s,site);
+  assert.match(ui,/SHORT BY £/);
+  assert.match(ui,/CASH REQUIRED/);
+  assert.match(ui,/MINIMUM CASH TO APPROVE/);
+  assert.match(ui,/WORKSHOP EXPANSION/);
+  assert.equal(site.upgrade(s,'workshop').code,'cash');
+  assert.equal(s.cash,2500);
+  assert.equal(s.premises.workshopLevel,0);
+  assert.equal(s.ledger.length,beforeLedger);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('30 game-day finance baseline retains full salaried team, rent, true cash and frozen report',()=>{
+  const E=browser(new Map()).productionEngine;
+  const s=E.createStaffed('Full Month Runway QA',[]);
+  assert.ok(E.events.holdMeeting(s,'buying').ok);
+  const starting=JSON.stringify(s);
+  const dayOneCash=s.cash;
+  const required=246+25;
+  for(let day=2;day<=30;day++){
+    s.day=day;
+    const staff=E.staffDay(s);
+    const premises=E.premisesDay(s);
+    E.advanceWorkshop(s);
+    E.advanceCustomers(s);
+    assert.equal(staff.payroll,246,'Actual daily four-person payroll');
+    assert.equal(staff.arrears,0);
+    assert.equal(premises.due,25);
+    assert.equal(premises.arrears,0);
+    assert.equal(s.cash,dayOneCash-(day-1)*required);
+    assert.equal(s.ledger.reduce((n,x)=>n+x.delta,0)+45000,s.cash);
+    assert.ok(E.normalize(JSON.parse(JSON.stringify(s))),'Career should restore on day '+day);
+  }
+  assert.equal(s.cash,37141);
+  assert.equal(s.staff.length,4);
+  assert.equal(s.payrollArrears,0);
+  assert.equal(s.premises.arrears,0);
+  assert.equal(s.monthPlan.unitTarget,4);
+  assert.equal(s.sold.length,0);
+  for(let session=1;session<=4;session++){
+    assert.ok(E.events.advanceSession(s).ok);
+    assert.equal(s.day,30);
+    assert.equal(s.cash,37141,'No wages charged again during Deal Day session');
+  }
+  const closed=E.monthly.close(s);
+  assert.ok(closed);
+  assert.equal(closed.operatingContribution,-7859);
+  s.day=31;
+  E.monthly.next(s);
+  assert.equal(s.monthlyReports.length,1);
+  assert.equal(s.monthlyReports[0].cashClosing,37141);
+  assert.equal(s.staff.length,4);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  assert.equal(JSON.parse(starting).cash,45000,'Baseline opening statement stays unchanged');
 });
