@@ -5867,7 +5867,7 @@ test('compact Buying Desk retains live offer projections, counteroffers and no c
   const offer=sellers[1].ask-100;
   app.typeInput('seller-offer-'+sellers[1].id,offer);
   const content=app.nodes.get('market-sellers').innerHTML;
-  assert.ok(content.includes('id="seller-offer-'+sellers[1].id+'" value="'+offer+'"'));
+  assert.equal(app.nodes.get('seller-offer-'+sellers[1].id).value,String(offer));
   assert.ok(content.includes('id="desk-total-'+sellers[1].id+'"'));
   assert.ok(content.includes('id="desk-headroom-'+sellers[1].id+'"'));
   assert.ok(content.includes('id="desk-projection-'+sellers[1].id+'"'));
