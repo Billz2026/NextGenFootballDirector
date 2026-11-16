@@ -55,8 +55,10 @@
           '<strong>'+esc(lot.title)+'</strong>'+
           '<small>'+esc(lot.fuel)+' · '+esc(lot.gearbox)+' · GRADE '+lot.profile.grade+
           ' · GUIDE '+money(lot.guide)+'</small>'+
-          '<button type="button" class="auction-catalogue-review" data-action="preview-auction" data-id="'+
-          esc(lot.id)+'">VIEW LOT REPORT</button></article>';
+          (h.phase==='finished'?'':active?
+            '<span class="auction-catalogue-location">CURRENT LOT BELOW</span>':
+            '<button type="button" class="auction-catalogue-review" data-action="preview-auction" data-id="'+
+              esc(lot.id)+'">VIEW LOT REPORT</button>')+'</article>';
       }).join('')+'</div></section>':'';
     if(!lots.length)
       return header+'<div class="trade-empty auction-closed"><h2>AUCTION HOUSE CLOSED TODAY.</h2>'+
