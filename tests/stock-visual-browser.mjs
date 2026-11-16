@@ -56,6 +56,9 @@ try{
     assert.equal(await panel.locator('.stock-finance-summary').count(),1);
     assert.equal(await panel.locator('.stock-action-box [data-page="workshop"]').count(),1);
     const metrics=await page.evaluate(()=>{
+      document.documentElement.style.scrollBehavior='auto';
+      document.body.style.scrollBehavior='auto';
+      window.scrollTo({top:0,behavior:'instant'});
       const p=document.querySelector('.stock-page-control');
       const rect=s=>p.querySelector(s).getBoundingClientRect();
       const lst=p.querySelector('.stock-register-list'),dos=p.querySelector('.stock-dossier');
