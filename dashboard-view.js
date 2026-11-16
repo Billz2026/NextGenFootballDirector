@@ -146,12 +146,12 @@
     ).join('');
   }
   function operations(model,state){
+    // Only surface indicators that are not already represented in the
+    // KPI detail text or the expandable career summary.
     const items=[
       ['LISTED FOR SALE',model.listed,'stock'],
-      ['AWAITING PREP',model.awaitingPrep,'workshop'],
       ['BOOKED VIEWINGS',model.booked,'sales'],
-      ['OUTSTANDING BILLS',money(model.arrears),'finance'],
-      ['CAREER SALES',state.sales,'reports']
+      ['OUTSTANDING BILLS',money(model.arrears),'finance']
     ];
     return items.map(([label,value,page])=>
       '<button type="button" class="dashboard-operations-item" data-page="'+page+
