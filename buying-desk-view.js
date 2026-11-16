@@ -50,7 +50,7 @@
     // The shortlist already reports each lead's live status; show a
     // smaller financial status line rather than four large dashboard tiles.
     const cards=[
-      ['SELLER LEADS',sellers.length,available+' AVAILABLE'],
+      ['STOCK OPPORTUNITIES',sellers.length,available+' AVAILABLE'],
       ['FORECOURT FREE',state.capacity-state.vehicles.length,
         state.vehicles.length+' / '+state.capacity+' OCCUPIED'],
       ['CASH AVAILABLE',money(Math.max(0,state.cash-reserved)),
@@ -68,11 +68,11 @@
       return ['ACQUIRED','done'];
     if(negotiation?.status==='walked')return ['SELLER LEFT','closed'];
     if(negotiation?.status==='counter')return ['COUNTER '+money(negotiation.counter),'counter'];
-    return ['NEW LEAD','new'];
+    return [car.marketTier==='new'?'NEW-CAR ALLOCATION':'NEW LEAD','new'];
   }
   function leadList(state,E,sellers,selectedId){
     return '<aside class="buy-leads" aria-labelledby="buy-leads-title">'+
-      '<div class="buy-leads-heading"><h2 id="buy-leads-title">SELLER SHORTLIST</h2>'+
+      '<div class="buy-leads-heading"><h2 id="buy-leads-title">SOURCING SHORTLIST</h2>'+
       '<span>CHOOSE A LEAD</span></div>'+
       '<div class="buy-lead-list">'+sellers.map((car,i)=>{
         const [label,kind]=leadStatus(car,state);
@@ -86,14 +86,14 @@
           '<div class="buy-lead-facts"><span>'+miles(car.miles)+
           '</span><span>GRADE '+car.profile.grade+
           '</span><span>'+esc(car.fuel)+'</span></div>'+
-          '<div class="buy-lead-bottom"><span>OWNER ASKS</span><b>'+money(car.ask)+'</b></div>'+
+          '<div class="buy-lead-bottom"><span>'+(car.marketTier==='new'?'SUPPLIER PRICE':'OWNER ASKS')+'</span><b>'+money(car.ask)+'</b></div>'+
           '</button>';
       }).join('')+'</div></aside>';
   }
   function pricing(car,state,E,offer){
     const {quote,inspected,remaining,reserved,position:signal}=figures(car,state,E,offer);
     const quotes=[
-      ['OWNER ASKING',money(car.ask)],
+      [car.marketTier==='new'?'FIXED SUPPLIER PRICE':'OWNER ASKING',money(car.ask)],
       ['TRADE VALUE',money(quote.trade)],
       ['LIKELY ACHIEVED SALE',money(quote.likelySale)],
       ['SUGGESTED MAX OFFER',money(quote.maxBid)]
@@ -146,6 +146,9 @@
     const controls=closed?
       '<button type="button" class="trade-button" disabled>ENQUIRY CLOSED</button>'+
       (kind==='done'?'<button type="button" class="trade-button trade-button-secondary" data-page="stock">VIEW VEHICLE STOCK</button>':''):
+      car.marketTier==='new'?
+      '<div class="buy-offer-actions"><p>Fixed-price supplier allocation. Registration and manufacturer warranty status require independent verification.</p>'+
+      '<button type="button" class="trade-button" data-action="buy-seller" data-id="'+esc(car.id)+'">ACQUIRE NEW-CAR ALLOCATION · '+money(car.ask)+'</button></div>':
       '<div class="buy-offer-actions">'+
         '<label for="seller-offer-'+esc(car.id)+'">YOUR OFFER (£)'+
         '<input class="trade-input" id="seller-offer-'+esc(car.id)+'" value="'+offer+'" type="number"'+
@@ -157,7 +160,7 @@
         '<div class="buy-counter-actions"><button type="button" class="trade-button trade-button-secondary" data-action="accept-seller-counter" data-id="'+esc(car.id)+'">ACCEPT '+money(deal.counter)+'</button>'+
         '<button type="button" class="trade-button trade-button-outline" data-action="walk-seller" data-id="'+esc(car.id)+'">WALK AWAY</button></div>':'');
     return '<div class="buy-trading">'+
-      '<div class="buy-trading-heading"><strong>YOUR OFFER</strong>'+
+      '<div class="buy-trading-heading"><strong>'+(car.marketTier==='new'?'SUPPLIER ALLOCATION':'YOUR OFFER')+'</strong>'+
         '<small>NO BUYER FEE · CASH PURCHASE</small></div>'+
       '<details class="buy-seller-story"><summary>SELLER POSITION · '+esc(approach.label)+'</summary>'+
         '<p>'+esc(approach.description)+'</p></details>'+
@@ -165,8 +168,11 @@
       '<p id="desk-funding-warning-'+esc(car.id)+'" class="trade-purchase-warning"'+
         (cannot&&!closed?'':' hidden')+'>'+esc(closed?'':cannot)+'</p>'+
       controls+
-      '<details class="buy-deal-terms"><summary>What happens when the owner accepts?</summary>'+
-      '<p>Purchase cash is debited once, your vehicle joins stock and the workshop must assess it. An owner may counter or withdraw after an unreasonable offer. A paid inspection is non-refundable.</p></details>'+
+      '<details class="buy-deal-terms"><summary>'+(car.marketTier==='new'?'What happens after supplier confirmation?':'What happens when the owner accepts?')+'</summary>'+
+      '<p>Purchase cash is debited once, your vehicle joins stock and the workshop must assess it. '+
+      (car.marketTier==='new'?'New-car allocation prices are fixed, not privately negotiated.':
+      'A private owner may counter or withdraw after an unreasonable offer.')+
+      ' A paid inspection is non-refundable.</p></details>'+
     '</div>';
   }
   function render(state,E,opts={}){
@@ -182,18 +188,18 @@
     const draft=opts.drafts&&Number.isSafeInteger(opts.drafts[active])?
       opts.drafts[active]:null;
     const negotiation=state.negotiations?.[active];
-    const offer=draft!==null?draft:
+    const offer=car.marketTier==='new'?car.ask:draft!==null?draft:
       negotiation?.status==='counter'?negotiation.counter:openingOffer(car);
     const report=opts.reportCard(car,'seller',offer);
     const heading='<div class="buy-detail-top"><span>SELECTED VEHICLE</span>'+
       '<span>GRADE '+car.profile.grade+'/5 · '+condition(car)+'</span></div>';
-    const detail='<section class="buy-seller-focus" aria-label="Selected private seller">'+heading+
-      '<div class="buy-focus-content"><div class="buy-vehicle">'+VC.heading(car,'seller','SELLER VEHICLE · '+esc(car.id))+
+    const detail='<section class="buy-seller-focus" aria-label="Selected sourcing opportunity">'+heading+
+      '<div class="buy-focus-content"><div class="buy-vehicle">'+VC.heading(car,'seller',(car.marketTier==='new'?'NEW-CAR TRADE ALLOCATION':'SELLER VEHICLE')+' · '+esc(car.id))+
       '<p class="buy-car-note">'+esc(car.note||'')+'</p>'+
       report+'</div>'+
       '<div class="buy-deal-workspace">'+
         '<div class="buy-mobile-vehicle-context"><strong>'+esc(car.title)+'</strong>'+
-          '<span>'+miles(car.miles)+' · '+esc(car.fuel)+' · OWNER ASKS '+money(car.ask)+'</span></div>'+
+          '<span>'+miles(car.miles)+' · '+esc(car.fuel)+' · '+(car.marketTier==='new'?'SUPPLIER PRICE ':'OWNER ASKS ')+money(car.ask)+'</span></div>'+
         pricing(car,state,E,offer)+
         tradingControls(car,state,E,offer,opts.reportCard,opts.leadFeedback)+
         costNotes(car,state,E,offer)+
