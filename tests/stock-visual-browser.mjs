@@ -43,6 +43,10 @@ try{
     assert.equal(acquired.vehicles.length,2);
     await page.locator('.career-nav [data-page="stock"]').evaluate(n=>n.click());
     await panel.waitFor({state:'visible'});
+    await page.evaluate(()=>{
+      document.scrollingElement?.scrollTo(0,0);
+      window.scrollTo(0,0);
+    });
     assert.equal((await panel.locator('h1').allInnerTexts()).length,1);
     assert.equal((await panel.locator('h1').innerText()).replace(/\s+/g,' ').trim(),'INVENTORY CONTROL.');
     assert.equal(await panel.locator('.stock-kpi').count(),3);
@@ -59,6 +63,7 @@ try{
       const details=p.querySelector('.stock-cost-details');
       return {
         viewportWidth:innerWidth,
+        windowScrollY:Math.round(scrollY),
         documentWidth:document.documentElement.scrollWidth,
         panelWidth:p.scrollWidth,panelClientWidth:p.clientWidth,
         dossierWidth:dos.scrollWidth,dossierClientWidth:dos.clientWidth,
