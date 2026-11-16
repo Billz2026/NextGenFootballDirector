@@ -360,3 +360,15 @@
 @media(prefers-reduced-motion:reduce){
   .events-page-control .eo-focus-choice{transition:none}
 }
+
+/* Month-end now has a genuine auction alongside retail and direct sourcing. */
+@media(min-width:1000px){
+  .events-page-control .eo-deal-day .eo-activities{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(min-width:761px) and (max-width:999px){
+  .events-page-control .eo-deal-day .eo-activities>.eo-activity:last-child{
+    grid-column:1/-1;
+  }
+}
