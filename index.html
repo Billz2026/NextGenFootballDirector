@@ -23,12 +23,12 @@
   <script src="./vehicle-accuracy.js?v=1" defer></script>
   <script src="./vehicle-market.js?v=2" defer></script>
   <script src="./premises.js?v=1" defer></script>
-  <script src="./people.js?v=7" defer></script>
-  <script src="./monthly.js?v=7" defer></script>
+  <script src="./people.js?v=8" defer></script>
+  <script src="./monthly.js?v=8" defer></script>
   <script src="./events.js?v=2" defer></script>
   <script src="./workshop.js?v=4" defer></script>
   <script src="./customers.js?v=5" defer></script>
-  <script src="./trading.js?v=19" defer></script>
+  <script src="./trading.js?v=20" defer></script>
   <script src="./vehicle-cards.js?v=4" defer></script>
   <script src="./vehicle-view.js?v=4" defer></script>
   <script src="./people-view.js?v=7" defer></script>
@@ -48,7 +48,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=34" defer></script>
+  <script src="./simulator.js?v=35" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -155,7 +155,7 @@
             <input id="dealership-name" name="dealershipName" type="text" maxlength="36" minlength="2" value="First Lot Motors" autocomplete="organization" required>
             <p class="field-help">Use 2–36 characters. You can build your own dealership identity.</p>
             <div class="setup-facts">
-              <div><span>STARTING CASH</span><strong>£12,500</strong></div>
+              <div><span>STARTING CASH</span><strong>£45,000</strong></div>
               <div><span>FORECOURT CAPACITY</span><strong>4 vehicles</strong></div>
               <div><span>CAREER TYPE</span><strong>Independent trader</strong></div>
               <div><span>STARTING STOCK</span><strong>None</strong></div>
@@ -227,7 +227,7 @@
 
               <div class="stat-grid dashboard-kpis" role="group" aria-label="Live dealership key figures">
                 <button type="button" class="stat-tile dashboard-kpi" data-page="finance" aria-label="Open finances">
-                  <span>CASH BALANCE</span><strong data-bind="cash">£12,500</strong>
+                  <span>CASH BALANCE</span><strong data-bind="cash">£45,000</strong>
                   <small data-bind="dashboard-cash-note">Before future bills</small>
                 </button>
                 <button type="button" class="stat-tile dashboard-kpi" data-page="stock" aria-label="Open vehicle stock">
@@ -356,7 +356,7 @@
 
             <section class="career-panel" data-panel="business" hidden aria-labelledby="business-title">
               <div class="page-heading"><div><p class="section-overline">OWNER'S OFFICE / BUSINESS OPERATIONS</p><h1 id="business-title">MY <em>DEALERSHIP.</em></h1><p>Your business identity, operating commitments and next investment decisions in one place.</p></div><button type="button" class="secondary-button hq-save" data-action="save">SAVE CAREER</button></div>
-              <div class="hq-identity"><div class="hq-identity-title"><small>INDEPENDENT MOTOR TRADER · STARTING CAPITAL £12,500</small><h2 data-bind="company">First Lot Motors</h2><p>DEALERSHIP CAREER PROFILE</p></div><div class="hq-identity-facts">
+              <div class="hq-identity"><div class="hq-identity-title"><small>INDEPENDENT MOTOR TRADER · STARTING CAPITAL <span data-bind="starting-capital">£45,000</span></small><h2 data-bind="company">First Lot Motors</h2><p>DEALERSHIP CAREER PROFILE</p></div><div class="hq-identity-facts">
                 <div><small>CAREER</small><strong data-bind="day-label">DAY 01</strong></div>
                 <div><small>REPUTATION</small><strong data-bind="reputation-score">5 / 100</strong></div>
                 <div><small>STAFF</small><strong data-bind="staff-count">0</strong></div>
