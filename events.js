@@ -98,7 +98,9 @@
       const adjustment=25*((mix(key+'|ask')%21)-10);
       const ask=Math.max(750,base.ask+adjustment);
       const delta=ask-base.ask;
-      const miles=Math.max(3000,base.miles+((mix(key+'|miles')%105)-52)*100);
+      const miles=base.marketTier==='new'?Math.max(5,Math.min(200,
+        base.miles+(mix(key+'|miles')%121)-60)):
+        Math.max(3000,base.miles+((mix(key+'|miles')%105)-52)*100);
       const id='S-'+day+'-'+(10+phase*10+i);
       const wantsQuickSale=chance('private|'+name+'|'+day+'|'+id,
         conditions(day,name).privateChance);
