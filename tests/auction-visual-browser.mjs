@@ -37,6 +37,7 @@ try{
     const layout=await page.evaluate(()=>{
       const panel=document.querySelector('.auction-hall-control');
       const bid=panel.querySelector('.auction-bid-box').getBoundingClientRect();
+      const vehicleFile=panel.querySelector('.auction-current').getBoundingClientRect();
       const catalogue=panel.querySelector('.auction-catalogue').getBoundingClientRect();
       const controls=panel.querySelector('.auction-controls').getBoundingClientRect();
       const headings=panel.querySelectorAll('h1');
@@ -44,6 +45,7 @@ try{
       return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,
         panelWidth:panel.scrollWidth,panelClientWidth:panel.clientWidth,
         bidTop:Math.round(bid.top),catalogueBottom:Math.round(catalogue.bottom),
+        vehicleFileTop:Math.round(vehicleFile.top),
         controlsTop:Math.round(controls.top),headingCount:headings.length,
         actionCount,lotCount:stateForTest(panel)};
       function stateForTest(p){return p.querySelectorAll('.auction-catalogue-item').length;}
@@ -59,6 +61,12 @@ try{
       label+': bidding workspace should follow compact catalogue');
     if(label==='desktop')
       assert.ok(layout.bidTop<800,'Bid workspace should begin above the desktop fold');
+    if(label==='phone'){
+      assert.ok(layout.bidTop<844,'Bid workspace should begin within the phone viewport');
+      assert.ok(layout.controlsTop<layout.vehicleFileTop,
+        'Mobile bidding controls should precede the long detailed vehicle file');
+      assert.match(await panel.locator('.auction-mobile-lot-context').innerText(),/LOT 001/);
+    }
     await page.screenshot({path:'review/auction-'+label+'.png',fullPage:true});
     console.log('AUCTION_VISUAL_PASS '+label+' '+JSON.stringify(layout));
     assert.deepEqual(errors,[],'Browser should have no uncaught errors');
