@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./styles.css?v=51">
   <link rel="stylesheet" href="./dashboard-polish.css?v=1">
   <link rel="stylesheet" href="./inbox-polish.css?v=1">
+  <link rel="stylesheet" href="./auction-polish.css?v=1">
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -38,7 +39,7 @@
   <script src="./workshop-view.js?v=6" defer></script>
   <script src="./customers-view.js?v=8" defer></script>
   <script src="./premises-view.js?v=3" defer></script>
-  <script src="./auction-hall-view.js?v=2" defer></script>
+  <script src="./auction-hall-view.js?v=3" defer></script>
   <script src="./dashboard-view.js?v=2" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
   <script src="./buying-desk-view.js?v=2" defer></script>
@@ -296,8 +297,8 @@
               <details class="inbox-policy"><summary>How Inbox approvals and receipts work</summary><p>Routine expenses are posted through the business ledger. Paid copies are records, not new payment requests. Reading a message never moves money. Workshop and staff approvals can authorise actual expenditure and are checked before payment.</p></details>
             </section>
 
-            <section class="career-panel" data-panel="auctionHall" hidden aria-labelledby="auction-hall-title">
-              <div class="page-heading"><div><p class="section-overline">TRADE AUCTION / NUMERICAL LOT CATALOGUE</p><h1 id="auction-hall-title">THE AUCTION <em>HALL.</em></h1><p>One Monday auction per game week. Bid against another dealer until one side drops out; then finalise the hammer and buyer-fee payment before workshop transfer.</p></div><span class="career-chip">ONE LOT AT A TIME</span></div>
+            <section class="career-panel auction-hall-control" data-panel="auctionHall" hidden aria-labelledby="auction-hall-title">
+              <header class="auction-page-heading"><div><h1 id="auction-hall-title">WEEKLY <em>ROSTRUM.</em></h1><p>Review each vehicle, assess the full cost and bid with confidence.</p></div><span class="career-chip">ONE LOT AT A TIME</span></header>
               <div id="auction-hall-view" aria-live="polite"></div>
             </section>
 

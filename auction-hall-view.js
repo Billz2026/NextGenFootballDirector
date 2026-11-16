@@ -22,45 +22,60 @@
     const nextWeekday=(nextDay-1)%7===0?'MONDAY':'TUESDAY';
     const history=state.auctionHistory.slice(-10).reverse();
     const won=h.results.filter(r=>r.kind==='won').length;
-    const header='<div class="auction-hall-head"><div><span>INDEPENDENT MOTOR AUCTION · GAME DAY '+
-      state.day+'</span><h2>AUCTION <em>HALL.</em></h2>'+
-      '<p>One auction per game week, normally Monday (Tuesday when Monday is Deal Day). Bid until either dealer drops out. '+
-      'Each lot stays open until resolved, with no real-time timer.</p></div>'+
-      '<div class="auction-head-metrics"><div><small>LOTS TODAY</small><strong>'+lots.length+'</strong></div>'+
-      '<div><small>ACTIVE LOT</small><strong>'+(h.phase==='finished'||!lots.length?'—':E.lotNumber(h.index))+'</strong></div>'+
+    const sessionLabel=!lots.length?'CLOSED TODAY':h.phase==='finished'?'SESSION COMPLETE':
+      h.phase==='payment'?'PAYMENT DUE':'SESSION OPEN';
+    const sessionDay=(state.day-1)%7===0?'MONDAY':'TUESDAY';
+    const header='<div class="auction-hall-head" role="group" aria-label="Auction session status">'+
+      '<div class="auction-session-marker"><strong>'+sessionLabel+'</strong>'+
+      '<span>GAME DAY '+state.day+' · '+(lots.length?sessionDay+' SALE':
+        'NEXT '+nextWeekday+' · GAME DAY '+nextDay)+'</span></div>'+
+      '<div class="auction-head-metrics">'+
+      '<div><small>LOTS</small><strong>'+lots.length+'</strong></div>'+
+      '<div><small>ACTIVE</small><strong>'+(h.phase==='finished'||!lots.length?'—':E.lotNumber(h.index))+'</strong></div>'+
       '<div><small>WON TODAY</small><strong>'+won+'</strong></div>'+
-      '<div><small>CAREER AUCTION WINS</small><strong>'+own.length+'</strong></div></div></div>';
-    const notice='<p class="trade-alert">All amounts are simulated GBP. A winning bid becomes binding when the hammer falls. '+
-      'Confirm the separate invoice for the winning bid PLUS buyer fee before the car joins your workshop. Preparation funds are protected, not spent at the auction. '+
-      'A paid inspection is optional and non-refundable. A lot without a met vendor reserve remains unsold. '+
-      'No fees are charged for losing or passing. Competitor bidding is fixed for the day and cannot be rerolled.</p>';
-    const catalogue=lots.length?'<div class="auction-catalogue"><h3>NUMBERED LOT CATALOGUE</h3>'+
+      '<div><small>CAREER WINS</small><strong>'+own.length+'</strong></div></div></div>';
+    // Critical financial terms remain available on every phase, but no longer
+    // occupy a full-width paragraph above the actual bid and vehicle controls.
+    const notice='<details class="auction-rules"><summary>Rules, fees and settlement <span aria-hidden="true">⌄</span></summary>'+
+      '<p>All amounts are simulated GBP. A winning bid becomes binding when the hammer falls. '+
+      'Confirm the separate invoice for the winning bid PLUS buyer fee before the car joins your workshop. '+
+      'Preparation funds are protected, not spent at the auction. A paid inspection is optional and non-refundable. '+
+      'A lot without a met vendor reserve remains unsold. No fees are charged for losing or passing. '+
+      'Competitor bidding is fixed for the day and cannot be rerolled. Each lot has no real-time countdown.</p></details>';
+    const catalogue=lots.length?'<section class="auction-catalogue" aria-label="Numbered lot catalogue">'+
+      '<div class="auction-catalogue-head"><h3>NUMBERED LOT CATALOGUE</h3>'+
+      '<span>'+Math.min(h.index+1,lots.length)+' / '+lots.length+' LOTS</span></div>'+
       '<div class="auction-catalogue-list">'+lots.map((lot,i)=>{
         const r=h.results[i],active=i===h.index&&h.phase!=='finished';
         const spent=state.vehicles.some(v=>v.origin===lot.id)||state.sold.some(v=>v.origin===lot.id);
         return '<article class="auction-catalogue-item '+(active?'auction-catalogue-active':'')+
-          (r?' auction-catalogue-done':'')+'"><span>LOT '+E.lotNumber(i)+'</span>'+
+          (r?' auction-catalogue-done':'')+'">'+
+          '<div class="auction-lot-meta"><span>LOT '+E.lotNumber(i)+'</span>'+
+          '<b>'+(r?status[r.kind]:active?'ON THE ROSTRUM':spent?'ALREADY OWNED':'UPCOMING')+'</b></div>'+
           '<strong>'+esc(lot.title)+'</strong>'+
           '<small>'+esc(lot.fuel)+' · '+esc(lot.gearbox)+' · GRADE '+lot.profile.grade+
-          ' · GUIDE '+money(lot.guide)+'</small><b>'+ (r?status[r.kind]:active?'ON THE ROSTRUM':spent?'ALREADY OWNED':'UPCOMING')+
-          '</b><button type="button" class="auction-catalogue-review" data-action="preview-auction" data-id="'+
-          esc(lot.id)+'">VIEW LOT REPORT</button></article>';
-      }).join('')+'</div></div>':'';
+          ' · GUIDE '+money(lot.guide)+'</small>'+
+          (h.phase==='finished'?'':active?
+            '<span class="auction-catalogue-location">CURRENT LOT BELOW</span>':
+            '<button type="button" class="auction-catalogue-review" data-action="preview-auction" data-id="'+
+              esc(lot.id)+'">VIEW LOT REPORT</button>')+'</article>';
+      }).join('')+'</div></section>':'';
     if(!lots.length)
-      return header+notice+'<div class="trade-empty auction-closed"><h2>AUCTION HOUSE CLOSED TODAY.</h2>'+
-        '<p>Auctions run once each game week, normally Monday; never weekends. NEXT SESSION: '+nextWeekday+' · GAME DAY '+nextDay+
-        ' (in '+(nextDay-state.day)+' game day'+(nextDay-state.day===1?'':'s')+'). '+
-        (state.day%30===0?'Deal Day is also closed to auction bidding. ':'')+
+      return header+'<div class="trade-empty auction-closed"><h2>AUCTION HOUSE CLOSED TODAY.</h2>'+
+        '<p>There is no bidding outside the weekly sale. '+
+        (state.day%30===0?'Deal Day is reserved for retail customers, not auction bidding. ':'')+
         'Private sellers remain available through the Buying Desk.</p>'+
         '<button type="button" class="trade-button" data-page="auctions">OPEN BUYING DESK</button></div>'+
-        (history.length?'<div class="panel-card auction-results"><h3>PREVIOUS HAMMER RESULTS</h3>'+history.map(resultRow).join('')+'</div>':'');
+        notice+(history.length?'<details class="panel-card auction-results auction-results-disclosure">'+
+          '<summary>PREVIOUS HAMMER RESULTS · '+history.length+'</summary>'+
+          '<div class="auction-results-body">'+history.map(resultRow).join('')+'</div></details>':'');
     if(h.phase==='finished')
-      return header+notice+catalogue+
-        '<div class="panel-card auction-finished"><h3>HAMMER RESULTS · SESSION COMPLETE</h3>'+
+      return header+catalogue+
+        '<div class="panel-card auction-finished"><h3>FINAL HAMMER RESULTS</h3>'+
         '<p>Every lot has now left the auction ring. Any cars you purchased are in Vehicle Stock for assessment and repair.</p>'+
         h.results.map(resultRow).join('')+
         '<div class="auction-final-actions"><button type="button" class="trade-button" data-page="stock">VIEW VEHICLE STOCK</button>'+
-        '<button type="button" class="trade-button trade-button-secondary" data-page="auctions">PRIVATE SELLER DESK</button></div></div>';
+        '<button type="button" class="trade-button trade-button-secondary" data-page="auctions">PRIVATE SELLER DESK</button></div></div>'+notice;
     const lot=lots[h.index],current=h.currentBid||lot.guide;
     const previewLot=lots.find(x=>x.id===previewId&&x.id!==lot.id)||null;
     const preview=previewLot?'<section class="panel-card auction-preview"><div class="auction-preview-head"><div><span>CATALOGUE INSPECTION · NOT ON THE ROSTRUM</span><h3>LOT '+
@@ -122,8 +137,12 @@
       '<div><small>LIKELY RETAIL SALE</small><strong>'+money(lot.profile.likelySale)+'</strong></div></div>'+
       reportCard(lot,'auction',expectedNext)+
       '</div></article>'+
-      '<aside class="panel-card auction-bid-box"><div class="auction-bid-box-top"><small>LIVE HAMMER POSITION</small>'+
-      '<strong>'+money(current)+'</strong><span>'+esc(statusText)+'</span></div>'+
+      '<aside class="panel-card auction-bid-box">'+
+      '<div class="auction-mobile-lot-context"><strong>LOT '+E.lotNumber(h.index)+' · '+esc(lot.title)+'</strong>'+
+      '<small>'+esc(lot.fuel)+' · '+esc(lot.gearbox)+' · GRADE '+lot.profile.grade+
+      ' · GUIDE '+money(lot.guide)+'</small></div>'+
+      '<div class="auction-bid-box-top"><small>LIVE HAMMER POSITION</small>'+
+      '<strong>'+money(current)+'</strong></div>'+
       '<div class="auction-bid-maths"><div><span>'+(paymentDue?'WINNING HAMMER':'NEXT £100 BID')+'</span><b>'+money(expectedNext)+'</b></div>'+
       '<div><span>PLUS BUYER FEE</span><b>'+money(lot.fee)+'</b></div>'+
       '<div><span>PLUS EXPECTED PREPARATION</span><b>'+money(q.prep)+'</b></div>'+
@@ -134,12 +153,15 @@
       settlement+resolved+cashWarning+
       '<div class="auction-controls">'+controls+'</div>'+
       '<div class="auction-activity"><h3>AUCTIONEER ACTIVITY</h3>'+log+'</div></aside></div>';
-    const results=h.results.length?'<div class="panel-card auction-results"><h3>TODAY\'S HAMMER HISTORY</h3>'+
-      h.results.map(resultRow).join('')+'</div>':'';
-    const recent=history.filter(x=>x.day<state.day).length?
-      '<div class="panel-card auction-results"><h3>RECENT SESSION RESULTS</h3>'+
-      history.filter(x=>x.day<state.day).slice(0,6).map(resultRow).join('')+'</div>':'';
-    return header+notice+catalogue+preview+lotView+results+recent;
+    const results=h.results.length?'<details class="panel-card auction-results auction-results-disclosure">'+
+      '<summary>TODAY\'S HAMMER HISTORY · '+h.results.length+'</summary>'+
+      '<div class="auction-results-body">'+h.results.map(resultRow).join('')+'</div></details>':'';
+    const recentResults=history.filter(x=>x.day<state.day).slice(0,6);
+    const recent=recentResults.length?
+      '<details class="panel-card auction-results auction-results-disclosure">'+
+      '<summary>RECENT SESSION RESULTS · '+recentResults.length+'</summary>'+
+      '<div class="auction-results-body">'+recentResults.map(resultRow).join('')+'</div></details>':'';
+    return header+catalogue+preview+lotView+notice+results+recent;
   }
   window.MotorTradeAuctionHallView=Object.freeze({render});
 })();
