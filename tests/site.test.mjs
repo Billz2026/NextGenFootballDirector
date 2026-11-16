@@ -5731,3 +5731,35 @@ test('starting staff can be expanded, trained and released with actual cash obli
   assert.equal(restored.staff.length,4);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(restored))));
 });
+
+
+test('opening team and two purchased cars survive three quiet months without fictitious funding',()=>{
+  const E=browser(new Map()).productionEngine;
+  const s=E.createStaffed('Conservative Three Month Dealer',[]);
+  const sellers=E.marketFor(s).sellers;
+  assert.ok(sellers.length>=2);
+  for(const seller of sellers.slice(0,2)){
+    assert.ok(E.acquireSeller(s,seller.id,seller.ask).ok);
+  }
+  const openingAfterStock=s.cash;
+  assert.ok(openingAfterStock<45000);
+  assert.equal(s.vehicles.length,2);
+  for(let nextDay=2;nextDay<=90;nextDay++){
+    const finishing=s.day===s.monthPlan.endDay;
+    if(finishing)assert.ok(E.monthly.close(s));
+    s.day=nextDay;
+    if(finishing)E.monthly.next(s);
+    const payroll=E.staffDay(s),property=E.premisesDay(s);
+    assert.equal(payroll.arrears,0,'A fair cash reserve avoids automatic unpaid wages');
+    assert.equal(property.arrears,0,'Rent must be paid rather than hidden');
+    if(nextDay%30===0)assert.ok(E.normalize(JSON.parse(JSON.stringify(s))),
+      'Quarterly career progress must remain exportable and recoverable');
+  }
+  assert.equal(s.staff.length,4,'Staff should not disappear purely because trading is slow');
+  assert.equal(s.monthlyReports.length,2);
+  assert.ok(s.cash>0,'Real working capital supports an initial trading runway');
+  assert.equal(s.payrollArrears,0);
+  assert.equal(s.premises.arrears,0);
+  assert.ok(s.cash<openingAfterStock,'Quiet periods consume cash; no invented injections');
+  assert.equal(s.cash,45000+s.ledger.reduce((n,row)=>n+row.delta,0));
+});
