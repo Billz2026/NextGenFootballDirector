@@ -110,7 +110,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /workshop-view\.js\?v=7/);
   assert.match(html, /events-view\.js\?v=7/);
   assert.match(html, /monthly-view\.js\?v=9/);
-  assert.match(html, /people-view\.js\?v=7/);
+  assert.match(html, /people-view\.js\?v=8/);
   assert.match(html, /vehicle-view\.js\?v=4/);
   assert.doesNotMatch(html, /NextGenSessionsArcade|looping\.zip|<iframe/);
   assert.equal(existsSync(new URL('lab/', root)), false);
