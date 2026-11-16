@@ -5694,7 +5694,7 @@ test('opening team has paid 30-day runway, real ledger charges, and legacy caree
   assert.equal(legacy.staff.length,0);
   assert.equal(legacy.startingCapital,undefined);
   assert.equal(E.normalize(JSON.parse(JSON.stringify(legacy))).cash,12500);
-  assert.deepEqual(E.normalize(JSON.parse(JSON.stringify(legacy))).staff,[]);
+  assert.equal(E.normalize(JSON.parse(JSON.stringify(legacy))).staff.length,0);
   const invalid={...s,startingCapital:500000,cash:500000};
   assert.equal(E.normalize(JSON.parse(JSON.stringify(invalid))),null,
     'Players cannot inject arbitrary starting capital through the career marker');
