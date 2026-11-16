@@ -1,0 +1,592 @@
+/* v0.9.39 — Buying Desk only. A single page-level scroll and compact
+ * acquisition workspace. Economics, inputs and engine actions are untouched. */
+#screen-career:has(.buying-desk-control:not([hidden])) .career-topbar{
+  min-height:61px;
+  padding:9px clamp(16px,2.35vw,32px);
+}
+#screen-career:has(.buying-desk-control:not([hidden])) .career-content{
+  padding:12px clamp(16px,2.35vw,32px) 22px;
+}
+#screen-career:has(.buying-desk-control:not([hidden])) .game-notice{
+  margin:8px clamp(16px,2.35vw,32px) 0;
+  padding:8px 11px;
+  font-size:10px;
+  line-height:1.4;
+}
+#screen-career:has(.buying-desk-control:not([hidden])) #events-banner:has(.event-neutral-banner){
+  display:none;
+}
+.buying-desk-control .buy-page-heading{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:36px;
+  margin:0 0 9px;
+}
+.buying-desk-control .buy-page-heading h1{
+  margin:0;
+  color:#f2eee6;
+  font:900 clamp(25px,2.5vw,32px)/1.05 var(--title);
+  letter-spacing:.012em;
+}
+.buying-desk-control .buy-page-heading p{
+  margin:4px 0 0;
+  color:#acc0c3;
+  font:550 10px/1.35 var(--body);
+}
+.buying-desk-control .buy-level-strip{
+  min-height:34px;
+  margin:0 0 8px;
+  padding:7px 10px;
+  border-radius:5px;
+  background:#142b35;
+  border-color:#38515a;
+}
+.buying-desk-control .buy-level-strip>span{
+  color:#a6bac0;
+  font-size:9px;
+}
+.buying-desk-control .buy-level-strip strong{
+  font-size:12px;
+}
+.buying-desk-control .buy-level-strip>small{
+  text-align:right;
+  font-size:9px;
+}
+.buying-desk-control .buy-desk-stats{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:0;
+  margin:0 0 9px;
+  padding:0 5px;
+  background:#172e38;
+  border:1px solid #39525a;
+  border-radius:6px;
+}
+.buying-desk-control .buy-stat{
+  display:flex;
+  flex:1 1 0;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  min-height:47px;
+  margin:0;
+  padding:7px 11px;
+  border:0;
+  border-right:1px solid #38515a;
+  border-radius:0;
+  background:transparent;
+}
+.buying-desk-control .buy-stat:last-child{border-right:0}
+.buying-desk-control .buy-stat small{
+  min-width:0;
+  font:800 9px/1.3 var(--mono);
+  color:#a9c0c4;
+}
+.buying-desk-control .buy-stat>strong{
+  margin:0;
+  color:#efd3aa;
+  font:900 clamp(16px,1.65vw,22px)/1.1 var(--title);
+  white-space:nowrap;
+}
+.buying-desk-control .buy-stat>span{
+  display:none;
+}
+.buying-desk-control .buy-main-grid{
+  display:grid;
+  grid-template-columns:minmax(208px,235px) minmax(0,1fr);
+  gap:9px;
+  align-items:start;
+}
+.buying-desk-control .buy-leads,
+.buying-desk-control .buy-seller-focus{
+  border-radius:6px;
+  border-color:#3b5661;
+  background:#142b35;
+}
+.buying-desk-control .buy-leads-heading,
+.buying-desk-control .buy-detail-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:36px;
+  margin:0;
+  padding:8px 11px;
+  background:#1c3641;
+  border-bottom:1px solid #39525b;
+}
+.buying-desk-control .buy-leads-heading h2{
+  margin:0;
+  color:#e7d2b6;
+  font:900 15px/1.2 var(--title);
+}
+.buying-desk-control .buy-leads-heading>span,
+.buying-desk-control .buy-detail-top>span:first-child{
+  font:800 8px/1.3 var(--mono);
+  color:#a9bec2;
+}
+.buying-desk-control .buy-detail-top>span:last-child{
+  font:850 9px/1.3 var(--mono);
+  color:#f1ce98;
+}
+.buying-desk-control .buy-lead-list{
+  display:flex;
+  flex-direction:column;
+  max-height:none;
+  overflow:visible;
+  scrollbar-width:thin;
+}
+.buying-desk-control .buy-lead{
+  gap:5px;
+  width:100%;
+  min-height:94px;
+  padding:10px 11px;
+  border-left-width:2px;
+  border-bottom:1px solid #2d4650;
+}
+.buying-desk-control .buy-lead-top>span{
+  color:#a7bdc1;
+  font-size:8px;
+}
+.buying-desk-control .buy-lead-top>b{
+  font-size:8px;
+}
+.buying-desk-control .buy-lead>strong{
+  color:#f0eadf;
+  font:850 14px/1.2 var(--body);
+}
+.buying-desk-control .buy-lead-facts{
+  gap:4px 8px;
+}
+.buying-desk-control .buy-lead-facts>span{
+  color:#a8bdc1;
+  font-size:9px;
+  line-height:1.3;
+}
+.buying-desk-control .buy-lead-bottom>span{
+  font-size:8px;
+}
+.buying-desk-control .buy-lead-bottom>b{
+  color:#e9c58e;
+  font-size:18px;
+}
+.buying-desk-control .buy-lead-selected{
+  background:#223d47;
+  border-left-color:#e7bc80;
+}
+.buying-desk-control .buy-seller-focus{
+  height:auto;
+  min-height:0;
+  display:block;
+  overflow:hidden;
+}
+.buying-desk-control .buy-focus-content{
+  height:auto;
+  min-height:0;
+  overflow:visible;
+  display:grid;
+  grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
+}
+.buying-desk-control .buy-vehicle,
+.buying-desk-control .buy-deal-workspace{
+  height:auto;
+  min-height:0;
+  overflow:visible;
+}
+.buying-desk-control .buy-vehicle{
+  padding:11px 12px;
+  background:#132832;
+  border-right:1px solid #334c55;
+}
+.buying-desk-control .buy-vehicle .vehicle-photo-frame{
+  height:162px;
+  min-height:140px;
+}
+.buying-desk-control .buy-vehicle .vehicle-photo-block{
+  margin:0 0 7px;
+}
+.buying-desk-control .buy-vehicle .vehicle-card-heading{
+  padding:1px 0 6px;
+}
+.buying-desk-control .buy-vehicle .vehicle-card-heading h3{
+  font-size:clamp(20px,2vw,26px);
+  line-height:1.09;
+}
+.buying-desk-control .buy-vehicle .vehicle-card-heading p{
+  font-size:9px;
+}
+.buying-desk-control .buy-vehicle .vehicle-card-statline{
+  margin:3px 0 7px;
+}
+.buying-desk-control .buy-car-note{
+  margin:0 0 8px;
+  color:#aabfc3;
+  font-size:10px;
+  line-height:1.45;
+}
+.buying-desk-control .buy-mobile-vehicle-context{display:none}
+.buying-desk-control .buy-deal-workspace{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  background:#142c36;
+}
+.buying-desk-control .buy-valuation{
+  padding:11px 12px 9px;
+  border-bottom:1px solid #334c54;
+}
+.buying-desk-control .buy-valuation-heading,
+.buying-desk-control .buy-trading-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:0 0 8px;
+}
+.buying-desk-control .buy-valuation-heading>strong,
+.buying-desk-control .buy-trading-heading>strong{
+  color:#efdecb;
+  font:900 17px/1.1 var(--title);
+}
+.buying-desk-control .buy-valuation-heading>span,
+.buying-desk-control .buy-trading-heading>small{
+  font:800 9px/1.3 var(--mono);
+  color:#b6c7c8;
+}
+.buying-desk-control .buy-value-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+  margin:0 0 8px;
+}
+.buying-desk-control .buy-value-grid>div{
+  padding:7px 8px;
+  border-radius:4px;
+  background:#1d3741;
+  border-color:#35515a;
+}
+.buying-desk-control .buy-value-grid small{
+  font-size:8px;
+  line-height:1.3;
+}
+.buying-desk-control .buy-value-grid strong{
+  margin:3px 0 0;
+  font-size:clamp(17px,1.85vw,22px);
+  line-height:1.12;
+}
+.buying-desk-control .buy-budget-table{
+  margin:0 0 8px;
+  border-color:#39525a;
+  border-radius:5px;
+}
+.buying-desk-control .buy-budget-table>div{
+  padding:6px 9px;
+  gap:8px;
+}
+.buying-desk-control .buy-budget-table span{
+  font-size:9px;
+  line-height:1.35;
+}
+.buying-desk-control .buy-budget-table b{
+  font-size:11px;
+}
+.buying-desk-control .buy-budget-table .buy-budget-total{
+  padding:8px 9px;
+  background:#244038;
+}
+.buying-desk-control .buy-budget-total span{font-size:9px}
+.buying-desk-control .buy-budget-table .buy-budget-total b{
+  font-size:21px;
+}
+.buying-desk-control .buy-decision{
+  margin:0 0 7px;
+  padding:8px 9px;
+  border-radius:5px;
+}
+.buying-desk-control .buy-decision strong{font-size:9px}
+.buying-desk-control .buy-decision p{
+  margin:2px 0 0;
+  font-size:10px;
+  line-height:1.4;
+}
+.buying-desk-control .buy-cost-breakdown,
+.buying-desk-control .buy-budget-note,
+.buying-desk-control .buy-seller-story,
+.buying-desk-control .buy-deal-terms,
+.buying-desk-control .buy-disclosure{
+  min-width:0;
+  padding:0;
+  margin:5px 0 0;
+  border:1px solid #344e56;
+  border-radius:5px;
+  background:#142c35;
+}
+.buying-desk-control .buy-cost-breakdown summary,
+.buying-desk-control .buy-budget-note summary,
+.buying-desk-control .buy-seller-story summary,
+.buying-desk-control .buy-deal-terms summary,
+.buying-desk-control .buy-disclosure summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 9px;
+  color:#ddc9a9;
+  font:800 9px/1.4 var(--mono);
+  list-style:none;
+  cursor:pointer;
+}
+.buying-desk-control .buy-cost-breakdown summary::-webkit-details-marker,
+.buying-desk-control .buy-budget-note summary::-webkit-details-marker,
+.buying-desk-control .buy-seller-story summary::-webkit-details-marker,
+.buying-desk-control .buy-deal-terms summary::-webkit-details-marker,
+.buying-desk-control .buy-disclosure summary::-webkit-details-marker{display:none}
+.buying-desk-control .buy-cost-breakdown summary::after,
+.buying-desk-control .buy-budget-note summary::after,
+.buying-desk-control .buy-seller-story summary::after,
+.buying-desk-control .buy-deal-terms summary::after,
+.buying-desk-control .buy-disclosure summary::after{
+  content:'⌄';
+  color:#ddb783;
+  font:900 13px/1 var(--mono);
+}
+.buying-desk-control details[open]>summary::after{
+  transform:rotate(180deg);
+}
+.buying-desk-control .buy-cost-breakdown .buy-budget-table{
+  margin:0 8px 8px;
+}
+.buying-desk-control .buy-budget-note>p,
+.buying-desk-control .buy-seller-story>p,
+.buying-desk-control .buy-deal-terms>p,
+.buying-desk-control .buy-disclosure>p{
+  margin:0;
+  padding:1px 9px 9px;
+  color:#acbec2;
+  font:500 10px/1.6 var(--body);
+}
+.buying-desk-control .buy-trading{
+  padding:10px 12px 12px;
+}
+.buying-desk-control .buy-seller-story{
+  margin:0 0 9px;
+  background:#1b353d;
+}
+.buying-desk-control .buy-seller-story summary{
+  color:#dfc599;
+}
+.buying-desk-control .buy-offer-actions{
+  gap:7px;
+  grid-template-columns:minmax(0,1fr) auto;
+}
+.buying-desk-control .buy-offer-actions label{
+  gap:4px;
+  font-size:9px;
+}
+.buying-desk-control .buy-offer-actions input{
+  min-height:44px;
+  height:44px;
+}
+.buying-desk-control .buy-offer-actions .trade-button{
+  min-height:44px;
+  padding:9px 12px;
+  font-size:10px;
+  border-radius:5px;
+}
+.buying-desk-control .buy-opening-hint{
+  margin:7px 0 0;
+  color:#b9c6c7;
+  font-size:9px;
+  line-height:1.4;
+}
+.buying-desk-control .buy-deal-terms{
+  margin:10px 0 0;
+  border-top:1px solid #344e56;
+}
+.buying-desk-control .buy-counter{
+  margin:0 0 8px;
+  padding:9px 10px;
+}
+.buying-desk-control .buy-counter strong{
+  font-size:18px;
+  margin:3px 0;
+}
+.buying-desk-control .buy-counter small{font-size:9px}
+.buying-desk-control .buy-counter p{font-size:10px}
+.buying-desk-control .buy-counter-actions{
+  gap:7px;
+  margin-top:7px;
+}
+.buying-desk-control .buy-counter-actions .trade-button{
+  font-size:10px;
+  min-height:42px;
+}
+.buying-desk-control .buy-disclosure{
+  margin:8px 0 0;
+  background:#11252e;
+}
+.buying-desk-control .buy-disclosure summary{
+  color:#9fb8bd;
+  font-size:9px;
+}
+.buying-desk-control .buy-no-leads{
+  padding:21px;
+  border-radius:6px;
+  background:#162d37;
+}
+.buying-desk-control .buy-no-leads h2{
+  font-size:23px;
+}
+.buying-desk-control .buy-no-leads p{
+  margin:8px 0 13px;
+  font-size:11px;
+}
+.buying-desk-control summary:focus-visible,
+.buying-desk-control .buy-lead:focus-visible,
+.buying-desk-control .buy-offer-actions input:focus-visible{
+  outline:2px solid #eac188;
+  outline-offset:2px;
+}
+/* On spacious desktop widths show the four valuation benchmarks in one
+   row. Keep two columns when the negotiation panel is narrower. */
+@media(min-width:1450px){
+  .buying-desk-control .buy-value-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .buying-desk-control .buy-value-grid strong{font-size:19px}
+}
+@media(max-width:1230px){
+  .buying-desk-control .buy-main-grid{
+    grid-template-columns:minmax(200px,222px) minmax(0,1fr);
+  }
+  .buying-desk-control .buy-focus-content{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  }
+}
+@media(max-width:1090px){
+  .buying-desk-control .buy-main-grid{grid-template-columns:1fr}
+  .buying-desk-control .buy-lead-list{
+    display:flex;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    gap:0;
+    max-height:none;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+  }
+  .buying-desk-control .buy-lead{
+    flex:0 0 230px;
+    width:230px;
+    scroll-snap-align:start;
+    border-right:1px solid #344e58;
+    border-bottom:0;
+  }
+  .buying-desk-control .buy-lead:nth-child(odd){border-right:1px solid #344e58}
+  .buying-desk-control .buy-lead:last-child{border-right:0}
+  .buying-desk-control .buy-focus-content{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+}
+@media(max-width:760px){
+  .buying-desk-control .buy-page-heading h1{font-size:27px}
+  .buying-desk-control .buy-level-strip{
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:3px 8px;
+  }
+  .buying-desk-control .buy-level-strip>small{
+    text-align:left;
+  }
+  .buying-desk-control .buy-desk-stats{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .buying-desk-control .buy-stat{
+    min-height:39px;
+    padding:7px 9px;
+    border-right:0;
+    border-bottom:1px solid #38515a;
+  }
+  .buying-desk-control .buy-stat:nth-child(odd){border-right:1px solid #38515a}
+  .buying-desk-control .buy-stat:nth-last-child(-n+2){border-bottom:0}
+  .buying-desk-control .buy-stat small{font-size:8px}
+  .buying-desk-control .buy-stat>strong{font-size:17px}
+  .buying-desk-control .buy-lead{flex-basis:215px;width:215px;min-height:92px}
+  .buying-desk-control .buy-focus-content{
+    display:flex;
+    flex-direction:column;
+  }
+  .buying-desk-control .buy-detail-top{min-height:34px}
+  .buying-desk-control .buy-deal-workspace{order:0;width:100%}
+  .buying-desk-control .buy-vehicle{
+    order:1;
+    border-right:0;
+    border-top:1px solid #344f57;
+    border-bottom:0;
+    width:100%;
+  }
+  .buying-desk-control .buy-mobile-vehicle-context{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    padding:9px 11px;
+    background:#1d3741;
+    border-bottom:1px solid #39505a;
+  }
+  .buying-desk-control .buy-mobile-vehicle-context strong{
+    color:#f2e7d4;
+    font:850 14px/1.25 var(--body);
+  }
+  .buying-desk-control .buy-mobile-vehicle-context span{
+    color:#b8c8c9;
+    font:750 9px/1.4 var(--mono);
+  }
+  .buying-desk-control .buy-vehicle .vehicle-photo-frame{height:210px}
+  .buying-desk-control .buy-valuation{padding:9px 11px}
+  .buying-desk-control .buy-trading{padding:10px 11px}
+}
+@media(max-width:490px){
+  #screen-career:has(.buying-desk-control:not([hidden])) .career-content{
+    padding:10px 13px 19px;
+  }
+  #screen-career:has(.buying-desk-control:not([hidden])) .game-notice{
+    margin:7px 13px 0;
+  }
+  .buying-desk-control .buy-page-heading h1{font-size:25px}
+  .buying-desk-control .buy-page-heading p{font-size:10px}
+  .buying-desk-control .buy-leads-heading{min-height:32px;padding:7px 10px}
+  .buying-desk-control .buy-leads-heading h2{font-size:14px}
+  .buying-desk-control .buy-lead{
+    padding:9px 10px;
+    min-height:87px;
+    flex-basis:203px;
+    width:203px;
+  }
+  .buying-desk-control .buy-lead>strong{font-size:13px}
+  .buying-desk-control .buy-lead-bottom>b{font-size:17px}
+  .buying-desk-control .buy-value-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+  }
+  .buying-desk-control .buy-value-grid strong{font-size:19px}
+  .buying-desk-control .buy-budget-table .buy-budget-total b{font-size:20px}
+  .buying-desk-control .buy-offer-actions{
+    grid-template-columns:minmax(0,1fr) minmax(130px,.9fr);
+  }
+  .buying-desk-control .buy-offer-actions .trade-button{
+    white-space:normal;
+    min-height:44px;
+    padding:8px 6px;
+  }
+}
+@media(max-width:355px){
+  .buying-desk-control .buy-offer-actions{grid-template-columns:1fr}
+  .buying-desk-control .buy-offer-actions .trade-button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .buying-desk-control .buy-lead{transition:none}
+}
