@@ -14,11 +14,12 @@
   const AV = window.MotorTradeAuctionHallView;
   const SITE_VIEW = window.MotorTradePremisesView;
   const DV = window.MotorTradeDashboardView;
+  const CP = window.MotorTradeCareerProgression;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !IN || !BV || !SV || !FV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -143,6 +144,7 @@
   let inboxFilter = 'all';
   let eventNotice = '';
   let lastTradeResult = null;
+  let careerPromotion = null; // Transient recognition; tier remains derived from saved reputation.
   let expandedReportId = null;
   let auctionPreviewId = null;
   let offerDrafts = {};
@@ -278,6 +280,18 @@
     if (result.ok || result.changed) persistCareer();
     render();
   }
+  function completeCustomerSale(id,mode,allowance) {
+    if(!career)return;
+    const oldReputation=career.reputationScore;
+    const previousSales=career.sold.length;
+    const result=E.completeSale(career,id,mode,allowance);
+    if(result.ok&&career.sold.length>previousSales){
+      const extra=CP.saleFeedback(career,oldReputation,previousSales);
+      const tier=CP.promotion(oldReputation,career.reputationScore);
+      if(tier)careerPromotion=tier;
+      saveResult({...result,message:result.message+(extra?' '+extra:'')});
+    }else saveResult(result);
+  }
   function leadFeedback(id) {
     if (!lastTradeResult || lastTradeResult.id !== id) return '';
     return '<div class="trade-inline-feedback ' + (lastTradeResult.ok ? 'trade-feedback-success' : 'trade-feedback-warning') +
@@ -372,6 +386,7 @@
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
     byId('dashboard-operating-strip').innerHTML=DV.operations(d,career);
+    byId('dashboard-career-progress').innerHTML=CP.dashboard(career);
     bindText('dashboard-cash-note',d.reserved?
       money.format(d.reserved)+' earmarked for repairs':'Before future operating bills');
     bindText('dashboard-stock-note',d.listed+' listed · '+d.awaitingPrep+' awaiting prep');
@@ -454,6 +469,18 @@
         career.name + ' / Day ' + String(career.day).padStart(2, '0');
     }
     if (screen !== 'career' || !career) return;
+    const promotionLayer=byId('career-promotion');
+    promotionLayer.hidden=!careerPromotion;
+    if(careerPromotion){
+      if(promotionLayer.dataset.tier!==careerPromotion.name){
+        promotionLayer.innerHTML=CP.promotionHtml(careerPromotion);
+        promotionLayer.dataset.tier=careerPromotion.name;
+        promotionLayer.querySelector('[data-action="view-promotion"]')?.focus({preventScroll:true});
+      }
+    }else {
+      promotionLayer.innerHTML='';
+      delete promotionLayer.dataset.tier;
+    }
     // Derive mail from actual invoices, workshop quotes and staffing activity.
     // Never repeat a ledger receipt when reloading the same saved career.
     if(IN.sync(career,E))persistCareer();
@@ -510,6 +537,7 @@
   function show(pageOrScreen) {
     if (pageOrScreen === 'menu' || pageOrScreen === 'setup') {
       screen = pageOrScreen;
+      careerPromotion = null;
     } else if (career && Object.prototype.hasOwnProperty.call(PAGES, pageOrScreen)) {
       screen = 'career';
       currentPage = pageOrScreen;
@@ -555,6 +583,7 @@
     const enteringDealDay=(career.day+1)%30===0;
     // Close the completed 30-day period BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
+    const beforeDayReputation=career.reputationScore;
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
     career.day += 1;
     E.rollAuctionHall(career);
@@ -635,10 +664,13 @@
         status+'. Open MANAGEMENT REPORTS or your inbox for the full results. '+
         eventNotice;
     }
+    const promotion=CP.promotion(beforeDayReputation,career.reputationScore);
+    if(promotion)careerPromotion=promotion;
     persistCareer();
     render();
   }
   function resetWorkspace() {
+    careerPromotion = null;
     selectedMessageId = null;
     inboxFilter='all';
     lastTradeResult = null;
@@ -832,6 +864,21 @@
         '<p>'+VC.esc(model.position.text)+'</p>';
     }
   });
+  document.addEventListener('keydown',event=>{
+    if(!careerPromotion||screen!=='career')return;
+    const layer=byId('career-promotion');
+    if(event.key==='Escape'){
+      event.preventDefault();careerPromotion=null;render();return;
+    }
+    if(event.key!=='Tab')return;
+    const controls=[...layer.querySelectorAll('button:not(:disabled)')];
+    if(!controls.length)return;
+    if(event.shiftKey&&document.activeElement===controls[0]){
+      event.preventDefault();controls.at(-1).focus();
+    }else if(!event.shiftKey&&document.activeElement===controls.at(-1)){
+      event.preventDefault();controls[0].focus();
+    }
+  });
   document.addEventListener('click', event => {
     const button = event.target.closest('button[data-action],button[data-page]');
     if (!button) return;
@@ -850,7 +897,7 @@
     // workshops, payroll decisions or time progression to spend its funds.
     if(career?.auctionHall?.phase==='payment'&&
        !['settle-auction','toggle-report','preview-auction','close-auction-preview',
-         'menu','resume','dashboard','new-career','select-report',
+         'menu','resume','dashboard','new-career','select-report','view-promotion','dismiss-promotion',
           'toggle-career-tools','open-career-tools','export-career','choose-import','restore-career'].includes(button.dataset.action)){
       currentPage='auctionHall';
       eventNotice='Auction invoice outstanding. Pay the hammer plus buyer fee before other dealership decisions.';
@@ -858,6 +905,14 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'view-promotion':
+        careerPromotion=null;
+        show('reputation');
+        break;
+      case 'dismiss-promotion':
+        careerPromotion=null;
+        render();
+        break;
       case 'new-career':
         show('setup');
         break;
@@ -1153,17 +1208,17 @@
           saveResult(E.cancelCustomer(career,Number(button.dataset.id),'buyer'));
         break;
       case 'handover-customer':
-        if(career)saveResult(E.completeSale(career,Number(button.dataset.id),button.dataset.mode,null));
+        completeCustomerSale(Number(button.dataset.id),button.dataset.mode,null);
         break;
       case 'counter-sale':
         if (career) saveResult(E.counter(career,Number(button.dataset.id)));
         break;
       case 'sell-cash':
-        if (career) saveResult(E.completeSale(career,Number(button.dataset.id),'cash',null));
+        completeCustomerSale(Number(button.dataset.id),'cash',null);
         break;
       case 'sell-part-ex':
-        if (career) saveResult(E.completeSale(career,Number(button.dataset.id),'part-ex',
-          inputNumber('px-allowance-' + button.dataset.id)));
+        if(career)completeCustomerSale(Number(button.dataset.id),'part-ex',
+          inputNumber('px-allowance-' + button.dataset.id));
         break;
       case 'filter-ledger':
         if(career&&FV.FILTERS.includes(button.dataset.filter)){
