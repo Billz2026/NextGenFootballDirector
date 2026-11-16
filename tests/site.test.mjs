@@ -80,7 +80,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /auction-hall-view\.js\?v=3/);
   assert.match(html, /buying-desk-view\.js\?v=3/);
   assert.match(html, /stock-view\.js\?v=2/);
-  assert.match(html, /finance-view\.js\?v=2/);
+  assert.match(html, /finance-view\.js\?v=3/);
   assert.match(html, /styles\.css\?v=51/);
   assert.match(html, /career-storage\.js\?v=2/);
   assert.match(html, /cloud-config\.js\?v=1/);
@@ -4988,7 +4988,7 @@ test('v0.9.27 ledger HTML escapes special punctuation',()=>{
   assert.match(result,/&quot;alert\(1\)&quot;/);
   assert.match(result,/Bob&#39;s ledger/);
   assert.doesNotMatch(result,/<span onclick/);
-  assert.match(html,/finance-view\.js\?v=2/);
+  assert.match(html,/finance-view\.js\?v=3/);
   assert.match(html,/styles\.css\?v=51/);
 });
 
@@ -6084,4 +6084,69 @@ test('compact Workshop keeps internal and external quotes, live charges, QC and 
   assert.match(htmlWork,/REPAIRS PAID \/ BOOKED/);
   assert.match(htmlWork,/QC PASSED/);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('compact Finance desk retains distinct cash, reserves, stock and operating contribution',()=>{
+  const app=browser(new Map()),E=app.productionEngine,F=app.financeView;
+  const s=E.createStaffed('Finance Layout Regression',[]);
+  const page=F.summary(s,E);
+  assert.match(html,/class="career-panel finance-control"/);
+  assert.match(html,/class="finance-page-heading"/);
+  assert.match(html,/FINANCIAL <em>CONTROL\.<\/em>/);
+  assert.match(html,/finance-polish\.css\?v=1/);
+  assert.doesNotMatch(html,/<h1 id="finance-title">BUSINESS <em>FINANCES/);
+  assert.equal((page.html.match(/class="fin-tile/g)||[]).length,4);
+  assert.match(page.html,/CASH BALANCE/);
+  assert.match(page.html,/WORKING CASH AVAILABLE/);
+  assert.match(page.html,/INVESTED IN UNSOLD VEHICLES/);
+  assert.match(page.html,/MONTH OPERATING CONTRIBUTION/);
+  assert.match(page.html,/WHERE YOUR CASH WENT/);
+  assert.match(page.html,/RESERVES & OUTGOINGS/);
+  assert.match(page.html,/SALES PERFORMANCE/);
+  assert.match(page.html,/Customer deposits held separately/);
+  assert.match(page.html,/<details class="fin-disclosure">/);
+  assert.match(page.html,/not statutory net profit/);
+  assert.equal(page.snapshot.cash,45000);
+  assert.equal(page.snapshot.reserved,0);
+  assert.equal(page.snapshot.afterReserve,45000);
+  assert.equal(page.snapshot.held,0);
+  assert.equal(page.snapshot.cashReconciles,true);
+  assert.equal(s.staff.length,4);
+  const seller=E.marketFor(s).sellers[0];
+  assert.ok(E.acquireSeller(s,seller.id,seller.ask).ok);
+  const after=F.summary(s,E);
+  assert.equal(after.snapshot.stock,s.vehicles[0].cost);
+  assert.equal(after.snapshot.cash,s.cash);
+  assert.equal(after.snapshot.afterReserve,s.cash-E.workshop.reserved(s));
+  assert.equal(after.snapshot.cashReconciles,true);
+  assert.match(after.html,/CASH AFTER REPAIR RESERVES/);
+  assert.match(after.html,/After earmarked repairs/);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('compact Finance leaves overdue warnings and auction debts immediately visible',()=>{
+  const app=browser(new Map()),E=app.productionEngine,F=app.financeView;
+  const s=E.createStaffed('Finance Liabilities Regression',[]);
+  const originalCash=s.cash;
+  s.payrollArrears=575;
+  s.premises.arrears=150;
+  let page=F.summary(s,E).html;
+  assert.match(page,/UNPAID BILLS: £725/);
+  assert.ok(page.indexOf('UNPAID BILLS: £725')<page.indexOf('ACCOUNTING SCOPE'),
+    'Real overdue liabilities must not be hidden in accounting help');
+  const base=E.monthly.statement(s);
+  assert.equal(base.openingCash+base.cashIn-base.cashOut,s.cash);
+  const snapshot=F.snapshot(s,E);
+  assert.equal(snapshot.arrears,725);
+  assert.equal(snapshot.cash,originalCash);
+  assert.equal(snapshot.staffDaily,246);
+  assert.equal(snapshot.premisesDaily,25);
+  assert.equal(snapshot.held,0);
+  const result=F.ledger(s);
+  assert.match(result.controls,/TRANSACTION HISTORY/);
+  assert.doesNotMatch(result.controls,/ALL RECONCILED TRANSACTIONS/);
+  assert.match(result.controls,/MONEY IN/);
+  assert.match(result.controls,/MONEY OUT/);
+  assert.match(result.controls,/NON-CASH/);
+  assert.equal(s.cash,originalCash);
 });
