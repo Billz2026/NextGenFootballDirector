@@ -19,12 +19,15 @@
     const h=state.auctionHall,lots=E.marketFor(state).auctions;
     const own=state.auctionHistory.filter(x=>x.kind==='won');
     const nextDay=E.nextAuctionDay(state.day);
-    const nextWeekday=(nextDay-1)%7===0?'MONDAY':'TUESDAY';
+    const nextWeekday=window.MotorTradeCalendar.date(nextDay).toLocaleDateString('en-GB',
+      {weekday:'long',timeZone:'UTC'}).toUpperCase();
     const history=state.auctionHistory.slice(-10).reverse();
     const won=h.results.filter(r=>r.kind==='won').length;
     const sessionLabel=!lots.length?'CLOSED TODAY':h.phase==='finished'?'SESSION COMPLETE':
       h.phase==='payment'?'PAYMENT DUE':'SESSION OPEN';
-    const sessionDay=(state.day-1)%7===0?'MONDAY':'TUESDAY';
+    const sessionDay=E.events.isDealDay(state.day)?'MONTH-END':
+      window.MotorTradeCalendar.date(state.day).toLocaleDateString('en-GB',
+        {weekday:'long',timeZone:'UTC'}).toUpperCase();
     const header='<div class="auction-hall-head" role="group" aria-label="Auction session status">'+
       '<div class="auction-session-marker"><strong>'+sessionLabel+'</strong>'+
       '<span>GAME DAY '+state.day+' · '+(lots.length?sessionDay+' SALE':
@@ -62,9 +65,8 @@
       }).join('')+'</div></section>':'';
     if(!lots.length)
       return header+'<div class="trade-empty auction-closed"><h2>AUCTION HOUSE CLOSED TODAY.</h2>'+
-        '<p>There is no bidding outside the weekly sale. '+
-        (state.day%30===0?'Deal Day is reserved for retail customers, not auction bidding. ':'')+
-        'Private sellers remain available through the Buying Desk.</p>'+
+        '<p>Bidding runs on Mondays and again on the last calendar day of every month. '+
+        'Direct sellers remain available through the Buying Desk.</p>'+
         '<button type="button" class="trade-button" data-page="auctions">OPEN BUYING DESK</button></div>'+
         notice+(history.length?'<details class="panel-card auction-results auction-results-disclosure">'+
           '<summary>PREVIOUS HAMMER RESULTS · '+history.length+'</summary>'+
