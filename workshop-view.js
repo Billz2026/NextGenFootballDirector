@@ -177,17 +177,24 @@
       '<span>'+age(s,v)+' DAYS HELD · '+esc(v.color||'UNKNOWN COLOUR')+'</span></div></div>'+
       items(v)+'<p class="ws-caveat">Simulated assessment and QC are not a real MOT or roadworthiness certificate.</p>'+
       '</div><div class="ws-detail-control">'+actions(s,W,v)+
-      '<h4>COST CONTROL</h4>'+costs(v)+disposal(v)+'</div></div></article>';
+      '<div class="ws-quick-cost"><span>CAPITAL INVESTED TO DATE</span>'+
+        '<strong>'+cash(v.cost+paid(v))+'</strong></div>'+
+      '<details class="ws-finance-details"><summary>COST CONTROL · FULL BREAKDOWN</summary>'+
+        costs(v)+'</details>'+disposal(v)+'</div></div></article>';
   }
   function render(s,W,{filter='all',selectedId=null}={}){
     const q=summary(s,W),f=FILTERS.includes(filter)?filter:'all';
+    // Stage counts remain in the filter tabs; show the three core operating
+    // totals here without replicating the register's counts.
     const kpi='<div class="ws-kpis">'+[
-      ['ACTION REQUIRED',q.action],['REPAIRS RUNNING',q.repair],
-      ['QUALITY CHECK DUE',q.qc],['READY TO ADVERTISE',q.ready],['ON SALE',q.listed]
+      ['ACTION DUE',q.action],['REPAIRS ACTIVE',q.repair],
+      ['READY TO LIST',q.ready]
     ].map(([name,num])=>'<div><small>'+name+'</small><strong>'+num+'</strong></div>').join('')+
-      '</div><div class="ws-capacity"><span>TECHNICIANS '+q.tech+' ACTIVE / '+q.free+' FREE · IN-HOUSE '+
-      q.inHouse+'/'+q.bays+' BAYS</span><span>EXTERNAL GARAGES '+q.external+'/2</span>'+
-      '<span>REPAIR FUNDS RESERVED '+cash(q.reserve)+'</span></div>';
+      '</div><div class="ws-capacity" aria-label="Workshop operating capacity">'+
+      '<span>TECHNICIANS <strong>'+q.free+' FREE / '+q.tech+' ACTIVE</strong></span>'+
+      '<span>IN-HOUSE BAYS <strong>'+q.inHouse+' / '+q.bays+'</strong></span>'+
+      '<span>EXTERNAL REPAIRS <strong>'+q.external+' / 2</strong></span>'+
+      '<span>FUNDS RESERVED <strong>'+cash(q.reserve)+'</strong></span></div>';
     if(!s.vehicles.length)return {selectedId:null,html:kpi+
       '<div class="trade-empty ws-empty"><h2>NO VEHICLES TO PREPARE.</h2>'+
       '<p>Buy a vehicle at the Buying Desk or Auction Hall to create a workshop job.</p>'+
@@ -195,7 +202,7 @@
     const filters=[['all','ALL JOBS',q.count],['action','ACTION DUE',q.action],
       ['repair','IN REPAIR',q.repair],['ready','READY TO ADVERTISE',q.ready],
       ['listed','ON SALE',q.listed]];
-    const toolbar='<div class="ws-toolbar"><strong>WORKSHOP JOB REGISTER</strong>'+
+    const toolbar='<div class="ws-toolbar"><strong>JOB REGISTER</strong>'+
       '<div class="ws-filters" role="group" aria-label="Filter workshop jobs">'+filters.map(([key,label,n])=>
       '<button type="button" data-action="filter-workshop" data-filter="'+key+
       '" aria-pressed="'+(f===key)+'">'+label+' <b>'+n+'</b></button>').join('')+'</div></div>';
@@ -215,7 +222,7 @@
       '<div class="ws-layout"><aside class="ws-register"><header>JOBS <span>'+cars.length+
       ' SHOWN</span></header>'+list+'</aside>'+
       (chosen?dossier(s,W,chosen):'<div class="ws-file ws-no-results">No job selected.</div>')+
-      '</div><p class="ws-footnote">Jobs take game days. Repair charges, reserves and staffing come from your saved career.</p>'};
+      '</div>'};
   }
   window.MotorTradeWorkshopView=Object.freeze({render,summary,paid,FILTERS});
 })();
