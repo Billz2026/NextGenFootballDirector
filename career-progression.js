@@ -9,7 +9,7 @@
     {min:20,name:'LOCAL DEALER',reward:'Forecourt expansion to six spaces becomes eligible (£1,800).'},
     {min:40,name:'TRUSTED DEALER',reward:'Extra sales and technician hiring, subject to actual workshop space; eight-space forecourt upgrade becomes eligible (£3,600).'},
     {min:60,name:'REGIONAL SPECIALIST',reward:'Regional standing. Luxury stock still requires 65 reputation and £110,000 opening cash.'},
-    {min:80,name:'PRESTIGE DEALER',reward:'Highest staff hiring limits and further premises eligibility, subject to available cash and space.'}
+    {min:80,name:'PRESTIGE DEALER',reward:'Highest staff hiring limits and further premises eligibility; delivery-mileage new-car allocations require 85 reputation and £180,000 opening cash.'}
   ]);
   const safe=x=>String(x).replace(/[&<>"']/g,ch=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
