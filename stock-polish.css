@@ -430,12 +430,22 @@
     margin:7px 13px 0;
   }
   .stock-page-control .stock-page-heading h1{font-size:25px}
-  .stock-page-control .stock-page-heading p{font-size:10px}
+  .stock-page-control .stock-page-heading p{display:none}
   .stock-page-control .stock-kpi small{font-size:8px}
   .stock-page-control .stock-kpi strong{font-size:18px}
-  .stock-page-control .stock-unit{flex-basis:195px}
+  .stock-page-control .stock-unit{
+    flex-basis:185px;
+    min-height:53px;
+    padding:6px 8px;
+  }
+  .stock-page-control .stock-unit-select>small{display:none}
+  .stock-page-control .stock-dossier-top{min-height:32px;padding:7px 9px}
+  .stock-page-control .stock-dossier-finance{padding:8px 10px}
+  .stock-page-control .stock-finance-heading h3{display:none}
+  .stock-page-control .stock-finance-summary>div{padding:6px}
   .stock-page-control .stock-finance-summary strong{font-size:16px}
   .stock-page-control .stock-finance-summary small{font-size:7px}
+  .stock-page-control .stock-action-box{padding:8px 10px;margin-top:6px}
   .stock-page-control .stock-price-action{grid-template-columns:minmax(0,1fr) auto}
   .stock-page-control .stock-price-action .trade-button{
     white-space:normal;max-width:150px;
