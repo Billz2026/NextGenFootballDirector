@@ -4,7 +4,19 @@
 
 **Play:** https://billz2026.github.io/TheMotorTrade/
 
-**Before a full 30-day career test:** [Month-one playtest plan, expected cash benchmarks and bug-report checklist](docs/month-one-playtest.md). Always export an existing career before starting a new one.
+**Before playtesting the new calendar:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
+
+### v0.9.40 — Retail negotiations, showroom footfall, calendar month-end auctions, and new stock progression (16 November 2026)
+
+- **Five customer counteroffer rounds:** enter your desired price each round. Customers may accept, respond with a smaller offer or refuse a demand outside their budget. The price ceiling stays private and no deal is automatically completed; only a genuine agreed handover records the sale.
+- **Busier showroom:** a larger share of qualifying listed cars attracts enquiries, most resulting in real walk-in customers asking about price. Test drives remain required and can still reveal issues.
+- **Next-day appointments only:** normal remote enquiries get an appointment for the next game day (within 24 game-hours), and the customer arrives for the booked viewing. No deposit means the car is still for sale; unattended open negotiations do not hold a car beyond that day. Paid deposits remain separate collection arrangements with their own terms.
+- **Accessible used stock:** the initial 15-car starter catalogue now includes 13 templates under 100,000 miles, with higher mileage retained as the cheaper exception. Guide prices and realistic expected sale prices were increased where mileage fell; the seeded daily market still produces natural mileage variance.
+- **New-car allocations:** at 85 reputation and £180,000 opening cash, a separate trade-allocation tier can surface fictional 2026 vehicles with delivery mileage under 200, zero previous keepers and no MOT yet. The cars must still be purchased and prepared; cash and reputation alone do not grant free stock.
+- **True month ends:** Day 1 remains 9 November 2026. The first Deal Day is **30 November (game day 22)**, followed by **31 December (day 53)** and **31 January (day 84)**. February closes on the 28th or 29th. Five special auction lots are available on each month-end alongside Deal Day customer sessions. Regular Monday auctions continue.
+- **Save migration:** v14 career cash, employees, vehicles, ledger and archived 30-day reports are preserved. The *open* accounting plan migrates to the current real calendar month and its active period is recalculated from recorded ledger entries. If an old 30-day period crossed a calendar boundary, the pre-boundary portion remains in the historical ledger, not a fabricated retrospective monthly report; players should export a backup before upgrading. Old unfinished 30-day Deal Day session state is cleared when that date is not a true month end.
+- **Regression coverage:** `tests/calendar-customer-stock.test.mjs` checks 24-hour viewings, five counters, month-end auction dates, new-vehicle conditions, legacy-save migration and 66-day accounting progression.
+
 
 ### v0.9.38 — Full Day 1 team and fairer opening capital (16 November 2026)
 
