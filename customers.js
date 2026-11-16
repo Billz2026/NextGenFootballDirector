@@ -35,6 +35,8 @@
   const leadKey=(state,vehicle)=>[
     state.name,state.day,slot(state),vehicle.id,vehicle.origin
   ].join('|');
+  const walkInInterest=(state,vehicle)=>
+    D.isDealDay(state.day)||chance('walk-in|'+leadKey(state,vehicle),65);
   const heldDeposits=state=>Object.values(state.customerCases??{})
     .reduce((n,c)=>n+(c.held||0),0);
   function funds(state,c,type,delta){
@@ -83,8 +85,7 @@
       (!D.isDealDay(state.day)||D.partExchangeAvailable(state,vehicle));
     // Most retail leads now walk into the showroom in person, not only
     // during month-end events. Traffic remains seeded per vehicle and day.
-    const walkIn=D.isDealDay(state.day)||
-      chance('walk-in|'+key,65);
+    const walkIn=walkInInterest(state,vehicle);
     const c={
       id:'C-'+state.day+'-'+slot(state)+'-'+vehicle.id+'-'+
         (hash('lead-identity|'+key)%1000000),
@@ -490,7 +491,7 @@
     return true;
   }
   window.MotorTradeCustomers=Object.freeze({
-    caseFor,demand,open,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
+    caseFor,demand,walkInInterest,open,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
     ready,complete,advanceDay,nextSession,stats,valid,heldDeposits,balanceDue,customerPrep
   });
 })();
