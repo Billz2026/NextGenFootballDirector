@@ -31,6 +31,9 @@ try{
     },key);
     assert.ok(sellers.length>=2);
     for(const seller of sellers.slice(0,2)){
+      // Selecting a new seller is explicit: the Buying Desk never silently
+      // changes its selected lead after a successful purchase.
+      await page.locator('[data-action="select-seller"][data-id="'+seller.id+'"]').click();
       await page.locator('#seller-offer-'+seller.id).fill(String(seller.ask));
       await page.locator('[data-action="buy-seller"][data-id="'+seller.id+'"]').click();
     }
