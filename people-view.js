@@ -299,7 +299,9 @@
     const block=training?'ALREADY TRAINING':cooldown?
       'NEXT TRAINING DAY '+(e.lastTrainingDay+14):!affordable?'INSUFFICIENT UNRESERVED CASH':'';
     return '<div class="sd-dossier"><header class="sd-file-head"><div><small>EMPLOYEE FILE · ID '+
-      e.id+' · '+esc(roleName[e.role])+'</small><h3>'+esc(e.name)+'</h3></div>'+
+      e.id+' · '+esc(roleName[e.role])+
+      (e.origin==='opening-team'?' · OPENING TEAM':'')+
+      '</small><h3>'+esc(e.name)+'</h3></div>'+
       '<span class="sd-tag sd-tag-'+info.tone+'">'+esc(info.name)+'</span></header>'+
       '<div class="sd-staff-summary">'+
       '<div><small>MONTHLY BASE WAGE</small><strong>'+gbp(e.monthlySalary)+'</strong></div>'+
