@@ -4462,7 +4462,7 @@ test('v0.9.18 empty forecourt displays direct sourcing actions',()=>{
 
 
 test('v0.9.19 compact Vehicle Stock is scoped to desktop and retains full report access',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.37/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(css,/@media\(min-width:981px\)/);
   assert.match(css,/\.career-content:has\(\[data-panel="stock"\]:not\(\[hidden\]\)\)/);
   assert.match(css,/\.stock-dossier-vehicle \.vehicle-photo-frame\{[\s\S]*?height:125px/);
@@ -4531,7 +4531,7 @@ test('v0.9.20 workshop bookable quotes and hidden defects follow engine truth',(
 
 
 test('v0.9.21 compact Workshop hides non-urgent calendar banner only at desktop width',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.37/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(css,/@media\(min-width:1021px\)/);
   assert.match(css,/\.career-content:has\(\[data-panel="workshop"\]:not\(\[hidden\]\)\)>#events-banner:has\(\.event-neutral-banner\)/);
   assert.match(css,/#events-banner:has\(\.event-deadline-banner\)/);
@@ -5324,7 +5324,7 @@ test('v0.9.32 staff and recruitment preserve readable skills while collapsing se
 });
 
 test('v0.9.32 compact Staff & Recruitment desktop styles retain labels and responsive grid',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.37/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(html,/styles\.css\?v=51/);
   assert.match(html,/people-view\.js\?v=7/);
   assert.match(css,/\.career-main:has\(\[data-panel="staff"\]:not\(\[hidden\]\)\) \.career-topbar/);
@@ -5624,7 +5624,7 @@ test('v0.9.35 blocked and maximum upgrades still retain accurate eligibility',()
 });
 
 test('v0.9.35 one-page desktop polish is scoped to My Dealership and retains mobile layout',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.37/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
   assert.match(html,/styles\.css\?v=51/);
   assert.match(html,/premises-view\.js\?v=3/);
   assert.match(css,/v0\.9\.35 — Final My Dealership single-screen desktop polish/);
