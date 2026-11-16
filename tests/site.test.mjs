@@ -6363,7 +6363,9 @@ test('Recruitment sorts hireable candidates first and makes blocked roles explan
   const employed=PV.staffDesk(state,P,{mode:'candidates',selectedId:'c:'+employedCandidate.id});
   assert.match(employed.html,/already works at your dealership/);
   assert.match(employed.html,/CANNOT HIRE · ALREADY EMPLOYED/);
-  const blocked=PV.staffDesk(state,P,{mode:'candidates',role:'buyer'});
+  const otherBuyer=P.applicants(1).find(c=>c.role==='buyer'&&c.name!=='Sophie Reed');
+  const blocked=PV.staffDesk(state,P,{mode:'candidates',role:'buyer',
+    selectedId:'c:'+otherBuyer.id});
   assert.equal(blocked.counts.hireable,7);
   assert.match(blocked.html,/Only one vehicle buyer/);
   const before=state.cash,ledger=state.ledger.length;
