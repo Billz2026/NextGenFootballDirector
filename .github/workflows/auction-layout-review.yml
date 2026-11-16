@@ -1,0 +1,41 @@
+name: Auction Hall visual layout review
+on:
+  pull_request:
+    paths:
+      - 'auction-hall-view.js'
+      - 'auction-polish.css'
+      - 'index.html'
+      - 'tests/auction-visual-browser.mjs'
+      - '.github/workflows/auction-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate review script syntax
+        run: node --check tests/auction-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve the real game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/motortrade-auction-preview.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Capture desktop and phone, assert no overflow or dead lot controls
+        run: node tests/auction-visual-browser.mjs
+      - name: Upload real-browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: auction-layout-desktop-phone
+          path: review/auction-*.png
+          retention-days: 7
+          if-no-files-found: warn
