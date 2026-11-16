@@ -34,7 +34,7 @@
   if(!SAVES)throw new Error('Load career-storage.js before simulator.js');
   const ACCOUNT = window.MotorTradeAccountUI;
   const DISPLAY_KEY = 'the-motor-trade-display-v1';
-  const STARTING_CASH = 12500;
+  const STARTING_CASH = 45000; // new staffed career only; old saves retain their own capital
   const CAPACITY = E.CAPACITY;
   const START_DATE_UTC = Date.UTC(2026, 10, 9);
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -78,14 +78,14 @@
   function welcomeMessages() {
     return [
       makeMessage(1,1,'BUSINESS SUPPORT','Welcome to the motor trade',
-        'Run your first dealership, with £12,500 in capital.',
-        'Your dealership starts with £12,500 in cash and four forecourt spaces. Visit the Auction Hall for live numbered-lot bidding, and the Buying Desk for customers selling cars directly.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed: book appointments, arrange test drives, negotiate and complete handover. A part-exchange becomes your next stock vehicle.',
+        'Your £45,000 dealership opens with a complete four-person team.',
+        'Your dealership starts with £45,000 in cash, four forecourt spaces and one salaried employee in each essential role: sales, buying, preparation and staff supervision. Their wages cost money every game day, so preserve working capital. Visit the Auction Hall for numbered-lot bidding and the Buying Desk for private sellers.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed: book appointments, arrange test drives, negotiate and complete handover. A part-exchange becomes your next stock vehicle.',
         'auctionHall'),
       makeMessage(2,1,'BUYING DESK','Three ways to find your next car',
         'Auctions, direct sellers and part-exchanges all supply vehicles.',
         'Auctions have competing traders and buyer fees. Direct sellers can reject low offers. Part-exchanges happen when you sell one of your advertised cars and agree an allowance for the customer\'s existing vehicle.\n\nEvery route affects your cash and stock differently. Your first market opportunities are waiting.',
         'auctionHall'),
-      makeMessage(3,1,'ACCOUNTS OFFICE','Protect your opening £12,500',
+      makeMessage(3,1,'ACCOUNTS OFFICE','Protect your opening £45,000',
         'Gross margin is different from cash flow.',
         'Every purchase and preparation job costs cash. Customer sales return cash, while part-exchange deals include the incoming vehicle as a separate purchase.\n\nThe Finances page records each transaction. Gross trade margin excludes staff and premises overheads; the management report shows an operating contribution after those charges. VAT, tax, finance and after-sale claims remain unmodelled.',
         'finance')
@@ -454,6 +454,7 @@
     const date = gameDate(career.day);
     const short = dateShort.format(date).toUpperCase();
     bindText('company', career.name);
+    bindText('starting-capital',money.format(career.startingCapital??E.STARTING_CASH));
     bindText('cash', money.format(career.cash));
     bindText('customer-deposits',money.format(C.heldDeposits(career)));
     bindText('stock', career.stock + ' / ' + career.capacity);
@@ -682,7 +683,7 @@
         'Use CAREER SAVES to export it first. A recent valid save may be recoverable locally.')) return;
     const previousAccount=ACCOUNT?.activeAccount || null;
     if(ACCOUNT && !ACCOUNT.startGuestMode())return;
-    const newCareer = E.create(name, welcomeMessages());
+    const newCareer = E.createStaffed(name, welcomeMessages());
     const result = SAVES.save(newCareer, E.normalize, {force:true, backupPrevious:true});
     if (!result.ok) {
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);

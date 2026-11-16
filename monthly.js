@@ -27,7 +27,10 @@
   };
   function staffTarget(plan,employee,day){
     if(employee.role!=='sales')return null;
-    const first=Math.max(day+1,employee.startDay,plan.startDay);
+    // Opening employees are already on duty from Day 1; subsequent hires
+    // always begin on the following game day.
+    const first=Math.max(employee.origin==='opening-team'?day:day+1,
+      employee.startDay,plan.startDay);
     const days=Math.max(0,plan.endDay-first+1);
     const units=days<7?0:Math.max(1,Math.ceil(plan.unitTarget*days/
       Math.max(1,plan.endDay-plan.startDay+1)));
@@ -45,7 +48,18 @@
     const start=migrating?state.day:dayStart(state.day);
     const end=dayStart(state.day)+PERIOD-1;
     const days=end-start+1;
-    const target=targetFor(state.reputationScore,days);
+    const baseline=targetFor(state.reputationScore,days);
+    // An established four-person payroll needs a stronger volume goal than
+    // an owner-operated microdealer. This remains a *unit* target, not a
+    // guarantee of operating profit (reported separately).
+    const staffingTarget=Math.ceil(Math.min(4,(state.staff||[]).length)*days/PERIOD);
+    const unitTarget=Math.max(baseline.unitTarget,staffingTarget);
+    const factor=unitTarget/baseline.unitTarget;
+    const target=unitTarget===baseline.unitTarget?baseline:{
+      ...baseline,unitTarget,
+      turnoverTarget:money(baseline.turnoverTarget*factor),
+      marginTarget:money(baseline.marginTarget*factor)
+    };
     const next={
       month:monthOf(state.day),startDay:start,endDay:end,
       standardStartDay:dayStart(state.day),partial:start!==dayStart(state.day),

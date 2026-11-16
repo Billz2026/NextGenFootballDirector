@@ -5,7 +5,8 @@
  * Gross trading margin is before tax, VAT adjustments and business overheads.
  */
 (() => {
-  const STARTING_CASH = 12500;
+  const STARTING_CASH = 12500; // legacy career basis, retained for old saves
+  const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
   const VERSION = 14;
   const PH = window.MotorTradePhotos;
@@ -330,6 +331,19 @@
     Object.assign(state,D.initial());
     return state;
   }
+  // The public New Career path starts with a real four-person payroll.
+  // The original create() factory remains for historical save conversion,
+  // owner-operated fixtures and historical business-balance compatibility.
+  function createStaffed(name,messages){
+    const state=create(name,messages);
+    state.cash=STAFFED_STARTING_CASH;
+    state.startingCapital=STAFFED_STARTING_CASH;
+    state.staff=P.openingTeam();
+    state.nextStaffId=state.staff.length+1;
+    // Rebuild the monthly plan after adding the real opening payroll.
+    M.initialize(state);
+    return state;
+  }
   function normalize(saved) {
     if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
@@ -448,10 +462,16 @@
     if (!P.valid(workforce,saved.day)) return null;
     const ids = [...saved.vehicles,...saved.sold,...wholesale].map(v => v.id);
     if (new Set(ids).size !== ids.length || ids.some(id => id >= saved.nextId)) return null;
-    const balance = STARTING_CASH + sum(saved.ledger,'delta');
+    // Do not rebase historical £12,500 saves. The opening capital marker
+    // is only issued to new staffed careers and survives every save/reload.
+    if(saved.startingCapital!==undefined&&
+      (saved.version!==VERSION||saved.startingCapital!==STAFFED_STARTING_CASH))return null;
+    const openingCapital=saved.startingCapital??STARTING_CASH;
+    const balance = openingCapital + sum(saved.ledger,'delta');
     if (balance !== saved.cash || balance < 0 || balance > 100000000) return null;
     const restored={
       version:VERSION,name:saved.name.trim(),day:saved.day,cash:balance,capacity:expectedCapacity,
+      ...(saved.startingCapital===STAFFED_STARTING_CASH?{startingCapital:STAFFED_STARTING_CASH}:{}),
       premises:SITE.clone(site),
       inboxLedgerCursor:saved.version>=13?saved.inboxLedgerCursor:saved.ledger.length,
       // Migrate older daily auction saves: keep completed results in history,
@@ -861,7 +881,7 @@
     return result;
   }
   window.MotorTradeEngine = Object.freeze({
-    VERSION, STARTING_CASH, CAPACITY,people:P,staffDay,premises:SITE,premisesDay,
+    VERSION, STARTING_CASH, STAFFED_STARTING_CASH, CAPACITY,people:P,staffDay,premises:SITE,premisesDay,
     auctionDay,nextAuctionDay,settleAuction,
     startAuction,bidLiveAuction,passAuction,nextAuctionLot,rollAuctionHall,
     auctionLot,lotNumber,auctionValid,
@@ -870,7 +890,7 @@
     cancelCustomer,advanceCustomers,nextCustomerSession,agreeCustomer,
     workshop:W,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
     wholesaleOffer,disposeStock,hireStaff,decideStaffMorale,
-    market,marketFor,marketStatus,sellerApproach,create,normalize,acquireAuction,acquireSeller,walkSeller,
+    market,marketFor,marketStatus,sellerApproach,create,createStaffed,normalize,acquireAuction,acquireSeller,walkSeller,
     inspectLead,reportFor,quote:I.quote,
     advertise,buyers,counter,completeSale,totalMargin
   });

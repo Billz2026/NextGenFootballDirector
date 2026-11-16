@@ -4,6 +4,14 @@
 
 **Play:** https://billz2026.github.io/TheMotorTrade/
 
+### v0.9.38 — Full Day 1 team and fairer opening capital (16 November 2026)
+
+- **Four named, salaried employees are active from the beginning:** sales executive Lewis Carter, vehicle buyer Sophie Reed, preparation technician Chloe Baker and staff supervisor Tom Fletcher. All use the normal candidate skills, salaries and staff lifecycle; they are not free volunteers or decorative placeholders.
+- **New playable careers start with £45,000 cash and four forecourt spaces.** The opening team's contractual base pay totals £7,320 per 30-game-day month (approximately £246 per game day after game rounding), plus an initial £25 daily rent/utilities. No fictitious onboarding fees are charged for employees present when the dealership opens.
+- The initial volume objective scales to **four sales per game month** with four staff; meeting the volume objective does not itself guarantee operating profit. Hire additional workshop capacity (or sales capacity after reputation progression) when affordable, and retain discretion to train or release existing employees.
+- **Legacy saves remain on their original £12,500 starting-capital ledger basis**, with their own workforce, actual cash balance, transactions and existing month plans untouched. Only a newly created game receives the funded opening team. Save reloads require the explicit, validated starting-capital marker.
+- A focused 30-day payroll, full founding-team, additional hire, and legacy-save integrity regression suite accompanies the new career setup.
+
 ### v0.9.37 — Optional player accounts and cloud careers (13 November 2026)
 
 - Account registration, email/password sign-in, email verification and password reset using Supabase Auth (player username is a display name, not a sign-in identity).
@@ -138,7 +146,7 @@
 
 ## v0.9.3 — Modern UK Used-Car Market & Luxury Progression
 
-**Dealer career:** A new dealership still starts with £12,500 and four spaces. Its first catalogue mixes affordable 2016–2020 higher-mileage stock with a few accessible newer vehicles (including a high-mileage Nissan Leaf). As cash and reputation rise, the buying desk unlocks progressively newer **Modern**, **Premium** and **Luxury** stock. Older cars never disappear entirely; established traders can still look for low-cost opportunities. The buying desk shows the next unlock thresholds.
+**Dealer career (current):** New four-person staffed careers start with £45,000 and four spaces; pre-existing careers keep their original cash and salary commitments. Its first catalogue mixes affordable 2016–2020 higher-mileage stock with a few accessible newer vehicles (including a high-mileage Nissan Leaf). As cash and reputation rise, the buying desk unlocks progressively newer **Modern**, **Premium** and **Luxury** stock. Older cars never disappear entirely; established traders can still look for low-cost opportunities. The buying desk shows the next unlock thresholds.
 
 **Eligibility (both conditions):**
 
@@ -185,7 +193,7 @@ A buyer cancelling a new **in-person** reservation may have up to the **document
 
 ## v0.9 — Four-Space Forecourt & Customer Sales Journey
 
-**Every dealership now starts with four forecourt spaces** (formerly two), without increasing the existing £12,500 initial working capital. Having four spaces does not guarantee enough funds to fill them or prepare all four vehicles. Existing v1–v7 careers migrate to save schema **v8** with four spaces and retain their vehicles, sales, money, workshop jobs, employees, historical reports and progress. Original branding and home screen are unchanged.
+**Four forecourt spaces** are the baseline. The historical expansion to four spaces originally retained £12,500 working capital; new staffed careers now start with £45,000, while legacy careers retain their saved balances. Having four spaces does not guarantee enough funds to fill them or prepare all four vehicles. Existing v1–v7 careers migrate to save schema **v8** with four spaces and retain their vehicles, sales, money, workshop jobs, employees, historical reports and progress. Original branding and home screen are unchanged.
 
 The **Sales Office** now runs a customer process instead of allowing a single instant sale click:
 
@@ -300,7 +308,7 @@ Every auction lot and direct-seller offer now has a **persistent fictional dossi
 
 ## Playable trading foundation (v0.3 → v0.4)
 
-The main menu uses the original unchanged NextGen Sessions wordmark, standalone silver-and-gold Motor Trade vector title and sharp showroom background. Create a career with **£12,500 starting cash** and a **two-vehicle forecourt**. Continue Career resumes the same locally saved business.
+The main menu uses the original unchanged NextGen Sessions wordmark, standalone silver-and-gold Motor Trade vector title and sharp showroom background. The original v0.3 foundation offered **£12,500 cash** and **two forecourt spaces**; current staffed careers use the larger opening budget and four spaces documented above. Continue Career resumes the same locally saved business.
 
 ### Interactive bidding and seller negotiation
 

@@ -84,7 +84,9 @@
         'TRAINING UNTIL DAY '+employee.trainingUntil:
         active?(assigned?'ASSIGNED TO STOCK '+assigned.id:'AVAILABLE'):'UNAVAILABLE';
       return '<article class="people-card">'+header(employee)+
-        '<div class="people-meta"><span>'+esc(status)+'</span>'+
+        '<div class="people-meta">'+
+        (employee.origin==='opening-team'?'<span>OPENING TEAM</span>':'')+
+        '<span>'+esc(status)+'</span>'+
         '<span>MORALE '+employee.morale+'/100</span>'+
         '<span>'+employee.deals+' DEALS · '+employee.workDone+' PREP JOBS</span></div>'+
         '<div class="people-traits">'+traits[employee.role].map(([a,k])=>bar(a,employee.skills[k])).join('')+'</div>'+
@@ -297,7 +299,9 @@
     const block=training?'ALREADY TRAINING':cooldown?
       'NEXT TRAINING DAY '+(e.lastTrainingDay+14):!affordable?'INSUFFICIENT UNRESERVED CASH':'';
     return '<div class="sd-dossier"><header class="sd-file-head"><div><small>EMPLOYEE FILE · ID '+
-      e.id+' · '+esc(roleName[e.role])+'</small><h3>'+esc(e.name)+'</h3></div>'+
+      e.id+' · '+esc(roleName[e.role])+
+      (e.origin==='opening-team'?' · OPENING TEAM':'')+
+      '</small><h3>'+esc(e.name)+'</h3></div>'+
       '<span class="sd-tag sd-tag-'+info.tone+'">'+esc(info.name)+'</span></header>'+
       '<div class="sd-staff-summary">'+
       '<div><small>MONTHLY BASE WAGE</small><strong>'+gbp(e.monthlySalary)+'</strong></div>'+
