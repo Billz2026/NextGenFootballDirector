@@ -39,6 +39,7 @@ try{
       const bid=panel.querySelector('.auction-bid-box').getBoundingClientRect();
       const vehicleFile=panel.querySelector('.auction-current').getBoundingClientRect();
       const catalogue=panel.querySelector('.auction-catalogue').getBoundingClientRect();
+      const catalogueList=panel.querySelector('.auction-catalogue-list');
       const controls=panel.querySelector('.auction-controls').getBoundingClientRect();
       const headings=panel.querySelectorAll('h1');
       const actionCount=panel.querySelectorAll('[data-action="preview-auction"]').length;
@@ -46,6 +47,8 @@ try{
         panelWidth:panel.scrollWidth,panelClientWidth:panel.clientWidth,
         bidTop:Math.round(bid.top),catalogueBottom:Math.round(catalogue.bottom),
         vehicleFileTop:Math.round(vehicleFile.top),
+        catalogueScrollWidth:catalogueList.scrollWidth,
+        catalogueClientWidth:catalogueList.clientWidth,
         controlsTop:Math.round(controls.top),headingCount:headings.length,
         actionCount,lotCount:stateForTest(panel)};
       function stateForTest(p){return p.querySelectorAll('.auction-catalogue-item').length;}
@@ -62,7 +65,10 @@ try{
     if(label==='desktop')
       assert.ok(layout.bidTop<800,'Bid workspace should begin above the desktop fold');
     if(label==='phone'){
-      assert.ok(layout.bidTop<844,'Bid workspace should begin within the phone viewport');
+      assert.ok(layout.bidTop<650,'Bid workspace should begin high in the phone viewport');
+      assert.ok(layout.controlsTop<800,'First bid action should be visible on the first phone screen');
+      assert.ok(layout.catalogueScrollWidth>layout.catalogueClientWidth,
+        'Mobile catalogue should scroll inside its own row, not widen the page');
       assert.ok(layout.controlsTop<layout.vehicleFileTop,
         'Mobile bidding controls should precede the long detailed vehicle file');
       assert.match(await panel.locator('.auction-mobile-lot-context').innerText(),/LOT 001/);
