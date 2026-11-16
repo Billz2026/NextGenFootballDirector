@@ -1,0 +1,385 @@
+/* Inbox polish: tightly scoped to the Inbox panel, not trading logic. */
+#screen-career:has(.inbox-control:not([hidden])) .career-topbar{
+  min-height:61px;
+  padding:9px clamp(17px,2.35vw,32px);
+}
+#screen-career:has(.inbox-control:not([hidden])) .career-content{
+  padding:12px clamp(17px,2.35vw,32px) 20px;
+}
+#screen-career:has(.inbox-control:not([hidden])) .game-notice{
+  margin:8px clamp(17px,2.35vw,32px) 0;
+  padding:8px 11px;
+  font-size:10px;
+  line-height:1.4;
+}
+#screen-career:has(.inbox-control:not([hidden])) #events-banner{
+  display:none;
+}
+.inbox-control .inbox-heading{
+  margin:0 0 10px;
+  min-height:41px;
+  gap:12px;
+}
+.inbox-control .inbox-heading h1{
+  margin:0;
+  font-size:clamp(27px,2.7vw,33px);
+  line-height:1.05;
+}
+.inbox-heading-actions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-end;
+  gap:11px;
+}
+.inbox-control .inbox-heading .secondary-button{
+  min-height:32px;
+  padding:7px 10px;
+  font-size:9px;
+  border-color:#48616b;
+  background:#172b35;
+}
+.inbox-control .inbox-stat-strip{
+  display:flex;
+  align-items:center;
+  gap:0;
+  margin:0;
+  border:1px solid #344c55;
+  border-radius:6px;
+  background:#172c35;
+}
+.inbox-control .inbox-stat-strip>div{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:row;
+  gap:7px;
+  border-bottom:0;
+  border-right:1px solid #344c55;
+  padding:8px 11px;
+}
+.inbox-control .inbox-stat-strip>div:last-of-type{border-right:0}
+.inbox-control .inbox-stat-strip strong{
+  font:900 16px/1 var(--title);
+  color:#e6be82;
+}
+.inbox-control .inbox-stat-strip span{
+  font:750 9px/1.3 var(--mono);
+  color:#bac8c9;
+}
+.inbox-control .inbox-filters{
+  position:relative;
+  overflow:visible;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0;
+  margin:0 0 9px;
+  min-height:35px;
+}
+.inbox-control .inbox-filters>button,
+.inbox-control .inbox-department-menu summary,
+.inbox-control .inbox-department-options button{
+  appearance:none;
+  flex:none;
+  min-height:33px;
+  border-radius:5px;
+  padding:9px 11px;
+  font:800 9px/1.25 var(--mono);
+  border:1px solid #3d5861;
+  color:#b6c5c9;
+  background:#172d36;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.inbox-control .inbox-filters>button[aria-pressed="true"],
+.inbox-control .inbox-department-options button[aria-pressed="true"],
+.inbox-control .inbox-department-menu[data-active="true"] summary{
+  border-color:#bd9965;
+  background:#363c36;
+  color:#f2d1a2;
+}
+.inbox-control .inbox-department-menu{
+  min-width:0;
+  position:relative;
+  margin-left:2px;
+}
+.inbox-control .inbox-department-menu summary{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  justify-content:space-between;
+  list-style:none;
+  user-select:none;
+}
+.inbox-control .inbox-department-menu summary::-webkit-details-marker{display:none}
+.inbox-control .inbox-department-menu summary span{
+  color:#e5bc81;
+  font-size:12px;
+}
+.inbox-control .inbox-department-options{
+  position:absolute;
+  z-index:20;
+  top:calc(100% + 5px);
+  left:0;
+  min-width:190px;
+  display:grid;
+  gap:3px;
+  padding:6px;
+  background:#142731;
+  border:1px solid #52646a;
+  border-radius:6px;
+  box-shadow:0 14px 28px #0009;
+}
+.inbox-control .inbox-department-options button{
+  display:block;
+  width:100%;
+  text-align:left;
+  border-color:transparent;
+  background:transparent;
+}
+.inbox-control .inbox-department-options button:hover,
+.inbox-control .inbox-department-menu summary:hover,
+.inbox-control .inbox-filters>button:hover{
+  background:#27414b;
+  border-color:#bda076;
+}
+.inbox-control .inbox-layout{
+  height:clamp(430px,calc(100dvh - 280px),735px);
+  min-height:0;
+  grid-template-columns:minmax(255px,.78fr) minmax(0,1.42fr);
+  border-radius:7px;
+  background:#132632;
+}
+.inbox-control .inbox-column-head{
+  min-height:37px;
+  padding:10px 13px;
+  border-bottom:1px solid #344a55;
+  background:#19303b;
+  color:#dce5e4;
+  font:800 10px/1.3 var(--mono);
+}
+.inbox-control .inbox-column-head small{
+  font-size:9px;
+  color:#a6b9bd;
+}
+.inbox-control .inbox-row{
+  position:relative;
+  min-height:65px;
+  gap:6px;
+  padding:9px 13px;
+  border-bottom:1px solid #2b424b;
+}
+.inbox-control .inbox-list .message-icon{display:none}
+.inbox-control .inbox-list .message-title{
+  font-size:12px;
+  line-height:1.3;
+  color:#e4ebea;
+}
+.inbox-control .inbox-list .message-from{
+  font-size:9px;
+  line-height:1.3;
+}
+.inbox-control .inbox-list .message-summary{
+  font-size:10px;
+  line-height:1.35;
+}
+.inbox-control .inbox-list .message-copy{gap:3px}
+.inbox-control .inbox-list .message-unread{
+  position:absolute;
+  top:16px;
+  right:8px;
+  margin:0;
+  width:6px;
+  height:6px;
+}
+.inbox-control .inbox-list .inbox-message-tags{margin-top:0}
+.inbox-control .inbox-list .inbox-message-tags b{
+  font-size:8px;
+  color:#e9be83;
+}
+.inbox-control .inbox-list .inbox-row[aria-pressed="true"]{
+  background:#253d48;
+  box-shadow:inset 3px 0 #dcb274;
+}
+.inbox-control .inbox-list .inbox-row:focus-visible,
+.inbox-control .inbox-department-menu summary:focus-visible{
+  outline:2px solid #f4cc91;
+  outline-offset:-2px;
+}
+.inbox-control .inbox-detail{
+  padding:14px 18px;
+  background:#10212b;
+}
+.inbox-control .inbox-mail-heading{
+  margin:0 0 9px;
+  padding:0 0 9px;
+  border-bottom:1px solid #324a53;
+}
+.inbox-control .inbox-mail-heading h2{
+  margin:1px 0 0;
+  font:800 clamp(18px,2vw,23px)/1.2 var(--body);
+  letter-spacing:-.02em;
+  color:#f3e9dc;
+}
+.inbox-control .inbox-mail-heading .section-overline{
+  display:block;
+  margin-bottom:5px;
+  font-size:9px;
+}
+.inbox-control .inbox-email{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.inbox-control .inbox-email-header{
+  padding:8px 0 11px;
+  gap:10px;
+  border-bottom:1px solid #334954;
+}
+.inbox-control .inbox-email-avatar{
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  font-size:11px;
+}
+.inbox-control .inbox-email-address strong{font-size:12px}
+.inbox-control .inbox-email-address small{font-size:10px}
+.inbox-control .inbox-email-address>span{display:none}
+.inbox-control .inbox-email-time{
+  font-size:10px;
+  color:#b1c5c7;
+}
+.inbox-control .inbox-email-status{
+  border-top:0;
+  margin:0;
+  padding:6px 0;
+  font-size:9px;
+  border-bottom:1px solid #2e444e;
+}
+.inbox-control .inbox-email-status span:last-child{display:none}
+.inbox-control .inbox-email-body{
+  padding:12px 0 10px;
+  max-width:860px;
+  font:500 12px/1.65 var(--body);
+}
+.inbox-control .inbox-email-body p{margin-bottom:10px}
+.inbox-control .inbox-email-body .mail-greeting{margin-bottom:9px}
+.inbox-control .mail-paragraph-group{margin-bottom:9px}
+.inbox-control .inbox-email-body .mail-subject-heading{
+  font-size:11px;
+  margin:3px 0 7px;
+}
+.inbox-control .mail-key-value{
+  padding:7px 9px;
+  background:#1b343e;
+  border-color:#324b55;
+}
+.inbox-control .inbox-email-signature{
+  margin-top:15px;
+  padding-top:8px;
+  border-top:1px solid #324954;
+  gap:1px;
+}
+.inbox-control .inbox-email-signature>span,
+.inbox-control .inbox-email-signature>small{font-size:9px}
+.inbox-control .inbox-email-signature>strong{font-size:10px}
+.inbox-control .inbox-message-toolbar{
+  margin-top:8px;
+  padding-top:9px;
+  border-top:1px solid #344b54;
+}
+.inbox-control .inbox-message-toolbar .secondary-button{
+  min-height:34px;
+  padding:8px 10px;
+}
+.inbox-control .inbox-policy{
+  margin-top:7px;
+  color:#94aab2;
+  font-size:10px;
+}
+.inbox-control .inbox-policy summary{
+  display:inline-block;
+  cursor:pointer;
+  padding:6px 0;
+  font:650 10px/1.4 var(--body);
+  color:#a4b5ba;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+.inbox-control .inbox-policy p{
+  max-width:900px;
+  padding:4px 0 7px;
+  line-height:1.6;
+}
+.inbox-control .inbox-approval{
+  border-radius:5px;
+  margin-top:10px;
+  padding:12px;
+}
+.inbox-control .inbox-resolved{padding:10px 12px;margin-top:10px}
+@media(max-width:1020px){
+  .inbox-control .inbox-layout{
+    grid-template-columns:minmax(235px,.9fr) minmax(0,1.1fr);
+  }
+}
+@media(max-width:780px){
+  .inbox-control .inbox-heading{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+  .inbox-heading-actions{
+    width:100%;
+    justify-content:space-between;
+  }
+  .inbox-control .inbox-layout{
+    height:auto;
+    display:flex;
+    flex-direction:column;
+  }
+  .inbox-control .inbox-list{
+    max-height:250px;
+    overflow-y:auto;
+  }
+  .inbox-control .inbox-column{
+    border-right:0;
+    border-bottom:1px solid #344b55;
+  }
+  .inbox-control .inbox-detail{
+    min-height:280px;
+    max-height:none;
+    overflow-y:visible;
+    padding:13px;
+  }
+  .inbox-control .inbox-department-options{
+    left:auto;
+    right:0;
+  }
+}
+@media(max-width:570px){
+  #screen-career:has(.inbox-control:not([hidden])) .career-content{
+    padding:10px 13px 18px;
+  }
+  #screen-career:has(.inbox-control:not([hidden])) .game-notice{
+    margin:7px 13px 0;
+  }
+  .inbox-control .inbox-heading{margin-bottom:7px}
+  .inbox-control .inbox-heading h1{font-size:27px}
+  .inbox-control .inbox-stat-strip>div{padding:7px 8px}
+  .inbox-control .inbox-stat-strip span{font-size:8px}
+  .inbox-control .inbox-filters{flex-wrap:wrap}
+  .inbox-control .inbox-filters>button,
+  .inbox-control .inbox-department-menu summary{
+    padding:8px 9px;
+    font-size:8px;
+  }
+  .inbox-control .inbox-row{min-height:62px}
+  .inbox-control .inbox-email-time{
+    margin-left:0;
+    font-size:9px;
+  }
+  .inbox-control .inbox-email-body{font-size:12px}
+  .inbox-control .inbox-message-toolbar{flex-wrap:wrap}
+}
