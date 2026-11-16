@@ -78,7 +78,7 @@
       {item:labelsFor[1],cost:splitB},
       {item:labelsFor[2],cost:basePrep-splitA-splitB}
     ];
-    const hasFault=hash%100 < (grade===2?17:grade===3?37:grade===4?59:70);
+    const hasFault=hash%100 < (grade===1?3:grade===2?17:grade===3?37:grade===4?59:70);
     // Only full hybrids/PHEVs use hybrid-specific faults. Petrol/diesel
     // mild-hybrids retain an internal combustion engine and its repair risks.
     const faultPool=car.fuel==='Electric'?electricFaults:
@@ -86,8 +86,9 @@
       (grade>=4?majorFaults:lowFaults);
     const chosen=faultPool[hash%faultPool.length];
     const hiddenFault=hasFault?{item:chosen[0],cost:chosen[1]}:null;
-    const owners=1+(hash>>>3)%5;
-    const motMonths=1+(hash>>>9)%12;
+    const deliveryMileage=car.marketTier==='new'&&Number(car.miles)<=200;
+    const owners=deliveryMileage?0:1+(hash>>>3)%5;
+    const motMonths=deliveryMileage?36:1+(hash>>>9)%12;
     const motRecordedMiles=Math.max(0,(Number(car.miles)||70000)-1000-((hash>>>5)%6000));
     const motAdvisories=grade>=3?
       [grade>=4?'Tyre and suspension wear recorded':'Brake wear noted at previous test']:[];
@@ -104,8 +105,8 @@
     return {
       ref:'SIM-'+ref.toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,28),
       year,engine:vehicleEngine,grade,owners,
-      mot:{monthsRemaining:motMonths,recordedMiles:motRecordedMiles,
-        result:'PASS',advisories:motAdvisories},
+      mot:{monthsRemaining:motMonths,recordedMiles:deliveryMileage?0:motRecordedMiles,
+        result:deliveryMileage?'NOT DUE':'PASS',advisories:deliveryMileage?[]:motAdvisories},
       knownRepairs,hiddenFault,basePrep,riskAllowance,
       inspectionFee,demand,retail,likelySale,trade,targetMargin,
       inspected:false,legacy:false
@@ -145,9 +146,9 @@
        !Number.isSafeInteger(p.year)||p.year<1980||p.year>2035 ||
        typeof p.engine!=='string'||p.engine.length>75 ||
        !Number.isSafeInteger(p.grade)||p.grade<1||p.grade>5 ||
-       !Number.isSafeInteger(p.owners)||p.owners<1||p.owners>9 ||
+       !Number.isSafeInteger(p.owners)||p.owners<0||p.owners>9 ||
        !p.mot || !Number.isSafeInteger(p.mot.monthsRemaining) ||
-       p.mot.monthsRemaining<0||p.mot.monthsRemaining>24 ||
+       p.mot.monthsRemaining<0||p.mot.monthsRemaining>36 ||
        !Array.isArray(p.mot.advisories)||p.mot.advisories.length>6 ||
        !Number.isSafeInteger(p.mot.recordedMiles)||p.mot.recordedMiles<0 ||
        p.mot.recordedMiles>1000000 ||
