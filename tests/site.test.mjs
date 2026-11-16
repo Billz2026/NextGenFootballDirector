@@ -126,7 +126,7 @@ test('responsive dashboard supports mobile and reduced motion', () => {
 });
 
 test('v0.9.2 photo matching, image failure fallback and capacity labels', () => {
-  assert.match(html, /PRE-ALPHA · v0\.9\.37/);
+  assert.match(html, /PRE-ALPHA · v0\.9\.38/);
   assert.match(html, /<small>FORECOURT<\/small><strong data-bind="forecourt-capacity">4 vehicles<\/strong>/);
   assert.match(engine, /const CAPACITY = 4/);
   assert.match(css, /\.vehicle-photo-missing\[hidden\]/);
