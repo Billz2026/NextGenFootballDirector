@@ -1122,9 +1122,13 @@
           inputNumber('auction-bid-' + button.dataset.id)),button.dataset.id);
         break;
       case 'buy-seller':
-        if(career)selectedSellerId=button.dataset.id;
-        if (career) saveResult(E.acquireSeller(career,button.dataset.id,
-          inputNumber('seller-offer-' + button.dataset.id)),button.dataset.id);
+        if(career){
+          selectedSellerId=button.dataset.id;
+          const sourcing=E.marketFor(career).sellers.find(x=>x.id===button.dataset.id);
+          const purchaseOffer=sourcing?.marketTier==='new'?sourcing.ask:
+            inputNumber('seller-offer-'+button.dataset.id);
+          saveResult(E.acquireSeller(career,button.dataset.id,purchaseOffer),button.dataset.id);
+        }
         break;
       case 'accept-seller-counter':
         if (career) {
