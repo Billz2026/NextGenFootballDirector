@@ -5777,6 +5777,7 @@ test('compact Auction Hall uses one heading and a streamlined status and fee wor
   assert.match(markup,/NUMBERED LOT CATALOGUE/);
   assert.match(markup,/data-action="start-auction"/);
   assert.match(markup,/data-action="preview-auction"/);
+  assert.match(markup,/CURRENT LOT BELOW/);
   assert.match(markup,/<details class="auction-rules">/);
   assert.match(markup,/A winning bid becomes binding/);
   assert.ok(markup.indexOf('auction-catalogue')<markup.indexOf('auction-active-grid'));
