@@ -74,13 +74,15 @@
     const sold=state.sold||[],reports=state.monthlyReports||[];
     const profit=sold.find(v=>v.profit>0);
     const auction=(state.auctionHistory||[]).find(x=>x.kind==='won');
+    // Auction result history is bounded; ownership still proves a past purchase.
+    const auctionOwned=!!auction||[...(state.vehicles||[]),...sold].some(x=>x.source==='auction');
     let total=0,turnoverSale=null;
     for(const sale of sold){total+=sale.price;if(!turnoverSale&&total>=100000)turnoverSale=sale;}
     const success=reports.find(r=>r.targetMet===true);
     const expensive=sold.find(v=>v.price>=25000);
     return [
       {name:'FIRST PROFITABLE SALE',earned:!!profit,day:profit?.day,detail:'Positive gross margin at retail handover'},
-      {name:'FIRST AUCTION PURCHASE',earned:!!auction,day:auction?.day,detail:'Hammer won and invoice settled'},
+      {name:'FIRST AUCTION PURCHASE',earned:auctionOwned,day:auction?.day,detail:'Hammer won and invoice settled'},
       {name:'FIVE RETAIL SALES',earned:sold.length>=5,day:sold[4]?.day,detail:'Five completed vehicle handovers'},
       {name:'FIRST SUCCESSFUL MONTH',earned:!!success,day:success?.endDay,detail:'Volume target and positive operating contribution'},
       {name:'£25K VEHICLE SALE',earned:!!expensive,day:expensive?.day,detail:'Completed retail sale at £25,000 or more'},
