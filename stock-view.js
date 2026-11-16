@@ -114,37 +114,39 @@
       VC.heading(v,'stock',source+' · STOCK '+v.id)+
       '<p class="stock-dossier-note">'+esc(v.note||'')+'</p>'+
       '<div class="stock-facts"><div><small>ACQUIRED</small><strong>GAME DAY '+v.acquiredDay+'</strong></div>'+
-      '<div><small>DAYS HELD</small><strong class="'+(age>=30?'stock-age-warning':'')+'">'+age+'</strong></div>'+
-      '<div><small>SOURCE</small><strong>'+esc(source)+'</strong></div>'+
-      '<div><small>CONDITION</small><strong>GRADE '+grade+' / 5</strong></div></div>'+
-      (risk?'<div class="stock-aged-alert">'+risk+'</div>':'')+
+      '<div><small>DAYS HELD</small><strong class="'+(age>=30?'stock-age-warning':'')+'">'+age+'</strong></div></div>'+
       reportCard(v,'stock',v.asking??v.retail)+'</div>'+
-      '<div class="stock-dossier-finance"><div class="stock-finance-heading">'+
-      '<small>STOCK UNIT FINANCIALS</small><h3>THE NUMBERS.</h3></div>'+
-      '<div class="stock-cost-table">'+
-      costRow('Acquisition incl. inspection / assessment',f.acquisition)+
-      costRow('Repairs already paid / booked',f.paidRepairs)+
-      costRow('CASH INVESTED TO DATE',f.invested,true)+
-      costRow('Unspent preparation requirement',f.futurePrep)+
-      costRow('Modelled likely achieved sale',f.likelySale)+
-      '<div class="stock-cost-emphasis stock-margin'+(f.contribution<0?' stock-margin-loss':'')+
-      '"><span>PROJECTED GROSS CONTRIBUTION</span><strong>'+money(f.contribution)+'</strong></div>'+
+      '<div class="stock-dossier-finance">'+
+      '<div class="stock-finance-heading"><h3>UNIT FINANCIALS</h3></div>'+
+      '<div class="stock-finance-summary">'+
+        '<div><small>CASH INVESTED</small><strong>'+money(f.invested)+'</strong></div>'+
+        '<div><small>LIKELY RETAIL SALE</small><strong>'+money(f.likelySale)+'</strong></div>'+
+        '<div class="stock-summary-contribution'+(f.contribution<0?' stock-margin-loss':'')+
+          '"><small>PROJECTED GROSS CONTRIBUTION</small><strong>'+money(f.contribution)+'</strong></div>'+
       '</div>'+
-      '<p class="stock-finance-note">Cash invested includes paid repair bookings even before final QC. Unspent preparation is a protected estimate, not money already paid. Likely sale is a fictional projection'+
-      (v.status==='listed'?' capped at your asking price':'')+
-      '. Gross contribution excludes wages, premises, tax, aftersales and other overheads.</p>'+
+      (risk?'<div class="stock-aged-alert">'+risk+'</div>':'')+
       controls(v,state)+
+      '<details class="stock-cost-details"><summary>FULL COST BREAKDOWN & ASSUMPTIONS</summary>'+
+        '<div class="stock-cost-table">'+
+        costRow('Acquisition incl. inspection / assessment',f.acquisition)+
+        costRow('Repairs already paid / booked',f.paidRepairs)+
+        costRow('CASH INVESTED TO DATE',f.invested,true)+
+        costRow('Unspent preparation requirement',f.futurePrep)+
+        costRow('Modelled likely achieved sale',f.likelySale)+
+        '</div>'+
+        '<p class="stock-finance-note">Cash invested includes paid repair bookings even before final QC. Unspent preparation is a protected estimate, not money already paid. Likely sale is a fictional projection'+
+        (v.status==='listed'?' capped at your asking price':'')+
+        '. Gross contribution excludes wages, premises, tax, aftersales and other overheads.</p></details>'+
       '</div></div></section>';
   }
   function render(state,{filter='all',selectedId=null,reportCard=()=>''}={}){
     const value=FILTERS.includes(filter)?filter:'all';
     const stats=summary(state);
     const metrics=[
-      ['VEHICLES',stats.count,'CAPACITY '+state.capacity],
+      ['ON FORECOURT',stats.count+' / '+state.capacity,
+        stats.spaces+' SPACES AVAILABLE'],
       ['CASH INVESTED',money(stats.invested),'IN EXISTING STOCK'],
-      ['UNSPENT PREP',money(stats.reserved),'WORKSHOP FUNDING'],
-      ['ADVERTISED',stats.listed,'RETAIL MARKET'],
-      ['FREE SPACES',stats.spaces,'READY FOR PURCHASE']
+      ['UNSPENT PREP',money(stats.reserved),'WORKSHOP RESERVE']
     ];
     const head='<div class="stock-kpi-strip">'+metrics.map(([label,number,note])=>
       '<div class="stock-kpi"><small>'+label+'</small><strong>'+number+
@@ -156,8 +158,8 @@
       '<button type="button" class="trade-button trade-button-secondary" data-page="auctionHall">OPEN AUCTION HALL</button></div></div>'};
     const filters=[['all','ALL STOCK',stats.count],['prep','IN PREPARATION',stats.prep],
       ['ready','RETAIL READY',stats.ready],['listed','ADVERTISED',stats.listed]];
-    const toolbar='<div class="stock-toolbar"><div><small>LIVE FORECOURT REGISTER</small>'+
-      '<strong>'+state.vehicles.length+' ACTIVE UNITS</strong></div>'+
+    const toolbar='<div class="stock-toolbar"><div class="stock-toolbar-heading">'+
+      '<strong>STOCK REGISTER</strong><small>'+state.vehicles.length+' ACTIVE UNITS</small></div>'+
       '<div class="stock-filters" role="group" aria-label="Filter stock">'+
       filters.map(([name,label,count])=>'<button type="button" data-action="filter-stock" data-filter="'+name+
         '" aria-pressed="'+(value===name)+'">'+label+' <b>'+count+'</b></button>').join('')+'</div></div>';
@@ -168,11 +170,12 @@
       '<div class="stock-list-empty">No vehicles in this category. Choose another filter to review your active stock.</div>';
     return {selectedId:selected?.id??null,html:head+toolbar+
       '<div class="stock-workspace"><aside class="stock-register" aria-label="Current vehicle inventory">'+
-      '<div class="stock-register-title">STOCK REGISTER <span>'+eligible.length+' SHOWN</span></div>'+
+      '<div class="stock-register-title">VEHICLES <span>'+eligible.length+' SHOWN</span></div>'+
       '<div class="stock-register-list">'+list+'</div></aside>'+
       (selected?dossier(selected,state,reportCard):
         '<div class="stock-dossier stock-list-empty">Choose another category to view a vehicle file.</div>')+
-      '</div><p class="stock-disclosure">Vehicle history, values and customer demand are simulated. Vehicle photos are representative and are not vehicle-specific evidence.</p>'};
+      '</div><details class="stock-disclosure"><summary>About these inventory estimates</summary>'+
+      '<p>Vehicle history, values and customer demand are simulated. Representative vehicle photography is not evidence for the exact vehicle. No live verification is implied.</p></details>'};
   }
   window.MotorTradeStockView=Object.freeze({render,figures,summary,phase,FILTERS});
 })();
