@@ -72,6 +72,21 @@
   }
   function initial(){return {reputationScore:5,staff:[],nextStaffId:1,
     payrollArrears:0,reputationHistory:[]};}
+  // Opening employees belong to a newly established dealership, rather than
+  // being a paid recruitment action. Their ordinary salaries begin accruing
+  // on the next game-day tick. Existing careers are never seeded here.
+  function openingTeam(){
+    const roster={sales:'Lewis Carter',buyer:'Sophie Reed',
+      technician:'Chloe Baker',supervisor:'Tom Fletcher'};
+    const dayOneApplicants=applicants(1);
+    return Object.entries(roster).map(([role,name],index)=>{
+      const candidate=dayOneApplicants.find(c=>c.role===role&&c.name===name);
+      if(!candidate)throw new Error('Opening team candidate is unavailable: '+name);
+      return {...candidate,candidateId:candidate.id,id:index+1,
+        origin:'opening-team',hiredDay:1,startDay:1,trainingUntil:null,
+        lastTrainingDay:0,morale:76,deals:0,workDone:0};
+    });
+  }
   function applicants(day){
     const cycle=Math.floor((day-1)/7);
     return ROLES.flatMap((role,index)=>{
@@ -384,7 +399,11 @@
          !integer(s.monthlySalary)||s.monthlySalary<1000||s.monthlySalary>7000||
          !integer(s.experience)||s.experience<0||s.experience>45||
          !integer(s.hiredDay)||s.hiredDay<1||s.hiredDay>day||
-         !integer(s.startDay)||s.startDay!==s.hiredDay+1||
+         (s.origin!==undefined&&s.origin!=='opening-team')||
+         !integer(s.startDay)||
+         (s.origin==='opening-team'?
+           (s.hiredDay!==1||s.startDay!==1):
+           s.startDay!==s.hiredDay+1)||
          (s.trainingUntil!==null&&(!integer(s.trainingUntil)||s.trainingUntil<s.hiredDay))||
          !integer(s.lastTrainingDay)||s.lastTrainingDay<0||s.lastTrainingDay>day||
          !integer(s.morale)||s.morale<0||s.morale>100||
@@ -406,7 +425,7 @@
       reputationHistory:state.reputationHistory.map(e=>({...e}))};
   }
   window.MotorTradePeople=Object.freeze({
-    MAX_STAFF,HIRING_FEE,TRAINING_FEE,ROLES,tier,legacyScore,initial,
+    MAX_STAFF,HIRING_FEE,TRAINING_FEE,ROLES,tier,legacyScore,initial,openingTeam,
     applicants,dailyCost,active,isActive,activeTeam,availableTechnicians,
     technicianLimit,salesLimit,staffLimit,roleLimit,supervisor,moraleProposal,decideMorale,buyerDiscount,buyerEstimate,
     salesRep,salesProfile,salesImpact,salesBonus,hireQuote,WAGE_COVER_DAYS,
