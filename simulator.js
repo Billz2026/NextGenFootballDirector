@@ -185,10 +185,7 @@
       '<span class="message-copy">' +
         '<span class="message-from"><span>' + escapeText(message.from) + '</span><time>' + stamp + '</time></span>' +
         '<span class="message-title">' + escapeText(message.subject) + '</span>' +
-        (!compact?'<span class="inbox-message-tags"><b>'+escapeText(IN.labels[category]||category)+
-          '</b>'+(pending?'<b class="inbox-tag-action">APPROVAL REQUIRED</b>':'')+
-          (message.subject.startsWith('PAID COPY')?'<b class="inbox-tag-paid">ALREADY PAID</b>':'')+
-          '</span>':'') +
+        (!compact&&pending?'<span class="inbox-message-tags"><b class="inbox-tag-action">APPROVAL REQUIRED</b></span>':'') +
         '<span class="message-summary">' + escapeText(message.preview) + '</span>' +
       '</span>' +
       (message.read ? '' : '<span class="message-unread" aria-label="Unread"></span>');
@@ -216,11 +213,21 @@
     byId('inbox-paid-count').textContent=String(
       career.messages.filter(m=>m.subject.startsWith('PAID COPY')).length);
     byId('inbox-filter-count').textContent=String(ordered.length)+' SHOWN';
-    byId('inbox-filter-buttons').innerHTML=IN.categories.map(filter=>
+    const filterButton=filter=>
       '<button type="button" data-action="filter-inbox" data-filter="'+filter+
       '" aria-pressed="'+String(inboxFilter===filter)+'">'+
       IN.esc(IN.labels[filter])+
-      (filter==='action'&&counts.action?' · '+counts.action:'')+'</button>').join('');
+      (filter==='action'&&counts.action?' · '+counts.action:'')+'</button>';
+    const mainFilters=['all','unread','action'];
+    const departmentFilters=IN.categories.filter(filter=>!mainFilters.includes(filter));
+    const selectedDepartment=departmentFilters.includes(inboxFilter);
+    byId('inbox-filter-buttons').innerHTML=
+      mainFilters.map(filterButton).join('')+
+      '<details class="inbox-department-menu"'+(selectedDepartment?' data-active="true"':'')+'>'+
+        '<summary>'+(selectedDepartment?'DEPARTMENT: '+IN.esc(IN.labels[inboxFilter]):'DEPARTMENTS')+
+          '<span aria-hidden="true">⌄</span></summary>'+
+        '<div class="inbox-department-options">'+departmentFilters.map(filterButton).join('')+
+        '</div></details>';
     const detail=byId('inbox-detail');
     if(selectedMessageId===null||!ordered.some(m=>m.id===selectedMessageId))
       selectedMessageId=ordered[0]?.id??null;
@@ -234,8 +241,7 @@
     const category=IN.infer(selected);
     detail.innerHTML=
       '<div class="inbox-mail-heading">'+
-        '<span class="section-overline">'+escapeText(IN.labels[category]||category)+
-          (actionable?' · APPROVAL REQUIRED':'')+'</span>'+
+        (actionable?'<span class="section-overline">ACTION REQUIRED</span>':'')+
         '<h2>'+escapeText(selected.subject)+'</h2>'+
       '</div>'+
       IN.formatMail(selected,career)+IN.quoteControls(selected,career,E);
