@@ -111,6 +111,13 @@
       '</div>'+
       '<div id="desk-signal-'+esc(car.id)+'" class="buy-decision buy-decision-'+signal.kind+'">'+
         '<strong>'+signal.label+'</strong><p>'+esc(signal.text)+'</p></div>'+
+      '</div>';
+  }
+  function costNotes(car,state,E,offer){
+    const {quote,reserved}=figures(car,state,E,offer);
+    // These finance details stay accessible, but sit *after* the offer
+    // controls in both visual and keyboard order.
+    return '<div class="buy-subordinate-details">'+
       '<details class="buy-cost-breakdown"><summary>Full acquisition cost breakdown</summary>'+
         '<div class="buy-budget-table">'+
           '<div><span>Offer being considered</span><b id="desk-offer-'+esc(car.id)+'">'+money(offer)+'</b></div>'+
@@ -189,6 +196,7 @@
           '<span>'+miles(car.miles)+' · '+esc(car.fuel)+' · OWNER ASKS '+money(car.ask)+'</span></div>'+
         pricing(car,state,E,offer)+
         tradingControls(car,state,E,offer,opts.reportCard,opts.leadFeedback)+
+        costNotes(car,state,E,offer)+
       '</div></div></section>';
     return {selectedId:active,html:intro+
       '<div class="buy-main-grid">'+leadList(state,E,sellers,active)+detail+'</div>'+
