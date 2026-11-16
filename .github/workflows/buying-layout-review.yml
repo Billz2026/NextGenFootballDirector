@@ -1,0 +1,41 @@
+name: Buying Desk desktop and phone visual review
+on:
+  pull_request:
+    paths:
+      - 'buying-desk-view.js'
+      - 'buying-polish.css'
+      - 'index.html'
+      - 'tests/buying-visual-browser.mjs'
+      - '.github/workflows/buying-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate buying review script
+        run: node --check tests/buying-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve game for browser review
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/buying-layout-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Exercise desktop and phone Buying Desk layouts
+        run: node tests/buying-visual-browser.mjs
+      - name: Upload actual browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: buying-desk-desktop-phone
+          path: review/buying-desk-*.png
+          if-no-files-found: warn
+          retention-days: 7
