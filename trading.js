@@ -8,7 +8,7 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 14;
+  const VERSION = 15;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
@@ -42,26 +42,26 @@
     return (v ^ (v >>> 16)) >>> 0;
   };
   const nearest25 = n => Math.round(n / 25) * 25;
-  // Game calendar starts Monday 9 November 2026. Normally Monday auction;
-  // where Monday is month-end Deal Day, use Tuesday of the SAME game week.
-  // This guarantees exactly one weekday auction per week, never weekends.
-  function scheduledAuctionDay(day){
-    const monday=1+Math.floor((day-1)/7)*7;
-    return D.isDealDay(monday)?monday+1:monday;
-  }
-  const auctionDay=day=>integer(day)&&day>=1&&day===scheduledAuctionDay(day);
+  // Weekly Monday auctions remain open. An additional, genuine month-end
+  // auction runs on the last calendar date, including weekends.
+  const CAL=window.MotorTradeCalendar;
+  const scheduledAuctionDay=day=>1+Math.floor((day-1)/7)*7;
+  const auctionDay=day=>integer(day)&&day>=1&&
+    (day===scheduledAuctionDay(day)||D.isDealDay(day));
   function nextAuctionDay(day){
-    const thisWeek=scheduledAuctionDay(day);
-    return thisWeek>day?thisWeek:scheduledAuctionDay(day+7);
+    const monday=scheduledAuctionDay(day);
+    const week=monday>day?monday:monday+7;
+    const monthEnd=CAL.dayEnd(day);
+    const special=monthEnd>day?monthEnd:CAL.dayEnd(day+1);
+    return Math.min(week,special);
   }
   function market(day,reputationScore=0,session=0,dealershipName='',
     periodReputation=reputationScore,cash=STARTING_CASH) {
     const tier=MARKET.tierFor(cash,reputationScore).key;
     const dealSellers=MARKET.sellersForDealDay(cash,reputationScore);
     const special=D.customers(day,periodReputation,session,dealSellers,I.profile,dealershipName);
-    if(special)return {auctions:[],sellers:special.sellers.map(x=>({...x,...PH.describe(x)}))};
     const auctionCount=auctionDay(day)?
-      (day===1?3:3+(sample(day,1,29)%3)):0;
+      (day===1?3:D.isDealDay(day)?5:3+(sample(day,1,29)%3)):0;
     const baselineSellers=day===1?2:
       (sample(day,0,31)%5===0?0:1+(sample(day,1,37)%3));
     const sellerCount=Math.min(4,baselineSellers+
@@ -81,7 +81,7 @@
         retail:base.retail+delta,miles,fee,
         id:'A-'+day+'-'+i,kind:'auction',day};
     });
-    const sellers=Array.from({length:sellerCount},(_,i)=>{
+    const sellers=special?special.sellers:Array.from({length:sellerCount},(_,i)=>{
       const base=day===1?starter[3+i]:MARKET.pick('seller',tier,day,i,usedSeller);
       const offset=day===1?0:nearest25((sample(day,i,51)%601)-300);
       const ask=Math.max(950,base.ask+offset);
@@ -345,7 +345,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -465,7 +465,7 @@
     // Do not rebase historical £12,500 saves. The opening capital marker
     // is only issued to new staffed careers and survives every save/reload.
     if(saved.startingCapital!==undefined&&
-      (saved.version!==VERSION||saved.startingCapital!==STAFFED_STARTING_CASH))return null;
+      (saved.version<14||saved.startingCapital!==STAFFED_STARTING_CASH))return null;
     const openingCapital=saved.startingCapital??STARTING_CASH;
     const balance = openingCapital + sum(saved.ledger,'delta');
     if (balance !== saved.cash || balance < 0 || balance > 100000000) return null;
@@ -500,6 +500,9 @@
       reports:Object.fromEntries(Object.entries(reports).map(([k,v])=>[k,{...v}])),
       ...P.clone(workforce)
     };
+    if(saved.version<15&&restored.auctionHall.phase==='finished'&&
+       restored.auctionHall.index!==marketFor(restored).auctions.length)
+      restored.auctionHall=initialAuctionHall(restored.day);
     if(!M.restore(restored,saved))return null;
     if(!D.restore(restored,saved))return null;
     if(!C.valid(restored,saved))return null;
