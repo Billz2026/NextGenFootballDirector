@@ -172,6 +172,12 @@
   color:#a5b9be;
   font:600 9px/1.35 var(--body);
 }
+.auction-hall-control .auction-catalogue-location{
+  margin:auto 0 0;
+  color:#c4ad87;
+  font:800 9px/1.3 var(--mono);
+  letter-spacing:.02em;
+}
 .auction-hall-control .auction-catalogue-review{
   margin:auto 0 0;
   padding:5px 9px;
