@@ -397,8 +397,8 @@
       node.className=sales.positive?'dashboard-target-positive':'';
     bindText('dashboard-operating',money.format(d.report.operatingContribution));
     bindText('dashboard-auction',d.auctionOpen?'TODAY':'DAY '+d.auctionDay);
-    bindText('dashboard-auction-note',d.auctionWeekday==='TUE'?
-      'Tuesday · Deal Day reschedule':'Monday · weekly session');
+    bindText('dashboard-auction-note',d.auctionKind==='MONTH-END'?
+      d.auctionWeekday+' · Month-end auction':d.auctionWeekday+' · Weekly auction');
   }
   function renderMonthly() {
     const r=M.statement(career);
