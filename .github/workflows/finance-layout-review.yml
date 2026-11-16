@@ -1,0 +1,41 @@
+name: Business Finances desktop and phone visual review
+on:
+  pull_request:
+    paths:
+      - 'finance-view.js'
+      - 'finance-polish.css'
+      - 'index.html'
+      - 'tests/finance-visual-browser.mjs'
+      - '.github/workflows/finance-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate finance browser test syntax
+        run: node --check tests/finance-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve actual game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/finance-layout-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Verify finance cash reconciliation and compact layout at real sizes
+        run: node tests/finance-visual-browser.mjs
+      - name: Upload actual Chromium screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: business-finances-desktop-phone
+          path: review/finance-*.png
+          retention-days: 7
+          if-no-files-found: warn
