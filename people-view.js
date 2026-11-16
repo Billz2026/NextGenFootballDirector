@@ -201,7 +201,8 @@
         more.map(entry).join('')+'</div></details>':'')+'</section>';
     const future='<details class="rep-future"><summary>LONG-TERM PRESTIGE TARGET & MARKET ELIGIBILITY</summary>'+
       '<div class="rep-future-body"><p><strong>Live market rules:</strong> Modern stock needs £18,500 opening cash and 15 reputation; '+
-      'premium stock needs £42,000 and 40 reputation; luxury stock needs £110,000 and 65 reputation. '+
+      'premium stock needs £42,000 and 40 reputation; luxury stock needs £110,000 and 65 reputation; ' +
+      'delivery-mileage new-car allocations require £180,000 opening cash and 85 reputation. '+
       'The market checks cash and the monthly starting reputation, not just the tier name.</p>'+
       '<p><strong>Future development concept:</strong> a separate prestige-seller milestone of 80+ reputation '+
       'and £500,000 lifetime sales turnover. You currently have '+score+
