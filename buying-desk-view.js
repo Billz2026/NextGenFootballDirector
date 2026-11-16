@@ -104,17 +104,20 @@
       '<div class="buy-value-grid">'+quotes.map(([label,value])=>
         '<div><small>'+label+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<div class="buy-budget-table">'+
-        '<div><span>Offer being considered</span><b id="desk-offer-'+esc(car.id)+'">'+money(offer)+'</b></div>'+
-        '<div><span>Expected preparation / risk allowance</span><b id="desk-prep-'+esc(car.id)+'">'+money(quote.prep)+'</b></div>'+
-        '<div><span>Inspection paid</span><b>'+money(quote.inspection)+'</b></div>'+
-        '<div><span>Modelled total investment</span><b id="desk-total-'+esc(car.id)+'">'+money(quote.total)+'</b></div>'+
         '<div class="buy-budget-total"><span>PROJECTED GROSS CONTRIBUTION</span>'+
           '<b id="desk-projection-'+esc(car.id)+'" class="'+(quote.expectedMargin<0?'buy-negative':'')+'">'+money(quote.expectedMargin)+'</b></div>'+
-        '<div><span>Indicative cash after offer and prep reserves</span><b id="desk-headroom-'+esc(car.id)+'"'+
+        '<div><span>Cash after offer and estimated preparation</span><b id="desk-headroom-'+esc(car.id)+'"'+
           (remaining<0?' class="buy-negative"':'')+'>'+money(remaining)+'</b></div>'+
       '</div>'+
       '<div id="desk-signal-'+esc(car.id)+'" class="buy-decision buy-decision-'+signal.kind+'">'+
         '<strong>'+signal.label+'</strong><p>'+esc(signal.text)+'</p></div>'+
+      '<details class="buy-cost-breakdown"><summary>Full acquisition cost breakdown</summary>'+
+        '<div class="buy-budget-table">'+
+          '<div><span>Offer being considered</span><b id="desk-offer-'+esc(car.id)+'">'+money(offer)+'</b></div>'+
+          '<div><span>Expected preparation / risk allowance</span><b id="desk-prep-'+esc(car.id)+'">'+money(quote.prep)+'</b></div>'+
+          '<div><span>Inspection paid</span><b>'+money(quote.inspection)+'</b></div>'+
+          '<div><span>Modelled total investment</span><b id="desk-total-'+esc(car.id)+'">'+money(quote.total)+'</b></div>'+
+        '</div></details>'+
       '<details class="buy-budget-note"><summary>What the estimates include</summary>'+
       '<p>Gross contribution is an estimate before staff, premises, VAT/tax, retail finance and aftersales liabilities. Uninspected repair budgets include a risk allowance; actual faults can cost more. Existing repair reserves ('+
         money(reserved)+') are protected separately from your offer. Indicative headroom uses forecast preparation; purchase approval protects the full workshop commitment, which may be higher before inspection.</p></details></div>';
