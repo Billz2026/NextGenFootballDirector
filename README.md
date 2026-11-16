@@ -4,6 +4,8 @@
 
 **Play:** https://billz2026.github.io/TheMotorTrade/
 
+**Before a full 30-day career test:** [Month-one playtest plan, expected cash benchmarks and bug-report checklist](docs/month-one-playtest.md). Always export an existing career before starting a new one.
+
 ### v0.9.38 — Full Day 1 team and fairer opening capital (16 November 2026)
 
 - **Four named, salaried employees are active from the beginning:** sales executive Lewis Carter, vehicle buyer Sophie Reed, preparation technician Chloe Baker and staff supervisor Tom Fletcher. All use the normal candidate skills, salaries and staff lifecycle; they are not free volunteers or decorative placeholders.
