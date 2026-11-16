@@ -399,6 +399,20 @@
       esc(roleName[c.role])+'</small><h3>'+esc(c.name)+'</h3></div>'+
       '<span class="sd-tag sd-tag-'+(info.canHire?'available':'warning')+'">'+
       esc(info.reason)+'</span></header>'+
+      '<section class="sd-candidate-quick" aria-label="Current hiring decision">'+
+      '<div class="sd-hire-brief"><div><small>CHARGED ON HIRE</small><strong>'+
+      gbp(P.HIRING_FEE)+'</strong></div>'+
+      '<div><small>MINIMUM CASH BALANCE</small><strong>'+gbp(q.required)+'</strong></div></div>'+
+      (q.shortfall?'<p class="sd-issue">SHORT BY '+gbp(q.shortfall)+
+        '. Increase cash before taking on this salary.</p>':'')+
+      (!info.canHire&&!q.shortfall?'<p class="sd-issue">'+esc(info.reason)+
+        '. This role or candidate cannot be hired right now.</p>':'')+
+      '<div class="sd-candidate-action"><button type="button" class="trade-button sd-primary-hire" '+
+      'data-action="hire-staff" data-id="'+esc(c.id)+'"'+(info.canHire?'':' disabled')+'>'+
+      (info.canHire?'HIRE '+esc(c.name.toUpperCase())+' · '+gbp(P.HIRING_FEE):
+        'CANNOT HIRE · '+esc(info.reason))+'</button>'+
+      '<span>STARTS DAY '+(state.day+1)+' · DAILY PAYROLL +'+gbp(staffDaily)+'</span></div>'+
+      '</section>'+
       '<div class="sd-staff-summary">'+
       '<div><small>MONTHLY BASE WAGE</small><strong>'+gbp(c.monthlySalary)+'</strong></div>'+
       '<div><small>DAILY PAYROLL ADDED</small><strong>'+gbp(staffDaily)+'</strong></div>'+
@@ -411,17 +425,6 @@
       '<div class="sd-person-detail"><div>'+skillSection(c,P)+
       '</div><div class="sd-control"><div class="sd-section-head"><h4>HIRING DECISION</h4>'+
       '<span>STARTS DAY '+(state.day+1)+'</span></div>'+
-      '<div class="sd-hire-brief"><div><small>CHARGED ON HIRE</small><strong>'+
-      gbp(P.HIRING_FEE)+'</strong></div>'+
-      '<div><small>MINIMUM CASH BALANCE</small><strong>'+gbp(q.required)+'</strong></div></div>'+
-      (q.shortfall?'<p class="sd-issue">SHORT BY '+gbp(q.shortfall)+
-        '. Increase cash before taking on this salary.</p>':'')+
-      (!info.canHire&&!q.shortfall?'<p class="sd-issue">'+esc(info.reason)+
-        '. This role or candidate cannot be hired right now.</p>':'')+
-      '<button type="button" class="trade-button sd-primary-hire" data-action="hire-staff" data-id="'+
-      esc(c.id)+'"'+(info.canHire?'':' disabled')+'>'+
-      (info.canHire?'HIRE '+esc(c.name.toUpperCase())+' · '+gbp(P.HIRING_FEE):
-        'CANNOT HIRE · '+esc(info.reason))+'</button>'+
       '<details class="sd-hire-breakdown"><summary>FULL HIRING CASH & WAGE BREAKDOWN</summary>'+
       '<div class="sd-hire-figures">'+
       '<div><span>DEALERSHIP CASH TODAY</span><strong>'+gbp(todayCash)+'</strong></div>'+
