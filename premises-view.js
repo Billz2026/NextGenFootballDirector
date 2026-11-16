@@ -27,9 +27,13 @@
     const activeRepairs=state.vehicles.filter(v=>
       v.workshop?.method==='internal'&&
       ['in-progress','quality-check'].includes(v.workshop.stage)).length;
+    const P=window.MotorTradePeople;
+    const technicians=(state.staff||[]).filter(e=>e.role==='technician');
+    const techWorking=technicians.filter(e=>P?.isActive(state,e)).length;
+    const techniciansFree=P?.availableTechnicians(state)?.length??0;
     return {p,monthly,reserve,dailyWages,forecourt,workshop,stock,
       freeSpaces:Math.max(0,forecourt-stock),
-      activeRepairs,
+      activeRepairs,techWorking,techniciansFree,
       cashAfterRepairReserves:state.cash-reserve,
       runningDaily:p.total+dailyWages,
       arrears:(state.premises?.arrears??0)+(state.payrollArrears??0)};
@@ -71,6 +75,11 @@
       '<div class="hq-upgrade-costs hq-upgrade-headline-costs">'+
       line('ONE-OFF INVESTMENT',cash(q.cost))+
       line('EXTRA COST PER GAME DAY',cash(q.dailyIncrease))+'</div>'+
+      '<div class="hq-upgrade-projection">'+
+      line('CURRENT PREMISES / DAY',cash(q.currentDaily))+
+      line('AFTER UPGRADE / DAY',cash(q.newDaily))+
+      line('CASH AFTER INVESTMENT',cash(state.cash-q.cost))+
+      '</div>'+
       '<div class="'+(unlocked?'hq-upgrade-success':'hq-upgrade-warning')+'">'+message+'</div>'+
       '<button type="button" class="trade-button hq-invest-button" '+
       'data-action="upgrade-premises" data-kind="'+kind+'"'+
@@ -78,10 +87,13 @@
       (unlocked?'APPROVE '+cash(q.cost)+' INVESTMENT':reason)+'</button>'+
       '<details class="hq-upgrade-details"><summary>VIEW INVESTMENT REQUIREMENTS</summary>'+
       '<div class="hq-upgrade-costs">'+
-      line('CASH NEEDED INCL. BUFFERS',cash(q.requiredCash))+
+      line('MINIMUM CASH TO APPROVE',cash(q.requiredCash))+
+      line('PROTECTED CASH BUFFER',cash(q.protectedCash))+
       line('REPUTATION REQUIRED',q.requiredReputation+' / 100')+
+      line('CURRENT REPUTATION',state.reputationScore+' / 100')+
       '</div><p>Cash protection includes outstanding workshop preparation, payroll '+
-      'obligations, the required wage cover and additional premises costs.</p>'+
+      'obligations, three days of team wages and seven days of new premises costs. '+
+      'Only the investment is debited immediately; future running costs are charged on later game days.</p>'+
       '</details></article>';
   }
   function render(state,site){
@@ -95,16 +107,17 @@
     const metrics='<div class="hq-metrics">'+
       label('FORECOURT OCCUPANCY',r.stock+' / '+r.forecourt,
         r.freeSpaces+' '+(r.freeSpaces===1?'space':'spaces')+' available for buying')+
-      label('WORKSHOP CAPACITY',r.workshop+' BAYS',
-        r.activeRepairs+' in-house '+(r.activeRepairs===1?'job':'jobs')+' in progress')+
+      label('WORKSHOP CAPACITY',r.workshop+' PHYSICAL BAYS',
+        r.techWorking+' active '+(r.techWorking===1?'technician':'technicians')+
+        ' · '+r.techniciansFree+' free · '+r.activeRepairs+' jobs running')+
       label('DEALERSHIP CASH',cash(state.cash),
         cash(r.cashAfterRepairReserves)+' after workshop reserves')+
       label('DAILY RUNNING COST',cash(r.runningDaily),
         cash(p.total)+' premises + '+cash(r.dailyWages)+' wages')+
       '</div>';
-    const head='<div class="hq-brief"><div><small>LIVE BUSINESS OPERATIONS</small>'+
-      '<strong>RUNNING YOUR DEALERSHIP</strong>'+
-      '<p>Monitor your physical capacity, commitments and investment options.</p></div>'+
+    const head='<div class="hq-brief"><div><small>LIVE SITE STATUS</small>'+
+      '<strong>FACILITY POSITION</strong>'+
+      '<p>Workshop bays require available technicians; unused space does not complete repairs.</p></div>'+
       '<span class="hq-brief-status'+(r.arrears||state.cash<r.runningDaily?' hq-brief-alert':'')+'">'+
       nextState+'</span></div>';
     const cost='<section class="hq-cost-panel"><div class="hq-section-heading">'+
@@ -113,15 +126,20 @@
       '<div class="hq-commit-grid">'+
       line('PREMISES / DAY',cash(p.total))+
       line('STAFF WAGES / DAY',cash(r.dailyWages))+
+      line('TOTAL COST / DAY',cash(r.runningDaily))+
       line('WORKSHOP FUNDS RESERVED',cash(r.reserve))+
       line('MONTHLY PREMISES GUIDE',cash(p.monthlyGuide))+
       line('OUTSTANDING OBLIGATIONS',cash(r.arrears),r.arrears?' hq-due':'')+
-      line('MONTH-TO-DATE PREMISES COST',cash(monthly?.premisesExpense??0))+
-      '</div><p class="hq-context">Daily premises and staff costs continue even when no cars sell. '+
-      'Repair reserves are part of existing cash, not an additional charge.</p></section>';
+      '</div><details class="hq-cost-history"><summary>ACCRUED COSTS & CASH EXPLANATION</summary>'+
+      '<div class="hq-commit-grid">'+line('MONTH-TO-DATE PREMISES COST',
+        cash(monthly?.premisesExpense??0))+
+      line('CASH AFTER REPAIR RESERVES',cash(r.cashAfterRepairReserves))+
+      '</div><p>Daily premises and staff costs continue even without sales. '+
+      'Repair reserves are part of existing cash, not an additional charge. '+
+      'These are operating costs, not statutory accounts.</p></details></section>';
     const upgradeHead='<div class="hq-section-heading hq-upgrade-section-head">'+
       '<div><small>FACILITY INVESTMENT / OWNER APPROVAL</small>'+
-      '<h3>EXPANSION & RUNNING COSTS</h3></div>'+
+      '<h3>AVAILABLE EXPANSIONS</h3></div>'+
       '<span>'+possible+' '+(possible===1?'OPTION':'OPTIONS')+' CURRENTLY AFFORDABLE</span></div>';
     const more='<details class="hq-guidance"><summary>HOW PREMISES EXPANSION WORKS</summary>'+
       '<p>Forecourt expansion raises how many vehicles can be held. Workshop expansion '+
