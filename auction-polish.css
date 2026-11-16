@@ -244,6 +244,7 @@
   line-height:1.05;
   margin-top:4px;
 }
+.auction-hall-control .auction-mobile-lot-context{display:none}
 .auction-hall-control .auction-bid-box-top{
   padding:11px 14px;
   background:#243d34;
@@ -428,7 +429,27 @@
   .auction-hall-control .auction-head-metrics>div{padding:2px 8px}
 }
 @media(max-width:1100px){
-  .auction-hall-control .auction-active-grid{grid-template-columns:1fr}
+  /* Current offer and vehicle identity appear before the long vehicle file;
+     no nested scrolling and no loss of full risk/inspection information. */
+  .auction-hall-control .auction-active-grid{display:flex;flex-direction:column}
+  .auction-hall-control .auction-bid-box{order:0;width:100%}
+  .auction-hall-control .auction-current{order:1;width:100%}
+  .auction-hall-control .auction-mobile-lot-context{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:10px 14px 9px;
+    border-bottom:1px solid #3d565b;
+    background:#172f38;
+  }
+  .auction-hall-control .auction-mobile-lot-context strong{
+    color:#f1dfc2;
+    font:850 15px/1.3 var(--body);
+  }
+  .auction-hall-control .auction-mobile-lot-context small{
+    color:#a5c0c3;
+    font:700 9px/1.35 var(--mono);
+  }
   .auction-hall-control .auction-car-content .vehicle-photo-frame{height:235px}
   .auction-hall-control .auction-head-metrics{flex:0 1 500px}
 }
