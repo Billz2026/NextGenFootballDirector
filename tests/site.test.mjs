@@ -6569,7 +6569,7 @@ test('30 game-day finance baseline retains full salaried team, rent, true cash a
   s.day=31;
   E.monthly.next(s);
   assert.equal(s.monthlyReports.length,1);
-  assert.equal(s.monthlyReports[0].cashClosing,37141);
+  assert.equal(s.monthlyReports[0].closingCash,37141);
   assert.equal(s.staff.length,4);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
   assert.equal(JSON.parse(starting).cash,45000,'Baseline opening statement stays unchanged');
