@@ -207,7 +207,9 @@
       'and £500,000 lifetime sales turnover. You currently have '+score+
       ' reputation and '+cashNumber+' in completed turnover. '+
       'That separate milestone is not an additional unlock in this version.</p></div></details>';
-    return '<div class="rep-control">'+scoreHero+metrics+main+history+future+
+    return '<div class="rep-control">'+scoreHero+metrics+
+      (window.MotorTradeCareerProgression?.reputation(state)||'')+
+      main+history+future+
       '<p class="rep-disclosure">Reputation and trading results are fictional simulation values. '+
       'A higher score alone does not guarantee customers, profitable stock or cash.</p></div>';
   }
