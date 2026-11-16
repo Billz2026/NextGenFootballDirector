@@ -60,7 +60,7 @@
       '<div><small>MILEAGE</small><strong>'+mileage(car.miles)+'</strong></div>'+
       '<div><small>OWNERS</small><strong>'+esc(car.profile?.owners??'—')+'</strong></div>'+
       '<div><small>MOT</small><strong>'+(Number.isSafeInteger(car.profile?.mot?.monthsRemaining)?
-      esc(car.profile.mot.monthsRemaining)+' months':'Unknown')+'</strong></div></div>';
+      (car.profile.mot.result==='NOT DUE'?'First MOT not due':esc(car.profile.mot.monthsRemaining)+' months'):'Unknown')+'</strong></div></div>';
   }
   function mini(car,source='part-ex'){
     if(!car)return '';
