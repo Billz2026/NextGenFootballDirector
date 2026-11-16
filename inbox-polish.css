@@ -12,8 +12,14 @@
   font-size:10px;
   line-height:1.4;
 }
-#screen-career:has(.inbox-control:not([hidden])) #events-banner{
+/* Hide only routine calendar filler. Genuine management meetings and
+ * Deal Day deadlines must remain visible and actionable. */
+#screen-career:has(.inbox-control:not([hidden])) #events-banner:has(.event-neutral-banner){
   display:none;
+}
+#screen-career:has(.inbox-control:not([hidden])) #events-banner:has(.event-meeting-banner),
+#screen-career:has(.inbox-control:not([hidden])) #events-banner:has(.event-deadline-banner){
+  margin-bottom:9px;
 }
 .inbox-control .inbox-heading{
   margin:0 0 10px;
