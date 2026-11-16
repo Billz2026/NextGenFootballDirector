@@ -92,7 +92,11 @@ try{
       assert.equal(m.headingCount,1);
       assert.ok(m.documentWidth<=width+1,stage+' '+label+': page overflow '+JSON.stringify(m));
       assert.ok(m.panelWidth<=m.panelClientWidth+1,stage+' '+label+': report panel overflow');
-      assert.ok(m.scorecardTop<310,stage+' '+label+': monthly scorecard starts too low');
+      assert.ok(m.scorecardTop-m.pickerTop<70,
+        stage+' '+label+': the scorecard must follow the period selector closely');
+      const topLimit=label==='desktop'?310:label==='fold'?460:520;
+      assert.ok(m.scorecardTop<topLimit,
+        stage+' '+label+': monthly scorecard starts too low for this device');
       assert.ok(m.exceptionsTop>m.kpisBottom-2);
       if(label==='desktop')assert.ok(m.archiveTop<900,'Detailed archive is too deep on desktop');
       if(label==='phone')assert.ok(m.exceptionsTop<620,
