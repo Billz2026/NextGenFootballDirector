@@ -38,11 +38,11 @@
   }
   function archivePicker(state,chosen){
     const completed=[...state.monthlyReports].reverse();
-    return '<div class="report-picker"><button type="button" data-action="select-report" data-month="current"'+
+    return '<nav class="report-picker" aria-label="Choose current or archived monthly report"><button type="button" data-action="select-report" data-month="current"'+
       (chosen==='current'?' aria-current="true"':'')+'>CURRENT MONTH '+state.monthPlan.month+
       '</button>'+completed.map(x=>'<button type="button" data-action="select-report" data-month="'+x.month+'"'+
       (String(x.month)===String(chosen)?' aria-current="true"':'')+'>'+
-      'MONTH '+x.month+' · '+(x.targetMet?'TARGET HIT':'TARGET MISSED')+'</button>').join('')+'</div>';
+      'MONTH '+x.month+' · '+(x.targetMet?'TARGET HIT':'TARGET MISSED')+'</button>').join('')+'</nav>';
   }
   const nameByCategory={
     auctionPurchases:'Auction vehicle purchases',sellerPurchases:'Direct seller acquisitions',
@@ -214,17 +214,19 @@
     const contribution=r.operatingContribution??r.grossAfterStaff;
     const needed=Math.max(0,r.targetUnits-r.soldUnits);
     const flags=[];
-    if(needed)flags.push([isClosed?'SALES TARGET MISSED':'SALES REQUIRED',needed+' handover'+(needed===1?'':'s')+(isClosed?' short of the final target':' still needed')]);
-    if(contribution<0)flags.push(['OPERATING LOSS',money(contribution)+' after staff and premises']);
-    if(r.agedStock)flags.push(['AGEING STOCK',r.agedStock+' vehicle'+(r.agedStock===1?'':'s')+' held for 14+ days']);
-    if(r.stockAwaitingPrep)flags.push(['WORKSHOP BACKLOG',r.stockAwaitingPrep+' vehicle'+(r.stockAwaitingPrep===1?'':'s')+' unprepared']);
+    // Always show real financial warnings first, and never silently drop a
+    // fifth exception when wages, sales, stock age and preparation all matter.
     if((r.payrollArrears||0)+(r.premisesArrears||0))flags.push(['UNPAID BILLS',
       money((r.payrollArrears||0)+(r.premisesArrears||0))+' in outstanding obligations']);
-    const alerts=(flags.length?flags:[['NO IMMEDIATE FLAGS','No flagged exceptions']]).slice(0,4).map(item=>
+    if(contribution<0)flags.push(['OPERATING LOSS',money(contribution)+' after staff and premises']);
+    if(needed)flags.push([isClosed?'SALES TARGET MISSED':'SALES REQUIRED',needed+' handover'+(needed===1?'':'s')+(isClosed?' short of the final target':' still needed')]);
+    if(r.agedStock)flags.push(['AGEING STOCK',r.agedStock+' vehicle'+(r.agedStock===1?'':'s')+' held for 14+ days']);
+    if(r.stockAwaitingPrep)flags.push(['WORKSHOP BACKLOG',r.stockAwaitingPrep+' vehicle'+(r.stockAwaitingPrep===1?'':'s')+' unprepared']);
+    const alerts=(flags.length?flags:[['NO IMMEDIATE FLAGS','No flagged exceptions']]).map(item=>
       '<div class="mr-flag"><strong>'+item[0]+'</strong><span>'+item[1]+'</span></div>').join('');
     const top='<div class="mr-overview"><div class="mr-head"><div><small>MONTH '+r.month+' · DAYS '+
       r.startDay+'–'+r.endDay+' · '+(isClosed?'ARCHIVED RESULT':'LIVE POSITION')+
-      '</small><h2>MANAGEMENT REVIEW</h2></div><b>'+status+'</b></div>'+
+      '</small><h2>MONTH '+r.month+' SCORECARD</h2></div><b>'+status+'</b></div>'+
       '<div class="mr-kpis">'+
       cell('VEHICLES HANDED OVER',r.soldUnits+' / '+r.targetUnits,'Monthly target')+
       cell('OPERATING CONTRIBUTION',money(contribution),'After staff and premises costs',
