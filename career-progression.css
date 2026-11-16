@@ -1,0 +1,99 @@
+/* Read-only career goals and milestone presentation.
+ * Scoped styles; the underlying dealership economics are unchanged.
+ */
+.cp-dashboard,.cp-reputation{
+  background:linear-gradient(125deg,#1b3039,#132630);
+  border:1px solid #445a60;border-radius:9px;min-width:0;
+}
+.cp-dashboard{padding:12px 14px;margin:10px 0}
+.cp-dashboard-head,.cp-section-head{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  margin-bottom:10px;min-width:0
+}
+.cp-dashboard-head small,.cp-section-head small{
+  display:block;color:var(--gold);font:700 9px/1.3 var(--mono);letter-spacing:.08em
+}
+.cp-dashboard-head h2,.cp-section-head h3{
+  color:#f2eee7;font:900 22px/1.05 var(--title);letter-spacing:.025em;margin:3px 0 0
+}
+.cp-current-tier{
+  border:1px solid #6b6450;border-radius:5px;background:#29372f;
+  color:#f2cc93;font:700 9px/1.4 var(--mono);padding:7px 9px;
+  text-align:right;white-space:normal
+}
+.cp-current-tier:hover{background:#394839;border-color:#c9a66c}
+.cp-goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cp-goal{
+  min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:7px;
+  border:1px solid #3a535d;border-radius:6px;background:#11232e;
+  padding:11px 12px;text-align:left;transition:background .15s,border-color .15s
+}
+.cp-goal:hover{background:#203742;border-color:#ad9163}
+.cp-goal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-width:0}
+.cp-goal-top strong{font:800 10px/1.35 var(--mono);color:#e8e9e4;letter-spacing:.02em}
+.cp-goal-top>span{font:700 9px/1.3 var(--mono);color:var(--gold);text-align:right;flex:0 0 auto;max-width:45%}
+.cp-goal-track{display:block;height:5px;width:100%;border-radius:50px;background:#344853;overflow:hidden}
+.cp-goal-track span{display:block;height:100%;background:linear-gradient(90deg,#af884c,#f0c383);border-radius:inherit}
+.cp-goal small{color:#acbdc1;font-size:10px;line-height:1.45;min-height:29px}
+.cp-goal em{color:var(--gold);font:700 9px/1.3 var(--mono);margin-top:auto;font-style:normal}
+.cp-reputation{padding:16px;margin:16px 0 20px}
+.cp-reputation .cp-goal{padding:13px}
+.cp-reputation .cp-section-head>span{color:#9eb1b8;font:700 9px var(--mono);text-align:right}
+.cp-achievements-title{margin:22px 0 10px;padding-top:15px;border-top:1px solid #405660}
+.cp-achievements{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cp-achievement{
+  display:flex;align-items:flex-start;gap:10px;min-width:0;
+  border:1px solid #354a55;border-radius:6px;background:#142632;padding:12px
+}
+.cp-achievement-symbol{color:#7b929c;font:900 19px/1 var(--title)}
+.cp-earned{border-color:#6c674c;background:#26372d}
+.cp-earned .cp-achievement-symbol{color:var(--gold)}
+.cp-achievement>span:nth-child(2){flex:1;min-width:0}
+.cp-achievement strong{display:block;font:800 11px/1.35 var(--mono);color:#f1ece5}
+.cp-achievement small{display:block;color:#9eafb6;font-size:10px;margin-top:4px}
+.cp-achievement em{font:700 9px/1.3 var(--mono);color:#8c9da4;flex:0 0 auto}
+.cp-earned em{color:#eac182}
+.cp-rules{margin-top:13px;color:#8fa5af;font-size:10px;line-height:1.55}
+.career-promotion-layer{
+  position:fixed;inset:0;z-index:120;display:grid;place-items:center;
+  overflow:auto;padding:20px;background:rgba(3,11,17,.88);backdrop-filter:blur(6px)
+}
+.cp-promotion-dialog{
+  width:min(550px,100%);max-height:calc(100dvh - 40px);overflow:auto;
+  padding:clamp(23px,4vw,39px);border:1px solid #b28c53;border-radius:14px;
+  background:radial-gradient(ellipse at 50% 0,#3e3c2b80,transparent 65%),#142630;
+  box-shadow:0 25px 100px #000b;text-align:center
+}
+.cp-promotion-eyebrow{display:block;color:#f4ce97;font:700 10px var(--mono);letter-spacing:.07em}
+.cp-promotion-icon{display:block;color:var(--gold);font:900 55px/1 var(--title);margin:22px 0 16px}
+.cp-promotion-dialog h2{font:900 clamp(39px,6vw,55px)/.95 var(--title);letter-spacing:.03em;color:#f3f0ea}
+.cp-promotion-dialog h2 em{display:inline-block;margin-top:9px;color:var(--gold)}
+.cp-promotion-dialog>p{margin:18px auto 0;max-width:430px;font-size:13px;line-height:1.65;color:#d7e0df}
+.cp-promotion-dialog .cp-promotion-note{font-size:10px;color:#a5b7b9;line-height:1.65}
+.cp-promotion-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:25px}
+.cp-promotion-actions button{border-radius:6px;padding:13px 16px;font:800 10px var(--mono)}
+.cp-promotion-primary{background:var(--gold);border:1px solid #f7d199;color:#15262a}
+.cp-promotion-primary:hover{background:var(--gold-light)}
+.cp-promotion-secondary{background:#223942;border:1px solid #6b8185;color:#e9e3d6}
+.cp-promotion-secondary:hover{background:#304853}
+@media(max-width:1050px){
+  .cp-goals{grid-template-columns:1fr}
+  .cp-dashboard .cp-goal{gap:6px}
+  .cp-goal small{min-height:0}
+}
+@media(min-width:720px) and (max-width:1050px){
+  .cp-dashboard .cp-goals{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .cp-dashboard,.cp-reputation{padding:11px}
+  .cp-dashboard-head,.cp-section-head{align-items:flex-start}
+  .cp-dashboard-head h2,.cp-section-head h3{font-size:20px}
+  .cp-current-tier{font-size:8px;max-width:145px}
+  .cp-achievements{grid-template-columns:1fr}
+  .cp-achievement{padding:11px}
+  .cp-promotion-actions{flex-direction:column}
+  .cp-promotion-actions button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .cp-goal{transition:none}
+}
