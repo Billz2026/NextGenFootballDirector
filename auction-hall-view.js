@@ -28,7 +28,7 @@
     const header='<div class="auction-hall-head" role="group" aria-label="Auction session status">'+
       '<div class="auction-session-marker"><strong>'+sessionLabel+'</strong>'+
       '<span>GAME DAY '+state.day+' · '+(lots.length?sessionDay+' SALE':
-        'NEXT '+nextWeekday+' · DAY '+nextDay)+'</span></div>'+
+        'NEXT '+nextWeekday+' · GAME DAY '+nextDay)+'</span></div>'+
       '<div class="auction-head-metrics">'+
       '<div><small>LOTS</small><strong>'+lots.length+'</strong></div>'+
       '<div><small>ACTIVE</small><strong>'+(h.phase==='finished'||!lots.length?'—':E.lotNumber(h.index))+'</strong></div>'+
@@ -62,9 +62,8 @@
       }).join('')+'</div></section>':'';
     if(!lots.length)
       return header+'<div class="trade-empty auction-closed"><h2>AUCTION HOUSE CLOSED TODAY.</h2>'+
-        '<p>Auctions run once each game week, normally Monday; never weekends. NEXT SESSION: '+nextWeekday+' · GAME DAY '+nextDay+
-        ' (in '+(nextDay-state.day)+' game day'+(nextDay-state.day===1?'':'s')+'). '+
-        (state.day%30===0?'Deal Day is also closed to auction bidding. ':'')+
+        '<p>There is no bidding outside the weekly sale. '+
+        (state.day%30===0?'Deal Day is reserved for retail customers, not auction bidding. ':'')+
         'Private sellers remain available through the Buying Desk.</p>'+
         '<button type="button" class="trade-button" data-page="auctions">OPEN BUYING DESK</button></div>'+
         notice+(history.length?'<details class="panel-card auction-results auction-results-disclosure">'+
@@ -72,7 +71,7 @@
           '<div class="auction-results-body">'+history.map(resultRow).join('')+'</div></details>':'');
     if(h.phase==='finished')
       return header+catalogue+
-        '<div class="panel-card auction-finished"><h3>HAMMER RESULTS · SESSION COMPLETE</h3>'+
+        '<div class="panel-card auction-finished"><h3>FINAL HAMMER RESULTS</h3>'+
         '<p>Every lot has now left the auction ring. Any cars you purchased are in Vehicle Stock for assessment and repair.</p>'+
         h.results.map(resultRow).join('')+
         '<div class="auction-final-actions"><button type="button" class="trade-button" data-page="stock">VIEW VEHICLE STOCK</button>'+
