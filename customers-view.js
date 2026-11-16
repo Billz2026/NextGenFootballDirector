@@ -187,7 +187,10 @@
       '<header class="so-file-head"><div><small>RETAIL FILE · STOCK '+v.id+
       (c?' · '+esc(c.channel):' · ADVERTISED VEHICLE')+'</small>'+
       '<h3>'+esc(v.title)+'</h3></div>'+
-      '<span class="so-status so-status-'+leadInfo.tone+'">'+esc(leadInfo.title)+'</span></header>'+
+      '<div class="so-file-head-position"><span class="so-status so-status-'+leadInfo.tone+'">'+
+      esc(leadInfo.title)+'</span>'+
+      '<strong class="so-quick-price">'+(c?.price!==null&&c?.price!==undefined?'AGREED ':'ASKING ')+
+      cash(c?.price??v.asking)+'</strong></div></header>'+
       progress(leadInfo)+
       '<div class="so-file-grid"><section class="so-car">'+
       '<div class="so-vehicle-intro"><div class="so-car-photo">'+VC.photo(v,'stock')+'</div>'+
