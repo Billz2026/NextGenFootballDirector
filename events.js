@@ -1,9 +1,11 @@
 'use strict';
 /* The Motor Trade — monthly retail Deal Day and management meetings.
- * A 'month' is the game's 30-day accounting period, not a calendar month.
+ * Months follow real calendar boundaries: 28, 29, 30 or 31 days.
  * Incentives apply only to retail consumers/private sellers, never auctions.
  */
 (() => {
+  const CAL=window.MotorTradeCalendar;
+  if(!CAL)throw new Error('calendar.js must load before events.js');
   const PHASES=Object.freeze([
     {time:'09:00',name:'MORNING ENQUIRIES',detail:'Private sellers arrive and retail buyers begin comparing stock.'},
     {time:'11:00',name:'NEW CUSTOMER LEADS',detail:'A fresh group of owners arrive looking for quick agreements.'},
@@ -17,9 +19,9 @@
     care:{label:'Prioritise customer care',description:'Good-condition, fairly priced sales earn an extra point of customer trust.'}
   });
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-  const monthOf=day=>Math.floor((day-1)/30)+1;
-  const isDealDay=day=>day%30===0;
-  const isMeetingDay=day=>(day-1)%30===0;
+  const monthOf=CAL.monthOf;
+  const isDealDay=CAL.isMonthEnd;
+  const isMeetingDay=CAL.isMonthStart;
   const initial=()=>({deadlineSession:0,meetingHeldMonth:0,meetingFocus:'steady',meetings:[]});
   const meetingDue=state=>isMeetingDay(state.day)&&state.meetingHeldMonth!==monthOf(state.day);
   const meetingBlocksContinue=state=>state.day>1&&meetingDue(state);
@@ -44,7 +46,7 @@
       message:'Deal Day '+PHASES[state.deadlineSession].time+
       ': '+(count===0?'No new private-seller leads this session.':
         count+' private seller '+(count===1?'enquiry':'enquiries')+' arrived.')+
-      ' Auction houses remain closed.'};
+      ' The month-end auction rostrum is also available today.'};
   }
   // Each operating month has a seeded climate that stays fixed across
   // refreshes, saves, and trading sessions. This is a fictional variability
@@ -190,15 +192,18 @@
       return true;
     }
     const p=saved;
+    const legacy=saved.version<15;
+    const validationMonth=legacy?Math.floor((state.day-1)/30)+1:monthOf(state.day);
+    const validationDealDay=legacy?state.day%30===0:isDealDay(state.day);
     if(!Number.isSafeInteger(p.deadlineSession)||
       p.deadlineSession<0||p.deadlineSession>=PHASES.length||
-      (!isDealDay(state.day)&&p.deadlineSession!==0)||
+      (!validationDealDay&&p.deadlineSession!==0)||
       !Number.isSafeInteger(p.meetingHeldMonth)||p.meetingHeldMonth<0||
-      p.meetingHeldMonth>monthOf(state.day)||
+      p.meetingHeldMonth>validationMonth||
       !['steady',...Object.keys(FOCI)].includes(p.meetingFocus)||
       !Array.isArray(p.meetings)||p.meetings.length>120)return false;
     if(!p.meetings.every(m=>m&&typeof m==='object'&&
-      Number.isSafeInteger(m.month)&&m.month>=1&&m.month<=monthOf(state.day)&&
+      Number.isSafeInteger(m.month)&&m.month>=1&&m.month<=validationMonth&&
       Number.isSafeInteger(m.day)&&m.day>=1&&m.day<=state.day&&
       typeof m.focus==='string'&&Object.hasOwn(FOCI,m.focus)&&
       (m.previousMonth===null||Number.isSafeInteger(m.previousMonth))&&
@@ -209,9 +214,13 @@
       if(last.month>p.meetingHeldMonth||
         (last.month===p.meetingHeldMonth&&last.focus!==p.meetingFocus))return false;
     }
+    const meetings=p.meetings.map(x=>({...x,month:legacy?monthOf(x.day):x.month}));
+    const held=legacy?(meetings.at(-1)?.month??(
+      p.meetingHeldMonth>0?Math.min(monthOf(state.day),p.meetingHeldMonth):0)):
+      p.meetingHeldMonth;
     Object.assign(state,{
-      deadlineSession:p.deadlineSession,meetingHeldMonth:p.meetingHeldMonth,
-      meetingFocus:p.meetingFocus,meetings:p.meetings.map(x=>({...x}))
+      deadlineSession:isDealDay(state.day)?p.deadlineSession:0,
+      meetingHeldMonth:held,meetingFocus:p.meetingFocus,meetings
     });
     return true;
   }
