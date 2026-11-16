@@ -137,7 +137,11 @@
       '<div><small>LIKELY RETAIL SALE</small><strong>'+money(lot.profile.likelySale)+'</strong></div></div>'+
       reportCard(lot,'auction',expectedNext)+
       '</div></article>'+
-      '<aside class="panel-card auction-bid-box"><div class="auction-bid-box-top"><small>LIVE HAMMER POSITION</small>'+
+      '<aside class="panel-card auction-bid-box">'+
+      '<div class="auction-mobile-lot-context"><strong>LOT '+E.lotNumber(h.index)+' · '+esc(lot.title)+'</strong>'+
+      '<small>'+esc(lot.fuel)+' · '+esc(lot.gearbox)+' · GRADE '+lot.profile.grade+
+      ' · GUIDE '+money(lot.guide)+'</small></div>'+
+      '<div class="auction-bid-box-top"><small>LIVE HAMMER POSITION</small>'+
       '<strong>'+money(current)+'</strong></div>'+
       '<div class="auction-bid-maths"><div><span>'+(paymentDue?'WINNING HAMMER':'NEXT £100 BID')+'</span><b>'+money(expectedNext)+'</b></div>'+
       '<div><span>PLUS BUYER FEE</span><b>'+money(lot.fee)+'</b></div>'+
