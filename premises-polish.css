@@ -1,0 +1,340 @@
+/* Premises & Facilities: read-only investment presentation.
+   All quoted investment, liquidity and running cost values originate in
+   premises.js, staff payroll and the saved vehicle state. */
+#screen-career:has(.premises-page-control:not([hidden])) .career-topbar{
+  min-height:61px;padding:9px clamp(16px,2.35vw,32px);
+}
+#screen-career:has(.premises-page-control:not([hidden])) .career-content{
+  padding:12px clamp(16px,2.35vw,32px) 21px;
+}
+#screen-career:has(.premises-page-control:not([hidden])) .game-notice{
+  margin:8px clamp(16px,2.35vw,32px) 0;
+  padding:8px 11px;font-size:10px;line-height:1.45;
+}
+#screen-career:has(.premises-page-control:not([hidden]))
+ #events-banner:has(.event-neutral-banner){display:none}
+.premises-page-control .premises-page-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:37px;margin:0 0 8px;
+}
+.premises-page-control .premises-page-heading h1{
+  margin:0;color:#f1e9dc;
+  font:900 clamp(25px,2.45vw,32px)/1.05 var(--title);
+  letter-spacing:.012em;
+}
+.premises-page-control .premises-page-heading h1 em{
+  color:#e8c087;font-style:normal;
+}
+.premises-page-control .premises-page-heading p{
+  margin:4px 0 0;color:#b0c3c7;
+  font:550 10px/1.35 var(--body);
+}
+.premises-page-control .premises-page-heading .hq-save{
+  flex:0 0 auto;min-height:33px;
+  padding:7px 10px;font-size:10px;white-space:nowrap;
+}
+.premises-page-control .hq-identity{
+  grid-template-columns:minmax(205px,.8fr) minmax(0,1fr);
+  gap:11px;padding:9px 11px;margin:0 0 8px;
+  border-radius:6px;
+}
+.premises-page-control .hq-identity-title h2{
+  font-size:clamp(20px,2.2vw,27px);
+}
+.premises-page-control .hq-identity-title p{
+  display:none;
+}
+/* These two fields remain in the DOM for legacy data-bind compatibility.
+   Their figures are presented in the dedicated occupancy/bay metrics below. */
+.premises-page-control .hq-identity-facts>div:has([data-bind="forecourt-capacity"]),
+.premises-page-control .hq-identity-facts>div:has([data-bind="workshop-bays"]){
+  display:none;
+}
+.premises-page-control .hq-identity-facts{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+}
+.premises-page-control .hq-identity-facts>div{
+  padding:6px 7px;
+  justify-content:space-between;
+}
+.premises-page-control .hq-identity-facts small{font-size:8px}
+.premises-page-control .hq-identity-facts strong{
+  font-size:clamp(12px,1.35vw,15px);
+}
+.premises-page-control .hq-brief{
+  gap:9px;margin:0 0 8px;
+}
+.premises-page-control .hq-brief>div{
+  align-items:baseline;gap:8px;
+}
+.premises-page-control .hq-brief small{
+  font-size:8px;
+}
+.premises-page-control .hq-brief>div>strong{
+  font-size:16px;
+}
+.premises-page-control .hq-brief p{font-size:9px}
+.premises-page-control .hq-brief-status{
+  font-size:8px;padding:5px 7px;
+}
+.premises-page-control .hq-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;margin:0 0 8px;
+}
+.premises-page-control .hq-metric{
+  min-height:70px;gap:4px;
+  padding:9px 10px;
+  border-radius:5px;
+  background:#19323c;
+}
+.premises-page-control .hq-metric small{font-size:8px}
+.premises-page-control .hq-metric strong{
+  font:900 clamp(17px,2vw,24px)/1.12 var(--title);
+}
+.premises-page-control .hq-metric span{
+  font-size:9px;line-height:1.35;
+}
+.premises-page-control .hq-cost-panel{
+  padding:9px 11px;margin:0 0 9px;
+  border-radius:6px;
+}
+.premises-page-control .hq-section-heading{
+  margin:0 0 7px;gap:8px;
+}
+.premises-page-control .hq-section-heading h3{
+  font-size:17px;
+}
+.premises-page-control .hq-section-heading small{
+  font-size:8px;
+}
+.premises-page-control .hq-text-link{
+  min-height:31px;padding:7px 9px;
+}
+.premises-page-control .hq-commit-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px 13px;
+}
+.premises-page-control .hq-cost-line{
+  gap:7px;padding:6px 0;
+}
+.premises-page-control .hq-cost-line span{
+  font-size:9px;line-height:1.35;
+}
+.premises-page-control .hq-cost-line strong{
+  font-size:11px;
+}
+.premises-page-control .hq-cost-history{
+  margin:8px 0 0;
+  border:1px solid #3e5962;
+  background:#152e38;
+  border-radius:5px;
+}
+.premises-page-control .hq-cost-history summary{
+  cursor:pointer;padding:8px 10px;
+  font:850 9px/1.35 var(--mono);color:#e1c9a0;
+  list-style:none;
+}
+.premises-page-control .hq-cost-history summary::-webkit-details-marker{
+  display:none;
+}
+.premises-page-control .hq-cost-history summary::after{
+  content:'⌄';float:right;color:#e1ba81;
+  font:900 13px/1 var(--mono);
+}
+.premises-page-control .hq-cost-history[open] summary::after{
+  transform:rotate(180deg);
+}
+.premises-page-control .hq-cost-history .hq-commit-grid{
+  padding:0 10px 6px;grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.premises-page-control .hq-cost-history p{
+  margin:0;padding:0 10px 9px;
+  font:550 10px/1.5 var(--body);color:#b0c7ca;
+}
+.premises-page-control .hq-upgrade-section-head{
+  margin:0 0 7px;
+}
+.premises-page-control .hq-upgrades{
+  gap:9px;
+}
+.premises-page-control .hq-upgrade{
+  gap:7px;padding:10px 11px;
+  border-radius:6px;
+  background:#172e38;
+}
+.premises-page-control .hq-upgrade-head h3{
+  font:900 19px/1.08 var(--title);
+}
+.premises-page-control .hq-upgrade-head small{
+  font-size:8px;
+}
+.premises-page-control .hq-upgrade-capacity{
+  gap:7px;
+}
+.premises-page-control .hq-upgrade-capacity strong{
+  font:900 20px/1 var(--title);
+}
+.premises-page-control .hq-upgrade-capacity span{
+  font-size:9px;line-height:1.3;
+}
+.premises-page-control .hq-upgrade-headline-costs{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+.premises-page-control .hq-upgrade-headline-costs>.hq-cost-line{
+  padding:8px 9px;gap:4px;
+  background:#243b42;
+}
+.premises-page-control .hq-upgrade-headline-costs>.hq-cost-line span{
+  font-size:9px;
+}
+.premises-page-control .hq-upgrade-headline-costs>.hq-cost-line strong{
+  font-size:18px;
+}
+.premises-page-control .hq-upgrade-projection{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;
+}
+.premises-page-control .hq-upgrade-projection>.hq-cost-line{
+  flex-direction:column;align-items:flex-start;
+  justify-content:center;gap:4px;
+  padding:7px 8px;
+  border:1px solid #35515b;border-radius:4px;
+  background:#203640;
+}
+.premises-page-control .hq-upgrade-projection>.hq-cost-line span{
+  font:750 8px/1.3 var(--mono);
+  color:#b2c6c8;
+}
+.premises-page-control .hq-upgrade-projection>.hq-cost-line strong{
+  color:#f0d5ab;
+  font:900 13px/1.1 var(--title);
+}
+.premises-page-control .hq-upgrade-warning,
+.premises-page-control .hq-upgrade-success{
+  padding:6px 8px;font-size:9px;line-height:1.4;
+}
+.premises-page-control .hq-invest-button{
+  min-height:39px;
+  margin:0;
+  font-size:10px!important;
+  padding:9px 10px!important;
+}
+.premises-page-control .hq-upgrade-details{
+  margin:0;padding:6px 0 0;
+}
+.premises-page-control .hq-upgrade-details summary{
+  padding:4px 0;font-size:9px;
+}
+.premises-page-control .hq-upgrade-details .hq-costs{
+  gap:5px;
+}
+.premises-page-control .hq-upgrade-max-note{
+  padding:9px 10px;
+}
+.premises-page-control .hq-shortcuts{
+  margin:8px 0 0;
+}
+.premises-page-control .hq-guidance{
+  margin:8px 0 0;border-radius:5px;
+}
+.premises-page-control .hq-cost-history summary:focus-visible,
+.premises-page-control .hq-upgrade-details summary:focus-visible,
+.premises-page-control .hq-invest-button:focus-visible,
+.premises-page-control .hq-save:focus-visible{
+  outline:2px solid #f0c98e;outline-offset:2px;
+}
+@media(max-width:1220px){
+  .premises-page-control .hq-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .premises-page-control .hq-identity{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:840px){
+  .premises-page-control .hq-upgrades{
+    grid-template-columns:1fr;
+  }
+  .premises-page-control .hq-upgrade-projection{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:620px){
+  .premises-page-control .premises-page-heading h1{
+    font-size:25px;
+  }
+  .premises-page-control .premises-page-heading p{
+    display:none;
+  }
+  .premises-page-control .hq-identity-facts{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .premises-page-control .hq-brief{
+    flex-wrap:wrap;
+  }
+  .premises-page-control .hq-brief>div{
+    flex:1 1 100%;
+  }
+  .premises-page-control .hq-brief p{display:none}
+  .premises-page-control .hq-metrics{
+    gap:6px;
+  }
+  .premises-page-control .hq-metric{
+    min-height:64px;padding:7px 8px;
+  }
+  .premises-page-control .hq-metric strong{
+    font-size:20px;
+  }
+  .premises-page-control .hq-commit-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px 11px;
+  }
+  .premises-page-control .hq-upgrade-headline-costs{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .premises-page-control .hq-upgrade-projection{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .premises-page-control .hq-upgrade-projection>.hq-cost-line{
+    gap:3px;padding:6px;
+  }
+  .premises-page-control .hq-upgrade-projection>.hq-cost-line span{
+    font-size:8px;
+  }
+  .premises-page-control .hq-upgrade-projection>.hq-cost-line strong{
+    font-size:12px;
+  }
+}
+@media(max-width:470px){
+  #screen-career:has(.premises-page-control:not([hidden])) .career-content{
+    padding:10px 13px 19px;
+  }
+  #screen-career:has(.premises-page-control:not([hidden])) .game-notice{
+    margin:7px 13px 0;
+  }
+  .premises-page-control .premises-page-heading .hq-save{
+    min-height:32px;padding:7px;
+    font-size:9px;
+  }
+  .premises-page-control .premises-page-heading h1{
+    font-size:22px;
+  }
+  .premises-page-control .hq-identity{
+    padding:8px 9px;
+  }
+  .premises-page-control .hq-identity-title h2{font-size:20px}
+  .premises-page-control .hq-metric strong{font-size:18px}
+  .premises-page-control .hq-metric span{font-size:8px}
+  .premises-page-control .hq-section-heading h3{font-size:15px}
+  .premises-page-control .hq-upgrade-head h3{font-size:18px}
+  .premises-page-control .hq-upgrade-projection{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .premises-page-control .hq-upgrade-projection>.hq-cost-line:last-child{
+    grid-column:1/-1;
+  }
+}
