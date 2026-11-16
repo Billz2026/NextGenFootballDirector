@@ -1,0 +1,104 @@
+# tests 249
+# pass 245
+# fail 4
+# duration_ms 5566.035742
+
+not ok 195 - v0.9.19 compact Vehicle Stock is scoped to desktop and retains full report access
+  ---
+  duration_ms: 1.709942
+  type: 'test'
+  location: '/home/runner/work/TheMotorTrade/TheMotorTrade/tests/site.test.mjs:4464:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /PRE-ALPHA · v0\.9\.37/. Input:
+    
+    '<!doctype html>\n' +
+      '<html lang="en-GB">\n' +
+      '<head>\n' +
+      '  <meta charset="utf-8">\n' +
+      '  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
+      '  <meta name="theme-color" content="#0c151c">\n' +
+      '  <meta name="color-scheme" content="dark">\n' +
+      '  <meta name="description" content="The Motor Trade by NextGen Sessions. Start a career and build a UK used-car dealership in a management simulation.">\n' +
+      '  <meta property="og:type" content="website">\n' +
+      '  <meta property="og:site_name" content="NextGen Sessions">\n' +
+      '  <meta property="og:title" content="The Motor Trade | UK Car Dealership Simulator">\n' +
+      '  <meta property="og:description" content="Every car is a decision. Start a dealership career.">\n' +
+      '  <meta property="og:url" content="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="canonical" href="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="icon" href="./favicon.svg" type="image/svg+xml">\n' +
+
+not ok 198 - v0.9.21 compact Workshop hides non-urgent calendar banner only at desktop width
+  ---
+  duration_ms: 0.636896
+  type: 'test'
+  location: '/home/runner/work/TheMotorTrade/TheMotorTrade/tests/site.test.mjs:4533:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /PRE-ALPHA · v0\.9\.37/. Input:
+    
+    '<!doctype html>\n' +
+      '<html lang="en-GB">\n' +
+      '<head>\n' +
+      '  <meta charset="utf-8">\n' +
+      '  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
+      '  <meta name="theme-color" content="#0c151c">\n' +
+      '  <meta name="color-scheme" content="dark">\n' +
+      '  <meta name="description" content="The Motor Trade by NextGen Sessions. Start a career and build a UK used-car dealership in a management simulation.">\n' +
+      '  <meta property="og:type" content="website">\n' +
+      '  <meta property="og:site_name" content="NextGen Sessions">\n' +
+      '  <meta property="og:title" content="The Motor Trade | UK Car Dealership Simulator">\n' +
+      '  <meta property="og:description" content="Every car is a decision. Start a dealership career.">\n' +
+      '  <meta property="og:url" content="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="canonical" href="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="icon" href="./favicon.svg" type="image/svg+xml">\n' +
+
+not ok 232 - v0.9.32 compact Staff & Recruitment desktop styles retain labels and responsive grid
+  ---
+  duration_ms: 0.334001
+  type: 'test'
+  location: '/home/runner/work/TheMotorTrade/TheMotorTrade/tests/site.test.mjs:5326:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /PRE-ALPHA · v0\.9\.37/. Input:
+    
+    '<!doctype html>\n' +
+      '<html lang="en-GB">\n' +
+      '<head>\n' +
+      '  <meta charset="utf-8">\n' +
+      '  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
+      '  <meta name="theme-color" content="#0c151c">\n' +
+      '  <meta name="color-scheme" content="dark">\n' +
+      '  <meta name="description" content="The Motor Trade by NextGen Sessions. Start a career and build a UK used-car dealership in a management simulation.">\n' +
+      '  <meta property="og:type" content="website">\n' +
+      '  <meta property="og:site_name" content="NextGen Sessions">\n' +
+      '  <meta property="og:title" content="The Motor Trade | UK Car Dealership Simulator">\n' +
+      '  <meta property="og:description" content="Every car is a decision. Start a dealership career.">\n' +
+      '  <meta property="og:url" content="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="canonical" href="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="icon" href="./favicon.svg" type="image/svg+xml">\n' +
+
+not ok 245 - v0.9.35 one-page desktop polish is scoped to My Dealership and retains mobile layout
+  ---
+  duration_ms: 0.386007
+  type: 'test'
+  location: '/home/runner/work/TheMotorTrade/TheMotorTrade/tests/site.test.mjs:5626:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /PRE-ALPHA · v0\.9\.37/. Input:
+    
+    '<!doctype html>\n' +
+      '<html lang="en-GB">\n' +
+      '<head>\n' +
+      '  <meta charset="utf-8">\n' +
+      '  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
+      '  <meta name="theme-color" content="#0c151c">\n' +
+      '  <meta name="color-scheme" content="dark">\n' +
+      '  <meta name="description" content="The Motor Trade by NextGen Sessions. Start a career and build a UK used-car dealership in a management simulation.">\n' +
+      '  <meta property="og:type" content="website">\n' +
+      '  <meta property="og:site_name" content="NextGen Sessions">\n' +
+      '  <meta property="og:title" content="The Motor Trade | UK Car Dealership Simulator">\n' +
+      '  <meta property="og:description" content="Every car is a decision. Start a dealership career.">\n' +
+      '  <meta property="og:url" content="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="canonical" href="https://billz2026.github.io/TheMotorTrade/">\n' +
+      '  <link rel="icon" href="./favicon.svg" type="image/svg+xml">\n' +
