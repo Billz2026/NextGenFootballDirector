@@ -109,7 +109,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /customers-view\.js\?v=9/);
   assert.match(html, /workshop-view\.js\?v=7/);
   assert.match(html, /events-view\.js\?v=7/);
-  assert.match(html, /monthly-view\.js\?v=8/);
+  assert.match(html, /monthly-view\.js\?v=9/);
   assert.match(html, /people-view\.js\?v=7/);
   assert.match(html, /vehicle-view\.js\?v=4/);
   assert.doesNotMatch(html, /NextGenSessionsArcade|looping\.zip|<iframe/);
@@ -1378,7 +1378,7 @@ test('new dealerships receive achievable company targets and a live monthly dash
   assert.equal(state.monthlyReports.length,0);
   assert.equal(app.bindings.get('monthly-target')[0].textContent,'0 / 4');
   assert.match(app.nodes.get('monthly-dashboard-target').innerHTML,/MONTHLY SALES TARGET/);
-  assert.match(app.nodes.get('monthly-report-view').innerHTML,/MANAGEMENT REVIEW/);
+  assert.match(app.nodes.get('monthly-report-view').innerHTML,/MONTH \d+ SCORECARD/);
   assert.match(app.nodes.get('monthly-report-view').innerHTML,/STAFF COSTS|Wages paid/i);
   assert.match(app.nodes.get('monthly-report-view').innerHTML,/STOCK & WORKING CAPITAL/);
   assert.match(html,/data-panel="reports"/);
@@ -4997,7 +4997,7 @@ test('v0.9.28 management overview shows key measures before detailed reports',()
   const app=browser(new Map()),E=app.productionEngine;
   const state=E.create('Report Overview',[]);
   const page=app.monthlyView.renderReport(state,E.monthly);
-  assert.match(page,/MANAGEMENT REVIEW/);
+  assert.match(page,/MONTH 1 SCORECARD/);
   assert.match(page,/LIVE POSITION/);
   assert.match(page,/VEHICLES HANDED OVER/);
   assert.match(page,/OPERATING CONTRIBUTION/);
@@ -6222,4 +6222,83 @@ test('Operations Diary compact presentation keeps monthly management selection a
   assert.match(app.nodes.get('events-view').innerHTML,/MEETING COMPLETED/);
   assert.match(app.nodes.get('events-view').innerHTML,/SELECTED PRIORITY/);
   assert.ok(app.productionEngine.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('Management Reports compact scorecard retains the real monthly figures and one page heading',()=>{
+  const app=browser(new Map()),E=app.productionEngine,M=app.monthlyView;
+  const s=E.createStaffed('Reports Scorecard QA',[]);
+  const saved=JSON.stringify(s);
+  const view=M.renderReport(s,E.monthly);
+  assert.match(html,/class="career-panel reports-page-control"/);
+  assert.match(html,/MANAGEMENT <em>REPORTS\.<\/em>/);
+  assert.match(html,/reports-polish\.css\?v=1/);
+  assert.doesNotMatch(html,/PERFORMANCE \/ MONTHLY BOARD REVIEW/);
+  assert.match(view,/MONTH 1 SCORECARD/);
+  assert.match(view,/LIVE POSITION/);
+  assert.match(view,/VEHICLES HANDED OVER/);
+  assert.match(view,/OPERATING CONTRIBUTION/);
+  assert.match(view,/CURRENT CASH/);
+  assert.match(view,/CASH INVESTED IN STOCK/);
+  assert.match(view,/ARE WE ON TARGET/);
+  assert.match(view,/WHAT NEEDS ATTENTION/);
+  assert.match(view,/aria-label="Choose current or archived monthly report"/);
+  assert.equal((view.match(/class="mr-kpis"/g)||[]).length,1);
+  assert.equal((view.match(/class="report-metric /g)||[]).length,4);
+  assert.equal((view.match(/<details class="mr-detail">/g)||[]).length,8);
+  assert.match(view,/<details class="mr-records" aria-label="Detailed Management Records">/);
+  assert.equal(JSON.stringify(s),saved,'Read-only management reports cannot mutate career records');
+});
+
+test('Management Reports shows all five simultaneous exceptions with financial liabilities first',()=>{
+  const app=browser(new Map()),E=app.productionEngine,M=app.monthlyView;
+  const s=E.createStaffed('Reports Exception Completeness QA',[]);
+  const seller=E.marketFor(s).sellers[0];
+  assert.ok(E.acquireSeller(s,seller.id,seller.ask).ok);
+  for(let day=2;day<=16;day++){
+    s.day=day;
+    E.staffDay(s);
+    E.premisesDay(s);
+    E.advanceWorkshop(s);
+    E.advanceCustomers(s);
+  }
+  s.payrollArrears=575;
+  s.premises.arrears=150;
+  const live=E.monthly.statement(s);
+  assert.equal(live.agedStock,1);
+  assert.equal(live.stockAwaitingPrep,1);
+  assert.ok(live.operatingContribution<0);
+  assert.equal(live.targetUnits>live.soldUnits,true);
+  assert.equal(live.payrollArrears+live.premisesArrears,725);
+  const prior=JSON.stringify(s);
+  const view=M.renderReport(s,E.monthly);
+  for(const issue of ['UNPAID BILLS','OPERATING LOSS','SALES REQUIRED','AGEING STOCK','WORKSHOP BACKLOG'])
+    assert.match(view,new RegExp(issue));
+  const flags=view.match(/class="mr-flag"/g)||[];
+  assert.equal(flags.length,5,'Fifth simultaneous management issue must not be discarded');
+  assert.ok(view.indexOf('UNPAID BILLS')<view.indexOf('OPERATING LOSS'),
+    'Unpaid obligations are the highest-priority warning');
+  assert.equal(JSON.stringify(s),prior,'Rendering exceptions cannot affect accounting or saved career');
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+});
+
+test('Archived Management Reports stay frozen when the live month changes',()=>{
+  const app=browser(new Map()),E=app.productionEngine,M=app.monthlyView;
+  const s=E.createStaffed('Report Archive Stability QA',[]);
+  s.day=30;
+  const closed=E.monthly.close(s);
+  assert.ok(closed);
+  s.day=31;
+  E.monthly.next(s);
+  const frozen=JSON.stringify(s.monthlyReports[0]);
+  const historical=M.renderReport(s,E.monthly,'1');
+  assert.match(historical,/MONTH 1 SCORECARD/);
+  assert.match(historical,/ARCHIVED RESULT/);
+  assert.match(historical,/CLOSING CASH/);
+  assert.match(historical,/MONTH 1 · TARGET MISSED/);
+  assert.match(historical,/CURRENT MONTH 2/);
+  assert.equal((historical.match(/<details class="mr-detail">/g)||[]).length,8);
+  const live=M.renderReport(s,E.monthly,'current');
+  assert.match(live,/MONTH 2 SCORECARD/);
+  assert.match(live,/CURRENT CASH/);
+  assert.equal(JSON.stringify(s.monthlyReports[0]),frozen);
 });
