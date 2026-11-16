@@ -78,7 +78,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /vehicle-photos\.js\?v=5/);
   assert.match(html, /vehicle-market\.js\?v=2/);
   assert.match(html, /auction-hall-view\.js\?v=3/);
-  assert.match(html, /buying-desk-view\.js\?v=2/);
+  assert.match(html, /buying-desk-view\.js\?v=3/);
   assert.match(html, /stock-view\.js\?v=1/);
   assert.match(html, /finance-view\.js\?v=2/);
   assert.match(html, /styles\.css\?v=51/);
@@ -5817,4 +5817,59 @@ test('compact Auction Hall keeps settlement, history and closed-day actions acce
   assert.match(closed,/AUCTION HOUSE CLOSED TODAY/);
   assert.match(closed,/OPEN BUYING DESK/);
   assert.match(closed,/<details class="auction-rules">/);
+});
+
+test('premium compact Buying Desk has one sourcing heading and all critical buying actions',()=>{
+  const app=browser(new Map());
+  app.click('new-career');app.submitCareer('Premium Buying QA');
+  app.go('auctions');
+  const htmlDesk=app.nodes.get('market-sellers').innerHTML;
+  assert.match(html,/class="career-panel buying-desk-control"/);
+  assert.match(html,/DIRECT <em>SOURCING\.<\/em>/);
+  assert.doesNotMatch(html, /<h1 id="auctions-title">BUYING <em>DESK/);
+  assert.match(html,/buying-polish.css\?v=1/);
+  assert.match(htmlDesk,/SELLER SHORTLIST/);
+  assert.match(htmlDesk,/buy-seller-focus/);
+  assert.match(htmlDesk,/BUYING APPRAISAL/);
+  assert.match(htmlDesk,/TRADE VALUE/);
+  assert.match(htmlDesk,/SUGGESTED MAX OFFER/);
+  assert.match(htmlDesk,/LIKELY ACHIEVED SALE/);
+  assert.match(htmlDesk,/PROJECTED GROSS CONTRIBUTION/);
+  assert.match(htmlDesk,/buy-decision-/);
+  assert.match(htmlDesk,/data-action="buy-seller"/);
+  assert.match(htmlDesk,/data-action="select-seller"/);
+  assert.match(htmlDesk,/VIEW FULL REPORT/);
+  assert.match(htmlDesk,/<details class="buy-cost-breakdown">/);
+  assert.match(htmlDesk,/id="desk-total-/);
+  assert.match(htmlDesk,/<details class="buy-budget-note">/);
+  assert.match(htmlDesk,/<details class="buy-deal-terms">/);
+  assert.match(htmlDesk,/<details class="buy-disclosure">/);
+  assert.doesNotMatch(htmlDesk,/class="buy-inspection-prompt"/);
+  assert.doesNotMatch(htmlDesk,/class="buy-leads-tip"/);
+  assert.match(htmlDesk,/buy-mobile-vehicle-context/);
+  assert.ok(htmlDesk.indexOf('PROJECTED GROSS CONTRIBUTION')<
+    htmlDesk.indexOf('YOUR OFFER'));
+  const state=JSON.parse(app.storageData.get(STORAGE_KEY));
+  assert.equal(state.cash,45000);
+  assert.equal(state.staff.length,4);
+});
+test('compact Buying Desk retains live offer projections, counteroffers and no cash change on selection',()=>{
+  const storage=new Map(),app=browser(storage),E=app.productionEngine;
+  app.click('new-career');app.submitCareer('Buy Desk State QA');
+  const sellers=E.marketFor(E.createStaffed('Buy Desk State QA',[])).sellers;
+  assert.ok(sellers.length>=2);
+  const before=JSON.parse(storage.get(STORAGE_KEY));
+  app.click('select-seller',{id:sellers[1].id});
+  const after=JSON.parse(storage.get(STORAGE_KEY));
+  assert.equal(before.cash,after.cash);
+  assert.equal(before.staff.length,after.staff.length);
+  assert.equal(before.ledger.length,after.ledger.length);
+  const offer=sellers[1].ask-100;
+  app.typeInput('seller-offer-'+sellers[1].id,offer);
+  const content=app.nodes.get('market-sellers').innerHTML;
+  assert.ok(content.includes('id="seller-offer-'+sellers[1].id+'" value="'+offer+'"'));
+  assert.ok(content.includes('id="desk-total-'+sellers[1].id+'"'));
+  assert.ok(content.includes('id="desk-headroom-'+sellers[1].id+'"'));
+  assert.ok(content.includes('id="desk-projection-'+sellers[1].id+'"'));
+  assert.ok(content.includes('id="desk-signal-'+sellers[1].id+'"'));
 });
