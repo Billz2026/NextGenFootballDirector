@@ -106,7 +106,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /id="market-progression"/);
   assert.match(html, /vehicle-cards\.js\?v=4/);
   assert.match(html, /trading\.js\?v=20/);
-  assert.match(html, /customers-view\.js\?v=8/);
+  assert.match(html, /customers-view\.js\?v=9/);
   assert.match(html, /workshop-view\.js\?v=6/);
   assert.match(html, /events-view\.js\?v=6/);
   assert.match(html, /monthly-view\.js\?v=8/);
@@ -5943,4 +5943,64 @@ test('compact inventory keeps both listing and workshop financial restrictions i
   view=SV.render(s,{filter:'listed'});
   assert.match(view.html,/PRICING LOCKED/);
   assert.match(view.html,/data-action="list-stock" data-id="1" disabled/);
+});
+
+test('retail pipeline compact workspace keeps sales cases, pricing and customer actions',()=>{
+  const app=browser(new Map()),E=app.productionEngine;
+  const state=E.createStaffed('Retail Pipeline QA',[]);
+  const seller=E.marketFor(state).sellers[0];
+  assert.ok(E.acquireSeller(state,seller.id,seller.ask).ok);
+  const v=state.vehicles[0];
+  v.status='listed';v.listedDay=1;v.asking=v.retail;
+  let out=app.customersView.render(state,E);
+  assert.match(html,/class="sales-page-heading"/);
+  assert.match(html,/RETAIL <em>PIPELINE\.<\/em>/);
+  assert.doesNotMatch(html,/<h1 id="sales-title">SALES <em>OFFICE/);
+  assert.match(html,/sales-polish\.css\?v=1/);
+  assert.equal((out.html.match(/class="so-kpis"/g)||[]).length,1);
+  assert.equal((out.html.match(/<div><small>ADVERTISED VEHICLES<\/small>/g)||[]).length,1);
+  assert.match(out.html,/ACTION REQUIRED/);
+  assert.match(out.html,/HELD DEPOSITS/);
+  assert.match(out.html,/<details class="so-activity">/);
+  assert.match(out.html,/RECORDED ENQUIRIES/);
+  assert.match(out.html,/RETAIL CASE REGISTER/);
+  assert.match(out.html,/data-action="filter-sales"/);
+  assert.match(out.html,/data-action="select-sales"/);
+  assert.match(out.html,/so-quick-price/);
+  assert.match(out.html,/ASKING £/);
+  assert.match(out.html,/VEHICLE FINANCIALS/);
+  assert.match(out.html,/NEXT CUSTOMER ACTION/);
+  assert.match(out.html,/so-flow/);
+  assert.match(out.html,/LEAD \/ ENQUIRY/);
+  const c={id:'C-1-0-1-1',vehicleId:v.id,createdDay:1,createdSession:0,
+    name:'Demo Buyer',channel:'ONLINE',status:'collectable',
+    preferredMode:'cash',appointmentDay:null,agreedDay:1,price:v.asking,
+    allowance:null,collectionDay:1,held:250,counters:0,reason:'',
+    terms:'in-person',prepCost:75,exchange:null,salespersonId:1};
+  state.customerCases[String(v.id)]=c;
+  out=app.customersView.render(state,E);
+  assert.match(out.html,/AGREED £/);
+  assert.match(out.html,/Demo Buyer/);
+  assert.match(out.html,/READY FOR COLLECTION/);
+  assert.match(out.html,/BALANCE TO COLLECT TODAY/);
+  assert.match(out.html,/data-action="handover-customer"/);
+  assert.match(out.html,/data-action="customer-withdrawal"/);
+  assert.match(out.html,/data-action="cancel-customer"/);
+  assert.match(out.html,/CUSTOMER READY TO COLLECT/);
+});
+
+test('sales office still enforces deposit and customer agreement states without save changes',()=>{
+  const storage=new Map(),app=browser(storage);
+  app.click('new-career');app.submitCareer('Retail UI Safe State');
+  const before=JSON.parse(storage.get(STORAGE_KEY));
+  assert.equal(before.staff.length,4);
+  assert.equal(before.startingCapital,45000);
+  app.go('sales');
+  const empty=app.nodes.get('sales-list').innerHTML;
+  assert.match(empty,/NO CARS ADVERTISED/);
+  assert.match(empty,/OPEN VEHICLE STOCK/);
+  assert.match(empty,/<details class="so-activity">/);
+  assert.match(app.nodes.get('sales-list').innerHTML,/HELD DEPOSITS/);
+  assert.equal(JSON.parse(storage.get(STORAGE_KEY)).cash,before.cash);
+  assert.deepEqual(JSON.parse(storage.get(STORAGE_KEY)).staff,before.staff);
 });
