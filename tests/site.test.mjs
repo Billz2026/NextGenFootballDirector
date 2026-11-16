@@ -90,7 +90,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
     'cloud-user-display','cloud-load-career','cloud-upload-career','cloud-career-warning']) {
     assert.match(html, new RegExp('id="' + id + '"'));
   }
-  assert.match(html, /simulator\.js\?v=35/);
+  assert.match(html, /simulator\.js\?v=36/);
   assert.match(html, /premises\.js\?v=1/);
   assert.match(html, /premises-view\.js\?v=3/);
   assert.match(html, /id="premises-view"/);

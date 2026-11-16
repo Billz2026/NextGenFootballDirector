@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css?v=51">
   <link rel="stylesheet" href="./dashboard-polish.css?v=1">
+  <link rel="stylesheet" href="./inbox-polish.css?v=1">
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -48,7 +49,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=35" defer></script>
+  <script src="./simulator.js?v=36" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -274,23 +275,25 @@
 
             <section class="career-panel inbox-control" data-panel="inbox" hidden aria-labelledby="inbox-title">
               <header class="inbox-heading">
-                <div><p class="section-overline">YOUR BUSINESS / OWNER COMMUNICATIONS</p><h1 id="inbox-title">OWNER'S <em>INBOX.</em></h1><p>Messages from your team, approval requests, customer updates and payment confirmations.</p></div>
-                <button type="button" class="secondary-button" data-action="mark-all-read">MARK ALL READ</button>
+                <div><h1 id="inbox-title">OWNER'S <em>INBOX</em></h1></div>
+                <div class="inbox-heading-actions">
+                  <div class="inbox-stat-strip" aria-label="Inbox status">
+                    <div><strong id="inbox-action-count">0</strong><span>NEEDS APPROVAL</span></div>
+                    <div><strong id="inbox-unread-summary">0</strong><span>UNREAD</span></div>
+                    <span id="inbox-paid-count" hidden>0</span>
+                  </div>
+                  <button type="button" class="secondary-button" data-action="mark-all-read">MARK ALL READ</button>
+                </div>
               </header>
-              <div class="inbox-stat-strip" aria-label="Inbox status">
-                <div><span>REQUIRES YOUR DECISION</span><strong id="inbox-action-count">0</strong></div>
-                <div><span>UNREAD MESSAGES</span><strong id="inbox-unread-summary">0</strong></div>
-                <div><span>PAID TRANSACTION COPIES</span><strong id="inbox-paid-count">0</strong></div>
-              </div>
               <nav id="inbox-filter-buttons" class="inbox-filters" aria-label="Filter dealership communications"></nav>
               <div class="inbox-layout panel-card">
                 <div class="inbox-column">
-                  <div class="inbox-column-head"><span>MESSAGES <small id="inbox-filter-count">ALL MAIL</small></span><span id="inbox-unread-count">0 UNREAD</span></div>
+                  <div class="inbox-column-head"><span>MESSAGES <small id="inbox-filter-count">ALL MAIL</small></span><span id="inbox-unread-count" hidden>0 UNREAD</span></div>
                   <div class="inbox-list" id="inbox-list"></div>
                 </div>
                 <div class="inbox-detail" id="inbox-detail"><p>Select a message to read it.</p></div>
               </div>
-              <p class="inbox-accounts-disclosure">Accounts pays routine charges through the normal business ledger. Invoice copies confirm money already paid; opening or marking a message as read never moves cash. Workshop repair approvals are new financial decisions and are checked against available cash before booking.</p>
+              <details class="inbox-policy"><summary>How Inbox approvals and receipts work</summary><p>Routine expenses are posted through the business ledger. Paid copies are records, not new payment requests. Reading a message never moves money. Workshop and staff approvals can authorise actual expenditure and are checked before payment.</p></details>
             </section>
 
             <section class="career-panel" data-panel="auctionHall" hidden aria-labelledby="auction-hall-title">
