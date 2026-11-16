@@ -107,7 +107,7 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /vehicle-cards\.js\?v=4/);
   assert.match(html, /trading\.js\?v=20/);
   assert.match(html, /customers-view\.js\?v=9/);
-  assert.match(html, /workshop-view\.js\?v=6/);
+  assert.match(html, /workshop-view\.js\?v=7/);
   assert.match(html, /events-view\.js\?v=6/);
   assert.match(html, /monthly-view\.js\?v=8/);
   assert.match(html, /people-view\.js\?v=7/);
@@ -4494,7 +4494,7 @@ test('v0.9.20 workshop is a compact selected job register with safe filters',()=
   const previous=JSON.parse(storage.get(STORAGE_KEY));
   assert.equal(previous.vehicles.length,2);
   const page=app.nodes.get('workshop-board').innerHTML;
-  assert.match(page,/WORKSHOP JOB REGISTER/);
+  assert.match(page,/JOB REGISTER/);
   assert.match(page,/COST CONTROL/);
   assert.match(page,/AUTHORISE ASSESSMENT/);
   assert.match(page,/REPAIR REQUIREMENTS/);
@@ -6003,4 +6003,85 @@ test('sales office still enforces deposit and customer agreement states without 
   assert.match(app.nodes.get('sales-list').innerHTML,/HELD DEPOSITS/);
   assert.equal(JSON.parse(storage.get(STORAGE_KEY)).cash,before.cash);
   assert.deepEqual(JSON.parse(storage.get(STORAGE_KEY)).staff,before.staff);
+});
+
+test('compact Workshop shows one preparation heading and leaves core repair gates intact',()=>{
+  const app=browser(new Map()),E=app.productionEngine,W=E.workshop;
+  const s=E.createStaffed('Workshop Layout Regression',[]);
+  const seller=E.marketFor(s).sellers[0];
+  assert.ok(E.acquireSeller(s,seller.id,seller.ask).ok);
+  const v=s.vehicles[0];
+  let view=app.workshopView.render(s,W);
+  assert.match(html,/class="career-panel workshop-page-control"/);
+  assert.match(html,/PREPARATION <em>CONTROL\.<\/em>/);
+  assert.doesNotMatch(html,/<h1 id="workshop-title">WORKSHOP <em>OPERATIONS/);
+  assert.match(html,/workshop-polish\.css\?v=1/);
+  assert.equal((view.html.match(/class="ws-kpis"/g)||[]).length,1);
+  assert.equal((view.html.match(/<div><small>(?:ACTION DUE|REPAIRS ACTIVE|READY TO LIST)<\/small>/g)||[]).length,3);
+  assert.match(view.html,/TECHNICIANS/);
+  assert.match(view.html,/IN-HOUSE BAYS/);
+  assert.match(view.html,/EXTERNAL REPAIRS/);
+  assert.match(view.html,/FUNDS RESERVED/);
+  assert.match(view.html,/JOB REGISTER/);
+  assert.match(view.html,/ws-register-list/);
+  assert.match(view.html,/REPAIR REQUIREMENTS/);
+  assert.match(view.html,/AUTHORISE ASSESSMENT/);
+  assert.match(view.html,/CAPITAL INVESTED TO DATE/);
+  assert.match(view.html,/<details class="ws-finance-details">/);
+  assert.match(view.html,/COST CONTROL · FULL BREAKDOWN/);
+  assert.ok(view.html.indexOf('AUTHORISE ASSESSMENT')<
+    view.html.indexOf('CAPITAL INVESTED TO DATE'));
+  assert.ok(view.html.indexOf('CAPITAL INVESTED TO DATE')<
+    view.html.indexOf('COST CONTROL · FULL BREAKDOWN'));
+  assert.equal(s.staff.length,4);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  const cashBefore=s.cash;
+  view=app.workshopView.render(s,W,{filter:'action'});
+  assert.equal(view.selectedId,v.id);
+  view=app.workshopView.render(s,W,{filter:'ready'});
+  assert.equal(view.selectedId,null);
+  assert.equal(s.cash,cashBefore,'Filtering a job does not make a payment');
+});
+
+test('compact Workshop keeps internal and external quotes, live charges, QC and listing gates',()=>{
+  const app=browser(new Map()),E=app.productionEngine,W=E.workshop;
+  const s=E.createStaffed('Workshop Workflow Regression',[]);
+  const seller=E.marketFor(s).sellers[0];
+  assert.ok(E.acquireSeller(s,seller.id,seller.ask).ok);
+  const v=s.vehicles[0];
+  const startingCash=s.cash;
+  assert.ok(E.assessStock(s,v.id).ok);
+  let htmlWork=app.workshopView.render(s,W).html;
+  assert.match(htmlWork,/BOOK IN-HOUSE REPAIR/);
+  assert.match(htmlWork,/BOOK EXTERNAL REPAIR/);
+  assert.match(htmlWork,/COST CONTROL · FULL BREAKDOWN/);
+  assert.ok(E.startPrep(s,v.id,'external').ok);
+  htmlWork=app.workshopView.render(s,W).html;
+  assert.match(htmlWork,/REPAIRS BOOKED/);
+  assert.match(htmlWork,/REMAINING/);
+  assert.match(htmlWork,/CHARGED/);
+  assert.match(htmlWork,/CAPITAL INVESTED TO DATE/);
+  assert.ok(s.cash<startingCash,'Assessment and repair cost real money');
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
+  for(let day=2;day<19&&v.workshop.stage!=='quality-check';day++){
+    s.day=day;
+    E.staffDay(s);E.premisesDay(s);E.advanceWorkshop(s);
+  }
+  assert.equal(v.workshop.stage,'quality-check');
+  htmlWork=app.workshopView.render(s,W).html;
+  assert.match(htmlWork,/PERFORM FINAL QUALITY CHECK/);
+  assert.ok(E.finishPrep(s,v.id).ok);
+  if(v.workshop.stage==='in-progress'){
+    s.day++;
+    E.advanceWorkshop(s);
+    assert.equal(v.workshop.stage,'quality-check');
+    assert.ok(E.finishPrep(s,v.id).ok);
+  }
+  assert.equal(v.workshop.stage,'ready');
+  assert.equal(v.status,'prepared');
+  htmlWork=app.workshopView.render(s,W,{filter:'ready'}).html;
+  assert.match(htmlWork,/VIEW VEHICLE STOCK/);
+  assert.match(htmlWork,/REPAIRS PAID \/ BOOKED/);
+  assert.match(htmlWork,/QC PASSED/);
+  assert.ok(E.normalize(JSON.parse(JSON.stringify(s))));
 });
