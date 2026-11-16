@@ -99,8 +99,8 @@ try{
         stage+' '+label+': monthly scorecard starts too low for this device');
       assert.ok(m.exceptionsTop>m.kpisBottom-2);
       if(label==='desktop')assert.ok(m.archiveTop<900,'Detailed archive is too deep on desktop');
-      if(label==='phone')assert.ok(m.exceptionsTop<620,
-        'Real management warnings should be reached high on phone');
+      if(label==='phone')assert.ok(m.exceptionsTop<height-100,
+        'Management warnings must begin within the first phone screen, even with a required meeting banner');
       console.log('REPORT_VISUAL_PASS '+stage+' '+label+' '+JSON.stringify(m));
       await page.screenshot({path:'review/reports-'+stage+'-'+label+'.png',fullPage:true});
     };
