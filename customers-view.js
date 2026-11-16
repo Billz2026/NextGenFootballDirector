@@ -41,21 +41,21 @@
     switch(c.status){
       case 'enquiry':
         body='<p>'+esc(c.name)+' has enquired about this car. They have not inspected or test driven it yet.'+
-          ' Book a viewing within 48 game-hours. No deposit means the vehicle remains for sale.</p>'+ 
+          ' Book a viewing for the next game day (within 24 hours). This does not hold the vehicle.</p>'+ 
           '<button type="button" class="trade-button" data-action="book-customer" data-id="'+id+
           '">BOOK VIEWING →</button> '+cancel;
         break;
       case 'booked':
-        body='<div class="sales-case-highlight"><strong>VIEWING WITHIN 48 GAME-HOURS · NO DEPOSIT</strong>'+ 
+        body='<div class="sales-case-highlight"><strong>NEXT-DAY VIEWING · 24-HOUR LIMIT · NO DEPOSIT</strong>'+ 
           '<p>'+esc(c.name)+' is due on <strong>GAME DAY '+c.appointmentDay+
-          '</strong>. This is an appointment, not a reservation: the car stays for sale until someone pays a deposit or completes handover.</p>'+ 
+          '</strong>. This appointment is within 24 hours and the customer will attend. The car stays on sale until a paid deposit or completed handover.</p>'+ 
           (C.competingInterest(state,id)?'<button type="button" class="trade-button" data-action="competing-customer" data-id="'+id+
           '">SERVE ANOTHER BUYER NOW →</button><p>Another interested buyer can view and test drive now. If they do not purchase, the first booking is preserved.</p>':
           '<p>No second buyer is ready right now. The original customer can still attend their appointment.</p>')+
           '</div>'+cancel;
         break;
       case 'arrived':
-        body='<p>Customer has arrived to inspect the vehicle. A test drive can reveal objections that prevent a sale.'+
+        body='<p>Customer is in the showroom, asking about the advertised price. Offer a test drive before discussing the final figure. The drive can still reveal objections.'+
           (c.standby?' Another customer has an earlier unsecured booking; it is preserved unless this buyer purchases or pays a deposit.':'')+'</p>'+ 
           '<button type="button" class="trade-button" data-action="test-drive" data-id="'+id+
           '">OFFER TEST DRIVE →</button> '+cancel;
@@ -63,13 +63,22 @@
       case 'discussing':{
         const b=E.buyers(vehicle,state);
         if(!b){body='<p>Customer is not currently available to negotiate. Try a different time.</p>';break;}
-        const cashUI='<section class="sales-offer-mode"><h4>CASH PURCHASE</h4>'+
-          '<small>CUSTOMER INITIAL / REVISED OFFER</small><strong>'+cash(b.cashOffer)+'</strong>'+
-          '<p>Indicative maximum budget '+cash(b.cashLimit)+'. Increasing your counter risks a rejection or walkaway.</p>'+
-          '<div class="trade-action-row"><button class="trade-button trade-button-secondary" type="button" data-action="counter-sale" data-id="'+id+
-          '"'+(c.counters>=2?' disabled':'')+'>COUNTER +£150</button>'+
+        const maxCounter=Math.min(vehicle.asking,100000);
+        const nextCounter=Math.min(maxCounter,
+          Math.max(b.cashOffer+25,Math.min(vehicle.asking,b.cashOffer+100)));
+        const cashUI='<section class="sales-offer-mode"><h4>CASH PURCHASE · ROUND '+
+          Math.min(5,c.counters+1)+' OF 5</h4>'+
+          '<small>CUSTOMER CURRENT OFFER</small><strong>'+cash(b.cashOffer)+'</strong>'+
+          '<p>Make up to five counteroffers. The customer can agree, propose a smaller increase or hold firm. Their precise budget is not disclosed.</p>'+
+          (c.counters<5&&b.cashOffer<maxCounter?
+            '<label for="customer-counter-'+id+'">YOUR COUNTER PRICE (£)</label>'+
+            '<input id="customer-counter-'+id+'" class="trade-input" type="number" inputmode="numeric" min="'+
+            (b.cashOffer+25)+'" max="'+maxCounter+'" step="25" value="'+nextCounter+'">'+
+            '<button class="trade-button trade-button-secondary" type="button" data-action="counter-sale" data-id="'+id+
+            '">SEND COUNTEROFFER · ROUND '+(c.counters+1)+'/5</button>':
+            '<p class="so-final-offer">The final negotiation round has been reached. Accept the current offer or cancel this deal.</p>')+
           '<button class="trade-button" type="button" data-action="agree-cash" data-id="'+id+
-          '">AGREE CASH PRICE</button></div></section>';
+          '">ACCEPT CUSTOMER OFFER</button></section>';
         const part=b.exchange?'<section class="sales-offer-mode"><h4>PART-EXCHANGE PROPOSAL</h4>'+
           '<small>CUSTOMER OFFER FOR YOUR CAR</small><strong>'+cash(b.pxOffer)+'</strong>'+
           VC.mini(b.exchange,'part-ex')+
@@ -225,7 +234,8 @@
     const stats=E.customers.stats(state,state.monthPlan.startDay,state.day);
     const top='<div class="so-kpis">'+[
       ['ADVERTISED VEHICLES',s.rows.length],
-      ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
+      ['CUSTOMERS ON SITE',s.rows.filter(r=>['arrived','discussing'].includes(r.caseData.c?.status)).length],
+       ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
     ].map(([name,value])=>
       '<div><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<details class="so-activity"><summary>MONTHLY RETAIL ACTIVITY</summary>'+
