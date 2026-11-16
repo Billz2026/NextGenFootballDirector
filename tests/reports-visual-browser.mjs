@@ -88,6 +88,7 @@ try{
           pickerWidth:a.scrollWidth,pickerClientWidth:a.clientWidth
         };
       });
+      console.log('REPORT_MEASURE '+stage+' '+label+' '+JSON.stringify(m));
       assert.equal(m.headingCount,1);
       assert.ok(m.documentWidth<=width+1,stage+' '+label+': page overflow '+JSON.stringify(m));
       assert.ok(m.panelWidth<=m.panelClientWidth+1,stage+' '+label+': report panel overflow');
