@@ -220,7 +220,7 @@
       '<p class="ws-no-results">No jobs in this category. Select another filter.</p>';
     return {selectedId:chosen?.id??null,html:kpi+toolbar+
       '<div class="ws-layout"><aside class="ws-register"><header>JOBS <span>'+cars.length+
-      ' SHOWN</span></header>'+list+'</aside>'+
+      ' SHOWN</span></header><div class="ws-register-list">'+list+'</div></aside>'+
       (chosen?dossier(s,W,chosen):'<div class="ws-file ws-no-results">No job selected.</div>')+
       '</div>'};
   }
