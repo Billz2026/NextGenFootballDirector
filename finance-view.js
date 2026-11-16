@@ -60,7 +60,7 @@
         r.operatingContribution<0?' fin-tile-loss':'')+
       '</div>';
     const cashflow='<section class="fin-panel fin-cashflow"><div class="fin-panel-head">'+
-      '<div><small>'+month+'</small><h3>WHERE YOUR CASH WENT</h3></div>'+
+      '<div><small>'+month+'</small><h3>CASH FLOW · WHERE YOUR CASH WENT</h3></div>'+
       '<button type="button" class="fin-text-button" data-page="reports">FULL MONTHLY REPORT</button></div>'+
       '<div class="fin-flow">'+
       '<div><small>MONTH START</small><strong>'+money(r.openingCash)+'</strong></div>'+
@@ -81,7 +81,7 @@
       '<p class="fin-warning">AUCTION INVOICE PENDING: '+money(x.auctionInvoice)+
         ' must be settled separately before further buying.</p>':'';
     const commitments='<section class="fin-panel"><div class="fin-panel-head"><div>'+
-      '<small>CASH COMMITMENTS</small><h3>WHAT IS ALREADY SPOKEN FOR?</h3></div>'+
+      '<small>CASH COMMITMENTS</small><h3>RESERVES & OUTGOINGS</h3></div>'+
       '<button type="button" class="fin-text-button" data-page="workshop">WORKSHOP</button></div>'+
       line('Workshop cash earmarked',money(x.reserved))+
       line('Wages per game day',money(x.staffDaily))+
@@ -91,7 +91,7 @@
       '<p class="fin-detail">Repair reserves are still included in your cash balance. Daily costs are future expenses, not money deducted twice.</p>'+
       '</section>';
     const performance='<section class="fin-panel"><div class="fin-panel-head"><div>'+
-      '<small>TRADING & CUSTOMER FUNDS</small><h3>WHAT YOU HAVE EARNED</h3></div>'+
+      '<small>TRADING & CUSTOMER FUNDS</small><h3>SALES PERFORMANCE</h3></div>'+
       '<button type="button" class="fin-text-button" data-page="stock">VIEW STOCK</button></div>'+
       line('Completed retail handovers',String(x.lifetimeSales))+
       line('Realised gross trade margin',money(x.grossLifetime),x.grossLifetime<0?' fin-due':'')+
@@ -99,7 +99,8 @@
       line('This month gross trade margin',money(r.grossMargin))+
       '<p class="fin-detail">Gross margin is not cash in the bank or net profit. Deposits are held outside dealership cash until handover.</p>'+
       '</section>';
-    const footer='<p class="fin-disclosure">Simulation figures only. Operating contribution is not statutory net profit: VAT, tax, finance, depreciation, warranties and other consumer liabilities are not fully modelled.</p>';
+    const footer='<details class="fin-disclosure"><summary>ACCOUNTING SCOPE & EXCLUSIONS</summary>'+
+      '<p>Simulation figures only. Operating contribution is not statutory net profit: VAT, tax, finance, depreciation, warranties and other consumer liabilities are not fully modelled.</p></details>';
     return {snapshot:x,html:top+cashflow+'<div class="fin-secondary">'+
       commitments+performance+'</div>'+footer};
   }
@@ -121,8 +122,8 @@
     const all=rows(state,f),visible=expanded?all:all.slice(0,6);
     const count=f==='all'?state.ledger.length:all.length;
     const tabs=[['all','ALL ENTRIES'],['in','MONEY IN'],['out','MONEY OUT'],['noncash','NON-CASH']];
-    const controls='<div class="fin-ledger-top"><div><small>ALL RECONCILED TRANSACTIONS</small>'+
-      '<h3>TRANSACTION HISTORY</h3></div><div class="fin-ledger-filters" role="group" aria-label="Filter financial transactions">'+
+    const controls='<div class="fin-ledger-top"><div><h3>TRANSACTION HISTORY</h3></div>'+
+      '<div class="fin-ledger-filters" role="group" aria-label="Filter financial transactions">'+
       tabs.map(([key,label])=>'<button type="button" data-action="filter-ledger" data-filter="'+key+
         '" aria-pressed="'+String(f===key)+'">'+label+'</button>').join('')+'</div></div>';
     const entries=visible.length?visible.map(entry=>
