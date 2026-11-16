@@ -582,6 +582,11 @@
   // the session. It changes counteroffer movement, never resets after reload.
   // Hidden reservation prices remain private to the seller.
   function sellerApproach(state,car){
+    if(car.marketTier==='new')return {
+      label:'TRADE STOCK ALLOCATION',
+      description:'Delivery-mileage vehicle offered by a fictional trade supplier at a fixed wholesale price. Registration, paperwork and manufacturer warranty must be verified before retail sale.',
+      firstCounter:0,concession:0
+    };
     const index=Number(String(car.id).split('-').at(-1))||0;
     const isDeadline=D.isDealDay(state.day);
     const motivated=isDeadline&&D.sellerDiscount(state,car.id)>0;
@@ -598,6 +603,17 @@
     const car = marketFor(state).sellers.find(v => v.id === id);
     if (!car) return fail('expired','This seller is no longer available. Check the next day’s leads.');
     if (state.vehicles.some(v => v.origin === car.id)) return fail('owned','This vehicle has already been purchased. View Vehicle Stock.');
+    if(car.marketTier==='new'){
+      if(!integer(offer)||offer!==car.ask)
+        return fail('allocation','New-car allocations are fixed-price trade purchases. The supplier price is £'+car.ask.toLocaleString('en-GB')+'.');
+      const prep=car.profile.basePrep+(car.profile.hiddenFault?.cost||0);
+      const blocked=canBuy(state,offer,prep);
+      if(blocked)return blocked;
+      pay(state,-offer,'Direct purchase: '+car.title+' (new-car supplier allocation)');
+      addCar(state,car,'seller',offer,car.id);
+      return success('Trade supplier confirmed '+car.title+' at £'+offer.toLocaleString('en-GB')+
+        '. Delivery-mileage vehicle moved into your workshop for inspection.');
+    }
     const previous = (state.negotiations ??= {})[id];
     if (previous?.status === 'walked') return fail('walked','The owner has left. This opportunity has closed.');
     if (!integer(offer) || offer < 100 || offer > car.ask)
