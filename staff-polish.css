@@ -255,6 +255,36 @@
   padding:9px;
   font-size:10px;
 }
+.staff-page-control .sd-candidate-quick{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:9px;
+  padding:9px 10px;
+  border-bottom:1px solid #50645a;
+  background:#203b37;
+}
+.staff-page-control .sd-candidate-quick .sd-hire-brief{
+  flex:1 1 285px;
+  margin:0;
+}
+.staff-page-control .sd-candidate-action{
+  display:flex;flex-direction:column;
+  align-items:stretch;justify-content:center;
+  flex:0 1 255px;gap:5px;
+  min-width:0;
+}
+.staff-page-control .sd-candidate-action>span{
+  color:#c2d0c9;
+  font:750 9px/1.3 var(--mono);
+  text-align:center;
+}
+.staff-page-control .sd-candidate-quick>.sd-issue{
+  flex-basis:100%;order:3;
+  margin:0;
+}
+.staff-page-control .sd-candidate-action .trade-button{
+  margin:0;min-height:43px;width:100%;
+  padding:9px 10px;font-size:10px;
+}
 .staff-page-control .sd-hire-brief{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -272,12 +302,12 @@
 .staff-page-control .sd-hire-brief strong{
   color:#f0d4a7;font:900 20px/1.1 var(--title);
 }
-.staff-page-control .sd-control .sd-primary-hire{
+.staff-page-control .sd-candidate-action .sd-primary-hire{
   margin:0;
   background:#d8b478;color:#182b2b;
   border-color:#e8c589;
 }
-.staff-page-control .sd-control .sd-primary-hire:disabled{
+.staff-page-control .sd-candidate-action .sd-primary-hire:disabled{
   opacity:.55;cursor:not-allowed;
   background:#36434a;color:#b2c3c7;border-color:#536873;
 }
@@ -375,6 +405,15 @@
 }
 @media(max-width:760px){
   .staff-page-control .staff-page-heading h1{font-size:26px}
+  .staff-page-control .sd-candidate-quick{
+    gap:7px;padding:8px 9px;
+  }
+  .staff-page-control .sd-candidate-quick .sd-hire-brief{
+    flex:1 1 100%;
+  }
+  .staff-page-control .sd-candidate-action{
+    flex:1 1 100%;
+  }
   .staff-page-control .sd-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .staff-page-control .sd-kpis>div{min-height:53px;padding:7px 9px}
   .staff-page-control .sd-kpis small{font-size:8px}
