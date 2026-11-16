@@ -47,14 +47,17 @@
     const available=sellers.filter(x=>!state.vehicles.some(v=>v.origin===x.id)&&
       state.negotiations?.[x.id]?.status!=='walked').length;
     const reserved=E.workshop.reserved(state);
+    // The shortlist already reports each lead's live status; show a
+    // smaller financial status line rather than four large dashboard tiles.
     const cards=[
-      ['PRIVATE SELLER LEADS',sellers.length,'AVAILABLE '+available],
-      ['ACTIVE COUNTEROFFERS',negotiating,negotiating?'DECISION NEEDED':'NO OPEN COUNTERS'],
-      ['FORECOURT SPACES',state.capacity-state.vehicles.length,
+      ['SELLER LEADS',sellers.length,available+' AVAILABLE'],
+      ['FORECOURT FREE',state.capacity-state.vehicles.length,
         state.vehicles.length+' / '+state.capacity+' OCCUPIED'],
-      ['WORKING CASH',money(Math.max(0,state.cash-reserved)),
-        reserved?'REPAIRS RESERVED '+money(reserved):'NO REPAIR CASH COMMITTED']
+      ['CASH AVAILABLE',money(Math.max(0,state.cash-reserved)),
+        reserved?'REPAIR FUNDS HELD '+money(reserved):'AFTER EXISTING RESERVES']
     ];
+    if(negotiating)cards.splice(1,0,
+      ['COUNTEROFFERS',negotiating,'ACTION REQUIRED']);
     return '<div class="buy-desk-stats">'+cards.map(([label,value,note])=>
       '<div class="buy-stat"><small>'+label+'</small><strong>'+value+
       '</strong><span>'+note+'</span></div>').join('')+'</div>';
@@ -69,27 +72,23 @@
   }
   function leadList(state,E,sellers,selectedId){
     return '<aside class="buy-leads" aria-labelledby="buy-leads-title">'+
-      '<div class="buy-leads-heading"><div><small>DIRECT BUYING</small>'+
-      '<h2 id="buy-leads-title">SELLER SHORTLIST</h2></div>'+
-      '<span>'+sellers.length+' LEADS</span></div>'+
+      '<div class="buy-leads-heading"><h2 id="buy-leads-title">SELLER SHORTLIST</h2>'+
+      '<span>CHOOSE A LEAD</span></div>'+
       '<div class="buy-lead-list">'+sellers.map((car,i)=>{
         const [label,kind]=leadStatus(car,state);
         const selected=car.id===selectedId;
-        const approach=E.sellerApproach(state,car);
         return '<button type="button" class="buy-lead '+(selected?'buy-lead-selected ':'')+
           'buy-lead-'+kind+'" data-action="select-seller" data-id="'+esc(car.id)+
           '" aria-pressed="'+selected+'">'+
           '<div class="buy-lead-top"><span>LEAD '+String(i+1).padStart(2,'0')+
-          ' · '+esc(approach.label)+'</span><b>'+esc(label)+'</b></div>'+
+          '</span><b>'+esc(label)+'</b></div>'+
           '<strong>'+esc(car.title)+'</strong>'+
           '<div class="buy-lead-facts"><span>'+miles(car.miles)+
           '</span><span>GRADE '+car.profile.grade+
           '</span><span>'+esc(car.fuel)+'</span></div>'+
           '<div class="buy-lead-bottom"><span>OWNER ASKS</span><b>'+money(car.ask)+'</b></div>'+
           '</button>';
-      }).join('')+'</div>'+
-      '<p class="buy-leads-tip">These are fictional customer leads, not live classified adverts. Selecting a vehicle does not reserve it.</p>'+
-    '</aside>';
+      }).join('')+'</div></aside>';
   }
   function pricing(car,state,E,offer){
     const {quote,inspected,remaining,reserved,position:signal}=figures(car,state,E,offer);
@@ -100,7 +99,7 @@
       ['SUGGESTED MAX OFFER',money(quote.maxBid)]
     ];
     return '<div class="buy-valuation" aria-label="Vehicle buying appraisal">'+
-      '<div class="buy-valuation-heading"><div><small>THE NUMBERS</small><strong>BUYING APPRAISAL</strong></div>'+
+      '<div class="buy-valuation-heading"><strong>BUYING APPRAISAL</strong>'+
       '<span>'+esc(inspected?'INSPECTED':'UNINSPECTED')+'</span></div>'+
       '<div class="buy-value-grid">'+quotes.map(([label,value])=>
         '<div><small>'+label+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
@@ -116,8 +115,9 @@
       '</div>'+
       '<div id="desk-signal-'+esc(car.id)+'" class="buy-decision buy-decision-'+signal.kind+'">'+
         '<strong>'+signal.label+'</strong><p>'+esc(signal.text)+'</p></div>'+
-      '<p class="buy-budget-note">Gross contribution is an estimate before staff, premises, VAT/tax, retail finance and aftersales liabilities. Uninspected repair budgets include a risk allowance; actual faults can cost more. Existing repair reserves ('+
-        money(reserved)+') are protected separately from your offer. Indicative headroom uses forecast preparation; purchase approval protects the full workshop commitment, which may be higher before inspection.</p></div>';
+      '<details class="buy-budget-note"><summary>What the estimates include</summary>'+
+      '<p>Gross contribution is an estimate before staff, premises, VAT/tax, retail finance and aftersales liabilities. Uninspected repair budgets include a risk allowance; actual faults can cost more. Existing repair reserves ('+
+        money(reserved)+') are protected separately from your offer. Indicative headroom uses forecast preparation; purchase approval protects the full workshop commitment, which may be higher before inspection.</p></details></div>';
   }
   function tradingControls(car,state,E,offer,reportCard,leadFeedback){
     const [status,kind]=leadStatus(car,state);
@@ -147,15 +147,16 @@
         '<div class="buy-counter-actions"><button type="button" class="trade-button trade-button-secondary" data-action="accept-seller-counter" data-id="'+esc(car.id)+'">ACCEPT '+money(deal.counter)+'</button>'+
         '<button type="button" class="trade-button trade-button-outline" data-action="walk-seller" data-id="'+esc(car.id)+'">WALK AWAY</button></div>':'');
     return '<div class="buy-trading">'+
-      '<div class="buy-seller-story"><span>SELLER POSITION · '+esc(approach.label)+'</span>'+
-        '<p>'+esc(approach.description)+'</p></div>'+
-      '<div class="buy-trading-heading"><strong>NEGOTIATE THE PURCHASE</strong>'+
+      '<div class="buy-trading-heading"><strong>YOUR OFFER</strong>'+
         '<small>NO BUYER FEE · CASH PURCHASE</small></div>'+
+      '<details class="buy-seller-story"><summary>SELLER POSITION · '+esc(approach.label)+'</summary>'+
+        '<p>'+esc(approach.description)+'</p></details>'+
       proposed+notices+leadFeedback(car.id)+
       '<p id="desk-funding-warning-'+esc(car.id)+'" class="trade-purchase-warning"'+
         (cannot&&!closed?'':' hidden')+'>'+esc(closed?'':cannot)+'</p>'+
       controls+
-      '<div class="buy-deal-terms"><strong>WHEN A DEAL IS AGREED</strong><p>Purchase cash is debited once, your vehicle joins stock and the workshop must assess it. An owner may counter or withdraw after an unreasonable offer. A paid inspection is non-refundable.</p></div>'+
+      '<details class="buy-deal-terms"><summary>What happens when the owner accepts?</summary>'+
+      '<p>Purchase cash is debited once, your vehicle joins stock and the workshop must assess it. An owner may counter or withdraw after an unreasonable offer. A paid inspection is non-refundable.</p></details>'+
     '</div>';
   }
   function render(state,E,opts={}){
@@ -174,21 +175,22 @@
     const offer=draft!==null?draft:
       negotiation?.status==='counter'?negotiation.counter:openingOffer(car);
     const report=opts.reportCard(car,'seller',offer);
-    const heading='<div class="buy-detail-top"><span>VEHICLE REVIEW · '+esc(car.id)+'</span>'+
+    const heading='<div class="buy-detail-top"><span>SELECTED VEHICLE</span>'+
       '<span>GRADE '+car.profile.grade+'/5 · '+condition(car)+'</span></div>';
     const detail='<section class="buy-seller-focus" aria-label="Selected private seller">'+heading+
       '<div class="buy-focus-content"><div class="buy-vehicle">'+VC.heading(car,'seller','SELLER VEHICLE · '+esc(car.id))+
       '<p class="buy-car-note">'+esc(car.note||'')+'</p>'+
-      '<div class="buy-inspection-prompt"><strong>BEFORE YOU BUY</strong>'+
-        '<p>Inspect mileage, service history, MOT advisories and condition. A paid inspection may reveal a hidden repair before you commit.</p></div>'+
       report+'</div>'+
       '<div class="buy-deal-workspace">'+
+        '<div class="buy-mobile-vehicle-context"><strong>'+esc(car.title)+'</strong>'+
+          '<span>'+miles(car.miles)+' · '+esc(car.fuel)+' · OWNER ASKS '+money(car.ask)+'</span></div>'+
         pricing(car,state,E,offer)+
         tradingControls(car,state,E,offer,opts.reportCard,opts.leadFeedback)+
       '</div></div></section>';
     return {selectedId:active,html:intro+
       '<div class="buy-main-grid">'+leadList(state,E,sellers,active)+detail+'</div>'+
-      '<p class="buy-disclosure">All seller identities, inspection reports and valuations are fictional. Representative vehicle photography is not evidence of the exact vehicle. No live DVSA, DVLA or HPI verification is performed.</p>'};
+      '<details class="buy-disclosure"><summary>About this simulated market</summary>'+
+      '<p>All seller identities, inspection reports and valuations are fictional. Representative vehicle photography is not evidence of the exact vehicle. No live DVSA, DVLA or HPI verification is performed. Selecting a seller does not reserve the vehicle.</p></details>'};
   }
   window.MotorTradeBuyingDeskView=Object.freeze({render,figures,position,openingOffer,fundingWarning});
 })();
