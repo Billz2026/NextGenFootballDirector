@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="./inbox-polish.css?v=1">
   <link rel="stylesheet" href="./auction-polish.css?v=1">
   <link rel="stylesheet" href="./buying-polish.css?v=1">
+  <link rel="stylesheet" href="./stock-polish.css?v=1">
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -44,7 +45,7 @@
   <script src="./dashboard-view.js?v=2" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
   <script src="./buying-desk-view.js?v=3" defer></script>
-  <script src="./stock-view.js?v=1" defer></script>
+  <script src="./stock-view.js?v=2" defer></script>
   <script src="./finance-view.js?v=2" defer></script>
   <script src="./career-storage.js?v=2" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js" defer></script>
@@ -313,8 +314,8 @@
               <div id="market-sellers" class="buying-desk-content" aria-live="polite"></div>
             </section>
 
-            <section class="career-panel" data-panel="stock" hidden aria-labelledby="stock-title">
-              <div class="page-heading"><div><p class="section-overline">THE FORECOURT / VEHICLE MANAGEMENT</p><h1 id="stock-title">VEHICLE <em>STOCK.</em></h1><p>Track each vehicle's acquisition, repair progress, true cost and readiness to advertise. Preparation now takes game days.</p></div><span class="career-chip">SPACE <span data-bind="stock">0 / 4</span></span></div>
+            <section class="career-panel stock-page-control" data-panel="stock" hidden aria-labelledby="stock-title">
+              <header class="stock-page-heading"><div><h1 id="stock-title">INVENTORY <em>CONTROL.</em></h1><p>Review stock, preparation costs and the next decision for each vehicle.</p></div></header>
               <div id="stock-list" class="stock-control"></div>
             </section>
 

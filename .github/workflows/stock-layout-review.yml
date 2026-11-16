@@ -1,0 +1,41 @@
+name: Vehicle Stock desktop and phone visual review
+on:
+  pull_request:
+    paths:
+      - 'stock-view.js'
+      - 'stock-polish.css'
+      - 'index.html'
+      - 'tests/stock-visual-browser.mjs'
+      - '.github/workflows/stock-layout-review.yml'
+permissions:
+  contents: read
+jobs:
+  visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate browser test syntax
+        run: node --check tests/stock-visual-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve actual game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/stock-visual-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Capture stock register and check responsive flow
+        run: node tests/stock-visual-browser.mjs
+      - name: Upload genuine Chromium screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vehicle-stock-desktop-phone
+          path: review/vehicle-stock-*.png
+          retention-days: 7
+          if-no-files-found: warn
