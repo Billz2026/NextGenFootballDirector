@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="./reports-polish.css?v=1">
   <link rel="stylesheet" href="./staff-polish.css?v=1">
   <link rel="stylesheet" href="./premises-polish.css?v=1">
+  <link rel="stylesheet" href="./career-progression.css?v=1">
   <script src="./vehicle-intel.js?v=2" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -36,13 +37,14 @@
   <script src="./premises.js?v=1" defer></script>
   <script src="./people.js?v=8" defer></script>
   <script src="./monthly.js?v=8" defer></script>
+  <script src="./career-progression.js?v=1" defer></script>
   <script src="./events.js?v=2" defer></script>
   <script src="./workshop.js?v=4" defer></script>
   <script src="./customers.js?v=5" defer></script>
   <script src="./trading.js?v=20" defer></script>
   <script src="./vehicle-cards.js?v=4" defer></script>
   <script src="./vehicle-view.js?v=4" defer></script>
-  <script src="./people-view.js?v=8" defer></script>
+  <script src="./people-view.js?v=9" defer></script>
   <script src="./monthly-view.js?v=9" defer></script>
   <script src="./events-view.js?v=7" defer></script>
   <script src="./workshop-view.js?v=7" defer></script>
@@ -59,7 +61,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=36" defer></script>
+  <script src="./simulator.js?v=37" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -67,7 +69,7 @@
   <div class="top-stripe" aria-hidden="true"></div>
   <div id="app" role="main">
     <section class="menu-screen" id="screen-menu" aria-labelledby="menu-title">
-      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.38</span></header>
+      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.39</span></header>
       <div class="menu-layout">
         <div class="menu-lead">
           <div class="brand-lockup brand-lockup-large">
@@ -264,6 +266,7 @@
               </div>
 
               <div id="dashboard-operating-strip" class="dashboard-operating-strip" aria-label="Stock, customers and operating commitments"></div>
+              <div id="dashboard-career-progress"></div>
 
               <div class="dashboard-grid dashboard-command-grid">
                 <section class="panel-card priorities dashboard-task-panel" aria-labelledby="priorities-title">
@@ -379,6 +382,7 @@
             </section>
           </div>
           <footer class="career-footer"><span>THE MOTOR TRADE <b>•</b> NEXTGEN SESSIONS</span><span>PRE-ALPHA WORKSHOP & VEHICLE LIFECYCLE / LOCAL SAVE</span></footer>
+          <div id="career-promotion" class="career-promotion-layer" hidden></div>
         </div>
       </div>
     </section>
