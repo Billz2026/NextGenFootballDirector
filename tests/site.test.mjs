@@ -1,5 +1,5 @@
 // Current-production site and engine acceptance tests.
-// The pre-v0.9.49 monolith is retained as tests/historical-site-regression.mjs.
+// The pre-v0.9.49 monolith is retained as archive/historical-site-regression.mjs.
 // These tests deliberately avoid mock-sale shortcuts, hand-authored financial
 // balances, assumed calendar month lengths and pinned asset cache versions.
 import {test} from 'node:test';
