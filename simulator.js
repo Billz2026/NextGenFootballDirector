@@ -403,6 +403,19 @@
     for(const node of all('[data-bind="dashboard-sales-note"]'))
       node.className=sales.positive?'dashboard-target-positive':'';
     bindText('dashboard-operating',money.format(d.report.operatingContribution));
+    // Presentation-only status styling derived from live values; no new saved state.
+    const setKpiTone=(binding,tone)=>{
+      const tile=byId(binding)?.closest('.dashboard-kpi');
+      if(tile)tile.dataset.tone=tone;
+    };
+    setKpiTone('cash',career.cash<0?'critical':'neutral');
+    setKpiTone('dashboard-monthly-sales',sales.positive?'positive':
+      d.daysToGo<=5?'attention':'neutral');
+    setKpiTone('dashboard-operating',d.report.operatingContribution<0?'critical':
+      d.report.operatingContribution>0?'positive':'neutral');
+    // These thresholds match the existing career tiers (40/60/80).
+    setKpiTone('reputation-score',career.reputationScore>=80?'prestige':
+      career.reputationScore>=60?'positive':'neutral');
     bindText('dashboard-auction',d.auctionOpen?'TODAY':'DAY '+d.auctionDay);
     bindText('dashboard-auction-note',d.auctionKind==='MONTH-END'?
       d.auctionWeekday+' · Month-end auction':d.auctionWeekday+' · Weekly auction');
