@@ -26,17 +26,23 @@ try{
       const seller=E.marketFor(s).sellers[0];
       const purchase=E.acquireSeller(s,seller.id,seller.ask);
       if(!purchase.ok)throw Error('Acquisition failed: '+purchase.message);
-      for(let day=2;day<=30;day++){
+      for(let day=2;day<=s.monthPlan.endDay;day++){
+        E.showroom.closeWaiting(s,'Closing for the day.');
         s.day=day;
+        E.rollAuctionHall(s);
         E.staffDay(s);
         E.premisesDay(s);
+        E.stockAgeingDay(s);
         E.advanceWorkshop(s);
         E.advanceCustomers(s);
+        E.advanceAfterSales(s);
       }
       const closed=M.close(s);
       if(!closed)throw Error('Month 1 did not close');
-      s.day=31;
+      s.day=23;
+      E.rollAuctionHall(s);
       M.next(s);
+      E.advanceCustomers(s);
       if(!E.normalize(JSON.parse(JSON.stringify(s))))
         throw Error('Actual monthly history failed canonical career validation');
       const frozen=JSON.stringify(s.monthlyReports[0]);
@@ -46,7 +52,7 @@ try{
         cash:s.cash,stock:s.vehicles.length,archive:frozen,
         operating:closed.operatingContribution};
     },KEY);
-    assert.equal(fixture.day,31);
+    assert.equal(fixture.day,23);
     assert.equal(fixture.staff,4);
     assert.equal(fixture.startingCapital,45000);
     assert.equal(fixture.archived,1);
