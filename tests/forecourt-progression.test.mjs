@@ -91,11 +91,13 @@ test('temporary holding generates a real premises bill, then reduces as inventor
   const state=funded('Paid Storage Test');
   acquire(state,10);
   const oldCash=state.cash,oldRent=S.costs(state),count=state.vehicles.length;
-  state.day++;E.rollAuctionHall(state);
+  Q.closeWaiting(state,'Day closed.');
+  state.day++;E.rollAuctionHall(state);state.deadlineSession=0;
   const charged=E.premisesDay(state);
   assert.equal(charged.offsite,44);
   assert.equal(charged.due,oldRent.total);
   assert.equal(state.cash,oldCash-oldRent.total);
+  E.staffDay(state);E.advanceWorkshop(state);E.advanceCustomers(state);
   assert.ok(state.ledger.some(x=>x.day===state.day&&
     x.note.includes('offsite stock holding £44')));
   const disposal=E.disposeStock(state,state.vehicles.find(v=>v.workshop.stage==='unassessed').id);
