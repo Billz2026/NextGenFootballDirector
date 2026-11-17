@@ -284,7 +284,9 @@
     ]:[
       ['ATTRIBUTED ENQUIRIES',p.enquiries],
       ['TRACKED CONVERSIONS',p.converted+' / '+p.enquiries],
-      ['ENQUIRY CONVERSION',displayRate(p.conversionRate)],
+      ['ALL ENQUIRY CONVERSION',displayRate(p.conversionRate)],
+      ['MATURED ENQUIRIES',p.maturedEnquiries],
+      ['MATURED CONVERSION',displayRate(p.maturedRate)],
       ['RETAIL HANDOVERS',p.deals],
       ['GROSS MARGIN',gbp(p.gross)],
       ['SALES COMMISSION',gbp(p.commission)],
@@ -296,6 +298,7 @@
       'Earlier jobs without retained workshop records are excluded.':
       'Enquiries include only contacts with a saved salesperson assignment. '+
       'Conversion counts completed handovers linked to those tracked enquiries, not agreements. '+
+      'Matured enquiries are at least three days old or have a recorded closure; review flags use this settled group. '+
       'Retail margin after commission excludes salaries, premises and other overheads. '+
       'Historical sales can contribute margin even where earlier enquiries lack attribution.';
     return '<section class="sd-performance-record" aria-label="Measured employee performance">'+
