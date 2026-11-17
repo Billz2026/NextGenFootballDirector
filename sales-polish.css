@@ -27,7 +27,7 @@
   font:550 10px/1.4 var(--body);color:#adbec2;
 }
 .sales-control .so-kpis{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
   gap:0;padding:0 5px;margin:0 0 8px;
   border:1px solid #3b5560;border-radius:6px;background:#162e38;
 }
@@ -392,4 +392,10 @@
 }
 @media(max-width:840px){
   .sales-control .so-buyer-choices{grid-template-columns:minmax(0,1fr)}
+}
+
+@media(max-width:540px){
+  .sales-control .so-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sales-control .so-kpis>div:nth-child(2){border-right:0}
+  .sales-control .so-kpis>div:nth-child(-n+2){border-bottom:1px solid #3a535e}
 }
