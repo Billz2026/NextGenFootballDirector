@@ -58,6 +58,89 @@
       leadId:caseObj.id,type,detail:detail.slice(0,120)});
     if(state.customerHistory.length>2000)state.customerHistory.shift();
   }
+  // Buyers have persistent personalities, grounded vehicle concerns and real
+  // choices. Profiles are derived from a saved lead ID, never re-rolled.
+  const PERSONALITIES=Object.freeze([
+    {key:'budget',label:'BUDGET-CONSCIOUS',motive:'Needs a clear total price and will protect every pound.',budget:-175,counter:-12,hold:20},
+    {key:'careful',label:'CAUTIOUS BUYER',motive:'Prioritises condition and documentary evidence over a quick bargain.',budget:0,counter:-4,hold:29},
+    {key:'family',label:'PRACTICAL FAMILY BUYER',motive:'Wants dependability and predictable running costs.',budget:25,counter:1,hold:40},
+    {key:'decisive',label:'READY TO BUY',motive:'Will complete promptly if you address the main concern.',budget:125,counter:11,hold:64},
+    {key:'comparison',label:'COMPARING DEALERS',motive:'Has other vehicles on the shortlist and is prepared to walk.',budget:-100,counter:-8,hold:27},
+    {key:'detail',label:'DETAIL-FOCUSED BUYER',motive:'Checks vehicle history, preparation and condition closely.',budget:50,counter:0,hold:36}
+  ]);
+  function behaviour(c,v){
+    if(!c||!v)return null;
+    const person=PERSONALITIES[hash('buyer-character|'+c.id)%PERSONALITIES.length];
+    const grade=v.profile?.grade??3,history=String(v.history||'');
+    const category=v.marketTier==='new'?'new':
+      v.fuel==='Electric'?'battery':
+      history==='Partial'?'history':
+      v.miles>=90000?'mileage':
+      grade>=3?'condition':'value';
+    const concerns={
+      new:{label:'Delivery paperwork',quote:'Before I go ahead, I want to know what happens with registration and the pre-delivery checks.',proof:47,cost:150,discount:175,service:'registration and handover checks'},
+      battery:{label:'Battery condition',quote:'I like the car, but I need reassurance about battery condition. Do you have an independent health report?',proof:14,cost:225,discount:200,service:'independent EV battery assessment'},
+      history:{label:'Incomplete service history',quote:'The service history is incomplete. What protection do I have against a surprise bill?',proof:33,cost:175,discount:200,service:'independent mechanical assessment'},
+      mileage:{label:'Higher mileage',quote:'The mileage is higher than I had in mind. Why should I pay this much?',proof:39,cost:175,discount:200,service:'independent wear-and-condition inspection'},
+      condition:{label:'Vehicle preparation',quote:'Can you show me what was checked and prepared before this car went on sale?',proof:62,cost:150,discount:150,service:'independent handover inspection'},
+      value:{label:'Price against alternatives',quote:'I have seen another car at a similar price. What makes this one worth buying?',proof:55,cost:125,discount:175,service:'independent handover inspection'}
+    };
+    const issue=concerns[category];
+    const evidence=clamp(issue.proof+
+      (history==='Full'?15:0)+(grade<=2?10:grade>=4?-12:0)+
+      (person.key==='careful'?-8:0),5,92);
+    return {...person,issue:category,concern:issue.label,quote:issue.quote,
+      service:issue.service,remedyCost:issue.cost,discount:issue.discount,
+      evidenceChance:evidence};
+  }
+  function objection(state,id,decision){
+    const c=caseFor(state,id),v=state.vehicles.find(x=>x.id===id);
+    if(!c||!v||v.status!=='listed'||c.status!=='discussing'||
+      c.objectionStatus!=='pending')
+      return fail('stage','A fresh customer objection must be open during negotiations.');
+    if(!['evidence','inspection','discount','hold','walk'].includes(decision))
+      return fail('choice','Choose a valid response to the customer concern.');
+    const profile=behaviour(c,v);
+    if(decision==='evidence'){
+      if(c.evidenceTried)return fail('repeat','You have already explained the available vehicle documentation.');
+      c.evidenceTried=true;
+      const proved=chance('records|'+c.id,profile.evidenceChance);
+      append(state,c,proved?'objection-resolved':'objection-rejected',
+        'Explained available vehicle records ('+profile.concern+')');
+      if(!proved)return {ok:false,changed:true,code:'not-reassured',
+        message:c.name+' still wants stronger reassurance about '+profile.concern.toLowerCase()+
+        '. No inspection or battery-health report has been invented. Consider a real concession or walk away.'};
+      c.objectionStatus='resolved';c.objectionAction='evidence';
+      return ok(c.name+' is satisfied with the available records and your honest explanation. The price and trading costs remain unchanged.');
+    }
+    if(decision==='inspection'){
+      c.objectionStatus='resolved';c.objectionAction='inspection';
+      c.remedyCost=profile.remedyCost;
+      append(state,c,'objection-resolved','Promised '+profile.service+' at £'+c.remedyCost);
+      return ok(c.name+' accepts a dealer-funded '+profile.service+
+        '. The £'+c.remedyCost+' commitment is payable at handover and reduces realised gross margin. It is not a fictitious completed inspection.');
+    }
+    if(decision==='discount'){
+      c.objectionStatus='resolved';c.objectionAction='discount';
+      c.priceDiscount=profile.discount;
+      v.cashOffer=null;
+      append(state,c,'objection-resolved','Negotiated price reduced by £'+c.priceDiscount);
+      return ok(c.name+' accepts a £'+c.priceDiscount+
+        ' reduction in the achievable cash or part-exchange sale price. This reduces your final trading margin.');
+    }
+    if(decision==='walk'||!chance('stand-firm|'+c.id,profile.hold)){
+      c.status='lost';c.reason=decision==='walk'?
+        'Dealer declined the proposed concessions; buyer left without a sale.':
+        'Customer rejected firm terms and purchased nothing.';
+      append(state,c,'objection-walked',c.reason);
+      restoreBooked(state,c);
+      return {ok:decision==='walk',changed:true,code:'buyer-left',
+        message:c.name+' left the showroom without buying. No false sale, commission or concession expense was recorded.'};
+    }
+    c.objectionStatus='resolved';c.objectionAction='hold';
+    append(state,c,'objection-resolved','Buyer agreed to proceed without a concession');
+    return ok(c.name+' accepts your firm position without a discount or additional commitment. You can now negotiate the sale price.');
+  }
   function demand(state,vehicle){
     if(vehicle?.status!=='listed')return false;
     if(caseFor(state,vehicle.id))return false;
@@ -98,6 +181,8 @@
       appointmentDay:null,agreedDay:null,price:null,allowance:null,
       collectionDay:null,held:0,counters:0,reason:'',
       terms:'in-person',prepCost:0,exchange:null,
+      objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
+      remedyCost:0,priceDiscount:0,
       salespersonId:P.salesRep(state,id)?.id??null
     };
     state.customerCases[String(id)]=c;
@@ -168,6 +253,8 @@
       appointmentDay:null,agreedDay:null,price:null,allowance:null,
       collectionDay:null,held:0,counters:0,reason:'',
       terms:'in-person',prepCost:0,exchange:null,
+      objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
+      remedyCost:0,priceDiscount:0,
       salespersonId:P.salesRep(state,id+1)?.id??null,
       standby:{...booked,standby:null}
     };
@@ -195,13 +282,15 @@
       return {ok:false,changed:true,code:'drive-rejected',
         message:c.name+' declined to proceed after the test drive. No sale was made.'};
     }
-    c.status='discussing';
-    return ok(c.name+' completed a satisfactory test drive. You can now discuss cash or part-exchange terms.');
+    c.status='discussing';c.objectionStatus='pending';
+    const issue=behaviour(c,v);
+    return ok(c.name+' completed the test drive but raised a concern about '+issue.concern.toLowerCase()+'. Address their objection before agreeing terms.');
   }
   function negotiate(state,vehicle,current,limit,proposal){
     const c=caseFor(state,vehicle.id);
     if(!c||c.status!=='discussing')
       return fail('stage','A completed test drive is required before negotiations.');
+    if(c.objectionStatus==='pending')return fail('objection','Address the customer’s vehicle concern before discussing the final figures.');
     if(c.counters>=5)return fail('limit','Five negotiation rounds completed. Agree the latest offer or let the customer leave.');
     const requested=proposal===undefined?Math.min(vehicle.asking-25,current+100):proposal;
     if(!ints(requested)||requested<=current||requested>vehicle.asking||requested>100000)
@@ -214,7 +303,8 @@
     // likely to be accepted; rejected requests can prompt a smaller counter.
     const chanceToAccept=clamp(89-Math.floor(difference/12)-
       (round-1)*4+P.salesImpact(state,c).counterLift+
-      (state.reputationScore>=40?5:0),20,92);
+      (state.reputationScore>=40?5:0)+behaviour(c,vehicle).counter+
+      (c.objectionAction==='inspection'?8:c.objectionAction==='evidence'?5:0),20,92);
     if(affordable&&chance('negotiation-accept|'+c.id+'|'+round+'|'+requested,chanceToAccept)){
       vehicle.cashOffer=requested;
       append(state,c,'counter-accepted','Round '+round+': agreed £'+requested);
@@ -244,6 +334,7 @@
     const c=caseFor(state,id);
     if(!c||c.status!=='discussing')return fail('stage','The customer must complete a test drive and negotiate first.');
     if(!['cash','part-ex'].includes(mode))return fail('mode','Invalid sale method.');
+    if(c.objectionStatus==='pending')return fail('objection','Resolve the customer’s concern before accepting a deal.');
     if(mode==='part-ex'&&c.preferredMode!=='part-ex')
       return fail('mode','This customer is not offering a part-exchange.');
     if(!ints(price)||price<500||price>100000)return fail('price','Invalid negotiated price.');
@@ -325,7 +416,7 @@
   }
   function ready(state,id){
     const c=caseFor(state,id);
-    return c&&['agreed','collectable'].includes(c.status)&&
+    return c&&c.objectionStatus!=='pending'&&['agreed','collectable'].includes(c.status)&&
       (c.status!=='agreed'||c.agreedDay===state.day);
   }
   function complete(state,id){
@@ -408,7 +499,10 @@
       retainedAmount:state.customerFunds?.filter(x=>x.type==='retained'&&
         x.day>=startDay&&x.day<=endDay).reduce((n,x)=>n-x.delta,0)||0,
       completedSales:n('sale'),
-      counterRejections:n('counter-rejected')};
+      counterRejections:n('counter-rejected'),
+      objectionsResolved:n('objection-resolved'),
+      objectionsRejected:n('objection-rejected'),
+      buyerWalkaways:n('objection-walked')};
   }
   function valid(state,saved){
     if(saved.version<8){
@@ -435,6 +529,19 @@
       ['price','allowance'].every(k=>c[k]===null||no(c[k]))&&
       no(c.held,250)&&[0,250].includes(c.held)&&
       no(c.counters,5)&&typeof c.reason==='string'&&c.reason.length<200&&
+      (saved.version<16||(
+        ['unraised','pending','resolved'].includes(c.objectionStatus)&&
+        ['none','evidence','inspection','discount','hold','legacy'].includes(c.objectionAction)&&
+        typeof c.evidenceTried==='boolean'&&
+        no(c.remedyCost,300)&&[0,125,150,175,225].includes(c.remedyCost)&&
+        no(c.priceDiscount,250)&&[0,150,175,200].includes(c.priceDiscount)&&
+        (c.objectionAction==='inspection'?(c.remedyCost>0&&c.priceDiscount===0):
+          c.remedyCost===0)&&
+        (c.objectionAction==='discount'?(c.priceDiscount>0&&c.remedyCost===0):
+          c.priceDiscount===0)&&
+        (!['agreed','reserved','collectable'].includes(c.status)||
+          c.objectionStatus==='resolved')
+      ))&&
       (c.exchange===null||(c.exchange&&typeof c.exchange==='object'&&
         typeof c.exchange.title==='string'&&no(c.exchange.ask)&&no(c.exchange.floor)))&&
       (!['reserved','collectable'].includes(c.status)||c.held===250)&&
@@ -454,7 +561,8 @@
     const types=['enquiry','appointment','appointment-restored','appointment-displaced',
       'test-drive-pass','test-drive-reject',
       'counter-accepted','counter-rejected','agreement','deposit','deposit-refunded',
-      'deposit-retained','cancelled','arrived','no-show','expired','collection-due','sale'];
+      'deposit-retained','cancelled','arrived','no-show','expired','collection-due','sale',
+      'objection-resolved','objection-rejected','objection-walked'];
     if(!history.every(h=>h&&no(h.day,36500)&&h.day>=1&&h.day<=state.day&&
       no(h.vehicleId,100000)&&h.vehicleId>0&&
       typeof h.leadId==='string'&&h.leadId.length<=50&&
@@ -481,6 +589,12 @@
     state.customerCases=Object.fromEntries(Object.entries(cases).map(([key,c])=>
       [key,{...c,terms:saved.version>=9?c.terms:'legacy-refundable',
         prepCost:saved.version>=9?c.prepCost:0,
+        objectionStatus:saved.version>=16?c.objectionStatus:
+          ['discussing','agreed','reserved','collectable'].includes(c.status)?'resolved':'unraised',
+        objectionAction:saved.version>=16?c.objectionAction:'legacy',
+        evidenceTried:saved.version>=16?c.evidenceTried:false,
+        remedyCost:saved.version>=16?c.remedyCost:0,
+        priceDiscount:saved.version>=16?c.priceDiscount:0,
         exchange:c.exchange?{...c.exchange}:null,
         appointmentDay:saved.version<15&&c.status==='booked'?
           Math.max(state.day,Math.min(c.appointmentDay??(c.createdDay+1),c.createdDay+1)):
@@ -491,7 +605,7 @@
     return true;
   }
   window.MotorTradeCustomers=Object.freeze({
-    caseFor,demand,walkInInterest,open,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
+    caseFor,demand,walkInInterest,behaviour,objection,open,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
     ready,complete,advanceDay,nextSession,stats,valid,heldDeposits,balanceDue,customerPrep
   });
 })();
