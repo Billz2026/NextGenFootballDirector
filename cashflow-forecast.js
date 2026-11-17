@@ -43,7 +43,10 @@
     const addedOffsite=hasPurchase&&used>=permanent?
       E.premises.OVERFLOW_DAILY_FEE:0;
     const daily=wages+site.total+addedOffsite;
-    const committedToday=reserve+arrears+pendingInvoice;
+    const pendingClaims=E.aftersales?.pendingCost(state)??0;
+    // Unresolved estimates are a conservative planning provision, not a
+    // bank withdrawal or legally adjudicated debt.
+    const committedToday=reserve+arrears+pendingInvoice+pendingClaims;
     const planned=purchase+prep+extraRepair;
     const available=state.cash-committedToday;
     const afterPlans=available-planned;
@@ -71,7 +74,8 @@
       projected<minimumBuffer?'caution':'covered';
     return {valid:true,scenario,openingCash:state.cash,
       wages,premises:site.total,additionalOffsite:addedOffsite,daily,
-      reserve,arrears,ageingArrears,pendingInvoice,committedToday,available,planned,
+      reserve,arrears,ageingArrears,pendingInvoice,pendingClaims,
+      committedToday,available,planned,
       afterPlans,horizon,projected,projectedAgeing,runway,runwayCapped,
       minimumBuffer,severity,
       shortfall:Math.max(0,-projected),
@@ -119,6 +123,8 @@
       '<div><span>Current workshop reserves</span><strong>'+money(f.reserve)+'</strong></div>'+
       '<div><span>Existing unpaid wages, premises & stock holding</span><strong>'+money(f.arrears)+'</strong></div>'+
       '<div><span>Unpaid auction invoice</span><strong>'+money(f.pendingInvoice)+'</strong></div>'+
+      '<div><span>Open customer repair estimates (planning reserve)</span><strong>'+
+      money(f.pendingClaims)+'</strong></div>'+
       '<div><span>New proposed spending</span><strong>'+money(f.planned)+'</strong></div>'+
       '<div><span>Wages / game day</span><strong>'+money(f.wages)+'</strong></div>'+
       '<div><span>Premises / game day'+(f.additionalOffsite?' (incl. new offsite space)':'')+
@@ -135,6 +141,7 @@
     const note='<p class="fc-notes">Assumes <strong>NO future sales or new income</strong>, stable employee and premises costs, and one proposed vehicle purchased immediately. '+
       'New preparation and additional repairs are allowances for spending, not double-counted existing workshop reserves. '+
       'Reserved funds are still in today\'s bank balance; they are removed only to show what cannot safely be spent. '+
+      'Open aftersales estimates are provisioned once as a conservative scenario, not already-paid bills. '+
       'Stock holding costs escalate at 15, 30 and 45 days if the cars remain unsold. '+
       'Customer deposits ('+money(f.heldDeposits)+') are excluded. No transactions are created.</p>';
     return cards+warning+checkpoints+'<details class="fc-breakdown"><summary>VIEW FORECAST COST BREAKDOWN</summary>'+
