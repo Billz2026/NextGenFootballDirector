@@ -497,3 +497,9 @@
   .workshop-page-control .ws-dispatch-assignments{grid-template-columns:1fr}
   .workshop-page-control .ws-priority-control{align-items:flex-start}
 }
+
+@media(max-width:490px){
+  /* Keep the assessment decision above the first mobile fold. */
+  .workshop-page-control .ws-capacity + .ws-caveat{display:none}
+  .workshop-page-control .ws-dispatch-note{font-size:9px}
+}
