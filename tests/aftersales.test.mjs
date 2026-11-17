@@ -51,9 +51,9 @@ function caseCareer(){
 test('new career has no invented customer complaints, money changes or clutter',()=>{
   const s=E.createStaffed('Care Baseline',[]),before=JSON.stringify(s);
   assert.equal(s.version,20);
-  assert.deepEqual(A.stats(s),{open:0,resolved:0,potentialCost:0,paid:0});
+  assert.deepEqual(clone(A.stats(s)),{open:0,resolved:0,potentialCost:0,paid:0});
   assert.equal(V.render(s,E),'');
-  assert.deepEqual(E.advanceAfterSales(s),{opened:[],diagnosed:[],escalated:[]});
+  assert.deepEqual(clone(E.advanceAfterSales(s)),{opened:[],diagnosed:[],escalated:[]});
   assert.equal(JSON.stringify(s),before);
   valid(s);
 });
