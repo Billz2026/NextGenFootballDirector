@@ -611,3 +611,10 @@
 @media(prefers-reduced-motion:reduce){
   #screen-career .buying-desk-control .buy-lead{transition:none;}
 }
+
+/* Semantic buying capacity and live counteroffer indicators. */
+#screen-career .buying-desk-control .buy-stat-attention>strong{color:#E4A44F;}
+#screen-career .buying-desk-control .buy-stat-critical>strong{color:#EA7775;}
+#screen-career .buying-desk-control .buy-budget-total b.buy-neutral{
+  color:#F4F5F5;
+}

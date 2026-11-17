@@ -912,7 +912,8 @@
     if(kind!=='seller')return;
     const set=(id,text)=>{const el=byId(id+'-'+car.id);if(el)el.textContent=text;return el;};
     if(!valid||price<100||price>car.ask){
-      set('desk-projection','ENTER VALID OFFER');
+      const invalidProjection=set('desk-projection','ENTER VALID OFFER');
+      if(invalidProjection)invalidProjection.className='buy-neutral';
       const warning=byId('desk-funding-warning-'+car.id);
       if(warning){warning.hidden=true;warning.textContent='';}
       const signal=byId('desk-signal-'+car.id);

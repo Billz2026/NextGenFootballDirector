@@ -63,7 +63,9 @@
     if(negotiating)cards.splice(1,0,
       ['COUNTEROFFERS',negotiating,'ACTION REQUIRED']);
     return '<div class="buy-desk-stats">'+cards.map(([label,value,note])=>
-      '<div class="buy-stat"><small>'+label+'</small><strong>'+value+
+      '<div class="buy-stat'+(label==='COUNTEROFFERS'?' buy-stat-attention':
+        label==='BUYING PLACES FREE'&&value<=0?' buy-stat-critical':'')+
+      '"><small>'+label+'</small><strong>'+value+
       '</strong><span>'+note+'</span></div>').join('')+'</div>';
   }
   function leadStatus(car,state){
