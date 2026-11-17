@@ -11,8 +11,8 @@
  */
 (() => {
   const D=window.MotorTradeEvents;
-  const P=window.MotorTradePeople;
-  if(!P)throw new Error('Load people.js before customers.js');
+  const P=window.MotorTradePeople,Q=window.MotorTradeShowroom;
+  if(!P||!Q)throw new Error('Load people.js and showroom-traffic.js before customers.js');
   const ints=Number.isSafeInteger;
   const STATUS=Object.freeze(['enquiry','booked','arrived','discussing','agreed',
     'reserved','collectable','lost']);
@@ -270,6 +270,36 @@
     append(state,c,'arrived','Customer on site for immediate viewing');
     return ok(c.name+' is here to view stock '+id+' now. The original appointment remains booked unless this customer pays a deposit or buys the car. Offer a test drive before agreeing a sale.');
   }
+  function welcomeShowroom(state,leadId,salespersonId=null){
+    const check=Q.canServe(state,leadId,salespersonId);
+    if(!check.ok)return check;
+    const {q,v,existing}=check;
+    // A booked appointment has no deposit and does not reserve the stock.
+    // Keep it as a genuine competing viewer until this visitor secures a sale.
+    const standby=existing?.status==='booked'?{...existing,standby:null}:null;
+    const accepted=Q.serve(state,leadId,salespersonId);
+    if(!accepted.ok)return accepted;
+    const c={
+      id:q.customerId,vehicleId:v.id,createdDay:state.day,createdSession:slot(state),
+      name:q.name,channel:'SHOWROOM WALK-IN',status:'arrived',
+      preferredMode:q.preferredMode,appointmentDay:null,agreedDay:null,
+      price:null,allowance:null,collectionDay:null,held:0,counters:0,
+      reason:'',terms:'in-person',prepCost:0,exchange:null,
+      objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
+      remedyCost:0,priceDiscount:0,trustPenalty:0,
+      salespersonId,standby
+    };
+    state.customerCases[String(v.id)]=c;
+    v.cashOffer=null;
+    append(state,c,'enquiry','Showroom queue: '+q.purpose);
+    append(state,c,'arrived',salespersonId===null?'Owner served visitor':
+      'Assigned to salesperson '+salespersonId);
+    const rep=P.activeTeam(state,'sales').find(x=>x.id===salespersonId);
+    return ok(c.name+' is viewing '+v.title+
+      (rep?' with '+rep.name:' with you')+
+      (standby?'. An earlier unsecured appointment remains booked.':'.')+
+      ' Complete a test drive, address objections and negotiate. Other customers may leave while waiting.');
+  }
   function testDrive(state,id){
     const c=caseFor(state,id);
     const v=state.vehicles.find(x=>x.id===id);
@@ -375,6 +405,7 @@
       c.standby=null;
     }
     c.status='reserved';
+    Q.sold(state,id);
     funds(state,c,'received',250);
     state.cash-=expense;
     state.ledger.push({day:state.day,delta:-expense,
@@ -434,6 +465,7 @@
       c.held=0;
     }
     append(state,c,'sale',c.preferredMode);
+    Q.sold(state,id);
     if(c.standby)append(state,c.standby,'appointment-displaced',
       'Car sold to competing buyer before original unsecured appointment.');
     delete state.customerCases[String(id)];
@@ -479,9 +511,11 @@
         restoreBooked(state,c,notices);
       }
     }
+    notices.push(...Q.roll(state));
     return notices;
   }
   function nextSession(state){
+    Q.roll(state);
     for(const c of Object.values(state.customerCases)){
       if(['reserved','collectable'].includes(c.status))continue;
       if(c.status==='lost'){
@@ -508,7 +542,9 @@
       counterRejections:n('counter-rejected'),
       objectionsResolved:n('objection-resolved'),
       objectionsRejected:n('objection-rejected'),
-      buyerWalkaways:n('objection-walked')};
+      buyerWalkaways:n('objection-walked'),
+      showroomServed:n('showroom-served'),
+      showroomMissed:n('showroom-left')};
   }
   function valid(state,saved){
     if(saved.version<8){
@@ -569,7 +605,8 @@
       'test-drive-pass','test-drive-reject',
       'counter-accepted','counter-rejected','agreement','deposit','deposit-refunded',
       'deposit-retained','cancelled','arrived','no-show','expired','collection-due','sale',
-      'objection-resolved','objection-rejected','objection-walked'];
+      'objection-resolved','objection-rejected','objection-walked',
+      'showroom-served','showroom-left'];
     if(!history.every(h=>h&&no(h.day,36500)&&h.day>=1&&h.day<=state.day&&
       no(h.vehicleId,100000)&&h.vehicleId>0&&
       typeof h.leadId==='string'&&h.leadId.length<=50&&
@@ -629,7 +666,7 @@
     return true;
   }
   window.MotorTradeCustomers=Object.freeze({
-    caseFor,demand,walkInInterest,behaviour,objection,open,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
+    caseFor,demand,walkInInterest,behaviour,objection,open,welcomeShowroom,book,competingInterest,serveCompeting,testDrive,negotiate,agree,deposit,cancel,
     ready,complete,advanceDay,nextSession,stats,valid,heldDeposits,balanceDue,customerPrep
   });
 })();
