@@ -68,6 +68,7 @@ try{
         listWidth:list.scrollWidth,listClientWidth:list.clientWidth
       };
     });
+    console.log('WORKSHOP_VISUAL_METRICS '+label+' '+JSON.stringify(metrics));
     assert.equal(metrics.headingCount,1);
     assert.ok(metrics.documentWidth<=width+1,
       label+': document horizontal overflow '+JSON.stringify(metrics));
