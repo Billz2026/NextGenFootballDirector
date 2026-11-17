@@ -182,8 +182,13 @@
     button.dataset.id = String(message.id);
     const pending=IN.needsAction(message,career);
     const category=IN.infer(message);
+    const liveLiability = (
+      (String(message.reference||'').startsWith('wage-arrears:') && career.payrollArrears>0) ||
+      (String(message.reference||'').startsWith('premises-arrears:') && (career.premises?.arrears||0)>0)
+    );
     button.className = (compact ? 'message-preview' : 'inbox-row')+
-      (message.read ? '' : ' is-unread')+(pending?' inbox-row-action':'');
+      (message.read ? '' : ' is-unread')+(pending?' inbox-row-action':'')+
+      (liveLiability?' inbox-row-critical':'');
     if (!compact) button.setAttribute('aria-pressed', String(message.id === selectedMessageId));
     const stamp = message.day === 1 ? 'DAY 01' : 'DAY ' + String(message.day).padStart(2, '0');
     button.innerHTML =
@@ -215,7 +220,9 @@
       (actions?' · '+actions+' APPROVAL'+(actions===1?'':'S'):'');
     byId('inbox-unread-count').textContent=unread+' UNREAD';
     byId('inbox-action-count').textContent=String(actions);
+    byId('inbox-action-count').dataset.tone=actions>0?'attention':'neutral';
     byId('inbox-unread-summary').textContent=String(unread);
+    byId('inbox-unread-summary').dataset.tone=unread>0?'unread':'neutral';
     byId('inbox-paid-count').textContent=String(
       career.messages.filter(m=>m.subject.startsWith('PAID COPY')).length);
     byId('inbox-filter-count').textContent=String(ordered.length)+' SHOWN';
@@ -245,6 +252,13 @@
     }
     const actionable=IN.needsAction(selected,career);
     const category=IN.infer(selected);
+    const criticalLiability=(
+      (String(selected.reference||'').startsWith('wage-arrears:') && career.payrollArrears>0) ||
+      (String(selected.reference||'').startsWith('premises-arrears:') && (career.premises?.arrears||0)>0)
+    );
+    // Presentation only: data-tone follows existing live message and ledger state.
+    detail.dataset.tone=criticalLiability?'critical':actionable?'attention':
+      selected.subject.startsWith('PAID COPY')?'positive':'neutral';
     detail.innerHTML=
       '<div class="inbox-mail-heading">'+
         (actionable?'<span class="section-overline">ACTION REQUIRED</span>':'')+
