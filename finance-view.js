@@ -56,13 +56,13 @@
         'POSITIVE THIS MONTH · After staff and premises costs':
         'BREAK-EVEN SO FAR · After staff and premises costs';
     const top='<div class="fin-primary">'+
-      tile('CASH BALANCE',money(x.cash),'Dealership cash held today · includes repair reserves',' fin-tile-hero')+
+      tile('CASH BALANCE',money(x.cash),'Dealership cash held today · includes repair reserves',' fin-tile-hero'+(x.cash<0?' fin-tile-loss':''))+
       tile(workingLabel,money(x.afterReserve),workingDetail,
         x.afterReserve<0?' fin-tile-alert':'')+
       tile('INVESTED IN UNSOLD VEHICLES',money(x.stock),
         state.vehicles.length+' vehicle'+(state.vehicles.length===1?'':'s')+' still owned')+
       tile('MONTH OPERATING CONTRIBUTION',money(r.operatingContribution),operatingDetail,
-        r.operatingContribution<0?' fin-tile-loss':'')+
+        r.operatingContribution<0?' fin-tile-loss':r.operatingContribution>0?' fin-tile-profit':'')+
       '</div>';
     const cashflow='<section class="fin-panel fin-cashflow"><div class="fin-panel-head">'+
       '<div><small>'+month+'</small><h3>CASH FLOW · WHERE YOUR CASH WENT</h3></div>'+
@@ -74,16 +74,16 @@
       '<span aria-hidden="true">−</span>'+
       '<div><small>CASH PAID OUT</small><strong class="fin-negative">'+money(r.cashOut)+'</strong></div>'+
       '<span aria-hidden="true">=</span>'+
-      '<div class="fin-flow-total"><small>CASH NOW</small><strong>'+money(x.cash)+'</strong></div>'+
+      '<div class="fin-flow-total'+(x.cash<0?' fin-flow-deficit':'')+'"><small>CASH NOW</small><strong>'+money(x.cash)+'</strong></div>'+
       '</div>'+
       '<div class="fin-flow-footer"><span>NET CASH CHANGE <b class="'+tone(r.netCashChange)+'">'+
       signed(r.netCashChange)+'</b></span><span>'+r.soldUnits+' / '+r.targetUnits+
       ' VEHICLES SOLD TOWARDS MONTHLY TARGET</span></div></section>';
     const notice=x.arrears?
-      '<p class="fin-warning">UNPAID BILLS: '+money(x.arrears)+
+      '<p class="fin-warning fin-warning-arrears">UNPAID BILLS: '+money(x.arrears)+
         ' of staff or premises obligations remain outstanding.</p>':'';
     const auctionNotice=x.auctionInvoice?
-      '<p class="fin-warning">AUCTION INVOICE PENDING: '+money(x.auctionInvoice)+
+      '<p class="fin-warning fin-warning-invoice">AUCTION INVOICE PENDING: '+money(x.auctionInvoice)+
         ' must be settled separately before further buying.</p>':'';
     const commitments='<section class="fin-panel"><div class="fin-panel-head"><div>'+
       '<small>CASH COMMITMENTS</small><h3>RESERVES & OUTGOINGS</h3></div>'+
@@ -102,9 +102,9 @@
       '<small>TRADING & CUSTOMER FUNDS</small><h3>SALES PERFORMANCE</h3></div>'+
       '<button type="button" class="fin-text-button" data-page="stock">VIEW STOCK</button></div>'+
       line('Completed retail handovers',String(x.lifetimeSales))+
-      line('Realised gross trade margin',money(x.grossLifetime),x.grossLifetime<0?' fin-due':'')+
+      line('Realised gross trade margin',money(x.grossLifetime),x.grossLifetime<0?' fin-due':x.grossLifetime>0?' fin-profit':'')+
       line('Customer deposits held separately',money(x.held))+
-      line('This month gross trade margin',money(r.grossMargin))+
+      line('This month gross trade margin',money(r.grossMargin),r.grossMargin<0?' fin-due':r.grossMargin>0?' fin-profit':'')+
       '<p class="fin-detail">Gross margin is not cash in the bank or net profit. Deposits are held outside dealership cash until handover.</p>'+
       '</section>';
     const footer='<details class="fin-disclosure"><summary>ACCOUNTING SCOPE & EXCLUSIONS</summary>'+

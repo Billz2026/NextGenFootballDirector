@@ -1,0 +1,167 @@
+/* The Motor Trade — Finance Department, 2026.
+   Cash ≠ revenue; deposits ≠ income; forecast ≠ future sales.
+   Visual overrides only. Finance engine, ledger and career saves untouched. */
+#screen-career:has(.finance-control:not([hidden])) .career-topbar{min-height:57px;padding:8px clamp(17px,2.35vw,32px)}
+#screen-career:has(.finance-control:not([hidden])) .career-content{padding:9px clamp(17px,2.35vw,32px) 16px}
+#screen-career:has(.finance-control:not([hidden])) .game-notice{margin:7px clamp(17px,2.35vw,32px) 0;padding:7px 11px;background:#211E19;color:#E8D7BA;border:1px solid #514735;border-left:3px solid #B68A42}
+#screen-career .finance-control{color:#F4F5F5}
+#screen-career .finance-control .finance-page-heading{min-height:39px;margin:0 0 9px}
+#screen-career .finance-control .finance-page-heading h1,#screen-career .finance-control .finance-page-heading h1 em{color:#F4F5F5;font:800 clamp(25px,2.45vw,32px)/1.1 var(--body);letter-spacing:-.035em}
+#screen-career .finance-control .finance-page-heading p{color:#AFBBC4;font:500 11px/1.4 var(--body)}
+/* Cash & operating result. Green only for positive contribution, never idle cash. */
+#screen-career .finance-control .fin-primary{gap:8px;margin-bottom:9px}
+#screen-career .finance-control .fin-tile{min-height:80px;padding:10px 11px;gap:5px;background:#121A21;border:1px solid #303A43;border-radius:7px}
+#screen-career .finance-control .fin-tile-hero{border-color:#706044;background:linear-gradient(120deg,rgba(182,138,66,.09),transparent 65%),#121A21;box-shadow:inset 3px 0 #B68A42}
+#screen-career .finance-control .fin-tile small{color:#B6C2CA;font:700 9px/1.3 var(--body);letter-spacing:.035em}
+#screen-career .finance-control .fin-tile strong,#screen-career .finance-control .fin-tile-hero strong{color:#F4F5F5;font:800 clamp(21px,2.08vw,28px)/1.1 var(--body);font-variant-numeric:tabular-nums;letter-spacing:-.035em;overflow-wrap:anywhere}
+#screen-career .finance-control .fin-tile span{color:#AAB6BE;font:500 9px/1.35 var(--body)}
+#screen-career .finance-control .fin-tile-profit{border-color:#41674E}
+#screen-career .finance-control .fin-tile-profit strong{color:#6CC68E}
+#screen-career .finance-control .fin-tile-loss,#screen-career .finance-control .fin-tile-alert{border-color:#805053;background:#241B20}
+#screen-career .finance-control .fin-tile-hero.fin-tile-loss{box-shadow:inset 3px 0 #EA7775}
+#screen-career .finance-control .fin-tile-loss strong,#screen-career .finance-control .fin-tile-hero.fin-tile-loss strong,#screen-career .finance-control .fin-tile-alert strong{color:#EA7775}
+/* Common panels and navigation links */
+#screen-career .finance-control .fin-panel{padding:11px 12px;background:#121A21;border:1px solid #303A43;border-radius:7px}
+#screen-career .finance-control .fin-panel-head{margin:0 0 9px;gap:9px}
+#screen-career .finance-control .fin-panel-head small{color:#C7B28B;font:750 9px/1.3 var(--body);letter-spacing:.045em}
+#screen-career .finance-control .fin-panel-head h3{color:#F4F5F5;font:800 16px/1.2 var(--body);letter-spacing:-.015em}
+#screen-career .finance-control .fin-text-button{min-height:32px;padding:7px 10px;background:#263039;color:#F4F5F5;border:1px solid #596873;border-radius:5px;font:750 10px/1.3 var(--body);letter-spacing:.01em}
+#screen-career .finance-control .fin-text-button:hover{background:#34414A;border-color:#B5C1C9}
+/* Actual cash flow bridge. Regular outgoings must not look like losses. */
+#screen-career .finance-control .fin-cashflow{margin-bottom:9px}
+#screen-career .finance-control .fin-flow{gap:7px}
+#screen-career .finance-control .fin-flow>div{min-height:52px;padding:9px 10px;gap:5px;background:#172129;border:1px solid #35414A;border-radius:5px}
+#screen-career .finance-control .fin-flow>span{color:#C2A979;font-size:16px}
+#screen-career .finance-control .fin-flow small{color:#B7C3CA;font:700 9px/1.25 var(--body)}
+#screen-career .finance-control .fin-flow strong{color:#F4F5F5;font:800 clamp(17px,1.8vw,23px)/1.15 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fin-flow .fin-positive{color:#6CC68E!important}
+#screen-career .finance-control .fin-flow .fin-negative{color:#F4F5F5!important}
+#screen-career .finance-control .fin-flow .fin-flow-total{background:#202930;border:1px solid #586348;box-shadow:inset 3px 0 #B68A42}
+#screen-career .finance-control .fin-flow .fin-flow-total strong{color:#F4F5F5}
+#screen-career .finance-control .fin-flow .fin-flow-total.fin-flow-deficit{background:#271C20;border-color:#805053;box-shadow:inset 3px 0 #EA7775}
+#screen-career .finance-control .fin-flow .fin-flow-total.fin-flow-deficit strong{color:#EA7775}
+#screen-career .finance-control .fin-flow-footer{margin:7px 0 0;color:#B5C2CA;font:700 10px/1.35 var(--body)}
+#screen-career .finance-control .fin-flow-footer .fin-positive{color:#6CC68E!important}
+#screen-career .finance-control .fin-flow-footer .fin-negative{color:#EA7775!important}
+/* Financial ledger and actual outstanding bills */
+#screen-career .finance-control .fin-secondary{gap:9px;margin:0 0 9px}
+#screen-career .finance-control .fin-pair{gap:9px;padding:7px 0;border-bottom:1px solid #303A43}
+#screen-career .finance-control .fin-pair span{color:#B7C3CA;font:550 10px/1.4 var(--body)}
+#screen-career .finance-control .fin-pair strong{color:#F4F5F5;font:750 11px/1.3 var(--body);font-variant-numeric:tabular-nums;white-space:normal;text-align:right;overflow-wrap:anywhere}
+#screen-career .finance-control .fin-pair.fin-profit strong{color:#6CC68E}
+#screen-career .finance-control .fin-pair.fin-due strong{color:#EA7775}
+#screen-career .finance-control .fin-detail{margin:8px 0 0;color:#AAB6BE;font:500 10px/1.5 var(--body)}
+#screen-career .finance-control .fin-warning{margin:8px 0 0;padding:8px 10px;background:#291B20;border-left:3px solid #EA7775;color:#F4B0AB;font:750 10px/1.4 var(--body)}
+#screen-career .finance-control .fin-warning-invoice{background:#271F19;border-left-color:#E4A44F;color:#F1C18B}
+#screen-career .finance-control .fin-disclosure,#screen-career .finance-control .fin-help{margin:8px 0 9px;background:#172129;color:#B7C3CB;border:1px solid #303A43;border-radius:5px}
+#screen-career .finance-control .fin-disclosure summary,#screen-career .finance-control .fin-help summary{padding:9px 11px;color:#DCE4E8;font:750 10px/1.3 var(--body)}
+#screen-career .finance-control .fin-disclosure summary::after{color:#C7B28B}
+#screen-career .finance-control .fin-disclosure p,#screen-career .finance-control .fin-help p{color:#B5C2CA;font:500 10px/1.55 var(--body)}
+/* Transaction history. Cash out is a debit, not necessarily a loss. */
+#screen-career .finance-control .fin-ledger-section{margin-top:0;background:#121A21;border:1px solid #303A43;border-radius:7px;overflow:hidden}
+#screen-career .finance-control .fin-ledger-top{min-height:43px;padding:9px 11px;gap:8px;background:#182128;border-bottom:1px solid #303A43}
+#screen-career .finance-control .fin-ledger-top h3{color:#F4F5F5;font:800 16px/1.25 var(--body)}
+#screen-career .finance-control .fin-ledger-filters{gap:6px}
+#screen-career .finance-control .fin-ledger-filters button{min-height:33px;padding:7px 10px;background:#182128;color:#C3CDD4;border:1px solid #39454E;border-radius:5px;font:750 10px/1.25 var(--body)}
+#screen-career .finance-control .fin-ledger-filters button:hover{background:#25313B;border-color:#7E8B95;color:#FFF}
+#screen-career .finance-control .fin-ledger-filters button[aria-pressed="true"]{background:#263039;border-color:#63717A;box-shadow:inset 3px 0 #B9233F;color:#F4F5F5}
+#screen-career .finance-control .fin-ledger-list{scrollbar-width:thin;scrollbar-color:#50616C transparent}
+#screen-career .finance-control .fin-entry{grid-template-columns:56px minmax(0,1fr) auto;gap:9px;padding:8px 11px;background:transparent;border-bottom:1px solid #2D3841}
+#screen-career .finance-control .fin-entry time{color:#AAB6BE;font:750 9px/1.25 var(--body)}
+#screen-career .finance-control .fin-entry-desc{gap:5px;align-items:center}
+#screen-career .finance-control .fin-entry-desc small{color:#C6B18C;font:700 9px/1.25 var(--body)}
+#screen-career .finance-control .fin-entry-desc span{color:#C9D3D9;font:500 10px/1.4 var(--body)}
+#screen-career .finance-control .fin-entry>strong{color:#E7ECEF;font:750 11px/1.25 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fin-entry>strong.fin-positive{color:#6CC68E!important}
+#screen-career .finance-control .fin-entry>strong.fin-negative{color:#E7ECEF!important}
+#screen-career .finance-control .fin-entry>strong.fin-neutral{color:#BBC7CE!important}
+#screen-career .finance-control .fin-ledger-bottom{padding:9px 11px;background:#172129;border-top:1px solid #303A43;color:#AAB6BE;font:650 9px/1.3 var(--body)}
+#screen-career .finance-control .fin-show-more{min-height:34px;padding:7px 11px;background:#263039;border:1px solid #596873;border-radius:5px;color:#F4F5F5;font:750 10px/1.2 var(--body)}
+#screen-career .finance-control .fin-show-more:hover{background:#34414A}
+#screen-career .finance-control .fin-ledger-empty{color:#AFBCC4;background:#121A21;font:500 11px/1.45 var(--body)}
+/* Read-only cash runway: no colour that implies a guaranteed future result. */
+#screen-career .finance-control .fc-forecast{margin:0 0 9px;padding:11px 12px;background:#121A21;border:1px solid #303A43;border-left:3px solid #B68A42;border-radius:7px}
+#screen-career .finance-control .fc-heading{gap:10px;margin-bottom:9px}
+#screen-career .finance-control .fc-heading small{color:#C7B28B;font:750 9px/1.3 var(--body)}
+#screen-career .finance-control .fc-heading h3{color:#F4F5F5;font:800 clamp(16px,1.68vw,20px)/1.2 var(--body)}
+#screen-career .finance-control .fc-heading>span{color:#C5D1D8;background:#263039;border:1px solid #52606A;border-radius:4px;font:750 9px/1.25 var(--body)}
+#screen-career .finance-control .fc-controls{margin-bottom:9px;gap:9px}
+#screen-career .finance-control .fc-horizons{gap:5px}
+#screen-career .finance-control .fc-horizons button,#screen-career .finance-control .fc-reset{min-height:35px;padding:8px 10px;background:#263039;color:#E0E6EA;border:1px solid #53616B;border-radius:5px;font:750 10px/1.2 var(--body)}
+#screen-career .finance-control .fc-horizons button:hover,#screen-career .finance-control .fc-reset:hover{background:#34414A;border-color:#B5C1C9}
+#screen-career .finance-control .fc-horizons button[aria-pressed="true"]{background:#263039;color:#F4F5F5;border-color:#74818A;box-shadow:inset 3px 0 #B9233F}
+#screen-career .finance-control .fc-scenario-fields{gap:7px}
+#screen-career .finance-control .fc-scenario-fields label{gap:5px}
+#screen-career .finance-control .fc-scenario-fields label span{color:#B5C2CA;font:700 9px/1.3 var(--body)}
+#screen-career .finance-control .fc-scenario-fields input{min-height:35px;padding:8px 9px;background:#0D141A;color:#F4F5F5;border:1px solid #64717B;border-radius:5px;font:750 13px/1.2 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fc-scenario-fields input:hover{border-color:#94A3AD}
+#screen-career .finance-control .fc-summary-grid{gap:7px;margin-bottom:8px}
+#screen-career .finance-control .fc-pair{gap:5px;padding:10px 9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .finance-control .fc-pair small,#screen-career .finance-control .fc-checkpoints small{color:#B5C2CA;font:700 9px/1.28 var(--body)}
+#screen-career .finance-control .fc-pair strong{color:#F4F5F5;font:800 clamp(15px,1.65vw,21px)/1.17 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fc-pair.fc-negative{background:#271C20;border-color:#805053}
+#screen-career .finance-control .fc-pair.fc-negative strong{color:#EA7775}
+#screen-career .finance-control .fc-alert{margin-bottom:8px;padding:9px 10px;border:1px solid #3D6549;border-left:3px solid #6CC68E;background:#182A20;border-radius:5px}
+#screen-career .finance-control .fc-alert strong{color:#8ADDAA;font:800 11px/1.3 var(--body)}
+#screen-career .finance-control .fc-alert p{color:#BFD9C7;font:500 10px/1.45 var(--body)}
+#screen-career .finance-control .fc-alert-caution{background:#292219;border-color:#765D3D;border-left-color:#E4A44F}
+#screen-career .finance-control .fc-alert-caution strong{color:#F0C087}
+#screen-career .finance-control .fc-alert-caution p{color:#E0C7A8}
+#screen-career .finance-control .fc-alert-shortfall,#screen-career .finance-control .fc-alert-blocked{background:#291C20;border-color:#815156;border-left-color:#EA7775}
+#screen-career .finance-control .fc-alert-shortfall strong,#screen-career .finance-control .fc-alert-blocked strong{color:#F4AAA5}
+#screen-career .finance-control .fc-alert-shortfall p,#screen-career .finance-control .fc-alert-blocked p{color:#D6BEC0}
+#screen-career .finance-control .fc-checkpoints{gap:7px;margin-bottom:8px}
+#screen-career .finance-control .fc-checkpoints>div{padding:8px 9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .finance-control .fc-checkpoints strong{color:#F4F5F5;font:750 12px/1.3 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fc-checkpoints>div.fc-negative{background:#271C20;border-color:#805053}
+#screen-career .finance-control .fc-checkpoints>div.fc-negative strong{color:#EA7775}
+#screen-career .finance-control .fc-breakdown{margin-bottom:5px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .finance-control .fc-breakdown summary{padding:9px 11px;color:#DCE4E8;font:750 10px/1.3 var(--body)}
+#screen-career .finance-control .fc-cost-table>div{padding:7px 0;border-top:1px solid #303A43}
+#screen-career .finance-control .fc-cost-table span{color:#B7C3CA;font:550 10px/1.4 var(--body)}
+#screen-career .finance-control .fc-cost-table strong{color:#F4F5F5;font:750 10px/1.35 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .finance-control .fc-cost-table .fc-total strong{color:#F4F5F5}
+#screen-career .finance-control .fc-notes{margin-top:8px;color:#AAB6BE;font:500 9px/1.5 var(--body)}
+#screen-career .finance-control .fc-notes strong{color:#D2C1A5}
+#screen-career .finance-control .fc-warning{background:#291C20;border-left:3px solid #EA7775;color:#F4AAA5}
+/* Keep first-screen information compact while maintaining readable controls. */
+@media(min-width:1181px){
+ #screen-career .finance-control .fin-ledger-list{max-height:320px;overflow-y:auto;overscroll-behavior:contain}
+}
+@media(max-width:1180px){
+ #screen-career .finance-control .fin-primary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #screen-career .finance-control .fin-secondary{grid-template-columns:1fr}
+}
+@media(max-width:790px){
+ #screen-career .finance-control .fin-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #screen-career .finance-control .fin-flow>span{display:none}
+ #screen-career .finance-control .fin-ledger-top{flex-direction:column;align-items:stretch}
+ #screen-career .finance-control .fin-ledger-filters{overflow-x:auto;flex-wrap:nowrap}
+ #screen-career .finance-control .fin-ledger-filters button{flex:0 0 auto}
+ #screen-career .finance-control .fin-entry-desc{flex-direction:column;align-items:flex-start;gap:3px}
+ #screen-career .finance-control .fc-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ #screen-career:has(.finance-control:not([hidden])) .career-content{padding:10px 13px 18px}
+ #screen-career .finance-control .finance-page-heading h1{font-size:25px}
+ #screen-career .finance-control .finance-page-heading p{display:none}
+ #screen-career .finance-control .fin-primary{gap:6px}
+ #screen-career .finance-control .fin-tile{min-height:76px;padding:8px 9px}
+ #screen-career .finance-control .fin-tile strong,#screen-career .finance-control .fin-tile-hero strong{font-size:21px}
+ #screen-career .finance-control .fin-tile small,#screen-career .finance-control .fin-tile span{font-size:8px}
+ #screen-career .finance-control .fin-panel{padding:9px 10px}
+ #screen-career .finance-control .fin-flow>div{min-height:54px}
+ #screen-career .finance-control .fin-flow strong{font-size:19px}
+ #screen-career .finance-control .fc-scenario-fields{grid-template-columns:1fr}
+ #screen-career .finance-control .fc-horizons{width:100%}
+ #screen-career .finance-control .fc-horizons button{flex:1}
+ #screen-career .finance-control .fc-pair strong{font-size:17px}
+ #screen-career .finance-control .fin-entry{grid-template-columns:43px minmax(0,1fr) auto;gap:6px;padding:8px}
+ #screen-career .finance-control .fin-entry-desc span{font-size:9px}
+}
+@media(max-width:355px){
+ #screen-career .finance-control .fin-primary{grid-template-columns:1fr}
+ #screen-career .finance-control .fin-entry{grid-template-columns:42px minmax(0,1fr)}
+ #screen-career .finance-control .fin-entry>strong{grid-column:2;text-align:left}
+}
+@media(prefers-reduced-motion:reduce){#screen-career .finance-control .fin-tile{transition:none}}

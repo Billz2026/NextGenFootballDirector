@@ -112,8 +112,8 @@
     const s=status(f);
     const signed=n=>(n<0?'−':'')+money(Math.abs(n));
     const cards='<div class="fc-summary-grid">'+
-      pair('SPENDABLE BEFORE NEW PLANS',signed(f.available))+
-      pair('CASH AFTER PROPOSED SPEND',signed(f.afterPlans))+
+      pair('SPENDABLE BEFORE NEW PLANS',signed(f.available),f.available<0?'fc-negative':'')+
+      pair('CASH AFTER PROPOSED SPEND',signed(f.afterPlans),f.afterPlans<0?'fc-negative':'')+
       pair(f.horizon+'-DAY FREE CASH OUTLOOK',signed(f.projected),
         f.projected<0?'fc-negative':'')+
       pair('NO-SALES RUNWAY',f.runway===null?'NO DAILY COST':
