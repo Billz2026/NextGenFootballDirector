@@ -96,6 +96,7 @@
        note.startsWith('Workshop repair booking:')||
        note.startsWith('Workshop transfer to outside garage:')||
        note.startsWith('Workshop quality rectification:'))return 'preparation';
+    if(note.startsWith('Customer remedy at handover:'))return 'preparation';
     if(note.startsWith('Workshop assessment:'))return 'inspections';
     if(note.startsWith('Pre-purchase inspection:'))return 'inspections';
     if(note.startsWith('Staff payroll'))return 'payroll';
