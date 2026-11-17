@@ -147,6 +147,7 @@ try{
   await page.locator('[data-action="hold-meeting"][data-focus="buying"]').click();
   let state=await stored(page);
   assert.equal(state.meetingHeldMonth,1);
+  const firstMonthTarget=state.monthPlan.unitTarget;
   const purchases=await page.evaluate(key=>{
     const E=window.MotorTradeEngine;
     const s=JSON.parse(localStorage.getItem(key));
@@ -215,8 +216,8 @@ try{
   assert.equal(state.vehicles.length,2);
   assert.equal(state.monthlyReports[0].closingCash,lastDayCash);
   assert.equal(state.monthlyReports[0].soldUnits,0);
-  assert.equal(state.monthlyReports[0].targetUnits,state.monthPlan.unitTarget,
-    'Archived first-month target should be consistent with the career plan');
+  assert.equal(state.monthlyReports[0].targetUnits,firstMonthTarget,
+    'Archived November unit target must remain frozen when December gets a new plan');
   const frozen=JSON.stringify(state.monthlyReports[0]);
   await go(page,'business');
   await page.screenshot({path:'review/premises-month23-desktop.png',fullPage:true});
