@@ -37,6 +37,7 @@
   }
   function render(state,E){
     const cases=state.afterSalesCases||[];
+    if(!state.sold.length&&!cases.length)return '';
     const stats=E.aftersales.stats(state);
     const open=cases.filter(c=>c.status!=='resolved')
       .sort((a,b)=>a.openedDay-b.openedDay||a.id-b.id);
