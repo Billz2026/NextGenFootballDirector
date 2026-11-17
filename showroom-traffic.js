@@ -29,7 +29,8 @@
      if(b.leads.some(q=>q.vehicleId===v.id))continue;
      if(D.isDealDay(s.day)&&!D.retailActive(s,v))continue;
      const fair=v.profile?.likelySale||v.retail,grade=v.profile?.grade||3;
-     const over=Math.max(0,(v.asking-fair)/Math.max(1,fair));
+     const over=window.MotorTradeStockAgeing?.overpricing(s,v) ??
+       Math.max(0,(v.asking-fair)/Math.max(1,fair));
      const probability=limit(67-Math.round(over*110)-(grade>=4?11:0)+
        Math.floor(s.reputationScore/7)+P.salesImpact(s,v.id).enquiryLift+
        (D.isDealDay(s.day)?10:0),18,94);

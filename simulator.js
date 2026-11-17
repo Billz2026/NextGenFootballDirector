@@ -618,6 +618,7 @@
         linkPage:'staff',reference:'supervisor-checkins:'+career.day});
     }
     const premisesEvent=E.premisesDay(career);
+    const ageingEvent=E.stockAgeingDay(career);
     const workshopEvents=E.advanceWorkshop(career);
     const customerEvents=E.advanceCustomers(career);
     lastTradeResult = null;
@@ -651,6 +652,12 @@
     eventNotice+=' PREMISES: '+money.format(premisesEvent.paid)+' of '+
       money.format(premisesEvent.due)+' daily rent/utilities paid; '+
       money.format(premisesEvent.arrears)+' outstanding.';
+    if(ageingEvent.due||ageingEvent.paid)
+      eventNotice+=' STOCK AGEING: '+money.format(ageingEvent.paid)+
+        ' paid of '+money.format(ageingEvent.due)+' accrued today; '+
+        money.format(ageingEvent.arrears)+' outstanding.';
+    if(ageingEvent.alerts.length)
+      eventNotice+=' '+ageingEvent.alerts.join(' ');
     if(workshopEvents.length)
       eventNotice+=' WORKSHOP: '+workshopEvents.join(' ');
     if(customerEvents.length)
@@ -1227,6 +1234,32 @@
       case 'list-stock':
         if (career) saveResult(E.advertise(career,Number(button.dataset.id),
           inputNumber('stock-price-' + button.dataset.id)));
+        break;
+      case 'reprice-aged-stock':
+        if(career){
+          const vehicle=career.vehicles.find(v=>v.id===Number(button.dataset.id));
+          if(vehicle){
+            const target=E.stockAgeing.marketTarget(career,vehicle);
+            if(window.confirm('Reduce the asking price for '+vehicle.title+' to '+
+              money.format(target)+'? Market guidance is fictional and does not guarantee a sale.'))
+              saveResult(E.advertise(career,vehicle.id,target));
+          }
+        }
+        break;
+      case 'dispose-aged-stock':
+        if(career){
+          const vehicle=career.vehicles.find(v=>v.id===Number(button.dataset.id));
+          if(vehicle){
+            const quote=E.wholesaleOffer(vehicle,career.day);
+            const invested=vehicle.cost+vehicle.prepSpent;
+            if(window.confirm('Sell '+vehicle.title+' to the trade for '+
+              money.format(quote)+'? This is final, frees the stock space and '+(
+              quote<invested?'realises a '+money.format(invested-quote)+' trading loss':
+              'realises a '+money.format(quote-invested)+' trading gain')+
+              '. Holding costs already incurred are separate.'))
+              saveResult(E.disposeStock(career,vehicle.id));
+          }
+        }
         break;
       case 'select-sales':
         if(career&&career.vehicles.some(v=>v.id===Number(button.dataset.id)&&v.status==='listed')){

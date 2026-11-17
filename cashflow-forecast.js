@@ -29,7 +29,8 @@
     const wages=(state.staff||[]).reduce((n,e)=>n+E.people.dailyCost(e),0);
     const site=E.premises.costs(state);
     const reserve=E.workshop.reserved(state);
-    const arrears=state.payrollArrears+(state.premises?.arrears||0);
+    const ageingArrears=state.stockAgeingArrears||0;
+    const arrears=state.payrollArrears+(state.premises?.arrears||0)+ageingArrears;
     const pendingInvoice=state.auctionHall?.phase==='payment'?
       (()=>{const lot=E.auctionLot(state);
         return lot?state.auctionHall.currentBid+lot.fee:0;})():0;
@@ -46,17 +47,33 @@
     const planned=purchase+prep+extraRepair;
     const available=state.cash-committedToday;
     const afterPlans=available-planned;
-    const at=days=>afterPlans-daily*days;
+    const stockAgeing=E.stockAgeing;
+    const ageingAt=days=>stockAgeing?.forecast(state,days,hasPurchase)??0;
+    const at=days=>afterPlans-daily*days-ageingAt(days);
+    const projectedAgeing=ageingAt(horizon);
     const projected=at(horizon);
-    const runway=daily>0?Math.max(0,Math.floor(Math.max(0,afterPlans)/daily)):null;
-    const minimumBuffer=daily*3;
+    // The runway includes future 15/30/45-day thresholds. Incremental cost
+    // avoids recomputing every earlier day for each new checkpoint.
+    let runway=0,headroom=afterPlans;
+    const cap=365;
+    if(daily===0&&!(state.vehicles.length||hasPurchase))runway=null;
+    else for(let i=1;i<=cap;i++){
+      const ageingNext=(stockAgeing?.chargeFor(state,state.day+i)??0)+
+        (hasPurchase?(stockAgeing?.fee(i)??0):0);
+      if(headroom<daily+ageingNext)break;
+      headroom-=daily+ageingNext;
+      runway=i;
+    }
+    const runwayCapped=runway===cap;
+    const minimumBuffer=daily*3+ageingAt(3);
     const severity=overCapacity||prepWithoutPurchase?'blocked':
       projected<0?'shortfall':
       projected<minimumBuffer?'caution':'covered';
     return {valid:true,scenario,openingCash:state.cash,
       wages,premises:site.total,additionalOffsite:addedOffsite,daily,
-      reserve,arrears,pendingInvoice,committedToday,available,planned,
-      afterPlans,horizon,projected,runway,minimumBuffer,severity,
+      reserve,arrears,ageingArrears,pendingInvoice,committedToday,available,planned,
+      afterPlans,horizon,projected,projectedAgeing,runway,runwayCapped,
+      minimumBuffer,severity,
       shortfall:Math.max(0,-projected),
       offsiteLimited:overCapacity,prepWithoutPurchase,
       checkpoints:HORIZONS.map(day=>({day,headroom:at(day)})),
@@ -77,7 +94,7 @@
     };
     if(f.severity==='caution')return {
       title:'THIN CASH BUFFER',
-      description:'The plan is funded, but leaves less than three game days of wages and premises costs after day '+f.horizon+'.'
+      description:'The plan is funded, but leaves less than three game days of wages, premises and stock-holding costs after day '+f.horizon+'.'
     };
     return {title:'FORECAST COVERED',
       description:'The proposed spending and '+f.horizon+' days of baseline bills leave at least a three-day operating buffer.'};
@@ -96,18 +113,20 @@
       pair(f.horizon+'-DAY FREE CASH OUTLOOK',signed(f.projected),
         f.projected<0?'fc-negative':'')+
       pair('NO-SALES RUNWAY',f.runway===null?'NO DAILY COST':
-        f.runway+' GAME DAY'+(f.runway===1?'':'S'))+
+        (f.runwayCapped?'365+':f.runway)+' GAME DAY'+(f.runway===1?'':'S'))+
       '</div>';
     const details='<div class="fc-cost-table">'+
       '<div><span>Current workshop reserves</span><strong>'+money(f.reserve)+'</strong></div>'+
-      '<div><span>Existing unpaid wages & premises</span><strong>'+money(f.arrears)+'</strong></div>'+
+      '<div><span>Existing unpaid wages, premises & stock holding</span><strong>'+money(f.arrears)+'</strong></div>'+
       '<div><span>Unpaid auction invoice</span><strong>'+money(f.pendingInvoice)+'</strong></div>'+
       '<div><span>New proposed spending</span><strong>'+money(f.planned)+'</strong></div>'+
       '<div><span>Wages / game day</span><strong>'+money(f.wages)+'</strong></div>'+
       '<div><span>Premises / game day'+(f.additionalOffsite?' (incl. new offsite space)':'')+
       '</span><strong>'+money(f.premises+f.additionalOffsite)+'</strong></div>'+
-      '<div class="fc-total"><span>'+f.horizon+' days of fixed costs</span><strong>'+
-      money(f.daily*f.horizon)+'</strong></div></div>';
+      '<div><span>Escalating stock ageing charges / '+f.horizon+' days</span><strong>'+
+      money(f.projectedAgeing)+'</strong></div>'+
+      '<div class="fc-total"><span>'+f.horizon+' days of fixed costs & stock holding</span><strong>'+
+      money(f.daily*f.horizon+f.projectedAgeing)+'</strong></div></div>';
     const checkpoints='<div class="fc-checkpoints" aria-label="Cash headroom by projection horizon">'+
       f.checkpoints.map(p=>'<div class="'+(p.headroom<0?'fc-negative':'')+'"><small>DAY '+
         p.day+'</small><strong>'+signed(p.headroom)+'</strong></div>').join('')+'</div>';
@@ -116,6 +135,7 @@
     const note='<p class="fc-notes">Assumes <strong>NO future sales or new income</strong>, stable employee and premises costs, and one proposed vehicle purchased immediately. '+
       'New preparation and additional repairs are allowances for spending, not double-counted existing workshop reserves. '+
       'Reserved funds are still in today\'s bank balance; they are removed only to show what cannot safely be spent. '+
+      'Stock holding costs escalate at 15, 30 and 45 days if the cars remain unsold. '+
       'Customer deposits ('+money(f.heldDeposits)+') are excluded. No transactions are created.</p>';
     return cards+warning+checkpoints+'<details class="fc-breakdown"><summary>VIEW FORECAST COST BREAKDOWN</summary>'+
       details+'</details>'+note;

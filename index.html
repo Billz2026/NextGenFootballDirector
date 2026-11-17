@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="./inbox-polish.css?v=1">
   <link rel="stylesheet" href="./auction-polish.css?v=1">
   <link rel="stylesheet" href="./buying-polish.css?v=1">
-  <link rel="stylesheet" href="./stock-polish.css?v=1">
+  <link rel="stylesheet" href="./stock-polish.css?v=2">
   <link rel="stylesheet" href="./sales-polish.css?v=3">
   <link rel="stylesheet" href="./workshop-polish.css?v=1">
   <link rel="stylesheet" href="./finance-polish.css?v=2">
@@ -37,18 +37,19 @@
   <script src="./premises.js?v=2" defer></script>
   <script src="./people.js?v=9" defer></script>
   <script src="./calendar.js?v=1" defer></script>
-  <script src="./monthly.js?v=10" defer></script>
+  <script src="./monthly.js?v=11" defer></script>
   <script src="./career-progression.js?v=3" defer></script>
   <script src="./events.js?v=3" defer></script>
   <script src="./showroom-traffic.js?v=1" defer></script>
   <script src="./workshop.js?v=5" defer></script>
-  <script src="./customers.js?v=11" defer></script>
-  <script src="./trading.js?v=26" defer></script>
+  <script src="./stock-ageing.js?v=1" defer></script>
+  <script src="./customers.js?v=12" defer></script>
+  <script src="./trading.js?v=27" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
   <script src="./staff-performance.js?v=1" defer></script>
   <script src="./people-view.js?v=12" defer></script>
-  <script src="./monthly-view.js?v=9" defer></script>
+  <script src="./monthly-view.js?v=10" defer></script>
   <script src="./events-view.js?v=8" defer></script>
   <script src="./workshop-view.js?v=8" defer></script>
   <script src="./customers-view.js?v=13" defer></script>
@@ -57,15 +58,15 @@
   <script src="./dashboard-view.js?v=5" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
   <script src="./buying-desk-view.js?v=5" defer></script>
-  <script src="./stock-view.js?v=3" defer></script>
-  <script src="./cashflow-forecast.js?v=1" defer></script>
-  <script src="./finance-view.js?v=4" defer></script>
+  <script src="./stock-view.js?v=4" defer></script>
+  <script src="./cashflow-forecast.js?v=2" defer></script>
+  <script src="./finance-view.js?v=5" defer></script>
   <script src="./career-storage.js?v=2" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js" defer></script>
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=43" defer></script>
+  <script src="./simulator.js?v=44" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -73,7 +74,7 @@
   <div class="top-stripe" aria-hidden="true"></div>
   <div id="app" role="main">
     <section class="menu-screen" id="screen-menu" aria-labelledby="menu-title">
-      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.46</span></header>
+      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.47</span></header>
       <div class="menu-layout">
         <div class="menu-lead">
           <div class="brand-lockup brand-lockup-large">
@@ -329,7 +330,7 @@
             </section>
 
             <section class="career-panel stock-page-control" data-panel="stock" hidden aria-labelledby="stock-title">
-              <header class="stock-page-heading"><div><h1 id="stock-title">INVENTORY <em>CONTROL.</em></h1><p>Review stock, preparation costs and the next decision for each vehicle.</p></div></header>
+              <header class="stock-page-heading"><div><h1 id="stock-title">INVENTORY <em>CONTROL.</em></h1><p>Manage ageing stock, holding charges and pricing decisions.</p></div></header>
               <div id="stock-list" class="stock-control"></div>
             </section>
 

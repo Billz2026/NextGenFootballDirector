@@ -110,6 +110,20 @@ try{
     assert.equal(selected.staff.length,4,'Selecting stock must not affect team');
     await panel.locator('.stock-cost-details summary').click();
     assert.equal(await panel.locator('.stock-cost-details').evaluate(x=>x.open),true);
+    // Inspect the age-pressure presentation without changing the real saved career.
+    // The finance/ageing regression tests separately drive genuine game-day debits.
+    const ageingMarkup=await page.evaluate(k=>{
+      const E=window.MotorTradeEngine,V=window.MotorTradeStockView;
+      const s=JSON.parse(localStorage.getItem(k));
+      s.day=s.vehicles[0].acquiredDay+31;
+      return V.render(s,{reportCard:()=>''}).html;
+    },key);
+    assert.match(ageingMarkup,/STOCK AGEING/);
+    assert.match(ageingMarkup,/STOCK HOLDING \/ DAY/);
+    assert.match(ageingMarkup,/MARKET PRICE GUIDE/);
+    assert.match(ageingMarkup,/30\+ DAYS/);
+    assert.equal(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).cash,key),cash,
+      'Ageing estimates must not debit money simply by viewing them');
     assert.deepEqual(errors,[],'No browser JavaScript errors');
     console.log('STOCK_VISUAL_PASS '+name+' '+JSON.stringify(metrics));
     await context.close();

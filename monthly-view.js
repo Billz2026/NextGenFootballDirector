@@ -82,9 +82,9 @@
       cell('GROSS TRADE MARGIN',money(r.grossMargin),
         'Planning guide: '+money(r.targetMargin),r.grossMargin<0?'report-value-negative':'')+
       cell('AFTER STAFF COSTS',money(r.grossAfterStaff),
-        'Before premises rent, utilities and tax',r.grossAfterStaff<0?'report-value-negative':'')+
+        'Before premises, ageing charges and tax',r.grossAfterStaff<0?'report-value-negative':'')+
       cell('OPERATING CONTRIBUTION',money(r.operatingContribution??r.grossAfterStaff),
-        'After recorded staff and premises costs · before tax, finance and depreciation',
+        'After staff, premises and stock ageing · before tax and finance',
         (r.operatingContribution??r.grossAfterStaff)<0?'report-value-negative':'')+
       cell('CASH AT END OF PERIOD',money(r.closingCash),'Opening: '+money(r.openingCash))+
       cell('REPUTATION',r.closingReputation+'/100',
@@ -95,7 +95,7 @@
       progress(r.turnover,r.targetTurnover,'Sales turnover guidance')+
       progress(Math.max(0,r.grossMargin),r.targetMargin,'Gross trading margin guidance')+
       (companyWarning?'<p class="report-alert">'+companyWarning+'</p>':'')+
-      '<p class="report-muted">Target outcome requires the unit count AND a positive operating contribution after staff and premises charges. '+
+      '<p class="report-muted">Target outcome requires the unit count AND a positive operating contribution after staff, premises and stock ageing charges. '+
       'Turnover and margin figures are secondary benchmarks, not additional mandatory gates. '+
       (isClosed?'This target was set at the start of the period.':
       'Targets change for the next month if reputation changes.')+'</p></section>';
@@ -114,7 +114,11 @@
       amount('Gross margin less staff costs',r.grossAfterStaff)+
       amount('Premises expenses accrued',-(r.premisesExpense??0))+
       amount('Premises arrears outstanding',r.premisesArrears??0)+
-      amount('Operating contribution after premises costs',r.operatingContribution??r.grossAfterStaff)+
+      (r.stockAgeingExpense!==undefined?
+        amount('Stock ageing expenses accrued',-r.stockAgeingExpense)+
+        amount('Stock ageing charges paid',-r.stockAgeingPaid)+
+        amount('Stock ageing arrears outstanding',r.stockAgeingArrears):'')+
+      amount('Operating contribution after operating costs',r.operatingContribution??r.grossAfterStaff)+
       '<p class="report-muted">Gross margin is recognised when a vehicle sells, whereas buying and preparation affect cash immediately. '+
       'Some inspection costs may remain outside realised vehicle margin until stock is sold. '+
       'Recurring premises costs are accrued daily even if unpaid; investment reduces cash but is capital expenditure, not immediate operating expense. These are game management figures, not statutory accounts, taxable profit or a VAT calculation.</p></section>';
@@ -216,9 +220,10 @@
     const flags=[];
     // Always show real financial warnings first, and never silently drop a
     // fifth exception when wages, sales, stock age and preparation all matter.
-    if((r.payrollArrears||0)+(r.premisesArrears||0))flags.push(['UNPAID BILLS',
-      money((r.payrollArrears||0)+(r.premisesArrears||0))+' in outstanding obligations']);
-    if(contribution<0)flags.push(['OPERATING LOSS',money(contribution)+' after staff and premises']);
+    if((r.payrollArrears||0)+(r.premisesArrears||0)+(r.stockAgeingArrears||0))flags.push(['UNPAID BILLS',
+      money((r.payrollArrears||0)+(r.premisesArrears||0)+(r.stockAgeingArrears||0))+
+      ' in outstanding obligations']);
+    if(contribution<0)flags.push(['OPERATING LOSS',money(contribution)+' after staff, premises and stock holding']);
     if(needed)flags.push([isClosed?'SALES TARGET MISSED':'SALES REQUIRED',needed+' handover'+(needed===1?'':'s')+(isClosed?' short of the final target':' still needed')]);
     if(r.agedStock)flags.push(['AGEING STOCK',r.agedStock+' vehicle'+(r.agedStock===1?'':'s')+' held for 14+ days']);
     if(r.stockAwaitingPrep)flags.push(['WORKSHOP BACKLOG',r.stockAwaitingPrep+' vehicle'+(r.stockAwaitingPrep===1?'':'s')+' unprepared']);
@@ -229,7 +234,7 @@
       '</small><h2>MONTH '+r.month+' SCORECARD</h2></div><b>'+status+'</b></div>'+
       '<div class="mr-kpis">'+
       cell('VEHICLES HANDED OVER',r.soldUnits+' / '+r.targetUnits,'Monthly target')+
-      cell('OPERATING CONTRIBUTION',money(contribution),'After staff and premises costs',
+      cell('OPERATING CONTRIBUTION',money(contribution),'After staff, premises and stock ageing costs',
         contribution<0?'report-value-negative':'report-value-positive')+
       cell(isClosed?'CLOSING CASH':'CURRENT CASH',money(r.closingCash),'Opening '+money(r.openingCash))+
       cell('CASH INVESTED IN STOCK',money(r.stockCapital),r.stockCount+' unsold vehicles')+'</div>'+
