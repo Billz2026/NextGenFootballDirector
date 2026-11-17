@@ -461,3 +461,76 @@
 @media(prefers-reduced-motion:reduce){
   .stock-page-control .stock-unit{transition:none}
 }
+
+/* Ageing capital: compact financial consequences and user-directed price choice. */
+.stock-page-control .stock-age-overview{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:6px;padding:8px 11px;margin:0 0 8px;
+  border:1px solid #8b6547;border-left:3px solid #d39d68;
+  border-radius:5px;background:#352e2b;
+}
+.stock-page-control .stock-age-overview strong{
+  color:#f7d4a6;font:850 9px/1.4 var(--mono);
+}
+.stock-page-control .stock-age-overview span{
+  color:#eac5a6;font:800 9px/1.4 var(--mono);
+}
+.stock-page-control .stock-age-watch{color:#e8c79a}
+.stock-page-control .stock-age-figures{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  order:2;gap:6px;margin:7px 0 0;
+}
+.stock-page-control .stock-age-figures>div{
+  display:flex;flex-direction:column;gap:4px;min-width:0;
+  padding:8px;background:#332f30;border:1px solid #64534b;border-radius:4px;
+}
+.stock-page-control .stock-age-figures small{
+  color:#dac6b2;font:800 8px/1.3 var(--mono);
+}
+.stock-page-control .stock-age-figures strong{
+  color:#f1d3ac;font:900 clamp(14px,1.6vw,19px)/1.1 var(--title);
+  overflow-wrap:anywhere;
+}
+.stock-page-control .stock-age-figures .stock-age-loss{
+  color:#f1a995;
+}
+.stock-page-control .stock-age-explainer{
+  order:2;margin:6px 0 0;
+  color:#bdcace;font:550 9px/1.45 var(--body);
+}
+.stock-page-control .stock-age-reprice{
+  width:100%;border:1px solid #b99460;
+  background:#614d33;color:#f8e8c9;
+  white-space:normal;
+}
+.stock-page-control .stock-trade-choice{
+  display:flex;flex-direction:column;gap:4px;
+  margin-top:7px;padding:8px;border-top:1px solid #50634e;
+}
+.stock-page-control .stock-trade-choice>strong{
+  color:#f1d1a0;font:850 9px/1.3 var(--mono);
+}
+.stock-page-control .stock-trade-choice p{
+  margin:0;color:#c8d2c7;font:550 9px/1.35 var(--body);
+}
+.stock-page-control .stock-trade-choice small{
+  color:#eab59c;font:700 9px/1.35 var(--body);
+}
+.stock-page-control .stock-trade-choice .trade-button{
+  width:100%;margin-top:3px;
+}
+.stock-page-control .stock-trade-choice .trade-button:disabled{
+  opacity:.55;cursor:not-allowed;
+}
+.stock-page-control .stock-age-reprice:focus-visible,
+.stock-page-control .stock-trade-choice .trade-button:focus-visible{
+  outline:2px solid #edc695;outline-offset:2px;
+}
+@media(max-width:520px){
+  .stock-page-control .stock-age-figures{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .stock-page-control .stock-age-figures>div:last-child{
+    grid-column:1/-1;
+  }
+}
