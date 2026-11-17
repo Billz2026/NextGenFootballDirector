@@ -931,8 +931,9 @@
     const customer=C.caseFor(state,id);
     if(customer&&customer.status!=='lost')return fail('customer',
       'Resolve the active customer enquiry or agreement before selling this vehicle to the trade.');
-    if(Q.waiting(state).some(x=>x.vehicleId===id))return fail('viewing',
-      'A showroom visitor is waiting for this vehicle. Serve or close the visitor before trade disposal.');
+    // Clear unserved walk-ins just as a retail sale does; a trade exit
+    // cannot silently leave a visitor queued for a car that no longer exists.
+    Q.sold(state,id);
     const proceeds=wholesaleOffer(vehicle,state.day);
     const basis=vehicle.cost+vehicle.prepSpent;
     pay(state,proceeds,'Wholesale stock disposal: '+vehicle.title);
