@@ -35,8 +35,8 @@ function listed(name='Showroom Check 0'){
   check(s);
   return {s,v};
 }
-function twoVisitors(){
-  const data=listed();
+function twoVisitors(name='Showroom Check 0'){
+  const data=listed(name);
   for(let i=0;i<20&&Q.waiting(data.s).length<2;i++)day(data.s);
   assert.ok(Q.waiting(data.s).length>=2,'expected deterministic competing visitors');
   return data;
@@ -116,7 +116,7 @@ test('unsecured appointment is preserved when competing buyer walks away',()=>{
   check(s);
 });
 test('£250 deposit removes all unsecured rival visitors without double selling',()=>{
-  const {s,v}=twoVisitors();
+  const {s,v}=twoVisitors('Deposit Queue Check');
   const [first,second]=Q.waiting(s);
   assert.equal(E.welcomeShowroom(s,first.id,Q.availableStaff(s)[0].id).ok,true);
   assert.equal(E.testDrive(s,v.id).ok,true);
