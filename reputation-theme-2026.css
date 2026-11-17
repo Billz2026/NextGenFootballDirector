@@ -1,0 +1,98 @@
+/* The Motor Trade 2026 — scoped black, platinum & gold redesign. No economic calculations or save data changed. */
+#screen-career .reputation-page-control{color:#F4F5F5}
+#screen-career .reputation-page-control .page-heading{min-height:39px;gap:10px;margin:0 0 9px}
+#screen-career .reputation-page-control .page-heading .section-overline{color:#C8B28B;font:700 9px/1.3 var(--body);letter-spacing:.05em;margin:0 0 2px}
+#screen-career .reputation-page-control .page-heading h1{color:#F4F5F5;font:800 clamp(25px,2.45vw,32px)/1.1 var(--body);letter-spacing:-.035em;margin:0}
+#screen-career .reputation-page-control .page-heading h1 em{color:#F4F5F5;font:800 clamp(25px,2.45vw,32px)/1.1 var(--body);letter-spacing:-.035em;margin:0}
+#screen-career .reputation-page-control .page-heading p:last-child{color:#AFBBC4;font:500 11px/1.4 var(--body);margin:4px 0 0}
+#screen-career .reputation-page-control .page-heading .career-chip{min-height:33px;padding:8px 10px;background:#263039;border:1px solid #52616B;border-radius:5px;color:#D9E2E6;font:750 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-hero{margin:0 0 9px;padding:12px 14px 10px;background:linear-gradient(115deg,rgba(182,138,66,.07),transparent 68%),#121A21;border:1px solid #67553D;border-left:3px solid #B68A42;border-radius:7px}
+#screen-career .reputation-page-control .rep-hero-id h2{margin:3px 0;color:#F4F5F5;font:800 clamp(22px,2.25vw,30px)/1.15 var(--body)}
+#screen-career .reputation-page-control .rep-hero-id small{color:#C9B28B;font:750 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-hero-id p{color:#B5C2CA;font:500 10px/1.4 var(--body)}
+#screen-career .reputation-page-control .rep-score strong{color:#F4F5F5;font:850 clamp(40px,4.7vw,58px)/1 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .reputation-page-control .rep-score span{color:#B7C3CA;font:700 13px/1.25 var(--body)}
+#screen-career .reputation-page-control .rep-progress{height:7px;margin:9px 0 7px;background:#2A3740;border:0}
+#screen-career .reputation-page-control .rep-progress>div{background:#B68A42}
+#screen-career .reputation-page-control .rep-next{color:#CBB68E;font:700 9px/1.4 var(--body)}
+#screen-career .reputation-page-control .rep-next strong{color:#CBB68E;font:700 9px/1.4 var(--body)}
+#screen-career .reputation-page-control .rep-kpis{gap:8px;margin:0 0 9px}
+#screen-career .reputation-page-control .rep-kpi{min-height:65px;padding:9px 10px;gap:5px;background:#121A21;border:1px solid #303A43;border-radius:6px}
+#screen-career .reputation-page-control .rep-kpi small{color:#B5C2CA;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-kpi strong{color:#F4F5F5;font:800 clamp(18px,1.8vw,24px)/1.15 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .reputation-page-control .rep-kpi span{color:#AEBBC3;font:500 9px/1.35 var(--body)}
+#screen-career .reputation-page-control .rep-kpi.rep-good strong{color:#6CC68E}
+#screen-career .reputation-page-control .rep-change>strong.rep-good{color:#6CC68E}
+#screen-career .reputation-page-control .rep-kpi.rep-bad strong{color:#EA7775}
+#screen-career .reputation-page-control .rep-kpi.rep-alert strong{color:#EA7775}
+#screen-career .reputation-page-control .rep-change>strong.rep-bad{color:#EA7775}
+#screen-career .reputation-page-control .rep-kpi.rep-alert{background:#291C20;border-color:#815156}
+#screen-career .reputation-page-control .cp-reputation{margin:0 0 9px;padding:11px 12px;background:#121A21;border:1px solid #303A43;border-radius:7px}
+#screen-career .reputation-page-control .cp-section-head{margin:0 0 8px}
+#screen-career .reputation-page-control .cp-section-head small{color:#C8B28B;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-panel-head small{color:#C8B28B;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-section-head h3{color:#F4F5F5;font:800 15px/1.2 var(--body);margin:2px 0 0}
+#screen-career .reputation-page-control .rep-panel-head h3{color:#F4F5F5;font:800 15px/1.2 var(--body);margin:2px 0 0}
+#screen-career .reputation-page-control .cp-section-head>span{color:#AAB8C0;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-panel-head>span{color:#AAB8C0;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-goals{gap:7px}
+#screen-career .reputation-page-control .cp-reputation .cp-goal{padding:9px 10px;gap:5px;background:#172129;border:1px solid #34424C;border-radius:5px}
+#screen-career .reputation-page-control .cp-goal-top strong{color:#F4F5F5;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-goal-top>span{color:#D5B68B;font:750 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-goal-track{height:5px;background:#303C44}
+#screen-career .reputation-page-control .cp-goal-track span{background:#B68A42}
+#screen-career .reputation-page-control .cp-goal small{min-height:0;color:#B2C0C8;font:500 9px/1.35 var(--body)}
+#screen-career .reputation-page-control .cp-goal em{color:#CDB791;font:650 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-achievements-title{margin:10px 0 8px;padding-top:9px;border-top:1px solid #303A43}
+#screen-career .reputation-page-control .cp-achievements{gap:6px}
+#screen-career .reputation-page-control .cp-achievement{padding:8px 9px;gap:8px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .cp-achievement strong{color:#F4F5F5;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .cp-achievement small{color:#AEBBC3;font:500 9px/1.35 var(--body)}
+#screen-career .reputation-page-control .cp-earned{background:#1C2C23;border-color:#41674E}
+#screen-career .reputation-page-control .cp-earned em{color:#8ADDAA}
+#screen-career .reputation-page-control .cp-earned .cp-achievement-symbol{color:#8ADDAA}
+#screen-career .reputation-page-control .cp-rules{margin:8px 0 0;color:#AEBBC3;font:500 9px/1.45 var(--body)}
+#screen-career .reputation-page-control .rep-main-grid{gap:9px;margin:0 0 9px}
+#screen-career .reputation-page-control .rep-panel{padding:11px 12px;background:#121A21;border:1px solid #303A43;border-radius:7px}
+#screen-career .reputation-page-control .rep-panel-head{margin:0 0 9px}
+#screen-career .reputation-page-control .rep-stage{min-height:39px;gap:6px;padding:6px 8px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .rep-stage-name strong{color:#F4F5F5;font:750 11px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-stage-name small{color:#AEBBC3;font:500 9px/1.25 var(--body)}
+#screen-career .reputation-page-control .rep-stage.rep-current{background:#28251E;border-color:#826B46;box-shadow:inset 3px 0 #B68A42}
+#screen-career .reputation-page-control .rep-stage.rep-current .rep-stage-name strong{color:#E5CAA5}
+#screen-career .reputation-page-control .rep-stage.rep-current em{color:#E5CAA5}
+#screen-career .reputation-page-control .rep-stage.rep-passed em{color:#8ADDAA}
+#screen-career .reputation-page-control .rep-panel-note{color:#AEBBC3;font:500 9px/1.45 var(--body)}
+#screen-career .reputation-page-control .rep-drivers>div{padding:9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .rep-drivers>div:first-child{border-left:3px solid #6CC68E}
+#screen-career .reputation-page-control .rep-drivers>div:last-child{border-left:3px solid #EA7775}
+#screen-career .reputation-page-control .rep-drivers strong{color:#F4F5F5;font:750 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-drivers p{color:#BCC8CF;font:500 10px/1.4 var(--body)}
+#screen-career .reputation-page-control .rep-risk{background:#291C20;border:1px solid #815156;border-left:3px solid #EA7775;border-radius:5px}
+#screen-career .reputation-page-control .rep-risk strong{color:#F4A9A3}
+#screen-career .reputation-page-control .rep-risk span{color:#B8C5CD;font:500 10px/1.45 var(--body)}
+#screen-career .reputation-page-control .rep-priority span{color:#B8C5CD;font:500 10px/1.45 var(--body)}
+#screen-career .reputation-page-control .rep-priority{background:#172129;border:1px solid #34434C;border-left:3px solid #B68A42;border-radius:5px}
+#screen-career .reputation-page-control .rep-priority strong{color:#F4F5F5}
+#screen-career .reputation-page-control .rep-risk button{color:#D4BE9A;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-priority button{color:#D4BE9A;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-quick-links button{min-height:33px;padding:8px 9px;background:#263039;border:1px solid #596873;border-radius:5px;color:#F4F5F5;font:750 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-quick-links button:hover{background:#35414A;border-color:#B5C1C9}
+#screen-career .reputation-page-control .rep-history{margin:0 0 9px}
+#screen-career .reputation-page-control .rep-change{padding:8px 9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .rep-change>span{color:#AAB7BF;font:700 9px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-change>strong{color:#F4F5F5;font:800 14px/1.2 var(--body)}
+#screen-career .reputation-page-control .rep-change p{color:#C0CDD3;font:500 10px/1.4 var(--body)}
+#screen-career .reputation-page-control .rep-more{margin:8px 0 0;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .rep-future{margin:8px 0 0;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .reputation-page-control .rep-more summary{padding:9px 11px;color:#D2B88E;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-future summary{padding:9px 11px;color:#D2B88E;font:750 10px/1.3 var(--body)}
+#screen-career .reputation-page-control .rep-future-body p{color:#B5C2CA;font:500 10px/1.5 var(--body)}
+#screen-career .reputation-page-control .rep-disclosure{color:#AAB7BF;font:500 9px/1.4 var(--body)}
+#screen-career .reputation-page-control :is(button,summary):focus-visible{outline:2px solid #F4F5F5;outline-offset:2px}
+#screen-career:has(.reputation-page-control:not([hidden])) .career-topbar{min-height:57px;padding:8px clamp(17px,2.35vw,32px)}
+#screen-career:has(.reputation-page-control:not([hidden])) .career-content{padding:9px clamp(17px,2.35vw,32px) 16px}
+#screen-career:has(.reputation-page-control:not([hidden])) .game-notice{margin:7px clamp(17px,2.35vw,32px) 0;padding:7px 11px;background:#211E19;border:1px solid #514735;border-left:3px solid #B68A42;color:#E8D7BA}
+@media(max-width:1120px){#screen-career .reputation-page-control .rep-main-grid{grid-template-columns:1fr}#screen-career .reputation-page-control .rep-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){#screen-career .reputation-page-control .cp-goals,#screen-career .reputation-page-control .cp-achievements,#screen-career .reputation-page-control .rep-drivers,#screen-career .reputation-page-control .rep-history-preview{grid-template-columns:1fr}}
+@media(max-width:520px){#screen-career:has(.reputation-page-control:not([hidden])) .career-content{padding:10px 13px 18px}#screen-career .reputation-page-control .page-heading{align-items:flex-start;flex-direction:column;gap:5px}#screen-career .reputation-page-control .page-heading h1{font-size:25px}#screen-career .reputation-page-control .page-heading p:last-child{display:none}#screen-career .reputation-page-control .rep-score strong{font-size:40px}#screen-career .reputation-page-control .rep-stage{grid-template-columns:20px minmax(0,1fr) 55px}#screen-career .reputation-page-control .rep-stage em{grid-column:2/-1;text-align:left}}

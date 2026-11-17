@@ -10,8 +10,8 @@
   const escape=s=>String(s).replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
-  const label=(a,b,note='')=>
-    '<div class="hq-metric"><small>'+a+'</small><strong>'+b+
+  const label=(a,b,note='',extra='')=>
+    '<div class="hq-metric'+extra+'"><small>'+a+'</small><strong>'+b+
     '</strong><span>'+note+'</span></div>';
   const line=(a,b,extra='')=>
     '<div class="hq-cost-line'+extra+'"><span>'+a+'</span><strong>'+b+'</strong></div>';
@@ -81,7 +81,7 @@
     const unlocked=q.eligible&&!q.shortfall;
     const reason=!q.eligible?'REQUIRES '+q.requiredReputation+' REPUTATION':
       q.shortfall?'SHORT BY '+cash(q.shortfall):'READY TO EXPAND';
-    const status=!q.eligible?'hq-unavailable':q.shortfall?'hq-waiting':'hq-ready';
+    const status=!q.eligible?'hq-unavailable':q.shortfall?'hq-cash-blocked':'hq-ready';
     const what=forecourt?'forecourt spaces':'repair bays';
     const value=q.current+' → '+q.next+' '+what;
     const message=!q.eligible?'Reach '+q.requiredReputation+
@@ -101,9 +101,9 @@
       '<div class="hq-upgrade-projection">'+
       line('CURRENT PREMISES / DAY',cash(q.currentDaily))+
       line('AFTER UPGRADE / DAY',cash(q.newDaily))+
-      line('CASH AFTER INVESTMENT',cash(state.cash-q.cost))+
+      line('CASH AFTER INVESTMENT',cash(state.cash-q.cost),state.cash-q.cost<0?' hq-due':'')+
       '</div>'+
-      '<div class="'+(unlocked?'hq-upgrade-success':'hq-upgrade-warning')+'">'+message+'</div>'+
+      '<div class="'+(unlocked?'hq-upgrade-success':!q.eligible?'hq-upgrade-warning':'hq-upgrade-danger')+'">'+message+'</div>'+
       '<button type="button" class="trade-button hq-invest-button" '+
       'data-action="upgrade-premises" data-kind="'+kind+'"'+
       (unlocked?'':' disabled')+'>'+
@@ -130,19 +130,19 @@
     const metrics='<div class="hq-metrics">'+
       label('VEHICLE STOCK LIMIT',r.stock+' / '+r.allowedStock,
         r.forecourt+' permanent + '+site.OVERFLOW_SPACES+' temporary offsite · '+
-        r.freeSpaces+' free for buying')+
+        r.freeSpaces+' free for buying',r.freeSpaces===0?' hq-metric-warning':'')+
       label('WORKSHOP CAPACITY',r.workshop+' PHYSICAL BAYS',
         r.techWorking+' active '+(r.techWorking===1?'technician':'technicians')+
         ' · '+r.techniciansFree+' free · '+r.activeRepairs+' jobs running')+
       label('DEALERSHIP CASH',cash(state.cash),
-        cash(r.cashAfterRepairReserves)+' after workshop reserves')+
+        cash(r.cashAfterRepairReserves)+' after workshop reserves',state.cash<0?' hq-metric-critical':r.cashAfterRepairReserves<0?' hq-metric-warning':'')+
       label('DAILY RUNNING COST',cash(r.runningDaily),
         cash(p.total)+' premises (offsite '+cash(p.offsite)+') + '+cash(r.dailyWages)+' wages')+
       '</div>';
     const head='<div class="hq-brief"><div><small>LIVE SITE STATUS</small>'+
       '<strong>FACILITY POSITION</strong>'+
       '<p>Workshop bays require available technicians; unused space does not complete repairs.</p></div>'+
-      '<span class="hq-brief-status'+(r.arrears||state.cash<r.runningDaily?' hq-brief-alert':'')+'">'+
+      '<span class="hq-brief-status'+(r.arrears?' hq-brief-critical':state.cash<r.runningDaily||r.freeSpaces===0?' hq-brief-warning':possible?' hq-brief-positive':'')+'">'+
       nextState+'</span></div>';
     const cost='<section class="hq-cost-panel"><div class="hq-section-heading">'+
       '<div><small>FIXED COSTS / CASH DISCIPLINE</small><h3>OPERATING COMMITMENTS</h3></div>'+
