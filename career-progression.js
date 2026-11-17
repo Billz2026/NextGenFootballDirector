@@ -6,10 +6,10 @@
 (() => {
   const LEVELS=Object.freeze([
     {min:0,name:'NEW TRADER',reward:'Build your first customer trust score.'},
-    {min:20,name:'LOCAL DEALER',reward:'Forecourt expansion to six spaces becomes eligible (£1,800).'},
-    {min:40,name:'TRUSTED DEALER',reward:'Extra sales and technician hiring, subject to actual workshop space; eight-space forecourt upgrade becomes eligible (£3,600).'},
-    {min:60,name:'REGIONAL SPECIALIST',reward:'Regional standing. Luxury stock still requires 65 reputation and £110,000 opening cash.'},
-    {min:80,name:'PRESTIGE DEALER',reward:'Highest staff hiring limits and further premises eligibility; delivery-mileage new-car allocations require 85 reputation and £180,000 opening cash.'}
+    {min:20,name:'LOCAL DEALER',reward:'Six permanent forecourt spaces unlock automatically. Two paid temporary offsite places remain available.'},
+    {min:40,name:'TRUSTED DEALER',reward:'Eight permanent forecourt spaces unlock automatically; additional sales staff become eligible. Workshop growth remains separately funded.'},
+    {min:60,name:'REGIONAL SPECIALIST',reward:'Ten permanent forecourt spaces unlock automatically. Luxury stock still requires 65 reputation and £110,000 opening cash.'},
+    {min:80,name:'PRESTIGE DEALER',reward:'Highest staff hiring limits and further workshop eligibility; delivery-mileage new-car allocations require 85 reputation and £180,000 opening cash.'}
   ]);
   const safe=x=>String(x).replace(/[&<>"']/g,ch=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -136,7 +136,7 @@
       '<span class="cp-promotion-icon" aria-hidden="true">◆</span>'+
       '<h2 id="cp-promotion-title">PROMOTED TO<br><em>'+safe(tier.name)+'</em></h2>'+
       '<p id="cp-promotion-detail">'+safe(tier.reward)+'</p>'+
-      '<p class="cp-promotion-note">This is a reputation milestone, not a cash award. Stock access, staffing and facilities retain their existing eligibility and purchase rules.</p>'+
+      '<p class="cp-promotion-note">Permanent forecourt space unlocks automatically at 20, 40 and 60 reputation and incurs ongoing premises overheads. This is not a cash award. Workshop expansion still requires investment.</p>'+
       '<div class="cp-promotion-actions">'+
       '<button type="button" data-action="view-promotion" class="cp-promotion-primary">VIEW CAREER PROGRESS ↗</button>'+
       '<button type="button" data-action="dismiss-promotion" class="cp-promotion-secondary">CONTINUE TRADING</button>'+
