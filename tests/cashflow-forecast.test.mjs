@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 const context={window:{},Date,Intl};
-for(const path of ['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js','vehicle-market.js','premises.js','people.js','calendar.js','monthly.js','events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','trading.js','cashflow-forecast.js','finance-view.js'])
+for(const path of ['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js','vehicle-market.js','premises.js','people.js','calendar.js','monthly.js','events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','aftersales.js','trading.js','cashflow-forecast.js','finance-view.js'])
   runInNewContext(readFileSync(new URL('../'+path,import.meta.url),'utf8'),context,{filename:path});
 const E=context.window.MotorTradeEngine,F=context.window.MotorTradeCashForecast,FV=context.window.MotorTradeFinanceView;
 const copy=s=>JSON.parse(JSON.stringify(s));
