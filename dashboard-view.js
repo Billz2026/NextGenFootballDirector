@@ -23,6 +23,7 @@
     const report=E.monthly.statement(state);
     const events=E.events,customers=Object.values(state.customerCases||{});
     const vehicles=state.vehicles||[];
+    const showroomWaiting=E.showroom.waiting(state).length;
     const listed=vehicles.filter(v=>v.status==='listed').length;
     const awaitingPrep=vehicles.filter(v=>v.status==='acquired').length;
     const unassessed=vehicles.filter(v=>v.workshop?.stage==='unassessed').length;
@@ -75,6 +76,10 @@
       add(4,'rent','Unpaid premises overheads',
         money(state.premises.arrears)+' in rent and utilities outstanding.',
         'business','VIEW COSTS','urgent');
+    if(showroomWaiting)
+      add(4,'showroom-queue',showroomWaiting+' customer'+(showroomWaiting===1?'':'s')+' waiting in the showroom',
+        'Visitors have limited patience. Handle them yourself or assign a free salesperson before advancing the trading day.',
+        'sales','MANAGE SHOWROOM','attention');
     if(dueViewing)
       add(5,'viewing',dueViewing+' customer viewing'+(dueViewing===1?'':'s')+' due',
         'Manage booked viewings and any buyers ready for negotiation.',
