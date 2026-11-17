@@ -6,6 +6,7 @@
   })[ch]);
   const gbp=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',
     maximumFractionDigits:0}).format(n);
+  const PERF=window.MotorTradeStaffPerformance;
   const roleName={sales:'SALES EXECUTIVE',buyer:'VEHICLE BUYER',technician:'PREP TECHNICIAN',supervisor:'STAFF SUPERVISOR'};
   const traits={
     sales:[['Sales', 'sales'],['Negotiation','negotiation'],['Customer care','care'],['Reliability','reliability']],
@@ -258,6 +259,60 @@
       (next?'NEXT UNLOCK: '+next+'.':'All eight technician places are unlocked.')+'</p>';
   }
 
+  function performanceTag(state,e){
+    if(!PERF||!['technician','sales'].includes(e.role))return '';
+    const result=PERF.employee(state,e);
+    const text=result.state==='review'?'REVIEW RESULTS':
+      result.state==='tracked'?'PERFORMANCE TRACKED':
+      result.state==='limited'?'LIMITED HISTORY':'NO RESULT HISTORY';
+    return '<span class="sd-perf-mini sd-perf-mini-'+result.state+'">'+text+'</span>';
+  }
+  const displayRate=value=>value===null?'—':value+'%';
+  const displayDays=value=>value===null?'—':value+' DAYS';
+  function performanceRecord(state,e){
+    if(!PERF||!['technician','sales'].includes(e.role))return '';
+    const p=PERF.employee(state,e);
+    const label=p.state==='review'?'REVIEW RESULTS':
+      p.state==='tracked'?'RESULTS AVAILABLE':
+      p.state==='limited'?'SMALL SAMPLE':'AWAITING RESULTS';
+    const tiles=p.role==='technician'?[
+      ['JOBS COMPLETED',p.completed],
+      ['BOOKING → QC CLEARANCE',displayDays(p.avgDays)],
+      ['FIRST-CHECK QC',displayRate(p.firstPassRate)],
+      ['QC REWORKS',p.qcReworks],
+      ['LEAD / ASSIST SHIFTS',p.leadShifts+' / '+p.assistantShifts]
+    ]:[
+      ['ATTRIBUTED ENQUIRIES',p.enquiries],
+      ['TRACKED CONVERSIONS',p.converted+' / '+p.enquiries],
+      ['ENQUIRY CONVERSION',displayRate(p.conversionRate)],
+      ['RETAIL HANDOVERS',p.deals],
+      ['GROSS MARGIN',gbp(p.gross)],
+      ['SALES COMMISSION',gbp(p.commission)],
+      ['MARGIN AFTER COMMISSION',gbp(p.contribution)]
+    ];
+    const disclosure=p.role==='technician'?
+      'Turnaround is elapsed game days from booking to passed QC, including pauses and QC waiting. '+
+      'First-check QC counts the first inspection only; rework is not erased by a later pass. '+
+      'Earlier jobs without retained workshop records are excluded.':
+      'Enquiries include only contacts with a saved salesperson assignment. '+
+      'Conversion counts completed handovers linked to those tracked enquiries, not agreements. '+
+      'Retail margin after commission excludes salaries, premises and other overheads. '+
+      'Historical sales can contribute margin even where earlier enquiries lack attribution.';
+    return '<section class="sd-performance-record" aria-label="Measured employee performance">'+
+      '<div class="sd-performance-head"><div><h4>EMPLOYEE PERFORMANCE RECORD</h4>'+
+      '<span>REAL GAME TRANSACTIONS · CURRENT CAREER</span></div>'+
+      '<strong class="sd-perf-status sd-perf-status-'+p.state+'">'+label+'</strong></div>'+
+      '<div class="sd-performance-grid">'+tiles.map(([name,value])=>
+        '<div><small>'+esc(name)+'</small><strong>'+esc(value)+'</strong></div>').join('')+
+      '</div>'+
+      (p.reasons.length?'<div class="sd-performance-warning"><strong>PERFORMANCE REVIEW SIGNAL</strong>'+
+        '<p>'+p.reasons.map(esc).join(' · ')+'</p></div>':
+        p.state==='limited'||p.state==='none'?
+        '<p class="sd-performance-note">Not enough attributable results to judge this employee yet. No underperformance penalty has been applied.</p>':'')+
+      '<p class="sd-performance-note">'+esc(disclosure)+'</p>'+
+      '<p class="sd-performance-note">Review flags are prompts to investigate, not evidence that one employee caused the result.</p>'+
+      '</section>';
+  }
   /* v0.9.31 — Staff control centre. Read-only view over existing people rules. */
   const DESK_MODES=Object.freeze(['team','candidates']);
   const DESK_ROLES=Object.freeze(['all','sales','buyer','technician','supervisor']);
@@ -306,7 +361,7 @@
         const names=people.length?people.map(e=>
           '<div class="sd-cover-person"><strong>'+esc(e.name)+'</strong>'+
           '<span>'+gbp(e.monthlySalary)+'/MO · '+esc(employeeStatus(state,P,e).name)+
-          '</span></div>').join(''):
+          '</span>'+performanceTag(state,e)+'</div>').join(''):
           '<div class="sd-cover-vacant">NO EMPLOYEE ASSIGNED</div>';
         const openings=Math.max(0,limit-people.length);
         return '<article class="sd-cover-role"><header><strong>'+esc(roleName[role])+'</strong>'+
@@ -351,7 +406,8 @@
       '<span class="sd-person-main"><small>'+esc(roleName[person.role])+'</small>'+
       '<strong>'+esc(person.name)+'</strong><span>'+gbp(person.monthlySalary)+
       ' / MONTH · '+person.experience+' YEARS EXPERIENCE</span>'+
-      '<span class="sd-row-extra">'+extra+'</span></span>'+
+      '<span class="sd-row-extra">'+extra+'</span>'+
+      (hired?performanceTag(state,person):'')+'</span>'+
       '<em class="sd-tag sd-tag-'+tone+'">'+esc(label)+'</em></button>';
   }
   function skillSection(person,P){
@@ -383,6 +439,7 @@
       '<div><small>MORALE</small><strong>'+e.morale+' / 100</strong></div>'+
       '<div><small>START DATE</small><strong>DAY '+e.startDay+'</strong></div></div>'+
       roleForecast(e,P)+
+      performanceRecord(state,e)+
       '<div class="sd-person-detail"><div>'+skillSection(e,P)+
       '<div class="sd-performance"><div><small>RETAIL DEALS</small><strong>'+e.deals+
       '</strong></div><div><small>PREPARATION TASKS</small><strong>'+e.workDone+
@@ -474,6 +531,7 @@
   }
   function staffDesk(state,P,{mode=null,role='all',selectedId=null}={}){
     const counts=deskCounts(state,P);
+    const performance=PERF?PERF.team(state):{review:[],withHistory:[]};
     const activeMode=DESK_MODES.includes(mode)?mode:
       state.staff.length?'team':'candidates';
     const f=DESK_ROLES.includes(role)?role:'all';
@@ -523,7 +581,9 @@
     const context=activeMode==='team'?
       '<span>ON YOUR PAYROLL · '+counts.active+' WORKING TODAY · '+
       counts.techniciansFree+' IN-HOUSE TECHNICIAN'+
-      (counts.techniciansFree===1?'':'S')+' FREE</span>':
+      (counts.techniciansFree===1?'':'S')+' FREE · '+
+      performance.review.length+' PERFORMANCE REVIEW'+
+      (performance.review.length===1?'':'S')+' FLAGGED</span>':
       '<span>APPLICANTS SORTED: ELIGIBLE FIRST · '+counts.hireable+
       ' CAN HIRE · REFRESHES DAY '+nextRefresh+
       ' · BLOCKED CANDIDATES REMAIN VISIBLE FOR COMPARISON</span>';
