@@ -14,8 +14,9 @@
     return Math.max(100,Math.min(car.ask,Math.round((car.ask-discount)/25)*25));
   }
   function fundingWarning(state,model){
-    if(state.vehicles.length>=state.capacity)
-      return 'FORECOURT FULL — sell stock before buying again.';
+    const site=window.MotorTradePremises;
+    if(state.vehicles.length>=site.storageLimit(state))
+      return 'PERMANENT FORECOURT AND BOTH OFFSITE HOLDING PLACES OCCUPIED — sell or hand over a car to buy again.';
     if(!model.affordable)
       return 'INSUFFICIENT CASH — required workshop funding exceeds available cash. Reduce your offer or release stock.';
     return '';
@@ -35,10 +36,12 @@
     const reserved=E.workshop.reserved(state);
     // Buying cash: offer now; projected prep must be retained for the workshop.
     // The engine's hard affordability gate also protects any actual hidden fault.
-    const remaining=state.cash-reserved-offer-quote.prep;
+    const site=window.MotorTradePremises;
+    const offsiteReserve=Math.max(0,state.vehicles.length+1-state.capacity)*site.OVERFLOW_DAILY_FEE;
+    const remaining=state.cash-reserved-offer-quote.prep-offsiteReserve;
     // Match the engine's full reserve gate while keeping hidden faults private.
     const requiredPrep=car.profile.basePrep+(car.profile.hiddenFault?.cost||0);
-    const affordable=state.cash>=reserved+offer+requiredPrep;
+    const affordable=state.cash>=reserved+offer+requiredPrep+offsiteReserve;
     return {quote,inspected,remaining,reserved,affordable,position:position(quote)};
   }
   function toolbar(state,E,sellers,selected){
@@ -51,8 +54,9 @@
     // smaller financial status line rather than four large dashboard tiles.
     const cards=[
       ['STOCK OPPORTUNITIES',sellers.length,available+' AVAILABLE'],
-      ['FORECOURT FREE',state.capacity-state.vehicles.length,
-        state.vehicles.length+' / '+state.capacity+' OCCUPIED'],
+      ['BUYING PLACES FREE',E.premises.storageLimit(state)-state.vehicles.length,
+        state.vehicles.length+' / '+E.premises.storageLimit(state)+
+        ' TOTAL · '+state.capacity+' PERMANENT + '+E.premises.OVERFLOW_SPACES+' OFFSITE'],
       ['CASH AVAILABLE',money(Math.max(0,state.cash-reserved)),
         reserved?'REPAIR FUNDS HELD '+money(reserved):'AFTER EXISTING RESERVES']
     ];
