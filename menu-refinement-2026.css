@@ -77,6 +77,30 @@
   font:800 14px/1.2 var(--body);
   letter-spacing:.105em;
 }
+#screen-menu .menu-primary-actions .action-btn > span:first-child {
+  flex:1 1 auto;
+  min-width:0;
+}
+#screen-menu .menu-primary-actions .action-btn > .arrow {
+  flex:0 0 auto;
+}
+#screen-menu #menu-continue[hidden] + #menu-new-career {
+  background:#f4f5f5;
+  color:#10161c;
+  border-color:#f4f5f5;
+}
+#screen-menu #menu-continue[hidden] + #menu-new-career::before {
+  content:"";
+  height:28px;
+  width:3px;
+  flex:0 0 3px;
+  border-radius:2px;
+  background:#bb223d;
+}
+#screen-menu #menu-continue[hidden] + #menu-new-career:hover {
+  background:#ffffff;
+  border-color:#ffffff;
+}
 #screen-menu .menu-primary-actions .action-btn .arrow {
   margin-left:auto;
   font:400 22px/1 var(--body);
