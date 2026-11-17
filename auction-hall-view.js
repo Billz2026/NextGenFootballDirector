@@ -148,7 +148,7 @@
       '<div class="auction-bid-maths"><div><span>'+(paymentDue?'WINNING HAMMER':'NEXT £100 BID')+'</span><b>'+money(expectedNext)+'</b></div>'+
       '<div><span>PLUS BUYER FEE</span><b>'+money(lot.fee)+'</b></div>'+
       '<div><span>PLUS EXPECTED PREPARATION</span><b>'+money(q.prep)+'</b></div>'+
-      '<div><span>PROJECTED GROSS CONTRIBUTION</span><b class="'+(q.expectedMargin<0?'auction-negative':'')+'">'+money(q.expectedMargin)+'</b></div></div>'+
+      '<div><span>PROJECTED GROSS CONTRIBUTION</span><b class="'+(q.expectedMargin<0?'auction-negative':q.expectedMargin>0?'auction-positive':'auction-neutral')+'">'+money(q.expectedMargin)+'</b></div></div>'+
       (intelligence?'<div class="people-bid-intel">VEHICLE BUYER INTELLIGENCE: COMPETITOR BID RANGE '+
         money(intelligence.lower)+'–'+money(intelligence.upper)+
         '. Forecast only — not the actual reserve or final bid.</div>':'')+
