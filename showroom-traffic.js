@@ -26,6 +26,7 @@
    const maxPerCar=cars.length<=2?3:2;
    for(const v of cars){
      if(b.leads.length>=7)break;
+     if(b.leads.some(q=>q.vehicleId===v.id))continue;
      if(D.isDealDay(s.day)&&!D.retailActive(s,v))continue;
      const fair=v.profile?.likelySale||v.retail,grade=v.profile?.grade||3;
      const over=Math.max(0,(v.asking-fair)/Math.max(1,fair));
@@ -152,6 +153,6 @@
    return true;
  }
  window.MotorTradeShowroom=Object.freeze({
-   initial,initialise,roll,waiting,customer,availableStaff,canServe,serve,sold,stats,valid,closeWaiting
+   initial,initialise,roll,refresh:generate,waiting,customer,availableStaff,canServe,serve,sold,stats,valid,closeWaiting
  });
 })();
