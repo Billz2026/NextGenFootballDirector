@@ -70,6 +70,11 @@ try{
       'TEAM & HIRING.');
     assert.equal(await panel.locator('.sd-coverage-grid .sd-cover-role').count(),4);
     assert.equal(await panel.locator('.sd-kpis>div').count(),4);
+    assert.equal(await panel.locator('.sd-performance-record').count(),1);
+    assert.match(await panel.locator('.sd-performance-record').innerText(),
+      /ATTRIBUTED ENQUIRIES/);
+    assert.match(await panel.locator('.sd-performance-record').innerText(),
+      /AWAITING RESULTS/);
     const opening=await snapshot(page);
     assert.equal(opening.startingCapital,45000);
     assert.equal(opening.staff.length,4);
@@ -150,6 +155,9 @@ try{
     assert.equal(trained.staff[0].trainingUntil,3);
     assert.equal(trained.staff[0].monthlySalary,1550);
     assert.equal(trained.staff.length,5);
+    assert.equal(await panel.locator('.sd-performance-record').count(),1);
+    assert.match(await panel.locator('.sd-performance-record').innerText(),
+      /NO UNDERPERFORMANCE|No underperformance penalty/i);
     assert.deepEqual(errors,[],'No uncaught browser errors');
     console.log('STAFF_HIRE_PASS '+label+' '+JSON.stringify({
       initialCash:opening.cash,postHireCash:hired.cash,postTrainingCash:trained.cash,
