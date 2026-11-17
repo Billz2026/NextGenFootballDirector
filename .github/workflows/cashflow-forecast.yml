@@ -1,0 +1,33 @@
+name: Cash-flow planning regression
+on:
+  pull_request:
+    paths:
+      - 'cashflow-forecast.js'
+      - 'finance-view.js'
+      - 'simulator.js'
+      - 'index.html'
+      - 'tests/cashflow-forecast.test.mjs'
+      - '.github/workflows/cashflow-forecast.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'cashflow-forecast.js'
+      - 'finance-view.js'
+      - 'simulator.js'
+      - 'index.html'
+      - 'tests/cashflow-forecast.test.mjs'
+      - '.github/workflows/cashflow-forecast.yml'
+permissions:
+  contents: read
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate finance model and simulator syntax
+        run: node --check cashflow-forecast.js && node --check finance-view.js && node --check simulator.js
+      - name: Check real cash runway, reserves and career saves
+        run: node --test tests/cashflow-forecast.test.mjs tests/staff-workshop-impact.test.mjs

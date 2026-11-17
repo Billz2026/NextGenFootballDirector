@@ -11,6 +11,7 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[ch]));
   const FILTERS=Object.freeze(['all','in','out','noncash']);
+  const CF=window.MotorTradeCashForecast;
   const signed=n=>(n>0?'+':'')+money(n);
   const tone=n=>n<0?' fin-negative':n>0?' fin-positive':'';
   function snapshot(state,E){
@@ -38,7 +39,7 @@
     return '<div class="fin-pair'+extra+'"><span>'+esc(label)+'</span>'+
       '<strong>'+esc(number)+'</strong></div>';
   }
-  function summary(state,E){
+  function summary(state,E,options={}){
     const x=snapshot(state,E),r=x.report;
     const month='MONTH '+r.month+' · DAYS '+r.startDay+'–'+r.endDay;
     const noRepairReserve=x.reserved===0;
@@ -101,7 +102,8 @@
       '</section>';
     const footer='<details class="fin-disclosure"><summary>ACCOUNTING SCOPE & EXCLUSIONS</summary>'+
       '<p>Simulation figures only. Operating contribution is not statutory net profit: VAT, tax, finance, depreciation, warranties and other consumer liabilities are not fully modelled.</p></details>';
-    return {snapshot:x,html:top+cashflow+'<div class="fin-secondary">'+
+    const forecast=CF?CF.render(state,E,options.scenario):'';
+    return {snapshot:x,html:top+cashflow+forecast+'<div class="fin-secondary">'+
       commitments+performance+'</div>'+footer};
   }
   function category(note){

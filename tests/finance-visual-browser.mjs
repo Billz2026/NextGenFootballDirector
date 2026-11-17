@@ -25,8 +25,11 @@ try{
       const assessed=E.assessStock(state,state.vehicles[0].id);
       if(!assessed.ok)throw Error('Assessment failed: '+assessed.message);
       state.day=2;
+      E.rollAuctionHall(state);
       E.staffDay(state);
       E.premisesDay(state);
+      E.advanceWorkshop(state);
+      E.advanceCustomers(state);
       const snap=F.snapshot(state,E);
       if(!snap.cashReconciles)throw Error('Cash reconciliation failed');
       if(!E.normalize(JSON.parse(JSON.stringify(state))))
@@ -52,6 +55,10 @@ try{
     assert.equal(await panel.locator('.fin-primary>.fin-tile').count(),4);
     assert.equal(await panel.locator('.fin-flow>div').count(),4);
     assert.equal(await panel.locator('.fin-secondary>.fin-panel').count(),2);
+    assert.equal(await panel.locator('#fin-cash-forecast').count(),1);
+    assert.equal(await panel.locator('.fc-summary-grid .fc-pair').count(),4);
+    assert.equal(await panel.locator('.fc-checkpoints>div').count(),3);
+    assert.match(await panel.locator('.fc-heading').innerText(),/NO SALES ASSUMED/);
     assert.equal(await panel.locator('.fin-ledger-filters button').count(),4);
     assert.equal(await panel.locator('.fin-disclosure').evaluate(x=>x.open),false);
     assert.match(await panel.locator('.fin-primary').innerText(),/CASH BALANCE/);
@@ -72,6 +79,8 @@ try{
         kpisBottom:Math.round(rect('.fin-primary').bottom),
         flowTop:Math.round(rect('.fin-cashflow').top),
         flowBottom:Math.round(rect('.fin-cashflow').bottom),
+        forecastTop:Math.round(rect('#fin-cash-forecast').top),
+        forecastBottom:Math.round(rect('#fin-cash-forecast').bottom),
         commitmentsTop:Math.round(rect('.fin-secondary').top),
         ledgerTop:Math.round(rect('.fin-ledger-section').top),
         firstTransactionTop:Math.round(rect('.fin-entry').top)
@@ -85,15 +94,33 @@ try{
     assert.ok(metrics.ledgerWidth<=metrics.ledgerClientWidth+1,
       label+': finance ledger horizontal overflow');
     assert.ok(metrics.flowTop>metrics.kpisBottom-2,'Cash reconciliation follows the four key balances');
-    assert.ok(metrics.commitmentsTop>metrics.flowBottom-2,'Obligations and performance follow cash movement');
+    assert.ok(metrics.forecastTop>metrics.flowBottom-2,'Forecast follows real cash reconciliation');
+    assert.ok(metrics.commitmentsTop>metrics.forecastBottom-2,'Real accounts follow the planning panel');
     if(label==='desktop'){
       assert.ok(metrics.flowTop<300,'Cashflow should be visible near top at 100% zoom');
-      assert.ok(metrics.ledgerTop<900,'Transaction history should begin on desktop first screen');
+      assert.ok(metrics.forecastTop<900,'Forecast should be discoverable without deep scrolling');
     }else{
       assert.ok(metrics.flowTop<450,'Mobile cashflow follows compact balances without deep scrolling');
     }
     await page.screenshot({path:'review/finance-'+label+'.png',fullPage:true});
     const savedBefore=await page.evaluate(key=>localStorage.getItem(key),KEY);
+    const firstForecast=await panel.locator('.fc-summary-grid').innerText();
+    await panel.locator('[data-forecast-field="purchase"]').fill('8200');
+    await panel.locator('[data-forecast-field="prep"]').fill('600');
+    await panel.locator('[data-forecast-field="extraRepair"]').fill('250');
+    assert.notEqual(await panel.locator('.fc-summary-grid').innerText(),firstForecast,
+      'What-if amounts should update projected headroom');
+    await panel.locator('[data-action="finance-horizon"][data-days="14"]').click();
+    assert.equal(await panel.locator('[data-days="14"]').getAttribute('aria-pressed'),'true');
+    assert.match(await panel.locator('.fc-summary-grid').innerText(),/14-DAY FREE CASH OUTLOOK/);
+    assert.equal(await panel.locator('[data-forecast-field="purchase"]').inputValue(),'8200');
+    await panel.locator('[data-forecast-field="purchase"]').fill('1000000');
+    assert.match(await panel.locator('.fc-alert').innerText(),/FUNDING SHORTFALL/);
+    await panel.locator('[data-action="finance-reset-plan"]').click();
+    assert.equal(await panel.locator('[data-forecast-field="purchase"]').inputValue(),'0');
+    assert.equal(await panel.locator('[data-days="7"]').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),savedBefore,
+      'Forecast inputs and horizon must never change persisted finances');
     await panel.locator('[data-action="filter-ledger"][data-filter="out"]').click();
     assert.ok(await panel.locator('.fin-entry').count()>=1);
     await panel.locator('[data-action="filter-ledger"][data-filter="in"]').click();
