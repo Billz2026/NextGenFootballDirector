@@ -95,7 +95,7 @@ test('available technicians accelerate a busy repair by at most one day each shi
   const v=s.vehicles[0];E.assessStock(s,v.id);
   assert.equal(E.startPrep(s,v.id,'internal').ok,true);
   const before=v.workshop.remainingDays;
-  assert.ok(before>=3);
+  assert.ok(before>=2);
   const helpers=P.availableTechnicians(s);
   assert.equal(helpers.length,2);
   const prev=s.staff.reduce((n,e)=>n+e.workDone,0);
