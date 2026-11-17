@@ -141,7 +141,7 @@ test('old v16 saves migrate with no fake customer services or expenses',()=>{
   const old=copy(s);old.version=16;delete old.showroom;
   const migrated=E.normalize(old);
   assert.ok(migrated);
-  assert.equal(migrated.version,17);
+  assert.equal(migrated.version,18);
   assert.ok(migrated.showroom);
   assert.equal(migrated.showroom.ownerUsed,0);
   assert.deepEqual(Array.from(migrated.showroom.staffUsed),[]);
