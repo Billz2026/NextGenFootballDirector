@@ -554,7 +554,7 @@
     const cases=saved.customerCases,history=saved.customerHistory;
     if(!cases||typeof cases!=='object'||Array.isArray(cases)||
       !Array.isArray(history)||history.length>2000||
-      Object.keys(cases).length>state.capacity)return false;
+      Object.keys(cases).length>(window.MotorTradePremises?.storageLimit(state)??state.capacity))return false;
     const no=(x,max=100000000)=>ints(x)&&x>=0&&x<=max;
     const validCase=([id,c])=>/^\d+$/.test(id)&&c&&
       c.vehicleId===Number(id)&&state.vehicles.some(v=>v.id===c.vehicleId&&v.status==='listed')&&
