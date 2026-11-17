@@ -25,7 +25,7 @@ try{
     await page.locator('[data-panel="auctionHall"]').waitFor({state:'visible'});
     const panel=page.locator('.auction-hall-control');
     const heading=await panel.locator('h1').innerText();
-    assert.equal(heading.replace(/\s+/g,' ').trim(),'WEEKLY ROSTRUM.');
+    assert.equal(heading.replace(/\s+/g,' ').trim(),'AUCTION ROSTRUM.');
     assert.equal(await panel.locator('.auction-hall-head h2').count(),0,
       'Do not repeat the large AUCTION HALL hero');
     assert.equal(await panel.locator('[data-action="start-auction"]').count(),1);
