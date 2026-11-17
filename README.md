@@ -6,6 +6,16 @@
 
 **Before playtesting the new calendar:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### v0.9.41 — Customer Behaviour 2.0 (17 November 2026)
+
+- **Six persistent buyer personalities:** budget-conscious, cautious, practical family, decisive, comparing dealers and detail-focused. Their hidden willingness to pay and counteroffer acceptance vary. The same buyer retains their profile across save/reload.
+- **Vehicle-grounded objections after the test drive:** concerns use real fictional dossier details: incomplete service history, grade and preparation, high mileage, unverified EV battery health, new-car documentation or comparable asking prices. Players must respond before finalising cash or part-exchange terms.
+- **Five meaningful responses:** show genuinely available records, promise a dealer-funded handover inspection, reduce the achievable sale price, stand firm and risk losing the buyer, or walk away. A weak explanation consumes its one attempt and reduces the buyer's willingness to pay by £125. No unrecorded battery-health report is invented.
+- **Economic integrity:** a service/inspection commitment is not charged when offered, but is actually charged to dealership cash exactly once at handover and deducted from gross trading margin before commission and reputation calculation. Concessions reduce the buyer's cash and part-exchange price ceiling; they do not create fictitious money or a free uplift. Lost buyers generate no sale or remedy charge.
+- **Appointments and negotiations unchanged:** next-game-day scheduled viewing, real test drives, five price-counter rounds, £250 segregated deposits, reservation collection and normal market limits remain.
+- **Career compatibility:** old v15 customer cases, including competing-buyer standby appointments, receive safe default fields and do not acquire retroactive promises, expenses or new objections mid-negotiation. Older saved transaction and cash records are unchanged.
+- **Automated regression coverage:** \`tests/customer-behaviour.test.mjs\` exercises persona persistence, objection gates, cash settlements, discounts, weaker buyer confidence, customer walkaways and save migration. Existing calendar tests are updated to expect version 16.
+
 ### v0.9.40 — Retail negotiations, showroom footfall, calendar month-end auctions, and new stock progression (16 November 2026)
 
 - **Five customer counteroffer rounds:** enter your desired price each round. Customers may accept, respond with a smaller offer or refuse a demand outside their budget. The price ceiling stays private and no deal is automatically completed; only a genuine agreed handover records the sale.
