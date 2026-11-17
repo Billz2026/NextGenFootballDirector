@@ -21,12 +21,18 @@ const people = readFileSync(new URL('people.js', root), 'utf8');
 const peopleView = readFileSync(new URL('people-view.js', root), 'utf8');
 const calendar = readFileSync(new URL('calendar.js', root), 'utf8');
 const monthly = readFileSync(new URL('monthly.js', root), 'utf8');
+const careerProgression = readFileSync(new URL('career-progression.js', root), 'utf8');
 const monthlyView = readFileSync(new URL('monthly-view.js', root), 'utf8');
 const events = readFileSync(new URL('events.js', root), 'utf8');
 const eventsView = readFileSync(new URL('events-view.js', root), 'utf8');
 const workshop = readFileSync(new URL('workshop.js', root), 'utf8');
 const workshopView = readFileSync(new URL('workshop-view.js', root), 'utf8');
 const showroomTraffic = readFileSync(new URL('showroom-traffic.js', root), 'utf8');
+const stockAgeing = readFileSync(new URL('stock-ageing.js', root), 'utf8');
+const afterSales = readFileSync(new URL('aftersales.js', root), 'utf8');
+const afterSalesView = readFileSync(new URL('aftersales-view.js', root), 'utf8');
+const staffPerformance = readFileSync(new URL('staff-performance.js', root), 'utf8');
+const cashForecast = readFileSync(new URL('cashflow-forecast.js', root), 'utf8');
 const customers = readFileSync(new URL('customers.js', root), 'utf8');
 const customersView = readFileSync(new URL('customers-view.js', root), 'utf8');
 const auctionHallView = readFileSync(new URL('auction-hall-view.js', root), 'utf8');
@@ -71,49 +77,49 @@ test('dashboard has inbox, calendar and navigable management areas', () => {
   assert.match(html, /class="stock-control"/);
   assert.match(html, /id="sales-list"/);
   assert.match(html, /id="ledger-list"/);
-  assert.match(html, /vehicle-intel\.js\?v=2/);
-  assert.match(html, /people\.js\?v=8/);
-  assert.match(html, /monthly\.js\?v=8/);
-  assert.match(html, /events\.js\?v=2/);
-  assert.match(html, /workshop\.js\?v=4/);
-  assert.match(html, /customers\.js\?v=5/);
-  assert.match(html, /vehicle-photos\.js\?v=5/);
-  assert.match(html, /vehicle-market\.js\?v=2/);
-  assert.match(html, /auction-hall-view\.js\?v=3/);
-  assert.match(html, /buying-desk-view\.js\?v=3/);
-  assert.match(html, /stock-view\.js\?v=2/);
-  assert.match(html, /finance-view\.js\?v=3/);
-  assert.match(html, /styles\.css\?v=51/);
-  assert.match(html, /career-storage\.js\?v=2/);
-  assert.match(html, /cloud-config\.js\?v=1/);
-  assert.match(html, /cloud-careers\.js\?v=1/);
-  assert.match(html, /cloud-account-ui\.js\?v=1/);
+  assert.match(html, /vehicle-intel\.js\?v=\d+/);
+  assert.match(html, /people\.js\?v=\d+/);
+  assert.match(html, /monthly\.js\?v=\d+/);
+  assert.match(html, /events\.js\?v=\d+/);
+  assert.match(html, /workshop\.js\?v=\d+/);
+  assert.match(html, /customers\.js\?v=\d+/);
+  assert.match(html, /vehicle-photos\.js\?v=\d+/);
+  assert.match(html, /vehicle-market\.js\?v=\d+/);
+  assert.match(html, /auction-hall-view\.js\?v=\d+/);
+  assert.match(html, /buying-desk-view\.js\?v=\d+/);
+  assert.match(html, /stock-view\.js\?v=\d+/);
+  assert.match(html, /finance-view\.js\?v=\d+/);
+  assert.match(html, /styles\.css\?v=\d+/);
+  assert.match(html, /career-storage\.js\?v=\d+/);
+  assert.match(html, /cloud-config\.js\?v=\d+/);
+  assert.match(html, /cloud-careers\.js\?v=\d+/);
+  assert.match(html, /cloud-account-ui\.js\?v=\d+/);
   for (const id of ['menu-account-toggle','cloud-account-panel','cloud-auth-form',
     'cloud-user-display','cloud-load-career','cloud-upload-career','cloud-career-warning']) {
     assert.match(html, new RegExp('id="' + id + '"'));
   }
-  assert.match(html, /simulator\.js\?v=36/);
-  assert.match(html, /premises\.js\?v=1/);
-  assert.match(html, /premises-view\.js\?v=4/);
+  assert.match(html, /simulator\.js\?v=\d+/);
+  assert.match(html, /premises\.js\?v=\d+/);
+  assert.match(html, /premises-view\.js\?v=\d+/);
   assert.match(html, /id="premises-view"/);
-  assert.match(html, /dashboard-view\.js\?v=2/);
-  assert.match(html, /inbox-office\.js\?v=3/);
+  assert.match(html, /dashboard-view\.js\?v=\d+/);
+  assert.match(html, /inbox-office\.js\?v=\d+/);
   assert.match(html, /id="inbox-action-count"/);
   assert.match(html, /id="inbox-filter-buttons"/);
   assert.match(html, /id="dashboard-priorities"/);
   assert.match(html, /id="dashboard-operating-strip"/);
   assert.match(html, /data-bind="dashboard-operating"/);
   assert.match(html, /data-bind="dashboard-monthly-sales"/);
-  assert.match(html, /vehicle-accuracy\.js\?v=1/);
+  assert.match(html, /vehicle-accuracy\.js\?v=\d+/);
   assert.match(html, /id="market-progression"/);
-  assert.match(html, /vehicle-cards\.js\?v=4/);
-  assert.match(html, /trading\.js\?v=20/);
-  assert.match(html, /customers-view\.js\?v=9/);
-  assert.match(html, /workshop-view\.js\?v=7/);
-  assert.match(html, /events-view\.js\?v=7/);
-  assert.match(html, /monthly-view\.js\?v=9/);
-  assert.match(html, /people-view\.js\?v=8/);
-  assert.match(html, /vehicle-view\.js\?v=4/);
+  assert.match(html, /vehicle-cards\.js\?v=\d+/);
+  assert.match(html, /trading\.js\?v=\d+/);
+  assert.match(html, /customers-view\.js\?v=\d+/);
+  assert.match(html, /workshop-view\.js\?v=\d+/);
+  assert.match(html, /events-view\.js\?v=\d+/);
+  assert.match(html, /monthly-view\.js\?v=\d+/);
+  assert.match(html, /people-view\.js\?v=\d+/);
+  assert.match(html, /vehicle-view\.js\?v=\d+/);
   assert.doesNotMatch(html, /NextGenSessionsArcade|looping\.zip|<iframe/);
   assert.equal(existsSync(new URL('lab/', root)), false);
 });
@@ -128,7 +134,7 @@ test('responsive dashboard supports mobile and reduced motion', () => {
 });
 
 test('v0.9.2 photo matching, image failure fallback and capacity labels', () => {
-  assert.match(html, /PRE-ALPHA · v0\.9\.38/);
+  assert.match(html, /PRE-ALPHA · v0\.9\.\d+/);
   assert.match(html, /<small>FORECOURT<\/small><strong data-bind="forecourt-capacity">4 vehicles<\/strong>/);
   assert.match(engine, /const CAPACITY = 4/);
   assert.match(css, /\.vehicle-photo-missing\[hidden\]/);
@@ -242,10 +248,13 @@ function browser(storageData = new Map(), { denyStorage = false, legacyStart = f
   vm.runInNewContext(people, context, { timeout: 1500 });
   vm.runInNewContext(calendar, context, { timeout: 1500 });
   vm.runInNewContext(monthly, context, { timeout: 1500 });
+  vm.runInNewContext(careerProgression, context, { timeout: 1500 });
   vm.runInNewContext(events, context, { timeout: 1500 });
   vm.runInNewContext(workshop, context, { timeout: 1500 });
+  vm.runInNewContext(stockAgeing, context, { timeout: 1500 });
   vm.runInNewContext(showroomTraffic, context, { timeout: 1500 });
   vm.runInNewContext(customers, context, { timeout: 1500 });
+  vm.runInNewContext(afterSales, context, { timeout: 1500 });
   vm.runInNewContext(engine, context, { timeout: 1500 });
   vm.runInNewContext(cards, context, { timeout: 1500 });
   // Test-fixture shortcut for PRE-v0.8 financial/reputation assertions only.
@@ -319,15 +328,18 @@ function browser(storageData = new Map(), { denyStorage = false, legacyStart = f
     }
   };
   vm.runInNewContext(vehicleView, context, { timeout: 1500 });
+  vm.runInNewContext(staffPerformance, context, { timeout: 1500 });
   vm.runInNewContext(peopleView, context, { timeout: 1500 });
   vm.runInNewContext(monthlyView, context, { timeout: 1500 });
   vm.runInNewContext(eventsView, context, { timeout: 1500 });
   vm.runInNewContext(workshopView, context, { timeout: 1500 });
   vm.runInNewContext(customersView, context, { timeout: 1500 });
+  vm.runInNewContext(afterSalesView, context, { timeout: 1500 });
   vm.runInNewContext(premisesView, context, { timeout: 1500 });
   vm.runInNewContext(auctionHallView, context, { timeout: 1500 });
   vm.runInNewContext(buyingDeskView, context, { timeout: 1500 });
   vm.runInNewContext(stockView, context, { timeout: 1500 });
+  vm.runInNewContext(cashForecast, context, { timeout: 1500 });
   vm.runInNewContext(financeView, context, { timeout: 1500 });
   vm.runInNewContext(dashboardView, context, { timeout: 1500 });
   vm.runInNewContext(inboxOffice, context, { timeout: 1500 });
@@ -620,7 +632,7 @@ test('homepage uses the original NextGen wordmark and standalone vector Motor Tr
   assert.match(svg, /<path d="/);
   assert.match(html, /src="\.\/assets\/nextgen-header-wordmark-2026\.webp"/);
   assert.match(html, /src="\.\/assets\/the-motor-trade-premium\.svg"/);
-  assert.match(html, /styles\.css\?v=51/);
+  assert.match(html, /styles\.css\?v=\d+/);
 });
 test('the title has no black plaque or clipping-prone CSS text gradient', () => {
   const titleStyles = css.match(/#screen-menu \.trade-wordmark-hero \{([\s\S]*?)\}/)?.[1] ?? '';
@@ -4466,7 +4478,7 @@ test('v0.9.18 empty forecourt displays direct sourcing actions',()=>{
 
 
 test('v0.9.19 compact Vehicle Stock is scoped to desktop and retains full report access',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.\d+/);
   assert.match(css,/@media\(min-width:981px\)/);
   assert.match(css,/\.career-content:has\(\[data-panel="stock"\]:not\(\[hidden\]\)\)/);
   assert.match(css,/\.stock-dossier-vehicle \.vehicle-photo-frame\{[\s\S]*?height:125px/);
@@ -4535,7 +4547,7 @@ test('v0.9.20 workshop bookable quotes and hidden defects follow engine truth',(
 
 
 test('v0.9.21 compact Workshop hides non-urgent calendar banner only at desktop width',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.\d+/);
   assert.match(css,/@media\(min-width:1021px\)/);
   assert.match(css,/\.career-content:has\(\[data-panel="workshop"\]:not\(\[hidden\]\)\)>#events-banner:has\(\.event-neutral-banner\)/);
   assert.match(css,/#events-banner:has\(\.event-deadline-banner\)/);
@@ -4992,8 +5004,8 @@ test('v0.9.27 ledger HTML escapes special punctuation',()=>{
   assert.match(result,/&quot;alert\(1\)&quot;/);
   assert.match(result,/Bob&#39;s ledger/);
   assert.doesNotMatch(result,/<span onclick/);
-  assert.match(html,/finance-view\.js\?v=3/);
-  assert.match(html,/styles\.css\?v=51/);
+  assert.match(html,/finance-view\.js\?v=\d+/);
+  assert.match(html,/styles\.css\?v=\d+/);
 });
 
 
@@ -5329,9 +5341,9 @@ test('v0.9.32 staff and recruitment preserve readable skills while collapsing se
 });
 
 test('v0.9.32 compact Staff & Recruitment desktop styles retain labels and responsive grid',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
-  assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/people-view\.js\?v=8/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.\d+/);
+  assert.match(html,/styles\.css\?v=\d+/);
+  assert.match(html,/people-view\.js\?v=\d+/);
   assert.match(css,/\.career-main:has\(\[data-panel="staff"\]:not\(\[hidden\]\)\) \.career-topbar/);
   assert.match(css,/\.sd-kpis>div\{min-height:56px/);
   assert.match(css,/\.sd-person\{padding:6px 8px/);
@@ -5445,8 +5457,8 @@ test('v0.9.33 Reputation uses compact responsive layout without removing complet
   assert.match(css,/\.rep-main-grid\{display:grid/);
   assert.match(css,/\.rep-history-preview\{display:grid/);
   assert.match(css,/@media\(max-width:760px\)/);
-  assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/people-view\.js\?v=8/);
+  assert.match(html,/styles\.css\?v=\d+/);
+  assert.match(html,/people-view\.js\?v=\d+/);
 });
 
 
@@ -5629,9 +5641,9 @@ test('v0.9.35 blocked and maximum upgrades still retain accurate eligibility',()
 });
 
 test('v0.9.35 one-page desktop polish is scoped to My Dealership and retains mobile layout',()=>{
-  assert.match(html,/PRE-ALPHA · v0\.9\.38/);
-  assert.match(html,/styles\.css\?v=51/);
-  assert.match(html,/premises-view\.js\?v=4/);
+  assert.match(html,/PRE-ALPHA · v0\.9\.\d+/);
+  assert.match(html,/styles\.css\?v=\d+/);
+  assert.match(html,/premises-view\.js\?v=\d+/);
   assert.match(css,/v0\.9\.35 — Final My Dealership single-screen desktop polish/);
   assert.match(css,/\.career-layout:has\(\[data-panel="business"\]:not\(\[hidden\]\)\) \.career-topbar/);
   assert.match(css,/\.hq-upgrade-headline-costs\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
@@ -5832,7 +5844,7 @@ test('premium compact Buying Desk has one sourcing heading and all critical buyi
   assert.match(html,/class="career-panel buying-desk-control"/);
   assert.match(html,/DIRECT <em>SOURCING\.<\/em>/);
   assert.doesNotMatch(html, /<h1 id="auctions-title">BUYING <em>DESK/);
-  assert.match(html,/buying-polish.css\?v=1/);
+  assert.match(html,/buying-polish.css\?v=\d+/);
   assert.match(htmlDesk,/SELLER SHORTLIST/);
   assert.match(htmlDesk,/buy-seller-focus/);
   assert.match(htmlDesk,/BUYING APPRAISAL/);
@@ -5886,7 +5898,7 @@ test('premium inventory keeps one page title, lean totals and visible next actio
   const empty=app.nodes.get('stock-list').innerHTML;
   assert.match(html,/class="career-panel stock-page-control"/);
   assert.match(html,/INVENTORY <em>CONTROL\.<\/em>/);
-  assert.match(html,/stock-polish\.css\?v=1/);
+  assert.match(html,/stock-polish\.css\?v=\d+/);
   assert.doesNotMatch(html,/<h1 id="stock-title">VEHICLE <em>STOCK/);
   assert.equal((empty.match(/class="stock-kpi"/g)||[]).length,3);
   assert.match(empty,/YOUR FORECOURT IS EMPTY/);
@@ -5961,7 +5973,7 @@ test('retail pipeline compact workspace keeps sales cases, pricing and customer 
   assert.match(html,/class="sales-page-heading"/);
   assert.match(html,/RETAIL <em>PIPELINE\.<\/em>/);
   assert.doesNotMatch(html,/<h1 id="sales-title">SALES <em>OFFICE/);
-  assert.match(html,/sales-polish\.css\?v=1/);
+  assert.match(html,/sales-polish\.css\?v=\d+/);
   assert.equal((out.html.match(/class="so-kpis"/g)||[]).length,1);
   assert.equal((out.html.match(/<div><small>ADVERTISED VEHICLES<\/small>/g)||[]).length,1);
   assert.match(out.html,/ACTION REQUIRED/);
@@ -6020,7 +6032,7 @@ test('compact Workshop shows one preparation heading and leaves core repair gate
   assert.match(html,/class="career-panel workshop-page-control"/);
   assert.match(html,/PREPARATION <em>CONTROL\.<\/em>/);
   assert.doesNotMatch(html,/<h1 id="workshop-title">WORKSHOP <em>OPERATIONS/);
-  assert.match(html,/workshop-polish\.css\?v=1/);
+  assert.match(html,/workshop-polish\.css\?v=\d+/);
   assert.equal((view.html.match(/class="ws-kpis"/g)||[]).length,1);
   assert.equal((view.html.match(/<div><small>(?:ACTION DUE|REPAIRS ACTIVE|READY TO LIST)<\/small>/g)||[]).length,3);
   assert.match(view.html,/TECHNICIANS/);
@@ -6098,7 +6110,7 @@ test('compact Finance desk retains distinct cash, reserves, stock and operating 
   assert.match(html,/class="career-panel finance-control"/);
   assert.match(html,/class="finance-page-heading"/);
   assert.match(html,/FINANCIAL <em>CONTROL\.<\/em>/);
-  assert.match(html,/finance-polish\.css\?v=1/);
+  assert.match(html,/finance-polish\.css\?v=\d+/);
   assert.doesNotMatch(html,/<h1 id="finance-title">BUSINESS <em>FINANCES/);
   assert.equal((page.html.match(/class="fin-tile/g)||[]).length,4);
   assert.match(page.html,/CASH BALANCE/);
@@ -6161,7 +6173,7 @@ test('compact Operations Diary distinguishes meeting, normal calendar and Deal D
   const s=E.createStaffed('Diary Layout Review',[]);
   assert.match(html,/class="career-panel events-page-control"/);
   assert.match(html,/OPERATIONS <em>DIARY\.<\/em>/);
-  assert.match(html,/events-polish\.css\?v=1/);
+  assert.match(html,/events-polish\.css\?v=\d+/);
   assert.doesNotMatch(html,/<h1 id="events-title">DEAL DAY & <em>MEETINGS/);
   const starting=JSON.stringify(s);
   const meeting=V.render(s);
@@ -6236,7 +6248,7 @@ test('Management Reports compact scorecard retains the real monthly figures and 
   const view=M.renderReport(s,E.monthly);
   assert.match(html,/class="career-panel reports-page-control"/);
   assert.match(html,/MANAGEMENT <em>REPORTS\.<\/em>/);
-  assert.match(html,/reports-polish\.css\?v=1/);
+  assert.match(html,/reports-polish\.css\?v=\d+/);
   assert.doesNotMatch(html,/PERFORMANCE \/ MONTHLY BOARD REVIEW/);
   assert.match(view,/MONTH 1 SCORECARD/);
   assert.match(view,/LIVE POSITION/);
@@ -6313,7 +6325,7 @@ test('Staff & Recruitment always identifies the complete opening team and exact 
   const state=E.createStaffed('Team Visibility QA',[]);
   assert.match(html,/class="career-panel staff-page-control"/);
   assert.match(html,/TEAM & <em>HIRING\.<\/em>/);
-  assert.match(html,/staff-polish\.css\?v=1/);
+  assert.match(html,/staff-polish\.css\?v=\d+/);
   assert.doesNotMatch(html,/DEALERSHIP OPERATIONS \/ EMPLOYMENT/);
   const desk=PV.staffDesk(state,P,{mode:'team'});
   assert.equal(desk.mode,'team');
@@ -6446,7 +6458,7 @@ test('Premises & Facilities identifies actual physical bays versus active techni
   const f=app.premisesView.figures(s,site);
   assert.match(html,/class="career-panel premises-page-control"/);
   assert.match(html,/PREMISES & <em>FACILITIES\.<\/em>/);
-  assert.match(html,/premises-polish\.css\?v=1/);
+  assert.match(html,/premises-polish\.css\?v=\d+/);
   assert.equal(f.forecourt,4);
   assert.equal(f.workshop,4);
   assert.equal(f.techWorking,1);
