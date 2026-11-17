@@ -89,6 +89,31 @@ test('supervisor visibly saves a planned repair day, retains normal salaries',()
   assert.equal(s.cash,before-dayCost-S.costs(s).total);
   save(s);
 });
+test('active supervisor changes a real final QC outcome, not just a displayed number',()=>{
+  function hash(t){
+    let n=2166136261;
+    for(const c of String(t))n=Math.imul(n^c.charCodeAt(0),16777619)>>>0;
+    return n>>>0;
+  }
+  const i=Array.from({length:2000},(_,i)=>i)
+    .find(i=>hash('quality|qc-fixture-'+i)%100===10);
+  assert.notEqual(i,undefined);
+  const s=E.createStaffed('Supervisor QC Test',[]);
+  s.vehicles=[{id:1,title:'QC Vehicle',status:'acquired',
+    origin:'qc-fixture-'+i,prepBudget:200,prepSpent:0,cost:1000,
+    profile:{grade:2},workshop:{
+      stage:'quality-check',assessmentFee:30,method:'external',
+      repairCost:200,remainingDays:0,plannedDays:3,partsDelay:0,
+      startedDay:1,completedDay:null,technicianId:null,reworks:0,paused:false
+    }}];
+  const noManager=copy(s);
+  noManager.staff.find(e=>e.role==='supervisor').trainingUntil=3;
+  assert.equal(W.quality(s,1).ok,true);
+  assert.equal(s.vehicles[0].status,'prepared');
+  assert.equal(W.quality(noManager,1).ok,true);
+  assert.equal(noManager.vehicles[0].workshop.stage,'in-progress');
+  assert.ok(noManager.cash<s.cash,'unsupervised rework must actually cost cash');
+});
 test('available technicians accelerate a busy repair by at most one day each shift',()=>{
   const s=funded('Assistant Shift Test',42);
   hireTechs(s,2);next(s);cars(s,1);
