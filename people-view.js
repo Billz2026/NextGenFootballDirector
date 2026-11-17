@@ -49,8 +49,8 @@
       const rating=person.skills.knowledge+person.skills.reliability;
       const qc=Math.min(8,Math.max(0,Math.floor((rating-20)/2)));
       return '<p class="people-caption"><strong>SUPERVISOR IMPACT:</strong> '+
-        (rating>=28?'One planned day saved on new internal repair bookings':'No scheduling day saved until combined knowledge/reliability reach 28')+
-        ' · '+qc+' percentage-point lower QC rework risk · weekly morale support +'+
+        (rating>=28?'Can save one planned day on new internal repair bookings':'No scheduling day saved until combined knowledge/reliability reach 28')+
+        ' · up to '+qc+' percentage-point lower QC rework risk · weekly morale support +'+
         (person.skills.care>=16?'5':'3')+' when staff need help. Active duty required.</p>';
     }
     if(person.role==='technician')
