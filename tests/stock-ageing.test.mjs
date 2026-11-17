@@ -149,6 +149,32 @@ test('aged ready stock can exit wholesale with correct paid-repair basis',()=>{
   assert.equal(s.sales,0,'trade exits are not retail sales');
   valid(s);
 });
+test('a stale advertised car can be repriced or liquidated without a forced price cut',()=>{
+  const s=career('Retail Pricing Pressure'),v=buy(s);
+  assert.equal(E.assessStock(s,v.id).ok,true);
+  assert.equal(E.startPrep(s,v.id,'external').ok,true);
+  for(let i=0;i<20&&v.status==='acquired';i++){
+    next(s);
+    if(v.workshop.stage==='quality-check')assert.equal(E.finishPrep(s,v.id).ok,true);
+  }
+  assert.equal(v.status,'prepared');
+  assert.equal(E.advertise(s,v.id,v.retail).ok,true);
+  const originalPrice=v.asking;
+  until(s,31);
+  assert.equal(v.asking,originalPrice,'ageing cannot silently discount a listed car');
+  const guide=A.marketTarget(s,v);
+  assert.ok(guide<originalPrice,'real stock at 30 days should have a competitive guide');
+  const html=SV.render(s,{reportCard:()=>''}).html;
+  assert.match(html,/data-action="reprice-aged-stock"/);
+  assert.match(html,/data-action="dispose-aged-stock"/);
+  assert.equal(E.advertise(s,v.id,guide).ok,true);
+  assert.equal(v.asking,guide);
+  const before=s.cash;
+  assert.equal(E.disposeStock(s,v.id).ok,true);
+  assert.ok(s.cash>before);
+  assert.equal(s.sold.length,0);
+  valid(s);
+});
 test('trade exit protects a live customer agreement',()=>{
   const s=career('Customer Protection'),v=buy(s);
   assert.equal(E.assessStock(s,v.id).ok,true);
