@@ -71,7 +71,8 @@ try{
     const panel=page.locator('.sales-control');
     await panel.waitFor({state:'visible'});
     assert.equal((await panel.locator('h1').innerText()).replace(/\s+/g,' ').trim(),'RETAIL PIPELINE.');
-    assert.equal(await panel.locator('.so-kpis>div').count(),3);
+    assert.equal(await panel.locator('.so-kpis>div').count(),4,
+      'Retail KPIs include advertised stock, on-site visitors, actions and held deposits');
     assert.equal(await panel.locator('.so-activity').evaluate(x=>x.open),false);
     assert.equal(await panel.locator('.so-register .so-unit').count(),1);
     assert.equal(await panel.locator('.so-quick-price').count(),1);
