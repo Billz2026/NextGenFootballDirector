@@ -1194,6 +1194,10 @@
       case 'test-drive':
         if(career)saveResult(E.testDrive(career,Number(button.dataset.id)));
         break;
+      case 'customer-objection':
+        if(career)saveResult(E.respondCustomer(career,Number(button.dataset.id),
+          button.dataset.choice),Number(button.dataset.id));
+        break;
       case 'agree-cash':
         if(career)saveResult(E.agreeCustomer(career,Number(button.dataset.id),'cash',null));
         break;
