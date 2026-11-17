@@ -9,7 +9,7 @@
   const esc=x=>String(x).replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const categories=['all','unread','action','operations','staff','accounts','sales','reports'];
-  const labels={all:'ALL MAIL',unread:'UNREAD',action:'NEEDS APPROVAL',operations:'WORKSHOP & BUYING',
+  const labels={all:'ALL MAIL',unread:'UNREAD',action:'NEEDS ACTION',operations:'WORKSHOP & BUYING',
     staff:'STAFF',accounts:'ACCOUNTS',sales:'CUSTOMERS',reports:'REPORTS'};
   const infer=m=>{
     if(['operations','staff','accounts','sales','reports'].includes(m.category))return m.category;
@@ -289,7 +289,8 @@
     const sender=emailSender(message);
     const decision=message.decision||'';
     const status=decision?decision.toUpperCase():
-      needsAction(message,state)?'AWAITING YOUR APPROVAL':
+      needsAction(message,state)?
+        (String(message.reference||'').startsWith('aftersales:')?'ACTION REQUIRED':'AWAITING YOUR APPROVAL'):
       message.subject.startsWith('PAID COPY')?'PAID · FOR YOUR RECORDS':'FOR INFORMATION';
     const body=preparedBody(message);
     const blocks=body.split(/\n{2,}/).filter(x=>x.trim());

@@ -196,7 +196,9 @@
       '<span class="message-copy">' +
         '<span class="message-from"><span>' + escapeText(message.from) + '</span><time>' + stamp + '</time></span>' +
         '<span class="message-title">' + escapeText(message.subject) + '</span>' +
-        (!compact&&pending?'<span class="inbox-message-tags"><b class="inbox-tag-action">APPROVAL REQUIRED</b></span>':'') +
+        (!compact&&pending?'<span class="inbox-message-tags"><b class="inbox-tag-action">'+
+          (String(message.reference||'').startsWith('aftersales:')?'ACTION REQUIRED':'APPROVAL REQUIRED')+
+          '</b></span>':'') +
         '<span class="message-summary">' + escapeText(message.preview) + '</span>' +
       '</span>' +
       (message.read ? '' : '<span class="message-unread" aria-label="Unread"></span>');
@@ -219,6 +221,8 @@
     byId('widget-unread-label').textContent=unread+' UNREAD'+
       (actions?' · '+actions+' APPROVAL'+(actions===1?'':'S'):'');
     byId('inbox-unread-count').textContent=unread+' UNREAD';
+    const markAllRead=byId('screen-career').querySelector('.inbox-heading [data-action="mark-all-read"]');
+    if(markAllRead)markAllRead.hidden=unread===0;
     byId('inbox-action-count').textContent=String(actions);
     byId('inbox-action-count').dataset.tone=actions>0?'attention':'neutral';
     byId('inbox-unread-summary').textContent=String(unread);
@@ -282,7 +286,9 @@
       action.textContent='OPEN '+PAGES[selected.linkPage]+' ↗';
       toolbar.appendChild(action);
     }
-    detail.appendChild(toolbar);
+    const mailHeading=detail.querySelector('.inbox-mail-heading');
+    if(mailHeading)mailHeading.after(toolbar);
+    else detail.appendChild(toolbar);
   }
   const cashText = n => money.format(n);
   const milesText = n => new Intl.NumberFormat('en-GB').format(n) + ' mi';

@@ -458,3 +458,196 @@
 @media(prefers-reduced-motion:reduce) {
   #screen-career .inbox-control .inbox-row {transition:none;}
 }
+
+/* Inbox v2 — tighter full-height desktop workspace (Inbox only).
+   Prioritise messages and business actions without reducing mail-body legibility. */
+@media (min-width:781px) {
+  #screen-career:has(.inbox-control:not([hidden])) .career-content {
+    padding-top:8px;
+    padding-bottom:8px;
+  }
+  #screen-career:has(.inbox-control:not([hidden])) .game-notice {
+    margin-top:6px;
+    padding:6px 10px;
+    font-size:10px;
+    line-height:1.32;
+  }
+  #screen-career .inbox-control .inbox-heading {
+    min-height:37px;
+    margin-bottom:7px;
+    gap:10px;
+  }
+  #screen-career .inbox-control .inbox-heading h1,
+  #screen-career .inbox-control .inbox-heading h1 em {
+    font-size:clamp(23px,2.1vw,28px);
+    line-height:1.12;
+  }
+  #screen-career .inbox-control .inbox-stat-strip>div {
+    padding:6px 10px;
+    gap:6px;
+  }
+  #screen-career .inbox-control .inbox-stat-strip strong {
+    font-size:14px;
+  }
+  #screen-career .inbox-control .inbox-heading .secondary-button {
+    min-height:31px;
+    padding:7px 10px;
+  }
+  #screen-career .inbox-control .inbox-heading .secondary-button[hidden] {
+    display:none;
+  }
+  #screen-career .inbox-control .inbox-filters {
+    min-height:32px;
+    margin-bottom:7px;
+    gap:5px;
+  }
+  #screen-career .inbox-control .inbox-filters>button,
+  #screen-career .inbox-control .inbox-department-menu summary {
+    min-height:32px;
+    padding:7px 10px;
+    font-size:10px;
+  }
+  #screen-career .inbox-control .inbox-layout {
+    height:clamp(390px,calc(100dvh - 244px),740px);
+    grid-template-columns:minmax(280px,.85fr) minmax(0,1.4fr);
+  }
+  #screen-career .inbox-control .inbox-column-head {
+    min-height:34px;
+    padding:8px 12px;
+    line-height:1.2;
+  }
+  #screen-career .inbox-control .inbox-row {
+    min-height:59px;
+    padding:8px 12px;
+  }
+  #screen-career .inbox-control .inbox-row .message-copy {
+    gap:2px;
+  }
+  #screen-career .inbox-control .inbox-row .message-from {
+    font-size:9px;
+    line-height:1.2;
+  }
+  #screen-career .inbox-control .inbox-row .message-title {
+    font-size:11px;
+    line-height:1.26;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:block;
+    max-width:100%;
+  }
+  #screen-career .inbox-control .inbox-row .message-summary {
+    font-size:10px;
+    line-height:1.25;
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  #screen-career .inbox-control .inbox-list .inbox-message-tags {
+    margin:0;
+  }
+  #screen-career .inbox-control .inbox-list .inbox-tag-action {
+    font-size:8px;
+    line-height:1.1;
+  }
+  #screen-career .inbox-control .inbox-detail {
+    padding:12px 17px;
+  }
+  #screen-career .inbox-control .inbox-mail-heading {
+    padding-bottom:8px;
+    margin-bottom:0;
+  }
+  #screen-career .inbox-control .inbox-mail-heading h2 {
+    font-size:clamp(18px,1.65vw,23px);
+    line-height:1.2;
+    margin-top:4px;
+  }
+  #screen-career .inbox-control .inbox-message-toolbar {
+    display:flex;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:0 0 7px;
+    padding:7px 0;
+    border-top:0;
+    border-bottom:1px solid #313C45;
+  }
+  #screen-career .inbox-control .inbox-message-toolbar .secondary-button {
+    min-height:29px;
+    padding:6px 10px;
+    font-size:9px;
+  }
+  #screen-career .inbox-control .inbox-message-toolbar .detail-action {
+    border-color:#6A7074;
+    background:#273039;
+    color:#F4F5F5;
+  }
+  #screen-career .inbox-control .inbox-email-header {
+    padding:8px 0;
+    gap:9px;
+  }
+  #screen-career .inbox-control .inbox-email-avatar {
+    flex-basis:32px;
+    width:32px;
+    height:32px;
+    font-size:11px;
+  }
+  #screen-career .inbox-control .inbox-email-address strong {
+    font-size:12px;
+  }
+  #screen-career .inbox-control .inbox-email-status {
+    padding:6px 0;
+    font-size:9px;
+  }
+  #screen-career .inbox-control .inbox-email-body {
+    padding:10px 0 8px;
+    font-size:12px;
+    line-height:1.52;
+  }
+  #screen-career .inbox-control .inbox-email-body p {
+    margin-bottom:7px;
+  }
+  #screen-career .inbox-control .inbox-email-body .mail-greeting {
+    margin-bottom:7px;
+  }
+  #screen-career .inbox-control .mail-paragraph-group {
+    margin-bottom:7px;
+  }
+  #screen-career .inbox-control .inbox-email-body .mail-subject-heading {
+    margin:2px 0 5px;
+  }
+  #screen-career .inbox-control .inbox-email-signature {
+    margin-top:10px;
+    padding-top:7px;
+  }
+  #screen-career .inbox-control .inbox-policy {
+    margin-top:4px;
+  }
+  #screen-career .inbox-control .inbox-policy summary {
+    padding:4px 0;
+  }
+}
+@media (min-width:781px) and (max-height:650px) {
+  #screen-career .inbox-control .inbox-layout {
+    height:max(340px,calc(100dvh - 230px));
+  }
+}
+/* On narrow devices preserve readable, stacked message and detail panes. */
+@media (max-width:780px) {
+  #screen-career .inbox-control .inbox-message-toolbar {
+    display:flex;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:0 0 10px;
+    padding:8px 0;
+    border-top:0;
+    border-bottom:1px solid #313C45;
+  }
+  #screen-career .inbox-control .inbox-message-toolbar .detail-action {
+    border-color:#6A7074;
+    color:#F4F5F5;
+  }
+  #screen-career .inbox-control .inbox-heading .secondary-button[hidden] {display:none;}
+}
