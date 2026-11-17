@@ -1,0 +1,68 @@
+name: Showroom final visitor regression
+on:
+  pull_request:
+    paths:
+      - 'showroom-traffic.js'
+      - 'customers.js'
+      - 'customers-view.js'
+      - 'index.html'
+      - 'tests/showroom-traffic.test.mjs'
+      - 'tests/showroom-final-browser.mjs'
+      - '.github/workflows/showroom-final-visitor.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'showroom-traffic.js'
+      - 'customers.js'
+      - 'customers-view.js'
+      - 'index.html'
+      - 'tests/showroom-traffic.test.mjs'
+      - 'tests/showroom-final-browser.mjs'
+      - '.github/workflows/showroom-final-visitor.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate showroom model and test syntax
+        run: |
+          node --check showroom-traffic.js
+          node --check customers-view.js
+          node --check customers.js
+          node --check tests/showroom-traffic.test.mjs
+      - name: Check genuine customer flow, session capacity and save recovery
+        run: node --test tests/showroom-traffic.test.mjs tests/customer-behaviour.test.mjs
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check browser test syntax
+        run: node --check tests/showroom-final-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve the game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/showroom-final-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Reproduce and serve the last showroom visitor on desktop and mobile
+        run: node tests/showroom-final-browser.mjs
+      - name: Upload genuine browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: showroom-last-visitor-desktop-phone
+          path: review/showroom-final-*.png
+          retention-days: 7
+          if-no-files-found: warn
