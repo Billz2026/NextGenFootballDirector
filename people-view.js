@@ -25,16 +25,41 @@
   const labels={
     sales:'Creates more enquiries, gets buyers to view sooner and improves test-drive conversion and negotiations. Higher performers earn a larger share of positive gross margin.',
     buyer:'Can secure more competitive private-seller agreements and provide auction rival-bid intelligence.',
-    technician:'Runs one assigned in-house repair at a time. More technicians enable parallel preparation, but wages and parts still cost money.',
-    supervisor:'Manages routine rota and morale check-ins automatically each week. Escalates costed staff-support proposals to you for approval or refusal. One supervisor maximum; salary continues daily.'
+    technician:'Leads an assigned in-house repair. Unassigned technicians with 12+ efficiency can support active jobs for faster turnaround. Physical bays still limit concurrent repairs.',
+    supervisor:'Active supervisors shorten planned in-house repairs, improve QC reliability and deliver weekly team morale support. One supervisor maximum; wages continue daily.'
   };
   function salesForecast(person,P){
     if(person.role!=='sales')return '';
     const p=P.salesProfile(person);
     return '<div class="people-caption"><strong>SALES IMPACT:</strong> +'+p.enquiryLift+
       ' percentage points to enquiry chance · +'+p.driveLift+
-      ' to drive conversion · '+(p.fastViewing?'NEXT-DAY VIEWINGS':'UP TO 48-HOUR VIEWINGS')+
+      ' to drive conversion · '+'24-HOUR BOOKED VIEWINGS'+
       ' · '+Math.round(p.commissionRate*100)+'% commission on positive gross margin.</div>';
+  }
+  function roleForecast(person,P){
+    if(person.role==='sales')return salesForecast(person,P);
+    if(person.role==='buyer'){
+      const discount=Math.min(180,Math.max(0,(person.skills.negotiation-10)*20));
+      const spread=Math.max(65,Math.min(300,300-(person.skills.knowledge-7)*14));
+      return '<p class="people-caption"><strong>BUYER IMPACT:</strong> Up to '+
+        gbp(discount)+' private-seller negotiation advantage; auction bid assessment ±'+
+        gbp(spread)+' before rounding. No guaranteed discounts or auction wins.</p>';
+    }
+    if(person.role==='supervisor'){
+      const rating=person.skills.knowledge+person.skills.reliability;
+      const qc=Math.min(8,Math.max(0,Math.floor((rating-20)/2)));
+      return '<p class="people-caption"><strong>SUPERVISOR IMPACT:</strong> '+
+        (rating>=28?'One planned day saved on new internal repair bookings':'No scheduling day saved until combined knowledge/reliability reach 28')+
+        ' · '+qc+' percentage-point lower QC rework risk · weekly morale support +'+
+        (person.skills.care>=16?'5':'3')+' when staff need help. Active duty required.</p>';
+    }
+    if(person.role==='technician')
+      return '<p class="people-caption"><strong>TECHNICIAN IMPACT:</strong> Leads one internal repair; '+
+        (person.skills.efficiency>=12?
+          'can assist one busy workshop job per shift when free, saving an extra day of repair progress':
+          'needs 12+ efficiency to speed repairs as an assistant')+
+        '. Physical bays still cap simultaneous repairs.</p>';
+    return '';
   }
   function applicants(state,P){
     const candidates=P.applicants(state.day);
@@ -51,7 +76,7 @@
       return '<article class="people-card">'+header(candidate)+
         '<div class="people-traits">'+traitsHtml+'</div>'+
         '<p class="people-caption">'+esc(labels[candidate.role])+'</p>'+
-        salesForecast(candidate,P)+
+        roleForecast(candidate,P)+
         '<div class="people-card-footer"><span>'+costText+'</span>'+
         '<button type="button" class="trade-button" data-action="hire-staff" data-id="'+
           esc(candidate.id)+'"'+(already||filled||paused||!!quote.shortfall?' disabled':'')+'>'+
@@ -90,7 +115,7 @@
         '<span>MORALE '+employee.morale+'/100</span>'+
         '<span>'+employee.deals+' DEALS · '+employee.workDone+' PREP JOBS</span></div>'+
         '<div class="people-traits">'+traits[employee.role].map(([a,k])=>bar(a,employee.skills[k])).join('')+'</div>'+
-        '<p class="people-caption">'+esc(labels[employee.role])+'</p>'+salesForecast(employee,P)+
+        '<p class="people-caption">'+esc(labels[employee.role])+'</p>'+roleForecast(employee,P)+
         '<div class="people-card-footer"><span>DAILY WAGE PROVISION '+gbp(P.dailyCost(employee))+'</span>'+
         '<div class="people-actions"><button type="button" class="trade-button trade-button-secondary" data-action="train-staff" data-id="'+employee.id+'">TRAIN · '+gbp(P.TRAINING_FEE)+'</button>'+
         '<button type="button" class="trade-button people-release" data-action="release-staff" data-id="'+employee.id+'">RELEASE</button></div></div></article>';
@@ -98,10 +123,10 @@
   }
   const levels=[
     {min:0,max:19,name:'NEW TRADER',benefit:'Starting reputation tier'},
-    {min:20,max:39,name:'LOCAL DEALER',benefit:'First forecourt expansion becomes eligible'},
-    {min:40,max:59,name:'TRUSTED DEALER',benefit:'Extra sales and technician hiring capacity'},
-    {min:60,max:79,name:'REGIONAL SPECIALIST',benefit:'Regional standing; luxury market needs 65+ and cash'},
-    {min:80,max:100,name:'PRESTIGE DEALER',benefit:'Highest staff capacity and premises eligibility'}
+    {min:20,max:39,name:'LOCAL DEALER',benefit:'Six permanent forecourt spaces unlock automatically'},
+    {min:40,max:59,name:'TRUSTED DEALER',benefit:'Eight forecourt spaces, extra sales hires and six technician slots'},
+    {min:60,max:79,name:'REGIONAL SPECIALIST',benefit:'Ten forecourt spaces; luxury sourcing still needs 65+ and cash'},
+    {min:80,max:100,name:'PRESTIGE DEALER',benefit:'Eight technician slots and three sales representative slots'}
   ];
   function reputation(state){
     const score=Math.max(0,Math.min(100,state.reputationScore));
@@ -219,8 +244,8 @@
     const total=state.staff.reduce((sum,employee)=>sum+employee.monthlySalary,0);
     const technicians=state.staff.filter(s=>s.role==='technician').length;
     const salespeople=state.staff.filter(s=>s.role==='sales').length;
-    const next=state.reputationScore<40?'6 technician places at 40 reputation':
-      state.reputationScore<80?'8 technician places at 80 reputation':null;
+    const next=state.reputationScore<40?'6 technician hiring places at 40 reputation':
+      state.reputationScore<80?'8 technician hiring places at 80 reputation':null;
     return '<div class="people-metrics"><div><span>EMPLOYEES</span><strong>'+
       state.staff.length+' / '+P.staffLimit(state)+'</strong></div>'+
       '<div><span>DAILY WAGE SETTLEMENT</span><strong>'+gbp(wages)+'</strong></div>'+
@@ -228,8 +253,8 @@
       '<div><span>UNPAID PAYROLL / NOTICE</span><strong>'+gbp(state.payrollArrears)+'</strong></div>'+
       '<div><span>IN-HOUSE TECHNICIANS</span><strong>'+technicians+' / '+P.technicianLimit(state)+'</strong></div>'+
       '<div><span>SALES EXECUTIVES</span><strong>'+salespeople+' / '+P.salesLimit(state)+'</strong></div>'+ 
-      '</div><p class="trade-alert">You can hire four technicians immediately, subject to a clear three-day wage buffer. '+
-      'Each works on a separate vehicle. You can hire one sales executive at first, two at 40 reputation and three at 80, alongside one buyer. '+
+      '</div><p class="trade-alert">Technician hiring slots grow with reputation: four initially, six at 40, eight at 80. Workshop bays limit active jobs, not hiring. A three-day wage buffer is still required. '+
+      'Qualified idle technicians can assist active repairs. You can hire one sales executive at first, two at 40 reputation and three at 80, alongside one buyer. '+
       (next?'NEXT UNLOCK: '+next+'.':'All eight technician places are unlocked.')+'</p>';
   }
 
@@ -335,7 +360,7 @@
       '<span>RATINGS OUT OF 20</span></div><div class="sd-skills">'+
       traits[person.role].map(([name,key])=>bar(name,person.skills[key])).join('')+
       '</div><details class="sd-role-impact"><summary>'+roleInfo+'</summary>'+
-      '<p>'+esc(labels[person.role])+'</p>'+salesForecast(person,P)+'</details></section>';
+      '<p>'+esc(labels[person.role])+'</p>'+roleForecast(person,P)+'</details></section>';
   }
   function employeeDetail(state,P,e){
     const info=employeeStatus(state,P,e);
@@ -357,9 +382,10 @@
       '<div><small>DAILY PAYROLL</small><strong>'+gbp(dayRate)+'</strong></div>'+
       '<div><small>MORALE</small><strong>'+e.morale+' / 100</strong></div>'+
       '<div><small>START DATE</small><strong>DAY '+e.startDay+'</strong></div></div>'+
+      roleForecast(e,P)+
       '<div class="sd-person-detail"><div>'+skillSection(e,P)+
       '<div class="sd-performance"><div><small>RETAIL DEALS</small><strong>'+e.deals+
-      '</strong></div><div><small>PREPARATION JOBS</small><strong>'+e.workDone+
+      '</strong></div><div><small>PREPARATION TASKS</small><strong>'+e.workDone+
       '</strong></div><div><small>HIRED DAY</small><strong>'+e.hiredDay+
       '</strong></div></div></div><div class="sd-control"><div class="sd-section-head">'+
       '<h4>EMPLOYEE DECISIONS</h4><span>CONFIRMED ACTIONS</span></div>'+
@@ -391,7 +417,7 @@
         ' may be employed at a time. Releasing an employee carries a notice cost.':
         c.role==='sales'?
         'Sales capacity is based on reputation: 1 place now, 2 at 40, 3 at 80.':
-        'Technician capacity depends on reputation AND unlocked workshop bays.'):
+        'Technician hiring slots depend on reputation: four initially, six at 40, eight at 80; physical bays limit concurrent jobs.'):
       info.reason==='TEAM FULL'?
         'Your total staff capacity is full. Reputation and premises may permit expansion.':
       info.reason==='INSUFFICIENT CASH'?
@@ -425,6 +451,7 @@
       '</strong></div></div>'+
       '<div class="sd-hire-reason"><strong>'+esc(info.reason)+'</strong>'+
       '<p>'+esc(capacityReason)+'</p></div>'+
+      roleForecast(c,P)+
       '<div class="sd-person-detail"><div>'+skillSection(c,P)+
       '</div><div class="sd-control"><div class="sd-section-head"><h4>HIRING DECISION</h4>'+
       '<span>STARTS DAY '+(state.day+1)+'</span></div>'+
