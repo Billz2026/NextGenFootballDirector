@@ -60,9 +60,9 @@
       '<div class="eo-timeline" aria-label="Five Deal Day sessions">'+phases+'</div>'+
       '<div class="eo-kpis">'+
       '<div><small>PRIVATE SELLERS THIS SESSION</small><strong>'+sellerCount+'</strong></div>'+
-      '<div><small>VEHICLES ADVERTISED</small><strong>'+listed+'</strong></div>'+
+      '<div class="'+(listed===0?'eo-kpi-attention':'eo-kpi-neutral')+'"><small>VEHICLES ADVERTISED</small><strong>'+listed+'</strong></div>'+
       '<div><small>RETAIL HANDOVERS TODAY</small><strong>'+today.length+'</strong></div>'+
-      '<div><small>MONTHLY SALES TARGET</small><strong>'+monthSold+' / '+month.unitTarget+'</strong></div>'+
+      '<div class="'+(monthSold<month.unitTarget?'eo-kpi-attention':'eo-kpi-neutral')+'"><small>MONTHLY SALES TARGET</small><strong>'+monthSold+' / '+month.unitTarget+'</strong></div>'+
       '</div>'+
       '<div class="eo-session-summary"><strong>TODAY’S RETAIL TURNOVER '+money(total)+'</strong>'+
       '<span>'+prep+' vehicle'+(prep===1?'':'s')+' need preparation · '+
@@ -152,8 +152,17 @@
       ['REPUTATION',state.reputationScore+' / 100'],
       ['STAFF ON PAYROLL',String(state.staff.length)]
     ];
-    const cards=metrics.map(([label,value])=>
-      '<div><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>').join('');
+    const cards=metrics.map(([label,value])=>{
+      const financial=label==='OPERATING CONTRIBUTION'?
+        (previous.operatingContribution??previous.grossAfterStaff):
+        label==='CLOSING CASH'?previous.closingCash:
+        label==='CURRENT CASH'?state.cash:null;
+      const tone=financial===null?'neutral':
+        financial<0?'critical':
+        label==='OPERATING CONTRIBUTION'&&financial>0?'positive':'neutral';
+      return '<div class="eo-kpi-'+tone+'"><small>'+esc(label)+
+        '</small><strong>'+esc(value)+'</strong></div>';
+    }).join('');
     const choices=Object.entries(d.FOCI).map(([id,focus])=>{
       const isSelected=done&&state.meetingFocus===id;
       return '<button type="button" class="eo-focus-choice'+(isSelected?' eo-focus-selected':'')+
@@ -228,8 +237,8 @@
       '<div class="eo-kpis">'+
       '<div><small>DAYS UNTIL DEAL DAY</small><strong>'+until+'</strong></div>'+
       '<div><small>MONTHLY HANDOVERS</small><strong>'+sold+' / '+current.unitTarget+'</strong></div>'+
-      '<div><small>VEHICLES ADVERTISED</small><strong>'+listed+'</strong></div>'+
-      '<div><small>CASH BALANCE</small><strong>'+money(state.cash)+'</strong></div>'+
+      '<div class="'+(listed===0?'eo-kpi-attention':'eo-kpi-neutral')+'"><small>VEHICLES ADVERTISED</small><strong>'+listed+'</strong></div>'+
+      '<div class="'+(state.cash<0?'eo-kpi-critical':'eo-kpi-neutral')+'"><small>CASH BALANCE</small><strong>'+money(state.cash)+'</strong></div>'+
       '</div><div class="eo-calendar-grid">'+
       '<section class="eo-schedule"><div><small>UPCOMING · GAME DAY '+next+'</small>'+
       '<h3>MONTH-END DEAL DAY</h3><strong>FIVE SESSIONS · 09:00–17:00</strong>'+
