@@ -54,10 +54,10 @@ test('age tiers start exactly on day 15, 30 and 45',()=>{
 test('holding charges are real ledger expenses, with no duplicate daily debit',()=>{
   const s=career('Stock Ageing Daily');const v=buy(s);
   assert.equal(v.acquiredDay,1);
-  until(s,14);
+  until(s,15);
   assert.equal(s.ledger.some(x=>x.note.startsWith('Stock ageing expense accrued:')),false);
   const before=s.cash,settled=next(s);
-  assert.equal(s.day,15);
+  assert.equal(s.day,16);
   assert.equal(settled.due,6);
   assert.equal(settled.paid,6);
   assert.equal(s.cash,before-E.people.dailyCost(s.staff[0])-
@@ -73,12 +73,12 @@ test('holding charges are real ledger expenses, with no duplicate daily debit',(
 });
 test('tier changes accrue higher costs and appear in monthly operating contribution',()=>{
   const s=career('Tier Accounting');buy(s);
-  const first=until(s,15);
+  const first=until(s,16);
   assert.equal(first.due,6);
-  const second=until(s,30);
+  const second=until(s,31);
   assert.equal(second.due,14);
   assert.ok(M.statement(s).stockAgeingExpense>0);
-  const third=until(s,45);
+  const third=until(s,46);
   assert.equal(third.due,28);
   assert.equal(s.stockAgeingArrears,0);
   const accrued=s.ledger.filter(x=>x.note.startsWith('Stock ageing expense accrued:'))
@@ -95,7 +95,7 @@ test('unpaid holding charges remain liabilities and cannot raid protected repair
   const reserved=E.workshop.reserved(s);
   const move=s.cash-reserved;
   s.cash-=move;s.ledger.push({day:s.day,delta:-move,note:'Test cash allocation'});
-  until(s,14);
+  until(s,15);
   const r=next(s);
   assert.equal(r.due,6);
   assert.equal(r.paid,0);
@@ -137,7 +137,7 @@ test('aged ready stock can exit wholesale with correct paid-repair basis',()=>{
   assert.equal(v.status,'prepared');
   assert.equal(E.disposeStock(s,v.id).ok,false,
     'new ready stock cannot use special ageing liquidation');
-  until(s,30);
+  until(s,31);
   const bid=E.wholesaleOffer(v,s.day);
   const investment=v.cost+v.prepSpent,originalCash=s.cash;
   const result=E.disposeStock(s,v.id);
@@ -159,7 +159,7 @@ test('trade exit protects a live customer agreement',()=>{
       assert.equal(E.finishPrep(s,v.id).ok,true);
   }
   assert.equal(E.advertise(s,v.id,v.retail).ok,true);
-  until(s,30);
+  until(s,31);
   s.customerCases[String(v.id)]={status:'agreed'};
   assert.equal(E.disposeStock(s,v.id).code,'customer');
   delete s.customerCases[String(v.id)];
@@ -182,13 +182,13 @@ test('finance runway anticipates future tier boundaries and stock desk shows cho
   const s=career('Planning Ageing'),v=buy(s);
   until(s,14);
   const f=F.forecast(s,E);
-  assert.equal(f.projectedAgeing,7*6);
-  assert.equal(f.projected,f.afterPlans-7*f.daily-7*6);
+  assert.equal(f.projectedAgeing,6*6);
+  assert.equal(f.projected,f.afterPlans-7*f.daily-6*6);
   const target=A.marketTarget(s,v);
   assert.ok(target>0);
   const html=SV.render(s,{reportCard:()=>''}).html;
   assert.ok(html.includes('15+ DAYS')===false,'day 14 should not show ageing tier');
-  until(s,30);
+  until(s,31);
   const aged=SV.render(s,{reportCard:()=>''}).html;
   assert.match(aged,/STOCK HOLDING \/ DAY/);
   assert.match(aged,/MARKET PRICE GUIDE/);
