@@ -70,6 +70,13 @@
           ' · '+events.dealSession(state).time+'.',
         'events',closing?'CLOSE MONTH':'OPEN DEAL DAY','urgent');
     }
+    const aftersales=E.aftersales?.stats(state)??{open:0,potentialCost:0};
+    if(aftersales.open)
+      add(2.5,'aftersales',aftersales.open+' post-sale customer case'+
+        (aftersales.open===1?'':'s')+' awaiting action',
+        money(aftersales.potentialCost)+' in estimated customer repairs. '+
+        'Unresolved cases can damage customer trust after seven game days.',
+        'sales','OPEN AFTERSALES','urgent');
     if(state.payrollArrears>0)
       add(3,'payroll','Outstanding staff wages',
         money(state.payrollArrears)+' remains owed to employees.',
