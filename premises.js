@@ -52,7 +52,7 @@
     const f=kind==='forecourt',level=f?state.premises.forecourtLevel:state.premises.workshopLevel;
     const sizes=f?FORECOURT:WORKSHOP,rep=f?FOR_REP:WORK_REP,fees=f?FOR_COST:WORK_COST;
     if(level>=sizes.length-1)return {kind,maximum:true,automatic:f};
-    const requiredReputation=rep[level],cost=fees[level];
+    const requiredReputation=rep[level],cost=f?0:fees[level];
     const after={
       ...state,premises:{...state.premises,[f?'forecourtLevel':'workshopLevel']:level+1}
     };
@@ -64,11 +64,12 @@
     // three days of staff wages protects a newly expanded dealership.
     const protectedCash=repairReserve+state.payrollArrears+state.premises.arrears+
       7*afterDaily+3*wages;
-    const requiredCash=cost+protectedCash;
+    const requiredCash=f?0:cost+protectedCash;
     return {kind,automatic:f,maximum:false,current:sizes[level],next:sizes[level+1],
-      level:level+1,cost,requiredReputation,eligible:state.reputationScore>=requiredReputation,
+      level:level+1,cost,requiredReputation,eligible:!f&&state.reputationScore>=requiredReputation,
       currentDaily:beforeDaily,newDaily:afterDaily,dailyIncrease:afterDaily-beforeDaily,
-      protectedCash,requiredCash,shortfall:Math.max(0,requiredCash-state.cash)};
+      protectedCash:f?0:protectedCash,requiredCash,
+      shortfall:f?0:Math.max(0,requiredCash-state.cash)};
   }
   function upgrade(state,kind){
     const q=quote(state,kind);
