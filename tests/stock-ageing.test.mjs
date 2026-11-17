@@ -8,7 +8,7 @@ const ctx={window:{},Date,Intl,document:{addEventListener(){}}};
 for(const path of ['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
   'events.js','workshop.js','stock-ageing.js','showroom-traffic.js',
-  'customers.js','trading.js','cashflow-forecast.js','finance-view.js',
+  'customers.js','aftersales.js','trading.js','cashflow-forecast.js','finance-view.js',
   'vehicle-cards.js','stock-view.js','monthly-view.js']){
   runInNewContext(readFileSync(new URL('../'+path,import.meta.url),'utf8'),
     ctx,{filename:path});

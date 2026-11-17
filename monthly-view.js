@@ -50,7 +50,8 @@
     inspections:'Pre-purchase inspections',payroll:'Wages paid',
     commission:'Sales commission paid',recruitment:'Recruitment / onboarding',
     training:'Staff training',staffExit:'Staff exits / notice',other:'Other recorded cash movements',
-    premisesPayments:'Rent and utilities paid',premisesInvestment:'Premises capital investment'
+    premisesPayments:'Rent and utilities paid',premisesInvestment:'Premises capital investment',
+    aftersales:'Aftersales repairs and diagnosis'
   };
   function renderReport(state,M,selected='current'){
     const historical=String(selected)!=='current';
@@ -84,7 +85,7 @@
       cell('AFTER STAFF COSTS',money(r.grossAfterStaff),
         'Before premises, ageing charges and tax',r.grossAfterStaff<0?'report-value-negative':'')+
       cell('OPERATING CONTRIBUTION',money(r.operatingContribution??r.grossAfterStaff),
-        'After staff, premises and stock ageing · before tax and finance',
+        'After staff, premises, stock ageing and aftersales · before tax',
         (r.operatingContribution??r.grossAfterStaff)<0?'report-value-negative':'')+
       cell('CASH AT END OF PERIOD',money(r.closingCash),'Opening: '+money(r.openingCash))+
       cell('REPUTATION',r.closingReputation+'/100',
@@ -95,7 +96,7 @@
       progress(r.turnover,r.targetTurnover,'Sales turnover guidance')+
       progress(Math.max(0,r.grossMargin),r.targetMargin,'Gross trading margin guidance')+
       (companyWarning?'<p class="report-alert">'+companyWarning+'</p>':'')+
-      '<p class="report-muted">Target outcome requires the unit count AND a positive operating contribution after staff, premises and stock ageing charges. '+
+      '<p class="report-muted">Target outcome requires the unit count AND a positive operating contribution after staff, premises, stock ageing and aftersales charges. '+
       'Turnover and margin figures are secondary benchmarks, not additional mandatory gates. '+
       (isClosed?'This target was set at the start of the period.':
       'Targets change for the next month if reputation changes.')+'</p></section>';
@@ -118,6 +119,8 @@
         amount('Stock ageing expenses accrued',-r.stockAgeingExpense)+
         amount('Stock ageing charges paid',-r.stockAgeingPaid)+
         amount('Stock ageing arrears outstanding',r.stockAgeingArrears):'')+
+      (r.afterSalesExpense!==undefined?
+        amount('After-sales repairs and diagnosis paid',-r.afterSalesExpense):'')+
       amount('Operating contribution after operating costs',r.operatingContribution??r.grossAfterStaff)+
       '<p class="report-muted">Gross margin is recognised when a vehicle sells, whereas buying and preparation affect cash immediately. '+
       'Some inspection costs may remain outside realised vehicle margin until stock is sold. '+
@@ -175,7 +178,11 @@
       countLine('Reputation closing',r.closingReputation)+
       amount('Outstanding staff wages / notice',r.payrollArrears)+
       '<h4>RECORDED REPUTATION EVENTS</h4>'+recent+
-      '<p class="report-muted">Customer surveys, warranty claims and formal complaints are not simulated yet. '+
+      (r.afterSalesExpense!==undefined?
+        countLine('Aftersales cases currently open',r.afterSalesOpen)+
+        countLine('Aftersales cases resolved this period',r.afterSalesResolved)+
+        amount('Aftersales repair and diagnosis paid',-r.afterSalesExpense):'')+
+      '<p class="report-muted">Post-handover mechanical complaints are modelled as fictional customer care cases; formal legal proceedings and full UK statutory consumer rights are not simulated. '+
       'This report includes only trust signals and financial events that the current game actually records.</p></section>';
     const journey=r.customerJourney;
     const customerSection=journey?
@@ -225,6 +232,8 @@
       ' in outstanding obligations']);
     if(contribution<0)flags.push(['OPERATING LOSS',money(contribution)+' after staff, premises and stock holding']);
     if(needed)flags.push([isClosed?'SALES TARGET MISSED':'SALES REQUIRED',needed+' handover'+(needed===1?'':'s')+(isClosed?' short of the final target':' still needed')]);
+    if(r.afterSalesOpen)flags.push(['AFTERSALES ACTION',r.afterSalesOpen+
+      ' unresolved post-handover customer case'+(r.afterSalesOpen===1?'':'s')]);
     if(r.agedStock)flags.push(['AGEING STOCK',r.agedStock+' vehicle'+(r.agedStock===1?'':'s')+' held for 14+ days']);
     if(r.stockAwaitingPrep)flags.push(['WORKSHOP BACKLOG',r.stockAwaitingPrep+' vehicle'+(r.stockAwaitingPrep===1?'':'s')+' unprepared']);
     const alerts=(flags.length?flags:[['NO IMMEDIATE FLAGS','No flagged exceptions']]).map(item=>

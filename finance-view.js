@@ -20,6 +20,7 @@
     const staffDaily=state.staff.reduce((n,v)=>n+E.people.dailyCost(v),0);
     const premisesDaily=E.premises.costs(state).total;
     const ageing=E.stockAgeing?.chargeFor(state)??0;
+    const aftersales=E.aftersales?.stats(state)??{open:0,potentialCost:0,paid:0};
     const arrears=state.payrollArrears+(state.premises?.arrears||0)+
       (state.stockAgeingArrears||0);
     const held=E.customers.heldDeposits(state);
@@ -28,6 +29,7 @@
     const auctionInvoice=lot?auction.currentBid+lot.fee:0;
     return {cash:state.cash,reserved,afterReserve:state.cash-reserved,
       stock:r.stockCapital,held,arrears,staffDaily,premisesDaily,ageingDaily:ageing,
+      aftersales,
       dailyCommitment:staffDaily+premisesDaily,
       grossLifetime:E.totalMargin(state),lifetimeSales:state.sales,
       auctionInvoice,report:r,
@@ -90,9 +92,11 @@
       line('Wages per game day',money(x.staffDaily))+
       line('Premises per game day',money(x.premisesDaily))+
       line('Current stock ageing charge per day',money(x.ageingDaily))+
+      line('Open aftersales repair estimates',money(x.aftersales.potentialCost))+
+      line('Aftersales costs paid this month',money(r.afterSalesExpense??0))+
       line('Outstanding bills',money(x.arrears),x.arrears?' fin-due':'')+
       notice+auctionNotice+
-      '<p class="fin-detail">Repair reserves remain in the cash balance. Stock ageing costs escalate after 15, 30 and 45 game days and are charged separately from premises costs. Daily costs are not deducted twice.</p>'+
+      '<p class="fin-detail">Repair reserves remain in the cash balance. Open aftersales estimates are contingent customer care exposure, not money already paid. Approved diagnosis and repairs are separate operating costs; daily costs are not deducted twice.</p>'+
       '</section>';
     const performance='<section class="fin-panel"><div class="fin-panel-head"><div>'+
       '<small>TRADING & CUSTOMER FUNDS</small><h3>SALES PERFORMANCE</h3></div>'+
