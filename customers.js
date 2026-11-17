@@ -104,12 +104,18 @@
     if(decision==='evidence'){
       if(c.evidenceTried)return fail('repeat','You have already explained the available vehicle documentation.');
       c.evidenceTried=true;
-      const proved=chance('records|'+c.id,profile.evidenceChance);
+      const proved=!['battery','new'].includes(profile.issue)&&
+        chance('records|'+c.id,profile.evidenceChance);
       append(state,c,proved?'objection-resolved':'objection-rejected',
         'Explained available vehicle records ('+profile.concern+')');
-      if(!proved)return {ok:false,changed:true,code:'not-reassured',
-        message:c.name+' still wants stronger reassurance about '+profile.concern.toLowerCase()+
-        '. No inspection or battery-health report has been invented. Consider a real concession or walk away.'};
+      if(!proved){
+        c.trustPenalty=125;
+        v.cashOffer=null;
+        return {ok:false,changed:true,code:'not-reassured',
+          message:c.name+' still wants stronger reassurance about '+profile.concern.toLowerCase()+
+          '. Their confidence has fallen, reducing their maximum willingness to pay by £125. '+
+          'No inspection or battery-health report has been invented. Consider a real concession or walk away.'};
+      }
       c.objectionStatus='resolved';c.objectionAction='evidence';
       return ok(c.name+' is satisfied with the available records and your honest explanation. The price and trading costs remain unchanged.');
     }
@@ -182,7 +188,7 @@
       collectionDay:null,held:0,counters:0,reason:'',
       terms:'in-person',prepCost:0,exchange:null,
       objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
-      remedyCost:0,priceDiscount:0,
+      remedyCost:0,priceDiscount:0,trustPenalty:0,
       salespersonId:P.salesRep(state,id)?.id??null
     };
     state.customerCases[String(id)]=c;
@@ -254,7 +260,7 @@
       collectionDay:null,held:0,counters:0,reason:'',
       terms:'in-person',prepCost:0,exchange:null,
       objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
-      remedyCost:0,priceDiscount:0,
+      remedyCost:0,priceDiscount:0,trustPenalty:0,
       salespersonId:P.salesRep(state,id+1)?.id??null,
       standby:{...booked,standby:null}
     };
@@ -535,6 +541,7 @@
         typeof c.evidenceTried==='boolean'&&
         no(c.remedyCost,300)&&[0,125,150,175,225].includes(c.remedyCost)&&
         no(c.priceDiscount,250)&&[0,150,175,200].includes(c.priceDiscount)&&
+        [0,125].includes(c.trustPenalty)&&
         (c.objectionAction==='inspection'?(c.remedyCost>0&&c.priceDiscount===0):
           c.remedyCost===0)&&
         (c.objectionAction==='discount'?(c.priceDiscount>0&&c.remedyCost===0):
@@ -596,6 +603,7 @@
       evidenceTried:saved.version>=16?c.evidenceTried:false,
       remedyCost:saved.version>=16?c.remedyCost:0,
       priceDiscount:saved.version>=16?c.priceDiscount:0,
+      trustPenalty:saved.version>=16?c.trustPenalty:0,
       exchange:c.exchange?{...c.exchange}:null,
       appointmentDay:saved.version<15&&c.status==='booked'?
         Math.max(state.day,Math.min(c.appointmentDay??(c.createdDay+1),c.createdDay+1)):
@@ -608,6 +616,7 @@
         evidenceTried:saved.version>=16?c.standby.evidenceTried:false,
         remedyCost:saved.version>=16?c.standby.remedyCost:0,
         priceDiscount:saved.version>=16?c.standby.priceDiscount:0,
+        trustPenalty:saved.version>=16?c.standby.trustPenalty:0,
         appointmentDay:saved.version<15&&c.standby.status==='booked'?
           Math.max(state.day,Math.min(c.standby.appointmentDay??(c.standby.createdDay+1),
             c.standby.createdDay+1)):c.standby.appointmentDay,
