@@ -1182,6 +1182,20 @@
           currentPage='sales';render();
         }
         break;
+      case 'welcome-showroom':
+        if(career){
+          const lead=E.showroom.customer(career,button.dataset.lead);
+          if(lead)selectedSalesId=lead.vehicleId;
+          saveResult(E.welcomeShowroom(career,button.dataset.lead,null));
+        }
+        break;
+      case 'assign-showroom':
+        if(career){
+          const lead=E.showroom.customer(career,button.dataset.lead);
+          if(lead)selectedSalesId=lead.vehicleId;
+          saveResult(E.welcomeShowroom(career,button.dataset.lead,Number(button.dataset.staff)));
+        }
+        break;
       case 'open-customer':
         if(career)saveResult(E.openCustomer(career,Number(button.dataset.id)));
         break;
