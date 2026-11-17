@@ -727,6 +727,7 @@
       return fail('reserved','An agreed or reserved vehicle cannot be repriced until the customer arrangement is cancelled.');
     vehicle.asking = asking;vehicle.status = 'listed';vehicle.listedDay = state.day;
     vehicle.cashOffer = null;
+    Q.refresh(state);
     return success(vehicle.title + ' is advertised at ' + asking + '. Check the Sales Office.');
   }
   function pxTemplate(vehicle) {
