@@ -56,9 +56,10 @@
    const b=s.showroom,phase=slot(s);
    if(b.day===s.day&&b.session===phase)return [];
    const gone=closeWaiting(s,'Left the dealership without being served.');
-   const fresh=b.day!==s.day;
+   // Deal Day has separate timed showroom sessions; each session gets
+   // its own finite capacity and patient queue.
    Object.assign(b,{day:s.day,session:phase,
-     ...(fresh?{turn:0,ownerUsed:0,staffUsed:[]}:{}),leads:[]});
+     turn:0,ownerUsed:0,staffUsed:[],leads:[]});
    generate(s);
    return gone.length?[gone.length+' unserved showroom visitor'+(gone.length===1?'':'s')+' left.']:[];
  }
