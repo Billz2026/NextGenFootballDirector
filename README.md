@@ -4,7 +4,16 @@
 
 **Play:** https://billz2026.github.io/TheMotorTrade/
 
-**Before playtesting the new calendar:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
+**Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
+
+### v0.9.42 — Showroom Traffic 2.0 (17 November 2026)
+
+- **Real, finite showroom visitor queue.** Advertised cars attract deterministic fictional customers based on pricing, grade, reputation and sales ability. Up to seven visitors per session, including multiple visitors for the same car. Each has a persistent identity and reason for visiting. Reopening the Sales Office or re-advertising at the same price cannot reroll leads.
+- **Owner and employee time is scarce.** The proprietor welcomes at most two visitors per session; each active salesperson can serve one in parallel. Assigned staff influence the customer's actual journey through their skills and earn ordinary commission only on completed handover. Unavailable employees cannot be assigned.
+- **Customer patience matters.** Urgent visitors leave if the owner attends another consultation first. Missed visits are logged and counted in monthly conversion reports; day-end departures are attributed to the correct trading date. Special month-end Deal Day sessions refresh the limited attention budget.
+- **Real competition for one vehicle.** An unsecured next-day booking does not reserve a car. A queued walk-in can negotiate first while the original appointment remains on standby; it is restored if the competing buyer leaves. Paid deposits and completed handovers immediately close remaining rival interest.
+- **Existing business rules preserved.** Staff-handled visitors still undergo test drives, objection handling, five negotiation rounds, cash or part-exchange agreement and real handover. Mere visitor arrivals never generate cash or guarantee sales. Existing v16 saves migrate without invented wages, customer charges or lost bookings.
+- **Regression coverage:** tests/showroom-traffic.test.mjs covers repeatable footfall, finite staff capacity, impatience, competing bookings, paid holds, actual margin treatment and v16 migration. Existing customer/calendar test harnesses import the new module.
 
 ### v0.9.41 — Customer Behaviour 2.0 (17 November 2026)
 
