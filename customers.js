@@ -78,12 +78,12 @@
       v.miles>=90000?'mileage':
       grade>=3?'condition':'value';
     const concerns={
-      new:{label:'Delivery paperwork',quote:'Before I go ahead, I want to know what happens with registration and the pre-delivery checks.',proof:47,cost:150,discount:175,service:'registration and handover checks'},
-      battery:{label:'Battery condition',quote:'I like the car, but I need reassurance about battery condition. Do you have an independent health report?',proof:14,cost:225,discount:200,service:'independent EV battery assessment'},
-      history:{label:'Incomplete service history',quote:'The service history is incomplete. What protection do I have against a surprise bill?',proof:33,cost:175,discount:200,service:'independent mechanical assessment'},
-      mileage:{label:'Higher mileage',quote:'The mileage is higher than I had in mind. Why should I pay this much?',proof:39,cost:175,discount:200,service:'independent wear-and-condition inspection'},
-      condition:{label:'Vehicle preparation',quote:'Can you show me what was checked and prepared before this car went on sale?',proof:62,cost:150,discount:150,service:'independent handover inspection'},
-      value:{label:'Price against alternatives',quote:'I have seen another car at a similar price. What makes this one worth buying?',proof:55,cost:125,discount:175,service:'independent handover inspection'}
+      new:{label:'Delivery paperwork',quote:'Before I go ahead, I want to know what happens with registration and the pre-delivery checks.',proof:47,cost:250,discount:175,service:'registration and handover checks'},
+      battery:{label:'Battery condition',quote:'I like the car, but I need reassurance about battery condition. Do you have an independent health report?',proof:14,cost:300,discount:200,service:'independent EV battery assessment'},
+      history:{label:'Incomplete service history',quote:'The service history is incomplete. What protection do I have against a surprise bill?',proof:33,cost:275,discount:200,service:'independent mechanical assessment'},
+      mileage:{label:'Higher mileage',quote:'The mileage is higher than I had in mind. Why should I pay this much?',proof:39,cost:275,discount:200,service:'independent wear-and-condition inspection'},
+      condition:{label:'Vehicle preparation',quote:'Can you show me what was checked and prepared before this car went on sale?',proof:62,cost:225,discount:150,service:'independent handover inspection'},
+      value:{label:'Price against alternatives',quote:'I have seen another car at a similar price. What makes this one worth buying?',proof:55,cost:225,discount:175,service:'independent handover inspection'}
     };
     const issue=concerns[category];
     const evidence=clamp(issue.proof+
@@ -539,7 +539,7 @@
         ['unraised','pending','resolved'].includes(c.objectionStatus)&&
         ['none','evidence','inspection','discount','hold','legacy'].includes(c.objectionAction)&&
         typeof c.evidenceTried==='boolean'&&
-        no(c.remedyCost,300)&&[0,125,150,175,225].includes(c.remedyCost)&&
+        no(c.remedyCost,300)&&[0,225,250,275,300].includes(c.remedyCost)&&
         no(c.priceDiscount,250)&&[0,150,175,200].includes(c.priceDiscount)&&
         [0,125].includes(c.trustPenalty)&&
         (c.objectionAction==='inspection'?(c.remedyCost>0&&c.priceDiscount===0):
