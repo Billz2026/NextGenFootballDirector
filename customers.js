@@ -296,7 +296,7 @@
     const c=caseFor(state,vehicle.id);
     if(!c||c.status!=='discussing')
       return fail('stage','A completed test drive is required before negotiations.');
-    if(c.objectionStatus==='pending')return fail('objection','Address the customer’s vehicle concern before discussing the final figures.');
+    if(c.objectionStatus!=='resolved')return fail('objection','Address the customer’s vehicle concern before discussing the final figures.');
     if(c.counters>=5)return fail('limit','Five negotiation rounds completed. Agree the latest offer or let the customer leave.');
     const requested=proposal===undefined?Math.min(vehicle.asking-25,current+100):proposal;
     if(!ints(requested)||requested<=current||requested>vehicle.asking||requested>100000)
@@ -340,7 +340,7 @@
     const c=caseFor(state,id);
     if(!c||c.status!=='discussing')return fail('stage','The customer must complete a test drive and negotiate first.');
     if(!['cash','part-ex'].includes(mode))return fail('mode','Invalid sale method.');
-    if(c.objectionStatus==='pending')return fail('objection','Resolve the customer’s concern before accepting a deal.');
+    if(c.objectionStatus!=='resolved')return fail('objection','Resolve the customer’s concern before accepting a deal.');
     if(mode==='part-ex'&&c.preferredMode!=='part-ex')
       return fail('mode','This customer is not offering a part-exchange.');
     if(!ints(price)||price<500||price>100000)return fail('price','Invalid negotiated price.');
@@ -422,7 +422,7 @@
   }
   function ready(state,id){
     const c=caseFor(state,id);
-    return c&&c.objectionStatus!=='pending'&&['agreed','collectable'].includes(c.status)&&
+    return c&&c.objectionStatus==='resolved'&&['agreed','collectable'].includes(c.status)&&
       (c.status!=='agreed'||c.agreedDay===state.day);
   }
   function complete(state,id){
