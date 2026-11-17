@@ -7,7 +7,8 @@ import {runInNewContext} from 'node:vm';
 const files=[
   'vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js',
-  'monthly.js','events.js','workshop.js','showroom-traffic.js','customers.js','trading.js'
+  'monthly.js','events.js','workshop.js','showroom-traffic.js','customers.js',
+  'trading.js','staff-performance.js'
 ];
 const context={window:{},Date,Intl};
 for(const path of files)runInNewContext(
@@ -84,6 +85,14 @@ test('promised independent check is charged once only on completed handover',()=
   assert.equal(E.completeSale(s,v.id,'cash',null).ok,true);
   assert.equal(s.sold.length,1);
   assert.equal(s.sold[0].customerRemedyCost,commitment);
+  assert.equal(s.sold[0].customerLeadId,c.id,
+    'completed handover must retain exact lead attribution');
+  const performance=W.MotorTradeStaffPerformance.employee(s,
+    s.staff.find(e=>e.role==='sales'));
+  assert.equal(performance.deals,1);
+  assert.equal(performance.converted,1,
+    'only the real handover can count as converted');
+  assert.equal(performance.contribution,s.sold[0].profit-s.sold[0].salesCommission);
   assert.equal(s.sold[0].profit,agreed-s.sold[0].acquisition-
     s.sold[0].prep-commitment);
   const rem=s.ledger.filter(x=>x.note.startsWith('Customer remedy at handover:'));
