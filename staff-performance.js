@@ -20,8 +20,14 @@
       job.completedDay>=job.startedDay);
     const avgDays=turnaround.length?round1(turnaround.reduce((sum,{job})=>
       sum+job.completedDay-job.startedDay,0)/turnaround.length):null;
-    const late=turnaround.filter(({job})=>Number.isSafeInteger(job.plannedDays)&&
-      job.completedDay-job.startedDay>job.plannedDays+2).length;
+    // A late job involving a previous lead is shared operational history.
+    // Only assess delay against jobs with one recorded lead throughout.
+    const late=turnaround.filter(({job})=>{
+      const shifts=Array.isArray(job.workLog)?job.workLog:[];
+      return shifts.length>0&&new Set(shifts.map(x=>x.leadId)).size===1&&
+        shifts[0].leadId===id&&Number.isSafeInteger(job.plannedDays)&&
+        job.completedDay-job.startedDay>job.plannedDays+2;
+    }).length;
     // First QC attempt is what diagnoses preparation rework. A later pass
     // should not erase the first-time failure.
     const checked=all.filter(({job})=>job.method==='internal'&&(
@@ -37,8 +43,8 @@
     const assistantShifts=shifts.filter(x=>x.assistantId===id).length;
     const qcReworks=checked.length-qcPassed;
     const reasons=[];
-    if(checked.length>=3&&firstPassRate<75)
-      reasons.push('First-check QC below 75% ('+qcReworks+' reworks)');
+    if(checked.length>=5&&firstPassRate<70)
+      reasons.push('First-check QC below 70% after '+checked.length+' checks ('+qcReworks+' reworks)');
     if(turnaround.length>=4&&late>=Math.ceil(turnaround.length/2))
       reasons.push(late+' jobs exceeded plan by more than 2 days');
     return {role:'technician',completed:completed.length,turnaroundCount:turnaround.length,
@@ -51,31 +57,46 @@
     const id=employee.id;
     // Only explicitly attributed enquiries count. Older customer histories
     // may have no salespersonId; never ascribe those leads to a person.
-    const leads=new Set((state.customerHistory||[])
-      .filter(h=>h.type==='enquiry'&&h.salespersonId===id&&
-        typeof h.leadId==='string').map(h=>h.leadId));
-    // A pre-update active enquiry can still be attributed from its saved case.
-    for(const c of Object.values(state.customerCases||{})){
-      if(c.salespersonId===id&&typeof c.id==='string')leads.add(c.id);
-      if(c.standby?.salespersonId===id&&typeof c.standby.id==='string')
-        leads.add(c.standby.id);
+    const leadDays=new Map();
+    const history=state.customerHistory||[];
+    for(const h of history){
+      if(h.type!=='enquiry'||h.salespersonId!==id||
+        typeof h.leadId!=='string')continue;
+      leadDays.set(h.leadId,Math.min(leadDays.get(h.leadId)??h.day,h.day));
     }
+    // Retain an in-progress legacy lead that predates tagged event logging.
+    for(const customer of Object.values(state.customerCases||{})){
+      for(const c of [customer,customer?.standby]){
+        if(c?.salespersonId===id&&typeof c.id==='string')
+          leadDays.set(c.id,Math.min(leadDays.get(c.id)??c.createdDay,c.createdDay));
+      }
+    }
+    const leads=new Set(leadDays.keys());
+    const ended=new Set(history.filter(h=>['sale','expired','cancelled',
+      'no-show','objection-walked'].includes(h.type)).map(h=>h.leadId));
+    const matured=new Set([...leadDays].filter(([leadId,createdDay])=>
+      ended.has(leadId)||state.day-createdDay>=3).map(([leadId])=>leadId));
     const deals=(state.sold||[]).filter(v=>v.salespersonId===id);
     const converted=new Set(deals.filter(v=>
       typeof v.customerLeadId==='string'&&leads.has(v.customerLeadId))
       .map(v=>v.customerLeadId)).size;
     const rate=leads.size?Math.round(converted/leads.size*100):null;
+    const maturedConverted=new Set(deals.filter(v=>
+      typeof v.customerLeadId==='string'&&matured.has(v.customerLeadId))
+      .map(v=>v.customerLeadId)).size;
+    const maturedRate=matured.size?Math.round(maturedConverted/matured.size*100):null;
     const gross=deals.reduce((sum,v)=>sum+(Number(v.profit)||0),0);
     const commission=deals.reduce((sum,v)=>sum+(Number(v.salesCommission)||0),0);
     const contribution=gross-commission;
     const reasons=[];
-    if(leads.size>=6&&rate<20)
-      reasons.push('Fewer than 20% of tracked enquiries converted');
+    if(matured.size>=6&&maturedRate<20)
+      reasons.push('Fewer than 20% of '+matured.size+' matured enquiries converted');
     if(deals.length>=3&&contribution<=0)
       reasons.push('Non-positive margin after commission across '+deals.length+' sales');
     return {role:'sales',enquiries:leads.size,converted,conversionRate:rate,
+      maturedEnquiries:matured.size,maturedConverted,maturedRate,
       deals:deals.length,gross,commission,contribution,reasons,
-      state:reasons.length?'review':leads.size>=6||deals.length>=3?'tracked':
+      state:reasons.length?'review':matured.size>=6||deals.length>=3?'tracked':
         leads.size||deals.length?'limited':'none'};
   }
   function employee(state,person){
