@@ -38,7 +38,7 @@ test('calendar follows actual month ends including February',()=>{
 
 test('new careers calculate November 30 as first month-end and normalise',()=>{
   const state=E.createStaffed('Calendar Test Motors',[]);
-  assert.equal(state.version,16);
+  assert.equal(state.version,17);
   assert.equal(state.monthPlan.endDay,22);
   assert.equal(state.staff.length,4);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
@@ -51,7 +51,7 @@ test('old v14 careers migrate without replacing cash or employees',()=>{
   state.monthPlan.unitTarget=4;
   const restored=E.normalize(JSON.parse(JSON.stringify(state)));
   assert.ok(restored);
-  assert.equal(restored.version,16);
+  assert.equal(restored.version,17);
   assert.equal(restored.cash,45000);
   assert.equal(restored.staff.length,4);
   assert.equal(restored.monthPlan.endDay,22);
