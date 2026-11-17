@@ -45,7 +45,7 @@
       '" aria-pressed="'+selected+'"><small>STOCK '+v.id+' · '+esc(v.source.toUpperCase())+
       '</small><strong>'+esc(v.title)+'</strong>'+
       '<span>'+new Intl.NumberFormat('en-GB').format(v.miles)+' MI · '+age(s,v)+' DAYS HELD</span>'+
-      '<em class="ws-status ws-status-'+k.tone+'">'+k.label+'</em>'+
+      '<em class="ws-status ws-status-'+k.tone+(v.workshop?.stage==='in-progress'&&v.workshop?.paused?' ws-status-paused':'')+'">'+k.label+'</em>'+
       (v.workshop?.priority==='urgent'&&v.status==='acquired'?'<b class="ws-urgent-tag">URGENT</b>':'')+
       '</button></article>';
   }
@@ -237,7 +237,7 @@
   function dossier(s,W,v,leadChoice=null){
     const k=status(v);
     return '<article class="ws-file"><div class="ws-file-head"><div><small>WORK ORDER · STOCK '+v.id+
-      '</small><h3>'+esc(v.title)+'</h3></div><span class="ws-status ws-status-'+k.tone+'">'+k.label+
+      '</small><h3>'+esc(v.title)+'</h3></div><span class="ws-status ws-status-'+k.tone+(v.workshop?.stage==='in-progress'&&v.workshop?.paused?' ws-status-paused':'')+'">'+k.label+
       '</span></div>'+steps(v)+
       '<div class="ws-detail"><div class="ws-detail-car">'+
       '<div class="ws-vehicle"><div class="ws-photo">'+VC.photo(v,'workshop')+'</div>'+
@@ -258,7 +258,7 @@
     const kpi='<div class="ws-kpis">'+[
       ['ACTION DUE',q.action],['REPAIRS ACTIVE',q.repair],
       ['READY TO LIST',q.ready]
-    ].map(([name,num])=>'<div><small>'+name+'</small><strong>'+num+'</strong></div>').join('')+
+    ].map(([name,num])=>'<div class="'+(name==='ACTION DUE'&&num>0?'ws-kpi-attention':name==='READY TO LIST'&&num>0?'ws-kpi-positive':'ws-kpi-neutral')+'"><small>'+name+'</small><strong>'+num+'</strong></div>').join('')+
       '</div><div class="ws-capacity" aria-label="Workshop operating capacity">'+
       '<span>TECHNICIANS <strong>'+q.free+' FREE / '+q.tech+' ACTIVE</strong></span>'+
       '<span>IN-HOUSE BAYS <strong>'+q.inHouse+' / '+q.bays+'</strong></span>'+ 
