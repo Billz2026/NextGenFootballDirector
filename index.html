@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="./premises-polish.css?v=1">
   <link rel="stylesheet" href="./career-progression.css?v=1">
   <link rel="stylesheet" href="./menu-brand-2026.css?v=1">
+  <link rel="stylesheet" href="./menu-refinement-2026.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -81,22 +82,27 @@
       <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.49</span></header>
       <div class="menu-layout">
         <div class="menu-lead">
-          <div class="brand-lockup brand-lockup-large">
-            <h1 id="menu-title" class="trade-wordmark-hero">
-              <span class="menu-logo-crop"><img src="./assets/motor-trade-approved-logo.png" alt="The Motor Trade" width="1920" height="819" decoding="async"></span>
-            </h1>
-            <div class="menu-publisher-lockup">
-              <span class="menu-publisher-label">A GAME BY</span>
-              <img class="parent-wordmark" src="./assets/nextgen-header-wordmark-2026.webp" alt="NextGen Sessions" width="1600" height="663">
-            </div>
+          <div class="menu-intro">
+            <span class="menu-eyebrow">UK DEALERSHIP MANAGEMENT SIMULATOR</span>
+            <span class="menu-mobile-title" aria-hidden="true">THE MOTOR TRADE</span>
+            <h1 id="menu-title">BUILD YOUR <span>DEALERSHIP.</span></h1>
+            <p class="menu-strapline">Every car is a decision. Every deal builds your reputation.</p>
           </div>
           <nav class="menu-actions" aria-label="Main menu">
-            <button type="button" class="action-btn action-btn-primary" id="menu-continue" data-action="resume" hidden><span class="button-mark" aria-hidden="true">▶</span><span><strong>CONTINUE</strong><small id="menu-resume-description" class="menu-visually-hidden">Resume your dealership</small></span><span class="arrow" aria-hidden="true">›</span></button>
-            <button type="button" class="action-btn action-btn-primary" id="menu-new-career" data-action="new-career"><span class="button-mark" aria-hidden="true">＋</span><span><strong>NEW CAREER</strong></span><span class="arrow" aria-hidden="true">›</span></button>
-            <button type="button" class="action-btn action-btn-muted" data-action="toggle-settings" aria-controls="menu-guide" aria-expanded="false"><span class="button-mark" aria-hidden="true">⚙</span><span><strong>SETTINGS</strong></span><span class="arrow" aria-hidden="true">›</span></button>
-            <button type="button" class="action-btn action-btn-muted" data-action="toggle-career-tools" aria-controls="career-tools" aria-expanded="false"><span class="button-mark" aria-hidden="true">▣</span><span><strong>CAREER SAVES</strong></span><span class="arrow" aria-hidden="true">›</span></button>
-            <button type="button" class="action-btn action-btn-muted menu-account-button" id="menu-account-toggle" data-cloud-action="toggle-account" aria-controls="cloud-account-panel" aria-expanded="false"><span class="button-mark" aria-hidden="true">♟</span><span><strong>PLAYER ACCOUNT</strong><small>OPTIONAL CLOUD SAVES</small></span><span class="arrow" aria-hidden="true">›</span></button>
+            <div class="menu-primary-actions">
+              <button type="button" class="action-btn action-btn-primary" id="menu-continue" data-action="resume" hidden><span><strong>CONTINUE CAREER</strong><small id="menu-resume-description" class="menu-visually-hidden">Resume your dealership</small></span><span class="arrow" aria-hidden="true">→</span></button>
+              <button type="button" class="action-btn action-btn-secondary" id="menu-new-career" data-action="new-career"><span><strong>NEW CAREER</strong></span><span class="arrow" aria-hidden="true">＋</span></button>
+            </div>
+            <div class="menu-utility-actions">
+              <button type="button" class="action-btn action-btn-muted" data-action="toggle-settings" aria-controls="menu-guide" aria-expanded="false"><span><strong>SETTINGS</strong></span></button>
+              <button type="button" class="action-btn action-btn-muted" data-action="toggle-career-tools" aria-controls="career-tools" aria-expanded="false"><span><strong>CAREER SAVES</strong></span></button>
+              <button type="button" class="action-btn action-btn-muted menu-account-button" id="menu-account-toggle" data-cloud-action="toggle-account" aria-controls="cloud-account-panel" aria-expanded="false"><span><strong>CLOUD ACCOUNT</strong></span></button>
+            </div>
           </nav>
+          <div class="menu-publisher-lockup">
+            <span class="menu-publisher-label">A GAME BY</span>
+            <img class="parent-wordmark" src="./assets/nextgen-header-wordmark-2026.webp" alt="NextGen Sessions" width="1600" height="663" decoding="async">
+          </div>
           <section class="cloud-account-panel" id="cloud-account-panel" hidden aria-label="Player account and cloud saves">
             <div class="cloud-account-heading"><strong>YOUR PLAYER ACCOUNT</strong><span>SECURE CLOUD SAVE</span></div>
             <p id="cloud-service-message" role="status">Checking cloud service. Guest careers remain available.</p>
