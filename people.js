@@ -108,10 +108,11 @@
     });
   }
   const dailyCost=employee=>Math.ceil(employee.monthlySalary/30);
-  // Reputation grants more repair bays; existing hires remain employed if
-  // reputation later drops, but new hires wait until the tier is restored.
-  const technicianLimit=state=>Math.min(state.reputationScore>=80?8:
-    state.reputationScore>=40?6:4,window.MotorTradePremises?.bays(state)??4);
+  // Workshop bays limit parallel active repairs, NOT how many qualified
+  // technicians can be employed. Spare technicians support busy repairers.
+  // Role slots depend on reputation alone and never dismiss existing staff.
+  const technicianLimit=state=>state.reputationScore>=80?8:
+    state.reputationScore>=40?6:4;
   const salesLimit=state=>state.reputationScore>=80?3:
     state.reputationScore>=40?2:1;
   const staffLimit=state=>2+salesLimit(state)+technicianLimit(state);
@@ -123,6 +124,22 @@
   const activeTeam=(state,role)=>state.staff.filter(s=>s.role===role&&isActive(state,s));
   const active=(state,role)=>activeTeam(state,role)[0]||null;
   const supervisor=state=>active(state,'supervisor');
+  function supervisorProfile(state){
+    const manager=supervisor(state);
+    if(!manager)return {manager:null,turnaroundDays:0,qcRiskReduction:0,
+      moraleGain:0,teamCare:false};
+    const rating=manager.skills.knowledge+manager.skills.reliability;
+    return {
+      manager,
+      // Coordinated parts and workshop scheduling save one planned game day
+      // on new internal repairs, but never on jobs already booked.
+      turnaroundDays:rating>=28?1:0,
+      // Documented workshop oversight improves (not guarantees) final QC.
+      qcRiskReduction:clamp(Math.floor((rating-20)/2),0,8),
+      moraleGain:manager.skills.care>=16?5:3,
+      teamCare:true
+    };
+  }
   function availableTechnicians(state){
     const occupied=new Set((state.vehicles||[]).filter(v=>
       v.workshop?.method==='internal'&&
@@ -212,7 +229,7 @@
     const inRole=state.staff.filter(s=>s.role===candidate.role).length;
     if(inRole>=roleLimit(state,candidate.role))
       return failure('role',candidate.role==='technician'?
-        'Technician places are full. Reputation AND an upgraded workshop are required for more repair bays.':
+        'Technician hiring slots are full for your current reputation. Spare technicians can assist booked repairs, but physical workshop bays still cap simultaneous jobs.':
         'You already employ somebody in that role at this dealership.');
     if(state.staff.length>=staffLimit(state)||state.staff.length>=MAX_STAFF)
       return failure('capacity','You have reached your current dealership staffing limit.');
@@ -313,13 +330,15 @@
       if(state.payrollArrears>0)employee.morale=clamp(employee.morale-9,0,100);
       else if(state.day%7===0)employee.morale=clamp(employee.morale-1,0,100);
     }
-    // A working supervisor routinely checks in with staff every game week.
-    // Small, free workplace fixes are delegated, not referred to the owner.
-    const manager=supervisor(state);
-    if(manager&&state.day%7===0){
+    // Supervisor maintains a healthier daily team, not an inert salary.
+    // Free rota/coaching interventions occur once per week and never erase
+    // unpaid wages. Heavier interventions still require owner approval.
+    const leader=supervisorProfile(state);
+    const manager=leader.manager;
+    if(manager&&state.day%7===0&&state.payrollArrears===0){
       for(const employee of state.staff){
-        if(employee.id===manager.id||employee.morale>55||employee.morale<=15)continue;
-        const gain=manager.skills.care>=16?5:3;
+        if(employee.id===manager.id||employee.morale>70||employee.morale<=15)continue;
+        const gain=leader.moraleGain;
         employee.morale=clamp(employee.morale+gain,0,100);
         support.push(employee.name+' +'+gain+' morale');
       }
@@ -427,7 +446,7 @@
   window.MotorTradePeople=Object.freeze({
     MAX_STAFF,HIRING_FEE,TRAINING_FEE,ROLES,tier,legacyScore,initial,openingTeam,
     applicants,dailyCost,active,isActive,activeTeam,availableTechnicians,
-    technicianLimit,salesLimit,staffLimit,roleLimit,supervisor,moraleProposal,decideMorale,buyerDiscount,buyerEstimate,
+    technicianLimit,salesLimit,staffLimit,roleLimit,supervisor,supervisorProfile,moraleProposal,decideMorale,buyerDiscount,buyerEstimate,
     salesRep,salesProfile,salesImpact,salesBonus,hireQuote,WAGE_COVER_DAYS,
     labourSaving,hire,train,release,advance,sale,worked,valid,clone
   });
