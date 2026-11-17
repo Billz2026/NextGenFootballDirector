@@ -173,11 +173,12 @@
   }
   function showroomDesk(state,E){
     const Q=E.showroom,waiting=Q.waiting(state),free=Q.availableStaff(state);
-    const capacity=Math.max(0,2-state.showroom.ownerUsed);
+    const slots=Q.ownerSlots(state),capacity=slots.regularLeft;
     const summary='<div class="so-visitor-head"><div><small>LIVE SHOWROOM FOOTFALL</small>'+
       '<h3>VISITORS & STAFF ASSIGNMENTS</h3></div>'+
       '<span>'+waiting.length+' WAITING · '+capacity+' OWNER SLOT'+(capacity===1?'':'S')+
-      ' · '+free.length+' SALES REP'+(free.length===1?'':'S')+' FREE</span></div>';
+      ' · '+free.length+' SALES REP'+(free.length===1?'':'S')+' FREE'+
+      (slots.finalAvailable?' · FINAL OWNER SLOT AVAILABLE':'')+'</span></div>';
     if(!waiting.length)return '<section class="so-visitor-desk" aria-label="Customer showroom queue">'+summary+
       '<p class="so-visitor-empty">No visitors currently waiting. Interest changes with advertised stock, pricing and game days. Existing appointments and customer negotiations remain in the retail register.</p></section>';
     const rows=waiting.slice().sort((a,b)=>a.maxTurns-b.maxTurns||a.vehicleId-b.vehicleId)
@@ -190,7 +191,8 @@
         const reps=free.filter(rep=>Q.canServe(state,q.id,rep.id).ok);
         const buttons=ready.ok?
           '<div class="so-visitor-actions">'+
-            '<button class="trade-button" type="button" data-action="welcome-showroom" data-lead="'+esc(q.id)+'">HANDLE MYSELF</button>'+
+            '<button class="trade-button" type="button" data-action="welcome-showroom" data-lead="'+esc(q.id)+'">'+
+              (slots.finalAvailable?'HANDLE FINAL VISITOR':'HANDLE MYSELF')+'</button>'+
             reps.map(rep=>'<button class="trade-button trade-button-secondary" type="button" data-action="assign-showroom" data-lead="'+esc(q.id)+
               '" data-staff="'+rep.id+'">ASSIGN '+esc(rep.name)+'</button>').join('')+
           '</div>':reps.length?
@@ -212,7 +214,7 @@
           '</small>'+booked+buttons+'</article>';
       }).join('');
     return '<section class="so-visitor-desk" aria-label="Customer showroom queue">'+
-      summary+'<p class="so-visitor-guidance">Serving someone yourself uses one of your two consultations this session and may make impatient visitors leave. A free salesperson can serve in parallel, once per session. No appointment holds a car without a deposit.</p>'+
+      summary+'<p class="so-visitor-guidance">The owner can serve two regular visitors each session. If no salesperson is free, you can serve one final patient visitor yourself. Other customers can leave as their patience runs out. Salespeople can handle one visitor each per session. A booking without a deposit does not reserve a car.</p>'+
       '<div class="so-visitor-grid">'+rows+'</div></section>';
   }
   const FILTERS=Object.freeze(['all','action','appointments','deposits']);

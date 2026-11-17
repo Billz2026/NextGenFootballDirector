@@ -4,6 +4,10 @@
  const D=window.MotorTradeEvents,P=window.MotorTradePeople;
  if(!D||!P)throw Error('Load events.js and people.js before showroom-traffic.js');
  const isInt=Number.isSafeInteger,limit=(n,a,b)=>Math.max(a,Math.min(b,n));
+ // Two ordinary owner consultations, plus one final assisted consultation
+ // when the sales team has no available representative. This prevents a
+ // patient final shopper being stranded behind the ordinary capacity limit.
+ const REGULAR_OWNER_LIMIT=2,MAX_OWNER_TURNS=3;
  const FIRST=['Alex','Sam','Jamie','Taylor','Jordan','Morgan','Charlie','Harper','Riley','Casey','Drew','Avery','Robin','Ellis','Frankie'];
  const LAST=['Patel','Jones','Ahmed','Williams','Singh','Brown','Khan','Evans','Wilson','Taylor','Clarke','Morgan','Shah','Davies','Ali'];
  function hash(text){let h=2166136261;for(const ch of String(text))h=Math.imul(h^ch.charCodeAt(0),16777619)>>>0;
@@ -39,6 +43,11 @@
        const chance=i===0?probability:Math.round(probability*(i===1?.62:.35));
        if(hash('visit|'+seed)%100>=chance)continue;
        const personality=hash('patience|'+seed)%5;
+       const maxTurns=personality===0?1:personality<=2?2:3;
+       // Newly listed vehicles can attract interest during an existing
+       // session. Never generate a visitor whose wait threshold has already
+       // elapsed or the next save would contain a non-serviceable queue.
+       if(maxTurns<=b.turn)continue;
        const idPart=hash('identity|'+seed)%1000000;
        b.leads.push({id:'Q-'+s.day+'-'+b.session+'-'+v.id+'-'+i,
          customerId:'C-'+s.day+'-'+b.session+'-'+v.id+'-'+idPart,
@@ -46,7 +55,7 @@
          name:FIRST[hash('first|'+seed)%FIRST.length]+' '+
            LAST[hash('last|'+seed)%LAST.length],
          purpose:['READY TO PURCHASE','WANTS A TEST DRIVE','COMPARING OTHER DEALERS','ASKING ABOUT PRICE'][hash('purpose|'+seed)%4],
-         maxTurns:personality===0?1:personality<=2?2:3,
+         maxTurns,
          status:'waiting',handledBy:null,reason:'',
          preferredMode:hash('exchange|'+seed)%100<35?'part-ex':'cash'});
      }
@@ -71,6 +80,11 @@
      !Object.values(s.customerCases||{}).some(c=>c.salespersonId===rep.id&&
       ['arrived','discussing','agreed','collectable'].includes(c.status)));
  }
+ function ownerSlots(s){
+   const used=s.showroom?.ownerUsed??0;
+   return {regularLeft:Math.max(0,REGULAR_OWNER_LIMIT-used),
+     finalAvailable:used===REGULAR_OWNER_LIMIT&&availableStaff(s).length===0};
+ }
  function canServe(s,id,staffId=null){
    const q=customer(s,id);
    if(!q)return {ok:false,code:'expired',message:'This visitor is no longer waiting.'};
@@ -82,8 +96,11 @@
    if(existing?.status==='booked'&&(existing.held||existing.standby))
      return {ok:false,code:'reserved',message:'The booked viewing already has an active rival.'};
    if(staffId===null){
-     if(s.showroom.ownerUsed>=2)return {ok:false,code:'owner-busy',
-       message:'You have personally served two visitors today. Use a free salesperson or move to the next day.'};
+     if(s.showroom.ownerUsed>=MAX_OWNER_TURNS)return {ok:false,code:'owner-busy',
+       message:'All owner consultation slots are used this session. The remaining visitors can be served by a free salesperson or will leave at closing.'};
+     if(s.showroom.ownerUsed>=REGULAR_OWNER_LIMIT&&availableStaff(s).length)
+       return {ok:false,code:'owner-busy',
+         message:'Two owner consultations completed. Assign an available salesperson; the final owner consultation is reserved for when the sales team is fully occupied.'};
    }else if(!isInt(staffId)||!availableStaff(s).some(rep=>rep.id===staffId))
      return {ok:false,code:'staff-busy',message:'That salesperson has already handled a visitor or is unavailable.'};
    return {ok:true,q,v,existing};
@@ -115,13 +132,15 @@
    const served=entries.filter(h=>h.type==='showroom-served').length;
    const missed=entries.filter(h=>h.type==='showroom-left').length;
    return {visitors:served+missed,served,missed,waiting:waiting(s).length,
-     capacityLeft:Math.max(0,2-(s.showroom?.ownerUsed||0)),freeSales:availableStaff(s).length};
+     capacityLeft:ownerSlots(s).regularLeft,
+     finalOwnerSlot:ownerSlots(s).finalAvailable,
+     freeSales:availableStaff(s).length};
  }
  function valid(s,saved){
    if(saved.version<17){s.showroom=initial(s.day);initialise(s);return true;}
    const b=saved.showroom;
    if(!b||!isInt(b.day)||b.day!==s.day||!isInt(b.session)||b.session!==slot(s)||
-     !isInt(b.turn)||b.turn<0||b.turn>2||
+     !isInt(b.turn)||b.turn<0||b.turn>MAX_OWNER_TURNS||
      !isInt(b.ownerUsed)||b.ownerUsed!==b.turn||
      !Array.isArray(b.staffUsed)||b.staffUsed.length>3||
      new Set(b.staffUsed).size!==b.staffUsed.length||
@@ -154,6 +173,7 @@
    return true;
  }
  window.MotorTradeShowroom=Object.freeze({
-   initial,initialise,roll,refresh:generate,waiting,customer,availableStaff,canServe,serve,sold,stats,valid,closeWaiting
+   initial,initialise,roll,refresh:generate,waiting,customer,
+   availableStaff,ownerSlots,canServe,serve,sold,stats,valid,closeWaiting
  });
 })();
