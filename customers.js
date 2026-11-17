@@ -153,7 +153,8 @@
     if(caseFor(state,vehicle.id))return false;
     if(D.isDealDay(state.day)&&!D.retailActive(state,vehicle))return false;
     const fair=vehicle.profile?.likelySale||vehicle.retail;
-    const overpriced=Math.max(0,(vehicle.asking-fair)/Math.max(fair,1));
+    const overpriced=window.MotorTradeStockAgeing?.overpricing(state,vehicle) ??
+      Math.max(0,(vehicle.asking-fair)/Math.max(fair,1));
     const grade=vehicle.profile?.grade||3;
     let percent=82-Math.round(overpriced*100)-(grade>=4?12:0)+
       Math.floor(state.reputationScore/8)+P.salesImpact(state,vehicle.id).enquiryLift;
@@ -216,7 +217,8 @@
       c.held||c.standby||state.day>=c.appointmentDay||D.isDealDay(state.day))
       return false;
     const fair=vehicle.profile?.likelySale||vehicle.retail;
-    const overpriced=Math.max(0,(vehicle.asking-fair)/Math.max(fair,1));
+    const overpriced=window.MotorTradeStockAgeing?.overpricing(state,vehicle) ??
+      Math.max(0,(vehicle.asking-fair)/Math.max(fair,1));
     const percent=clamp(58-Math.round(overpriced*90)-
       (vehicle.profile?.grade>=4?9:0)+Math.floor(state.reputationScore/10)+
       Math.floor(P.salesImpact(state,id).enquiryLift/2),12,88);
