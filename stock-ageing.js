@@ -36,7 +36,7 @@
   function overpricing(state,v){
     const fair=Number(v.profile?.likelySale??v.retail);
     const ageTarget=marketTarget(state,v);
-    return Math.max(0,(v.asking-ageTarget)/Math.max(1,fair));
+    return Math.max(0,(v.asking-(age(state,v)<15?fair:ageTarget))/Math.max(1,fair));
   }
   function ageInfo(state,v){
     const days=age(state,v),t=tier(days);
