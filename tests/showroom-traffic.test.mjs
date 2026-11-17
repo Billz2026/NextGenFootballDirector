@@ -44,7 +44,7 @@ function twoVisitors(name='Showroom Check 0'){
 test('new showroom is deterministic, finite and replay-safe',()=>{
   const {s}=twoVisitors();
   assert.ok(Q.waiting(s).length<=7);
-  const names=Q.waiting(s).map(q=>q.id);
+  const names=Array.from(Q.waiting(s),q=>q.id);
   const restored=E.normalize(copy(s));
   assert.deepEqual(Array.from(Q.waiting(restored),q=>q.id),names);
   const before=Q.waiting(s).length;
