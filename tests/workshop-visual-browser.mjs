@@ -42,7 +42,7 @@ try{
     assert.equal((await panel.locator('h1').innerText()).replace(/\s+/g,' ').trim(),
       'PREPARATION CONTROL.');
     assert.equal(await panel.locator('.ws-kpis>div').count(),3);
-    assert.equal(await panel.locator('.ws-capacity>span').count(),4);
+    assert.equal(await panel.locator('.ws-capacity>span').count(),5);
     assert.equal(await panel.locator('.ws-unit').count(),2);
     assert.equal(await panel.locator('.ws-steps span').count(),5);
     assert.equal(await panel.locator('[data-action="assess-workshop"]').count(),1);
@@ -105,6 +105,8 @@ try{
     assert.equal(await panel.locator('[data-action="start-workshop"]').count(),2);
     assert.equal(await panel.locator('[data-method="external"]').count(),1);
     assert.equal(await panel.locator('[data-method="internal"]').count(),1);
+    assert.equal(await panel.locator('[data-action="choose-workshop-tech"]').count(),1,
+      'opening technician should be selectable as lead');
     await page.screenshot({path:'review/workshop-quotes-'+label+'.png',fullPage:true});
     // Switch selected work order without financial mutation, preserving
     // all real state and previous assessment charges.
@@ -114,6 +116,18 @@ try{
     await panel.locator('[data-action="filter-workshop"][data-filter="action"]').click();
     await panel.locator('[data-action="filter-workshop"][data-filter="all"]').click();
     assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),before);
+    await panel.locator('[data-action="select-workshop"]').first().click();
+    await panel.locator('[data-action="priority-workshop"][data-priority="urgent"]').click();
+    const prioritised=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
+    assert.equal(prioritised.vehicles[0].workshop.priority,'urgent');
+    await panel.locator('[data-action="start-workshop"][data-method="internal"]').click();
+    const booked=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
+    assert.equal(booked.vehicles[0].workshop.method,'internal');
+    assert.equal(booked.vehicles[0].workshop.priority,'urgent');
+    assert.equal(booked.vehicles[0].workshop.technicianId,booked.staff.find(x=>x.role==='technician').id);
+    assert.equal(await panel.locator('.ws-dispatch-assignments').count(),1);
+    assert.equal(await panel.locator('[data-action="priority-workshop"]').count(),2);
+    assert.ok(await page.evaluate(key=>!!window.MotorTradeEngine.normalize(JSON.parse(localStorage.getItem(key))),KEY));
     assert.deepEqual(errors,[],'No browser JavaScript errors');
     console.log('WORKSHOP_VISUAL_PASS '+label+' '+JSON.stringify({fixture,...metrics}));
     await context.close();
