@@ -26,22 +26,32 @@ try{
       const v=state.vehicles[0];
       must(E.assessStock(state,v.id),'workshop assessment');
       must(E.startPrep(state,v.id,'external'),'workshop booking');
-      let day=1;
-      while(day<24&&v.status!=='prepared'){
-        state.day=++day;
+      const progress=()=>{
+        E.showroom.closeWaiting(state,'Unserved visitors left at closing');
+        if(state.day===state.monthPlan.endDay){
+          if(!E.monthly.close(state))throw Error('Unable to close real trading month');
+          state.day++;
+          E.rollAuctionHall(state);
+          E.monthly.next(state);
+        }else{
+          state.day++;
+          E.rollAuctionHall(state);
+        }
         E.staffDay(state);
         E.premisesDay(state);
+        E.stockAgeingDay(state);
         E.advanceWorkshop(state);
+        E.advanceCustomers(state);
+        E.advanceAfterSales(state);
+      };
+      while(state.day<35&&v.status!=='prepared'){
+        progress();
         if(v.workshop.stage==='quality-check')
           must(E.finishPrep(state,v.id),'workshop final QC');
       }
       if(v.status!=='prepared')throw Error('Vehicle preparation did not finish');
       must(E.advertise(state,v.id,v.retail),'list for retail');
-      while(day<28&&!E.customers.demand(state,v)){
-        state.day=++day;
-        E.staffDay(state);
-        E.premisesDay(state);
-      }
+      while(state.day<35&&!E.customers.demand(state,v))progress();
       const available=E.customers.demand(state,v);
       if(available)must(E.openCustomer(state,v.id),'open retail enquiry');
       if(!E.normalize(JSON.parse(JSON.stringify(state))))
