@@ -586,20 +586,35 @@
       ['in-person','legacy-refundable'].includes(c.terms)&&
       no(c.prepCost,250)&&
       (c.held===0||c.terms==='legacy-refundable'||c.prepCost>=75)))return false;
+    const hydrate=c=>({
+      ...c,
+      terms:saved.version>=9?c.terms:'legacy-refundable',
+      prepCost:saved.version>=9?c.prepCost:0,
+      objectionStatus:saved.version>=16?c.objectionStatus:
+        ['discussing','agreed','reserved','collectable'].includes(c.status)?'resolved':'unraised',
+      objectionAction:saved.version>=16?c.objectionAction:'legacy',
+      evidenceTried:saved.version>=16?c.evidenceTried:false,
+      remedyCost:saved.version>=16?c.remedyCost:0,
+      priceDiscount:saved.version>=16?c.priceDiscount:0,
+      exchange:c.exchange?{...c.exchange}:null,
+      appointmentDay:saved.version<15&&c.status==='booked'?
+        Math.max(state.day,Math.min(c.appointmentDay??(c.createdDay+1),c.createdDay+1)):
+        c.appointmentDay,
+      standby:c.standby?{...c.standby,
+        terms:saved.version>=9?c.standby.terms:'legacy-refundable',
+        prepCost:saved.version>=9?c.standby.prepCost:0,
+        objectionStatus:saved.version>=16?c.standby.objectionStatus:'unraised',
+        objectionAction:saved.version>=16?c.standby.objectionAction:'legacy',
+        evidenceTried:saved.version>=16?c.standby.evidenceTried:false,
+        remedyCost:saved.version>=16?c.standby.remedyCost:0,
+        priceDiscount:saved.version>=16?c.standby.priceDiscount:0,
+        appointmentDay:saved.version<15&&c.standby.status==='booked'?
+          Math.max(state.day,Math.min(c.standby.appointmentDay??(c.standby.createdDay+1),
+            c.standby.createdDay+1)):c.standby.appointmentDay,
+        exchange:c.standby.exchange?{...c.standby.exchange}:null,standby:null}:null
+    });
     state.customerCases=Object.fromEntries(Object.entries(cases).map(([key,c])=>
-      [key,{...c,terms:saved.version>=9?c.terms:'legacy-refundable',
-        prepCost:saved.version>=9?c.prepCost:0,
-        objectionStatus:saved.version>=16?c.objectionStatus:
-          ['discussing','agreed','reserved','collectable'].includes(c.status)?'resolved':'unraised',
-        objectionAction:saved.version>=16?c.objectionAction:'legacy',
-        evidenceTried:saved.version>=16?c.evidenceTried:false,
-        remedyCost:saved.version>=16?c.remedyCost:0,
-        priceDiscount:saved.version>=16?c.priceDiscount:0,
-        exchange:c.exchange?{...c.exchange}:null,
-        appointmentDay:saved.version<15&&c.status==='booked'?
-          Math.max(state.day,Math.min(c.appointmentDay??(c.createdDay+1),c.createdDay+1)):
-          c.appointmentDay,
-        standby:c.standby?{...c.standby,standby:null}:null}]));
+      [key,hydrate(c)]));
     state.customerHistory=history.map(h=>({...h}));
     state.customerFunds=existingFunds.map(v=>({...v}));
     return true;
