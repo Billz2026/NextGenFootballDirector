@@ -144,7 +144,7 @@
     const occupied=new Set((state.vehicles||[]).filter(v=>
       v.workshop?.method==='internal'&&
       ['in-progress','quality-check'].includes(v.workshop.stage))
-      .map(v=>v.workshop.technicianId));
+      .flatMap(v=>[v.workshop.technicianId,v.workshop.assistantId??null]));
     return activeTeam(state,'technician').filter(s=>!occupied.has(s.id));
   }
   function buyerDiscount(state){
