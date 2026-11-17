@@ -87,6 +87,8 @@ test('sales attribution requires lead identity, counts unique enquiries, and net
   assert.equal(p.enquiries,2,'duplicate history must not inflate lead count');
   assert.equal(p.converted,1);
   assert.equal(p.conversionRate,50);
+  assert.equal(p.maturedEnquiries,1,'completed handover is already mature');
+  assert.equal(p.maturedRate,100);
   assert.equal(p.gross,1200);
   assert.equal(p.commission,60);
   assert.equal(p.contribution,1140);
@@ -115,7 +117,11 @@ test('review thresholds require useful volume and cannot be triggered by one wea
   for(let i=1;i<=5;i++)salesFixture(s,'C-1-0-5-'+i,rep,{sold:false});
   assert.equal(PF.employee(s,rep).state,'limited');
   salesFixture(s,'C-1-0-5-6',rep,{sold:false});
+  assert.equal(PF.employee(s,rep).state,'limited',
+    'six brand new unanswered enquiries must not trigger a review');
+  s.day+=3;
   const r=PF.employee(s,rep);
+  assert.equal(r.maturedEnquiries,6);
   assert.equal(r.state,'review');
   assert.match(r.reasons.join(' '),/Fewer than 20%/);
   assert.equal(PF.team(s).review.length,1);
@@ -126,8 +132,8 @@ test('review thresholds require useful volume and cannot be triggered by one wea
 
 test('first-check QC failure remains a failure after eventual pass',()=>{
   const s=career(),t=staff(s,'technician');
-  for(let i=1;i<=3;i++){
-    const firstPass=i===3;
+  for(let i=1;i<=5;i++){
+    const firstPass=i===5;
     const j={method:'internal',stage:'ready',technicianId:t.id,
       startedDay:1,completedDay:4,plannedDays:3,
       workLog:[{day:2,leadId:t.id,assistantId:null,progress:1}],
@@ -136,10 +142,10 @@ test('first-check QC failure remains a failure after eventual pass',()=>{
     s.sold.push({workshopRecord:j});
   }
   const p=PF.employee(s,t);
-  assert.equal(p.completed,3);
-  assert.equal(p.checked,3);
+  assert.equal(p.completed,5);
+  assert.equal(p.checked,5);
   assert.equal(p.qcPassed,1);
-  assert.equal(p.qcReworks,2);
-  assert.equal(p.firstPassRate,33);
+  assert.equal(p.qcReworks,4);
+  assert.equal(p.firstPassRate,20);
   assert.equal(p.state,'review');
 });
