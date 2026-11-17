@@ -6,6 +6,15 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### v0.9.43 — Automatic Forecourt Growth & Limited Offsite Stock (17 November 2026)
+
+- **Permanent spaces unlock automatically:** 4 physical forecourt spaces initially; 6 at 20 reputation, 8 at 40 and 10 at 60. No extra purchase or approval is required. Earned permanent capacity never shrinks if reputation later declines. Normal daily premises rent and utilities rise with the size of the site.
+- **Two temporary offsite holding positions:** At every level the dealership can own up to two more cars than its physical forecourt capacity (6, 8, 10 or 12 total vehicles). Each occupied offsite position costs £22 per game day, added to real premises expenses, paid cash and any outstanding bills. Selling a car or disposing of stock reduces the daily charge immediately for future days.
+- **All purchasing routes agree:** Private seller acquisition, trade supplier allocations and auction bids enforce the total vehicle holding limit, plus existing repair reserves and a day of applicable storage cost. At the absolute limit, another purchase is rejected without taking cash. An incoming part-exchange is a replacement for the car just handed over, not an extra acquisition on top of an unchanged inventory.
+- **Clear visible accounting:** Vehicle Stock, Buying Desk, Dashboard, Reputation and My Dealership distinguish the permanent forecourt from two paid offsite positions. There is no misleading FORECOURT FULL warning at the physical limit while offsite places are available. My Dealership shows the current daily cost and when the next permanent expansion will unlock.
+- **Existing-career migration:** A v17 or earlier career at 42 reputation with four fitted spaces automatically migrates to eight permanent spaces, with a total holding limit of ten. Existing cash, staff, vehicles, transactions, customer bookings, reserved funds, paid historic upgrades and archived reports remain unchanged. Historical forecourt investments are not reversed or refunded; the new automatic policy only eliminates future one-off payments. The workshop still needs its separately approved investment.
+- **Regression coverage:** tests/forecourt-progression.test.mjs exercises reputation thresholds, previously capped careers, two overflow acquisitions and a blocked eleventh vehicle, offsite rent, permanent non-shrinking upgrades and distinct workshop investment. Earlier calendar/showroom tests expect v18 career files.
+
 ### v0.9.42 — Showroom Traffic 2.0 (17 November 2026)
 
 - **Real, finite showroom visitor queue.** Advertised cars attract deterministic fictional customers based on pricing, grade, reputation and sales ability. Up to seven visitors per session, including multiple visitors for the same car. Each has a persistent identity and reason for visiting. Reopening the Sales Office or re-advertising at the same price cannot reroll leads.
