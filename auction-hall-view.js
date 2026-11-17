@@ -113,10 +113,10 @@
       (h.index+1>=lots.length?'FINISH SESSION & VIEW RESULTS':'NEXT LOT '+E.lotNumber(h.index+1))+
       '</button>';
     const cashWarning=paymentDue?'':state.vehicles.length>=state.capacity?
-      '<p class="auction-risk">YOUR FORECOURT IS FULL. You cannot bid again until you sell stock.</p>':
+      '<p class="auction-risk auction-risk-critical">YOUR FORECOURT IS FULL. You cannot bid again until you sell stock.</p>':
       E.workshop.reserved(state)+expectedNext+lot.fee+
         lot.profile.basePrep+(lot.profile.hiddenFault?.cost||0)>state.cash?
-      '<p class="auction-risk">The next £100 bid may exceed available cash after buyer fees and reserved preparation. Consider passing.</p>':'';
+      '<p class="auction-risk auction-risk-warning">The next £100 bid may exceed available cash after buyer fees and reserved preparation. Consider passing.</p>':'';
     const log=h.feed.length?'<div class="auction-feed" aria-live="polite">'+
       h.feed.slice(-12).map(x=>'<p>'+esc(x)+'</p>').join('')+'</div>':
       '<div class="auction-feed"><p>Inspect the lot before opening the bidding. When you bid, competitors respond immediately.</p></div>';
@@ -163,7 +163,7 @@
       '<details class="panel-card auction-results auction-results-disclosure">'+
       '<summary>RECENT SESSION RESULTS · '+recentResults.length+'</summary>'+
       '<div class="auction-results-body">'+recentResults.map(resultRow).join('')+'</div></details>':'';
-    return header+catalogue+preview+lotView+notice+results+recent;
+    return header+preview+lotView+catalogue+notice+results+recent;
   }
   window.MotorTradeAuctionHallView=Object.freeze({render});
 })();

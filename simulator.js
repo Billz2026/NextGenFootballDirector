@@ -364,7 +364,13 @@
     return cashText(E.quote(car,kind,price,!!career.reports?.[car.id]).expectedMargin);
   }
   function renderAuctionHall(){
-    byId('auction-hall-view').innerHTML=AV.render(career,E,reportCard,auctionPreviewId);
+    const view=byId('auction-hall-view');
+    // Live status attributes are visual only; the auction engine is unchanged.
+    const hall=career.auctionHall;
+    view.dataset.phase=hall?.phase||'catalogue';
+    view.dataset.leader=hall?.leader||'none';
+    view.dataset.wins=hall?.results?.some(r=>r.kind==='won')?'yes':'no';
+    view.innerHTML=AV.render(career,E,reportCard,auctionPreviewId);
   }
   function renderMarket() {
     const progression=E.marketStatus(career);
