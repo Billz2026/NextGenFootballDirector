@@ -439,7 +439,7 @@
       cashValue(s.price) && integer(s.profit) && ['cash','part-ex'].includes(s.mode) &&
       (s.profile==null || I.validProfile(s.profile))&&
       (s.customerLeadId===undefined||
-        (typeof s.customerLeadId==='string'&&/^C-\\d+-\\d+-\\d+-\\d+$/.test(s.customerLeadId)))&&
+        (typeof s.customerLeadId==='string'&&/^C-\d+-\d+-\d+-\d+$/.test(s.customerLeadId)))&&
       (s.workshopRecord===undefined||W.valid({status:'listed',
         prepSpent:s.prep,workshop:s.workshopRecord},saved.day));
     const goodLedger = l => l && integer(l.day) && l.day >= 1 && l.day <= saved.day &&
