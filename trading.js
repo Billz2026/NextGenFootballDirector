@@ -8,13 +8,14 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 16;
+  const VERSION = 17;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
   if(!MARKET)throw new Error('Load vehicle-market.js before trading.js');
   const C = window.MotorTradeCustomers;
-  if(!C)throw new Error('Load customers.js before trading.js');
+  const Q = window.MotorTradeShowroom;
+  if(!C||!Q)throw new Error('Load customers.js and showroom-traffic.js before trading.js');
   const W = window.MotorTradeWorkshop;
   if (!W) throw new Error('Load workshop.js before trading.js');
   const D = window.MotorTradeEvents;
@@ -326,13 +327,14 @@
       version:VERSION,name,day:1,cash:STARTING_CASH,capacity:CAPACITY,
       stock:0,sales:0,reputation:P.tier(5),messages,
       vehicles:[],sold:[],wholesale:[],ledger:[],nextId:1,negotiations:{},auctionBids:{},reports:{},
-      customerCases:{},customerHistory:[],customerFunds:[],
+      customerCases:{},customerHistory:[],customerFunds:[],showroom:Q.initial(1),
       auctionHall:initialAuctionHall(1),auctionHistory:[],
       inboxLedgerCursor:0,
       premises:SITE.initial(),...P.initial()
     };
     M.initialize(state);
     Object.assign(state,D.initial());
+    Q.initialise(state);
     return state;
   }
   // The public New Career path starts with a real four-person payroll.
@@ -346,10 +348,13 @@
     state.nextStaffId=state.staff.length+1;
     // Rebuild the monthly plan after adding the real opening payroll.
     M.initialize(state);
+    // The opening sales hire can now serve one visitor per trading day.
+    state.showroom=Q.initial(state.day);
+    Q.initialise(state);
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -510,6 +515,7 @@
     if(!M.restore(restored,saved))return null;
     if(!D.restore(restored,saved))return null;
     if(!C.valid(restored,saved))return null;
+    if(!Q.valid(restored,saved))return null;
     if(!auctionValid(restored))return null;
     return restored;
   }
@@ -779,6 +785,7 @@
     return C.negotiate(state,v,buyer.cashOffer,buyer.cashLimit,proposal);
   }
   const openCustomer=(state,id)=>C.open(state,id);
+  const welcomeShowroom=(state,id,staffId=null)=>C.welcomeShowroom(state,id,staffId);
   const respondCustomer=(state,id,choice)=>C.objection(state,id,choice);
   const bookCustomer=(state,id)=>C.book(state,id);
   const competingCustomer=(state,id)=>C.serveCompeting(state,id);
@@ -926,7 +933,7 @@
     startAuction,bidLiveAuction,passAuction,nextAuctionLot,rollAuctionHall,
     auctionLot,lotNumber,auctionValid,
     upgradePremises,monthly:M,events:D,
-    customers:C,openCustomer,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
+    customers:C,showroom:Q,openCustomer,welcomeShowroom,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
     cancelCustomer,advanceCustomers,nextCustomerSession,agreeCustomer,
     workshop:W,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
     wholesaleOffer,disposeStock,hireStaff,decideStaffMorale,
