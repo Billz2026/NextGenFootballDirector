@@ -31,9 +31,10 @@
         '. Review price and stock age; nothing is guaranteed.</p></div>';
     }
     const rep=E.people.salesRep(state,c);
+    const buyer=C.behaviour(c,vehicle);
     // Customer name and case status are already in the selected-case header.
     // Keep channel and responsible adviser in the compact metadata line.
-    const who='<div class="sales-customer-meta"><span>'+esc(c.channel)+'</span>'+
+    const who='<div class="sales-customer-meta"><span>'+esc(c.channel)+' · '+esc(buyer?.label||'BUYER')+'</span>'+
       '<span>SALES ADVISER: '+esc(rep?.name||'Owner-managed')+
       (rep?' · '+Math.round(E.people.salesProfile(rep).commissionRate*100)+'% GROSS MARGIN COMMISSION':'')+
       '</span></div>';
@@ -67,6 +68,30 @@
       case 'discussing':{
         const b=E.buyers(vehicle,state);
         if(!b){body='<p>Customer is not currently available to negotiate. Try a different time.</p>';break;}
+        if(c.objectionStatus==='pending'){
+          const choice=key=>'<button type="button" class="trade-button'+
+            (key==='inspection'?'':' trade-button-secondary')+
+            '" data-action="customer-objection" data-choice="'+key+
+            '" data-id="'+id+'">';
+          body='<section class="so-buyer-objection" aria-label="Buyer objection">'+
+            '<div class="so-buyer-intro"><span>BUYER CONCERN · '+esc(buyer.concern)+'</span>'+
+            '<strong>'+esc(buyer.label)+'</strong></div>'+
+            '<p class="so-buyer-motive">'+esc(buyer.motive)+'</p>'+
+            '<blockquote class="so-buyer-quote">“'+esc(buyer.quote)+'”</blockquote>'+
+            '<p class="so-buyer-instruction">Choose how to respond. You cannot finalise the sale until the customer is satisfied, and an unrealistic approach can lose the deal.</p>'+
+            '<div class="so-buyer-choices">'+
+              choice('evidence')+'SHOW EXISTING RECORDS · NO CHARGE</button>'+
+              (c.evidenceTried?'<p class="so-buyer-tried">Records already discussed; the customer still needs reassurance.</p>':'')+
+              choice('inspection')+'PROMISE '+esc(buyer.service.toUpperCase())+' · '+cash(buyer.remedyCost)+'</button>'+
+              choice('discount')+'OFFER '+cash(buyer.discount)+' SALE PRICE REDUCTION</button>'+
+              choice('hold')+'HOLD FIRM · RISK LOSING BUYER</button>'+
+              choice('walk')+'WALK AWAY · NO SALE</button>'+
+            '</div>'+
+            '<p class="so-buyer-cost-note">Inspection costs are incurred only on completed handover and reduce gross margin. A price reduction permanently lowers the achievable selling price. No sale is guaranteed.</p>'+
+            '</section>'+cancel;
+          if(c.evidenceTried)body=body.replace('data-choice="evidence"','data-choice="evidence" disabled');
+          break;
+        }
         const maxCounter=Math.min(vehicle.asking,100000);
         const nextCounter=Math.min(maxCounter,
           Math.max(b.cashOffer+25,Math.min(vehicle.asking,b.cashOffer+100)));
@@ -96,7 +121,15 @@
           '<button type="button" class="trade-button" data-action="agree-part-ex" data-id="'+id+
           '">AGREE PART-EX TERMS</button></section>':
           '<p class="so-no-part-ex">NO PART-EXCHANGE OFFERED · Cash purchase only for this customer.</p>';
-        body='<p>The test drive went well. Discuss a realistic cash price or trade-in allowance; there is no completed sale until handover.'+
+        const outcome=c.objectionAction==='inspection'?
+          '<div class="so-buyer-resolution">CUSTOMER CONCERN ADDRESSED · Dealer-funded '+esc(buyer.service)+' commitment: <strong>'+cash(c.remedyCost)+'</strong> charged at handover, reducing profit.</div>':
+          c.objectionAction==='discount'?
+          '<div class="so-buyer-resolution">CUSTOMER CONCERN ADDRESSED · Agreed achievable sale price reduced by <strong>'+cash(c.priceDiscount)+'</strong>.</div>':
+          c.objectionAction==='evidence'?
+          '<div class="so-buyer-resolution">CUSTOMER CONCERN ADDRESSED · Explained existing documented vehicle facts. No extra cost.</div>':
+          c.objectionAction==='hold'?
+          '<div class="so-buyer-resolution">CUSTOMER CONCERN ADDRESSED · Buyer accepted your firm position.</div>':'';
+        body=outcome+'<p>The test drive went well. Discuss a realistic cash price or trade-in allowance; there is no completed sale until handover.'+
           (c.standby?' The earlier unsecured appointment stays open until a deposit or completed sale.':'')+'</p>'+ 
           '<div class="sales-offer-modes">'+cashUI+part+'</div>'+cancel;
         break;
@@ -107,6 +140,7 @@
           ' sale at <strong>'+cash(c.price)+'</strong>'+
           (c.exchange?' with a '+cash(c.allowance)+' allowance for '+esc(c.exchange.title):'')+
           '. No cash has been recognised as a retail sale yet.</p>'+
+          (c.remedyCost?'<p>DEALER-FUNDED HANDOVER INSPECTION: '+cash(c.remedyCost)+' will be deducted from realised gross profit on completion.</p>':'')+
           '<div class="trade-action-row"><button type="button" class="trade-button" data-action="handover-customer" data-mode="'+
           c.preferredMode+'" data-id="'+id+'">COMPLETE HANDOVER</button>'+
           '<button type="button" class="trade-button trade-button-secondary" data-action="deposit-customer" data-id="'+id+
