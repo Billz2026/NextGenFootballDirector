@@ -1,0 +1,226 @@
+/* THE MOTOR TRADE — 2026 premium showroom menu.
+   Scoped to the main menu; trading logic and game screens are untouched. */
+#screen-menu.menu-screen {
+  min-height:calc(100svh - 3px);
+  isolation:isolate;
+  overflow-x:hidden;
+  overflow-y:auto;
+  background-color:#080b0e;
+  background-image:
+    linear-gradient(90deg,rgba(3,7,10,.95) 0%,rgba(3,7,10,.89) 22%,rgba(4,9,13,.63) 42%,rgba(4,9,13,.10) 74%),
+    linear-gradient(0deg,rgba(2,5,9,.60),rgba(2,5,9,.08) 50%,rgba(3,6,9,.24)),
+    url("./assets/motor-trade-showroom-approved.png");
+  background-size:cover,cover,cover;
+  background-position:center,center,center 43%;
+  background-repeat:no-repeat;
+}
+#screen-menu.menu-no-showroom {
+  background-image:linear-gradient(135deg,#0c151d,#070a0e 60%,#18222b);
+}
+#screen-menu .menu-top {
+  height:54px;
+  min-height:54px;
+  padding:10px clamp(20px,4.5vw,68px);
+}
+#screen-menu .menu-status {
+  background:rgba(5,8,12,.76);
+  border-color:rgba(219,224,230,.25);
+  color:#cfd6dc;
+  letter-spacing:.095em;
+}
+#screen-menu .menu-layout {
+  display:flex;
+  width:100%;
+  max-width:1680px;
+  margin:0 auto;
+  align-items:center;
+  justify-content:flex-start;
+  padding:22px clamp(23px,5.5vw,100px) clamp(35px,6vh,76px);
+  gap:0;
+}
+#screen-menu .menu-lead {
+  width:min(530px,100%);
+  min-width:0;
+  flex:none;
+  align-items:flex-start;
+  text-align:left;
+  transform:none;
+}
+#screen-menu .brand-lockup-large {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  align-items:flex-start;
+  text-align:left;
+  margin:0 0 clamp(19px,3vh,28px);
+  gap:0;
+}
+#screen-menu .trade-wordmark-hero {
+  display:block;
+  width:100%;
+  max-width:530px;
+  margin:0;
+  padding:0;
+  line-height:0;
+  overflow:visible;
+}
+#screen-menu .menu-logo-crop {
+  display:block;
+  width:100%;
+  aspect-ratio:1920/370;
+  height:auto;
+  overflow:hidden;
+  line-height:0;
+}
+#screen-menu .trade-wordmark-hero .menu-logo-crop img {
+  display:block;
+  width:100%;
+  max-width:none;
+  height:auto;
+  transform:translateY(-17.7%);
+  mix-blend-mode:screen;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.6));
+}
+#screen-menu .menu-publisher-lockup {
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:12px;
+  margin-top:8px;
+}
+#screen-menu .menu-publisher-lockup::before {
+  content:"";
+  width:25px;
+  height:2px;
+  flex:none;
+  background:#b51e35;
+}
+#screen-menu .menu-publisher-label {
+  color:#dfe6e8;
+  font:700 10px/1.1 var(--mono);
+  letter-spacing:.14em;
+  white-space:nowrap;
+}
+#screen-menu .menu-publisher-lockup .parent-wordmark {
+  display:block;
+  width:clamp(115px,11.5vw,155px);
+  max-width:none;
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 7px rgba(0,0,0,.6));
+}
+#screen-menu .menu-actions {
+  width:min(420px,100%);
+  gap:9px;
+  margin:0;
+}
+#screen-menu .action-btn {
+  min-height:60px;
+  padding:9px 17px;
+  gap:13px;
+  border-radius:5px;
+  color:#f0f3f4;
+  background:rgba(7,13,18,.84);
+  border:1px solid rgba(217,225,232,.34);
+  box-shadow:0 5px 16px rgba(0,0,0,.31);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+#screen-menu .action-btn:hover {
+  border-color:#e0e7ea;
+  background:rgba(17,30,36,.94);
+  transform:translateX(3px);
+}
+#screen-menu .action-btn-primary {
+  color:#0a1118;
+  background:linear-gradient(120deg,#f6f8fa,#d4dbe0);
+  border-color:#f0f3f5;
+}
+#screen-menu .action-btn-primary:hover {
+  color:#0a1118;
+  background:linear-gradient(120deg,#fff,#e4ecf1);
+  border-color:#fff;
+}
+#screen-menu .action-btn-primary::before {
+  content:"";
+  width:3px;
+  height:30px;
+  background:#b31c36;
+  border-radius:2px;
+  flex:0 0 3px;
+}
+#screen-menu .action-btn strong {
+  font-size:22px;
+  letter-spacing:.06em;
+}
+#screen-menu .action-btn small {font-size:10px}
+#screen-menu .action-btn .arrow {font-size:26px}
+#screen-menu .button-mark {font-size:22px;width:23px;flex-basis:23px}
+#screen-menu .menu-guide,
+#screen-menu .cloud-account-panel,
+#screen-menu .career-tools,
+#screen-menu .menu-save-warning {
+  width:min(420px,100%);
+  max-width:100%;
+  margin-left:0;
+  background:rgba(6,13,18,.96);
+  border-color:rgba(218,225,232,.3);
+  color:#e6eef0;
+}
+#screen-menu .menu-setting-row button {
+  background:#e2e6e9;
+  color:#101720;
+  border-color:#f8f9fa;
+}
+@media (max-width:780px) {
+  #screen-menu.menu-screen {
+    background-image:
+      linear-gradient(90deg,rgba(2,6,9,.88),rgba(4,8,11,.50)),
+      linear-gradient(0deg,rgba(2,6,9,.78),rgba(2,6,9,.14) 60%,rgba(2,6,9,.45)),
+      url("./assets/motor-trade-showroom-approved.png");
+    background-position:center,center,56% center;
+  }
+  #screen-menu.menu-no-showroom {
+    background-image:linear-gradient(135deg,#0c151d,#070a0e 60%,#18222b);
+  }
+  #screen-menu .menu-layout {
+    padding:12px 20px 36px;
+    justify-content:center;
+  }
+  #screen-menu .menu-lead {
+    width:min(450px,100%);
+    align-items:center;
+    text-align:center;
+  }
+  #screen-menu .brand-lockup-large {align-items:center;text-align:center}
+  #screen-menu .trade-wordmark-hero {max-width:480px}
+  #screen-menu .menu-publisher-lockup {justify-content:center}
+  #screen-menu .menu-actions {width:min(420px,100%)}
+}
+@media (max-width:540px) {
+  #screen-menu .menu-top {height:42px;min-height:42px;padding:7px 12px}
+  #screen-menu .menu-layout {padding:5px 15px 22px}
+  #screen-menu .brand-lockup-large {margin-bottom:17px}
+  #screen-menu .menu-publisher-lockup {
+    gap:8px;
+    margin-top:5px;
+  }
+  #screen-menu .menu-publisher-lockup::before {width:16px}
+  #screen-menu .menu-publisher-label {font-size:8px}
+  #screen-menu .menu-publisher-lockup .parent-wordmark {width:112px}
+  #screen-menu .menu-actions {gap:8px}
+  #screen-menu .action-btn {min-height:53px;padding:8px 12px}
+  #screen-menu .action-btn strong {font-size:20px}
+  #screen-menu .action-btn .arrow {font-size:23px}
+  #screen-menu .menu-status {font-size:8px}
+}
+@media (max-height:660px) and (min-width:781px) {
+  #screen-menu .menu-layout {padding-top:10px;padding-bottom:15px}
+  #screen-menu .brand-lockup-large {margin-bottom:15px}
+  #screen-menu .action-btn {min-height:51px}
+  #screen-menu .menu-actions {gap:6px}
+}
+@media (prefers-reduced-motion:reduce) {
+  #screen-menu .action-btn {transition:none}
+}
