@@ -23,8 +23,10 @@
       reserve:W.reserved(s),
       tech:P.activeTeam(s,'technician').length,
       free:P.availableTechnicians(s).length,
-      bays:P.technicianLimit(s),
-      inHouse:cars.filter(v=>v.workshop?.stage==='in-progress'&&v.workshop.method==='internal').length,
+      bays:window.MotorTradePremises?.bays(s)??4,
+      assistants:P.availableTechnicians(s).filter(t=>t.skills.efficiency>=12).length,
+      supervisor:P.supervisorProfile(s),
+      inHouse:cars.filter(v=>['in-progress','quality-check'].includes(v.workshop?.stage)&&v.workshop.method==='internal').length,
       external:cars.filter(v=>v.workshop?.stage==='in-progress'&&v.workshop.method==='external').length};
   }
   function status(v){
@@ -101,6 +103,7 @@
       (q?'<span>'+q.duration+' DAYS · '+q.partsDelay+' PARTS-WAIT DAYS</span><small>'+
         esc(q.provider)+'</small>'+
         (q.saving>0?'<small class="ws-savings">IN-HOUSE LABOUR SAVING '+cash(q.saving)+'</small>':'')+
+        (q.supervisorDays?'<small>SUPERVISOR COORDINATION: ONE PLANNED REPAIR DAY SAVED</small>':'')+
         (q.supplement>0?'<small>EXTERNAL GARAGE UPLIFT '+cash(q.supplement)+'</small>':''):'')+
       (cannot?'<p class="ws-issue">'+esc(reason)+'</p>':'')+
       '<button type="button" class="trade-button" data-action="start-workshop" data-id="'+v.id+
@@ -192,9 +195,16 @@
     ].map(([name,num])=>'<div><small>'+name+'</small><strong>'+num+'</strong></div>').join('')+
       '</div><div class="ws-capacity" aria-label="Workshop operating capacity">'+
       '<span>TECHNICIANS <strong>'+q.free+' FREE / '+q.tech+' ACTIVE</strong></span>'+
-      '<span>IN-HOUSE BAYS <strong>'+q.inHouse+' / '+q.bays+'</strong></span>'+
+      '<span>IN-HOUSE BAYS <strong>'+q.inHouse+' / '+q.bays+'</strong></span>'+ 
+      '<span>SPARE REPAIR ASSISTANTS <strong>'+q.assistants+'</strong></span>'+
       '<span>EXTERNAL REPAIRS <strong>'+q.external+' / 2</strong></span>'+
-      '<span>FUNDS RESERVED <strong>'+cash(q.reserve)+'</strong></span></div>';
+      '<span>FUNDS RESERVED <strong>'+cash(q.reserve)+'</strong></span></div>'+ 
+      '<p class="ws-caveat">'+(q.supervisor.manager?
+        'SUPERVISOR '+esc(q.supervisor.manager.name.toUpperCase())+
+        ' · INTERNAL BOOKING '+(q.supervisor.turnaroundDays?'−1 DAY':'NO SCHEDULING BONUS')+
+        ' · QC REWORK RISK −'+q.supervisor.qcRiskReduction+' POINTS':
+        'NO ACTIVE SUPERVISOR · NO SCHEDULING OR QC OVERSIGHT BENEFIT')+
+      '. Idle qualified prep technicians may help active repairs finish sooner.</p>';
     if(!s.vehicles.length)return {selectedId:null,html:kpi+
       '<div class="trade-empty ws-empty"><h2>NO VEHICLES TO PREPARE.</h2>'+
       '<p>Buy a vehicle at the Buying Desk or Auction Hall to create a workshop job.</p>'+
