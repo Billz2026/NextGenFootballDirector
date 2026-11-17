@@ -1,0 +1,41 @@
+name: Stock ageing and pricing pressure regression
+on:
+  pull_request:
+    paths:
+      - 'stock-ageing.js'
+      - 'trading.js'
+      - 'stock-view.js'
+      - 'monthly.js'
+      - 'cashflow-forecast.js'
+      - 'customers.js'
+      - 'showroom-traffic.js'
+      - 'simulator.js'
+      - 'tests/stock-ageing.test.mjs'
+      - '.github/workflows/stock-ageing-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'stock-ageing.js'
+      - 'trading.js'
+      - 'stock-view.js'
+      - 'monthly.js'
+      - 'cashflow-forecast.js'
+      - 'customers.js'
+      - 'showroom-traffic.js'
+      - 'simulator.js'
+      - 'tests/stock-ageing.test.mjs'
+      - '.github/workflows/stock-ageing-regression.yml'
+permissions:
+  contents: read
+jobs:
+  ageing:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check ageing model and game integration syntax
+        run: node --check stock-ageing.js && node --check trading.js && node --check stock-view.js && node --check monthly.js && node --check customers.js && node --check showroom-traffic.js && node --check cashflow-forecast.js && node --check simulator.js
+      - name: Test real ageing, finances, saving, customer and workshop mechanics
+        run: node --test tests/stock-ageing.test.mjs tests/cashflow-forecast.test.mjs tests/customer-behaviour.test.mjs tests/staff-workshop-impact.test.mjs
