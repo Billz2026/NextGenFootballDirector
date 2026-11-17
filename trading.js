@@ -8,7 +8,7 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 17;
+  const VERSION = 18;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
@@ -334,6 +334,7 @@
     };
     M.initialize(state);
     Object.assign(state,D.initial());
+    SITE.sync(state);
     Q.initialise(state);
     return state;
   }
@@ -348,13 +349,14 @@
     state.nextStaffId=state.staff.length+1;
     // Rebuild the monthly plan after adding the real opening payroll.
     M.initialize(state);
+    SITE.sync(state);
     // The opening sales hire can now serve one visitor per trading day.
     state.showroom=Q.initial(state.day);
     Q.initialise(state);
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -401,12 +403,14 @@
     }
     if(!SITE.valid(site))return null;
     const expectedCapacity=SITE.capacity({premises:site});
+    const allowedStock=saved.version>=18?SITE.storageLimit({premises:site}):expectedCapacity;
+    if(saved.version>=18&&site.forecourtLevel<SITE.autoLevel(saved.reputationScore))return null;
     if(saved.version>=13&&(!integer(saved.inboxLedgerCursor)||
       saved.inboxLedgerCursor<0||saved.inboxLedgerCursor>saved.ledger?.length))return null;
     if ((saved.version>=10?saved.capacity!==expectedCapacity:![2,CAPACITY].includes(saved.capacity)) || !Array.isArray(saved.vehicles) ||
       !Array.isArray(saved.sold) || !Array.isArray(saved.ledger) ||
       !integer(saved.nextId) || saved.nextId < 1 ||
-      !cashValue(saved.cash) || saved.vehicles.length > expectedCapacity ||
+      !cashValue(saved.cash) || saved.vehicles.length > allowedStock ||
       saved.vehicles.length > 250 || saved.sold.length > 20000 ||
       saved.ledger.length > 60000 ||
       (saved.version>=12&&(!Array.isArray(saved.wholesale)||saved.wholesale.length>20000)))return null;
@@ -517,6 +521,9 @@
     if(!C.valid(restored,saved))return null;
     if(!Q.valid(restored,saved))return null;
     if(!auctionValid(restored))return null;
+    // v17 and earlier owned stock and legacy costs are validated first.
+    // A reputation unlock is then granted without a fabricated capital debit.
+    SITE.sync(restored);
     return restored;
   }
   const fail = (code, message) => ({ok:false,code,message});
@@ -549,12 +556,17 @@
     return v;
   }
   function canBuy(state, cost, preparation) {
-    if (state.vehicles.length >= state.capacity) return fail('capacity','Your forecourt is full. Sell a vehicle before buying another.');
+    const maximum=SITE.storageLimit(state);
+    if (state.vehicles.length >= maximum) return fail('capacity',
+      'All '+state.capacity+' forecourt spaces and '+SITE.OVERFLOW_SPACES+
+      ' temporary offsite stock positions are occupied. Sell or hand over a vehicle before buying again.');
     // No lending or wholesale exit yet: reserve preparation for *all* acquired cars.
     // Otherwise a second purchase could consume the cash needed to retail the first.
     const pendingPrep=W.reserved(state);
-    if (cost + preparation + pendingPrep > state.cash)
-      return fail('cash','Not enough cash to buy this car while reserving all required stock preparation.');
+    const nextOffsite=Math.max(0,state.vehicles.length+1-state.capacity);
+    const holdingBuffer=nextOffsite*SITE.OVERFLOW_DAILY_FEE;
+    if (cost + preparation + pendingPrep + holdingBuffer > state.cash)
+      return fail('cash','Not enough cash for this purchase, all required preparation and one day of temporary storage when applicable.');
     return null;
   }
   // An unsuccessful maximum bid does not incur a buyer's fee in this
@@ -866,6 +878,7 @@
     if(px)addCar(state,px,'part-ex',agreedAllowance,'PX-'+c.agreedDay+'-'+v.id);
     state.stock=state.vehicles.length;state.sales=state.sold.length;
     const review=P.sale(state,v,price,realised,c);
+    const expansion=SITE.sync(state);
     state.reputation=P.tier(state.reputationScore);
     const completed=state.sold.at(-1);
     completed.reputationDelta=review.reputationDelta;
@@ -879,7 +892,8 @@
         px?' (cash balance £'+cashBalance+' received after part-exchange allowance)':'')+
       (px?'; part-exchange allowance £'+agreedAllowance+'.':'.')+
       (remedyCost?' Dealer-funded inspection £'+remedyCost+' charged at handover.':'')+
-      ' Gross trading margin: £'+realised+' after any agreed inspection cost, before overheads, tax and aftersales.');
+      ' Gross trading margin: £'+realised+' after any agreed inspection cost, before overheads, tax and aftersales.'+
+      (expansion?' REPUTATION UNLOCK: forecourt automatically increased to '+expansion.current+' permanent spaces.':''));
   }
   function wholesaleOffer(vehicle){
     // Simplified emergency trade bid. A trade outlet is not a retail sale
@@ -908,12 +922,14 @@
     sum(state.wholesale,'profit'); }
   function premisesDay(state){
     const out=SITE.advance(state);
+    SITE.sync(state);
     state.reputation=P.tier(state.reputationScore);
     return out;
   }
   const upgradePremises=(state,kind)=>SITE.upgrade(state,kind);
   function staffDay(state) {
     const out=P.advance(state);
+    SITE.sync(state);
     state.reputation=P.tier(state.reputationScore);
     return out;
   }
