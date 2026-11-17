@@ -568,3 +568,127 @@
   #screen-career .game-clock strong {font-size:10px}
   #screen-career .dashboard-control .dashboard-heading {align-items:flex-start}
 }
+
+/* 2026 Dealer identity hierarchy — dealership name is a pinned primary
+   sidebar element; only long department navigation scrolls on desktop. */
+#screen-career .sidebar-career-featured {
+  display:flex;
+  flex-direction:column;
+  flex:0 0 auto;
+  gap:5px;
+  margin:2px 2px 8px;
+  padding:14px 13px;
+  border:1px solid #62513A;
+  border-left:3px solid #B68A42;
+  border-radius:6px;
+  background:radial-gradient(ellipse at top right,rgba(182,138,66,.12),transparent 76%),#141A20;
+  box-shadow:0 7px 20px rgba(0,0,0,.18);
+}
+#screen-career .sidebar-career-featured .section-overline {
+  color:#D0B284;
+  font:700 9px/1.3 var(--body);
+  letter-spacing:.12em;
+}
+#screen-career .sidebar-career-featured strong {
+  display:block;
+  color:#F4F5F5;
+  font:800 clamp(18px,1.45vw,23px)/1.15 var(--body);
+  letter-spacing:-.03em;
+  overflow-wrap:anywhere;
+}
+#screen-career .sidebar-career-featured small {
+  color:#B0BBC3;
+  font:600 9px/1.3 var(--body);
+  letter-spacing:.035em;
+}
+#screen-career .sidebar-rule {margin:6px 5px 12px;}
+#screen-career .nav-heading {margin-bottom:8px;color:#9DAAB3;}
+@media(min-width:1021px) {
+  #screen-career .career-sidebar {
+    height:calc(100dvh - 3px);
+    min-height:0;
+    overflow:hidden;
+  }
+  #screen-career .career-nav {
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding-right:3px;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    scrollbar-color:#53616B transparent;
+  }
+  #screen-career .sidebar-logo,
+  #screen-career .sidebar-career-featured,
+  #screen-career .sidebar-rule,
+  #screen-career .nav-heading,
+  #screen-career .sidebar-bottom {flex-shrink:0;}
+  #screen-career .sidebar-bottom {
+    margin-top:0;
+    padding-top:9px;
+  }
+}
+@media(max-width:1020px) {
+  #screen-career .career-sidebar {overflow:hidden;}
+  #screen-career .sidebar-career-featured {
+    flex:0 1 190px;
+    min-width:150px;
+    margin:0;
+    padding:9px 11px;
+    gap:3px;
+  }
+  #screen-career .sidebar-career-featured .section-overline {font-size:8px;}
+  #screen-career .sidebar-career-featured strong {font-size:15px;}
+  #screen-career .sidebar-career-featured small {font-size:7px;}
+  #screen-career .career-nav {
+    min-height:0;
+    flex:1 1 auto;
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+}
+@media(max-width:570px) {
+  #screen-career .career-sidebar {
+    display:grid;
+    grid-template-columns:95px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    align-items:center;
+    gap:8px 10px;
+    padding:9px 11px;
+  }
+  #screen-career .sidebar-logo {
+    grid-column:1;
+    grid-row:1;
+    width:95px;
+    min-width:0;
+    flex:none;
+  }
+  #screen-career .sidebar-identity-art {width:94px;max-width:100%;}
+  #screen-career .sidebar-career-featured {
+    grid-column:2;
+    grid-row:1;
+    width:100%;
+    min-width:0;
+    padding:10px 11px;
+    gap:4px;
+  }
+  #screen-career .sidebar-career-featured strong {
+    font-size:clamp(15px,4.4vw,19px);
+  }
+  #screen-career .sidebar-career-featured small {
+    font-size:7px;
+    line-height:1.2;
+  }
+  #screen-career .career-nav {
+    grid-column:1/-1;
+    grid-row:2;
+    width:100%;
+    min-width:0;
+    margin:0;
+    padding:0 0 1px;
+  }
+  #screen-career .career-nav button {min-height:38px;flex:0 0 auto;}
+}
