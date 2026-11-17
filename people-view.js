@@ -324,7 +324,7 @@
     const assigned=e.role==='technician'?state.vehicles.find(v=>
       v.workshop?.technicianId===e.id&&v.workshop.method==='internal'&&
       ['in-progress','quality-check'].includes(v.workshop.stage)):null;
-    if(state.payrollArrears>0)return {name:'PAYROLL OVERDUE',tone:'warning'};
+    if(state.payrollArrears>0)return {name:'PAYROLL OVERDUE',tone:'critical'};
     if(state.day<e.startDay)return {name:'STARTS DAY '+e.startDay,tone:'waiting'};
     if(e.trainingUntil!==null&&state.day<e.trainingUntil)
       return {name:'TRAINING TO DAY '+e.trainingUntil,tone:'waiting'};
@@ -381,7 +381,7 @@
       .sort((a,b)=>a.monthlySalary-b.monthlySalary);
     const examples=eligible.slice(0,3).map(c=>esc(c.name)+' · '+
       gbp(c.monthlySalary)+'/mo').join('  ·  ');
-    return '<section class="sd-hiring-overview" aria-label="Recruitment availability">'+
+    return '<section class="sd-hiring-overview'+(counts.hireable?' sd-hiring-open':' sd-hiring-blocked')+'" aria-label="Recruitment availability">'+
       '<div><h2>RECRUITMENT THIS WEEK</h2>'+
       '<p><strong>'+counts.hireable+' CAN HIRE NOW</strong> OF '+counts.candidates+
       ' WEEKLY APPLICANTS · REFRESHES GAME DAY '+nextRefresh+'</p>'+
@@ -398,7 +398,7 @@
     const hired=mode==='team',info=hired?employeeStatus(state,P,person):
       recruitStatus(state,P,person);
     const label=hired?info.name:info.reason;
-    const tone=hired?info.tone:info.canHire?'available':'warning';
+    const tone=hired?info.tone:info.canHire?'available':info.quote.shortfall?'critical':'warning';
     const id=hired?'e:'+person.id:'c:'+person.id;
     const extra=hired?(person.origin==='opening-team'?'OPENING TEAM · ':'')+
       gbp(P.dailyCost(person))+' DAILY WAGES':
@@ -486,7 +486,7 @@
 
     return '<div class="sd-dossier"><header class="sd-file-head"><div><small>RECRUITMENT FILE · '+
       esc(roleName[c.role])+'</small><h3>'+esc(c.name)+'</h3></div>'+
-      '<span class="sd-tag sd-tag-'+(info.canHire?'available':'warning')+'">'+
+      '<span class="sd-tag sd-tag-'+(info.canHire?'available':q.shortfall?'critical':'warning')+'">'+
       esc(info.reason)+'</span></header>'+
       '<section class="sd-candidate-quick" aria-label="Current hiring decision">'+
       '<div class="sd-hire-brief"><div><small>CHARGED ON HIRE</small><strong>'+
@@ -555,13 +555,13 @@
       ['ACTIVE TODAY',String(counts.active)],
       ['DAILY / MONTHLY WAGES',gbp(counts.daily)+' / '+gbp(counts.monthly)],
       ['CAN RECRUIT NOW',counts.hireable+' / '+counts.candidates]
-    ].map(([title,value])=>'<div><small>'+title+'</small><strong>'+value+
+    ].map(([title,value])=>'<div class="'+(title==='CAN RECRUIT NOW'&&counts.hireable?'sd-kpi-positive':'sd-kpi-neutral')+'"><small>'+title+'</small><strong>'+value+
       '</strong></div>').join('')+'</div>';
     const alert=state.payrollArrears?
-      '<div class="sd-cash-alert"><strong>UNPAID WAGES '+gbp(state.payrollArrears)+'</strong>'+
+      '<div class="sd-cash-alert sd-cash-critical"><strong>UNPAID WAGES '+gbp(state.payrollArrears)+'</strong>'+
       '<span>Employees are unavailable while payroll arrears remain outstanding.</span></div>':
       state.cash<counts.daily*3&&counts.employed?
-      '<div class="sd-cash-alert"><strong>PAYROLL RISK</strong><span>Cash '+gbp(state.cash)+
+      '<div class="sd-cash-alert sd-cash-warning"><strong>PAYROLL RISK</strong><span>Cash '+gbp(state.cash)+
       ' is less than three days of wages ('+gbp(counts.daily*3)+').</span></div>':'';
     const toolbar='<div class="sd-toolbar"><div class="sd-tabs" role="group" aria-label="Employee or candidate records">'+
       '<button type="button" data-action="staff-desk-mode" data-mode="team" aria-pressed="'+
