@@ -581,6 +581,9 @@
       return;
     }
     const enteringDealDay=D.isDealDay(career.day+1);
+    // Unserved visitors depart at close, BEFORE month-end reporting.
+    // They do not remain in a fictitious overnight showroom queue.
+    const missedVisitors=E.showroom.closeWaiting(career,'Left at close of business without being served.').length;
     // Close the actual calendar month BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
     const beforeDayReputation=career.reputationScore;
@@ -646,6 +649,9 @@
       eventNotice+=' WORKSHOP: '+workshopEvents.join(' ');
     if(customerEvents.length)
       eventNotice+=' CUSTOMERS: '+customerEvents.join(' ');
+    if(missedVisitors)
+      eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
+        ' left without being served.';
     if(closed){
       const id=career.messages.reduce((n,message)=>Math.max(n,message.id),0)+1;
       const status=closed.targetMet?'ACHIEVED':'MISSED';
