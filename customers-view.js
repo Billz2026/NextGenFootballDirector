@@ -322,7 +322,7 @@
       ['CUSTOMERS ON SITE',waiting+s.rows.filter(r=>['arrived','discussing'].includes(r.caseData.c?.status)).length],
        ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
     ].map(([name,value])=>
-      '<div><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
+      '<div class="'+(name==='ACTION REQUIRED'&&value>0?'so-kpi-attention':name==='CUSTOMERS ON SITE'&&value>0?'so-kpi-occupied':'so-kpi-neutral')+'"><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<details class="so-activity"><summary>MONTHLY RETAIL ACTIVITY</summary>'+
       '<p>THIS MONTH · '+stats.enquiries+' RECORDED ENQUIRIES · '+
       stats.appointments+' VIEWINGS BOOKED · '+stats.testDrives+' TEST DRIVES · '+

@@ -13,7 +13,7 @@
       waiting?'DIAGNOSIS BOOKED':'OWNER ACTION REQUIRED';
     const risk=done?'RESOLVED':
       days>=7?'OVERDUE · CUSTOMER TRUST AT RISK':'RESPONSE DUE';
-    return '<article class="ac-case'+(done?' ac-case-resolved':'')+'">'+
+    return '<article class="ac-case'+(done?' ac-case-resolved':days>=7?' ac-case-overdue':waiting?' ac-case-inspection':' ac-case-action')+'">'+
       '<div class="ac-case-top"><div><small>STOCK '+c.id+' · CLAIM DAY '+c.openedDay+
       '</small><h4>'+esc(sold?.title||'Sold vehicle')+'</h4></div>'+
       '<span class="ac-status">'+status+'</span></div>'+
@@ -45,7 +45,7 @@
       .sort((a,b)=>b.resolvedDay-a.resolvedDay||b.id-a.id).slice(0,4);
     const summary='<div class="ac-overview"><div><h3>AFTERSALES · CUSTOMER CARE</h3>'+
       '<p>Claims arise only after completed handovers. Workshop QC and supervision influence the risk; a passed QC never guarantees zero issues.</p></div>'+
-      '<div class="ac-kpis"><div><small>OPEN CASES</small><strong>'+stats.open+'</strong></div>'+
+      '<div class="ac-kpis"><div class="'+(stats.open>0?'ac-kpi-attention':'')+'"><small>OPEN CASES</small><strong>'+stats.open+'</strong></div>'+
       '<div><small>ESTIMATED REPAIR EXPOSURE</small><strong>'+money(stats.potentialCost)+'</strong></div>'+
       '<div><small>TOTAL CASE COSTS PAID</small><strong>'+money(stats.paid)+'</strong></div></div></div>';
     const casesHtml=open.length?
