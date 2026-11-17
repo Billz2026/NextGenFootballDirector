@@ -438,6 +438,8 @@
       integer(s.day) && s.day >= 1 && s.day <= saved.day &&
       cashValue(s.price) && integer(s.profit) && ['cash','part-ex'].includes(s.mode) &&
       (s.profile==null || I.validProfile(s.profile))&&
+      (s.customerLeadId===undefined||
+        (typeof s.customerLeadId==='string'&&/^C-\\d+-\\d+-\\d+-\\d+$/.test(s.customerLeadId)))&&
       (s.workshopRecord===undefined||W.valid({status:'listed',
         prepSpent:s.prep,workshop:s.workshopRecord},saved.day));
     const goodLedger = l => l && integer(l.day) && l.day >= 1 && l.day <= saved.day &&
@@ -881,6 +883,7 @@
       priceDiscount:c.priceDiscount||0,profit:realised,
       profile:v.profile?{...v.profile}:null,
       workshopRecord:JSON.parse(JSON.stringify(v.workshop)),
+      customerLeadId:c.id,
       exchange:px?px.title:null,allowance:px?agreedAllowance:0
     });
     if(px)addCar(state,px,'part-ex',agreedAllowance,'PX-'+c.agreedDay+'-'+v.id);
