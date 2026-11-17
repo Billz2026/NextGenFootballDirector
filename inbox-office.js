@@ -36,6 +36,9 @@
   }
   function needsAction(m,state){
     if(actionFor(m,state))return true;
+    const complaint=/^aftersales:(\d+)$/.exec(m.reference||'');
+    if(complaint&&state.afterSalesCases?.some(c=>c.id===Number(complaint[1])&&
+      c.status!=='resolved'))return true;
     const id=moraleId(m);
     return id!==null&&!m.decision&&state.payrollArrears===0&&
       !!state.staff.find(e=>e.id===id&&e.morale>0&&e.morale<=45)&&
