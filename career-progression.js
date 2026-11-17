@@ -121,7 +121,7 @@
       '<div class="cp-section-head cp-achievements-title"><div><small>CAREER RECORD</small>'+
       '<h3>EARNED MILESTONES</h3></div><span>'+done+' / '+earned.length+' EARNED</span></div>'+
       '<div class="cp-achievements">'+items+'</div>'+
-      '<p class="cp-rules">Achievements are calculated from completed sales, settled auctions and archived reports. No bonus cash, free vehicles or automatic upgrades are awarded.</p>'+
+      '<p class="cp-rules">Achievements use completed sales, settled auctions and archived reports. They award no cash or free cars. Permanent forecourt places unlock separately and automatically at 20, 40 and 60 reputation.</p>'+
       '</section>';
   }
   function promotion(before,after){
