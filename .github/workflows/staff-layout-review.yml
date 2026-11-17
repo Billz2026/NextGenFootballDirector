@@ -3,9 +3,13 @@ on:
   pull_request:
     paths:
       - 'people-view.js'
+      - 'staff-performance.js'
+      - 'customers.js'
+      - 'trading.js'
       - 'staff-polish.css'
       - 'index.html'
       - 'tests/staff-visual-browser.mjs'
+      - 'tests/staff-performance.test.mjs'
       - '.github/workflows/staff-layout-review.yml'
 permissions:
   contents: read
@@ -20,6 +24,8 @@ jobs:
           node-version: '22'
       - name: Validate test syntax
         run: node --check tests/staff-visual-browser.mjs
+      - name: Verify measured performance and career migrations
+        run: node --test tests/staff-performance.test.mjs tests/staff-workshop-impact.test.mjs tests/customer-behaviour.test.mjs
       - name: Install Chromium
         run: |
           npm install --no-save playwright@1.58.2

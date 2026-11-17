@@ -55,7 +55,8 @@
   }
   function append(state,caseObj,type,detail=''){
     state.customerHistory.push({day:state.day,vehicleId:caseObj.vehicleId,
-      leadId:caseObj.id,type,detail:detail.slice(0,120)});
+      leadId:caseObj.id,type,detail:detail.slice(0,120),
+      salespersonId:caseObj.salespersonId??null});
     if(state.customerHistory.length>2000)state.customerHistory.shift();
   }
   // Buyers have persistent personalities, grounded vehicle concerns and real
@@ -610,7 +611,9 @@
     if(!history.every(h=>h&&no(h.day,36500)&&h.day>=1&&h.day<=state.day&&
       no(h.vehicleId,100000)&&h.vehicleId>0&&
       typeof h.leadId==='string'&&h.leadId.length<=50&&
-      types.includes(h.type)&&typeof h.detail==='string'&&h.detail.length<=120))
+      types.includes(h.type)&&typeof h.detail==='string'&&h.detail.length<=120&&
+      (h.salespersonId===undefined||h.salespersonId===null||
+        (no(h.salespersonId,100000)&&h.salespersonId>0))))
       return false;
     const existingFunds=saved.version>=9?saved.customerFunds:
       Object.values(cases).filter(c=>c.held>0).map(c=>({
