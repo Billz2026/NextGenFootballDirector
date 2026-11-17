@@ -95,8 +95,7 @@
     const planPrice=ageing.target,canReprice=ageing.days>=15&&
       planPrice<price&&!locked;
     const canTrade=ageing.days>=30&&
-      (!caseRecord||caseRecord.status==='lost')&&
-      !window.MotorTradeShowroom.waiting(state).some(q=>q.vehicleId===v.id);
+      (!caseRecord||caseRecord.status==='lost');
     return '<div class="stock-action-box"><h4>NEXT DECISION · '+p.next+'</h4>'+
       (v.status==='listed'?'<p>Advertising is live. Buyer interest and agreements are managed in the Sales Office.</p>':
         '<p>Quality control has passed. Set your asking price to advertise the car.</p>')+
@@ -115,7 +114,7 @@
         ' before holding charges already incurred. No retail sale credit.</p>'+
         '<button type="button" class="trade-button trade-button-secondary" data-action="dispose-aged-stock" data-id="'+v.id+
         '"'+(canTrade?'':' disabled')+'>SELL TO TRADE · RELEASE STOCK SPACE</button>'+
-        (canTrade?'':'<small>Resolve open customer cases or waiting showroom visitors first.</small>')+
+        (canTrade?'':'<small>Resolve the active customer enquiry or agreement first.</small>')+
         '</div>':'')+
       (v.status==='listed'?'<button type="button" class="trade-button trade-button-secondary" data-page="sales" data-id="'+v.id+
       '">OPEN SALES OFFICE</button>':'')+'</div>';
