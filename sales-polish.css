@@ -343,3 +343,53 @@
 @media(prefers-reduced-motion:reduce){
   .sales-control .so-unit{transition:none}
 }
+
+/* Customer Behaviour 2.0 — compact in-showroom decision desk. */
+.sales-control .so-buyer-objection{
+  padding:12px;border:1px solid #9d7448;border-left:3px solid #dab178;
+  border-radius:7px;background:#29353a;margin:0 0 10px;
+}
+.sales-control .so-buyer-intro{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:6px;font:800 9px/1.35 var(--mono);color:#efd1a4;
+}
+.sales-control .so-buyer-intro strong{
+  padding:4px 7px;background:#354750;border:1px solid #5c6970;
+  border-radius:4px;font-size:9px;color:#e9e9df;
+}
+.sales-control .so-buyer-motive{margin:8px 0;color:#c5d1d0;font-size:11px}
+.sales-control .so-buyer-quote{
+  margin:8px 0;padding:10px 12px;border-left:2px solid #e3b77f;
+  border-radius:0 4px 4px 0;background:#182e38;
+  font:650 13px/1.55 var(--body);color:#f0e9e2;
+}
+.sales-control .so-buyer-instruction,
+.sales-control .so-buyer-cost-note{
+  color:#cad1cc;font-size:10px;line-height:1.5;margin:8px 0;
+}
+.sales-control .so-buyer-cost-note{
+  color:#aebfc1;font-size:9px;margin:9px 0 0;
+}
+.sales-control .so-buyer-choices{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;margin-top:10px;
+}
+.sales-control .so-buyer-choices .trade-button{
+  width:100%;min-width:0;min-height:40px;padding:9px 10px;
+  text-align:left;white-space:normal;line-height:1.35;font-size:10px;
+}
+.sales-control .so-buyer-choices .trade-button[data-choice="walk"]{
+  grid-column:1/-1;background:#293b42;
+}
+.sales-control .so-buyer-choices .trade-button:disabled{opacity:.55}
+.sales-control .so-buyer-tried{
+  grid-column:1/-1;color:#e2c69d;font-size:10px;margin:0;
+}
+.sales-control .so-buyer-resolution{
+  margin:0 0 8px;padding:9px;border:1px solid #4a8067;
+  border-radius:5px;background:#213d36;color:#d4eee0;
+  font:700 10px/1.45 var(--body);
+}
+@media(max-width:840px){
+  .sales-control .so-buyer-choices{grid-template-columns:minmax(0,1fr)}
+}
