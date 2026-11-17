@@ -124,6 +124,10 @@
     const grossMargin=sum(sales,'profit')+sum(disposals,'profit');
     const premisesExpense=ledger.filter(x=>x.note.startsWith('Premises expense accrued: £'))
       .reduce((n,x)=>n+Number(/^Premises expense accrued: £(\d+)/.exec(x.note)?.[1]||0),0);
+    const stockAgeingExpense=ledger.filter(x=>x.note.startsWith('Stock ageing expense accrued: £'))
+      .reduce((n,x)=>n+Number(/^Stock ageing expense accrued: £(\d+)/.exec(x.note)?.[1]||0),0);
+    const stockAgeingPaid=-ledger.filter(x=>x.note==='Stock ageing holding payment')
+      .reduce((n,x)=>n+x.delta,0);
     const inflow=ledger.filter(x=>x.delta>0).reduce((n,x)=>n+x.delta,0);
     const outflow=-ledger.filter(x=>x.delta<0).reduce((n,x)=>n+x.delta,0);
     const payrollCost=-(bucket.payroll+bucket.commission+bucket.recruitment+
@@ -156,7 +160,7 @@
       workshopStage:v.workshop?.stage??'unknown',
       workshopDaysLeft:v.workshop?.remainingDays??0
     }));
-    const operatingContribution=grossMargin-payrollCost-premisesExpense;
+    const operatingContribution=grossMargin-payrollCost-premisesExpense-stockAgeingExpense;
     const met=saleCount>=p.unitTarget && grossMargin>0&&operatingContribution>0;
     const report={
       month:p.month,monthLabel:CAL.monthLabel(state.day).toUpperCase(),
@@ -174,6 +178,7 @@
       premisesExpense,premisesPaid:-bucket.premisesPayments,
       premisesInvestment:-bucket.premisesInvestment,
       premisesArrears:state.premises?.arrears??0,
+      stockAgeingExpense,stockAgeingPaid,stockAgeingArrears:state.stockAgeingArrears||0,
       operatingContribution,
       openingCash:p.openingCash,closingCash:state.cash,
       cashIn:inflow,cashOut:outflow,netCashChange:inflow-outflow,
@@ -300,7 +305,11 @@
       !nonneg(r.premisesExpense)||!nonneg(r.premisesPaid)||
       !nonneg(r.premisesInvestment)||!nonneg(r.premisesArrears)||
       !whole(r.operatingContribution)||
-      r.operatingContribution!==r.grossAfterStaff-r.premisesExpense))return false;
+      r.operatingContribution!==r.grossAfterStaff-r.premisesExpense-
+        (r.stockAgeingExpense||0)))return false;
+    if(r.stockAgeingExpense!==undefined&&(
+      !nonneg(r.stockAgeingExpense)||!nonneg(r.stockAgeingPaid)||
+      !nonneg(r.stockAgeingArrears)))return false;
     if(r.customerHoldingAtClose!==undefined&&
       (!nonneg(r.customerHoldingAtClose)||r.customerHoldingAtClose>1000))return false;
     if(r.customerPreparationExpense!==undefined&&
