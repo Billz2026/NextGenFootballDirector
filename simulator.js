@@ -11,6 +11,7 @@
   const EV = window.MotorTradeEventsView;
   const WV = window.MotorTradeWorkshopView;
   const CV = window.MotorTradeCustomersView;
+  const ASV = window.MotorTradeAfterSalesView;
   const AV = window.MotorTradeAuctionHallView;
   const SITE_VIEW = window.MotorTradePremisesView;
   const DV = window.MotorTradeDashboardView;
@@ -20,7 +21,7 @@
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV || !CF)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -371,6 +372,7 @@
     byId('workshop-board').innerHTML=view.html;
   }
   function renderSales() {
+    byId('aftersales-board').innerHTML=ASV.render(career,E);
     const view=CV.render(career,E,{selectedId:selectedSalesId,filter:salesFilter});
     selectedSalesId=view.selectedId;
     byId('sales-list').innerHTML=view.html;
@@ -621,6 +623,7 @@
     const ageingEvent=E.stockAgeingDay(career);
     const workshopEvents=E.advanceWorkshop(career);
     const customerEvents=E.advanceCustomers(career);
+    const afterSalesEvents=E.advanceAfterSales(career);
     lastTradeResult = null;
     expandedReportId = null;
     career.reports = {};
@@ -662,6 +665,11 @@
       eventNotice+=' WORKSHOP: '+workshopEvents.join(' ');
     if(customerEvents.length)
       eventNotice+=' CUSTOMERS: '+customerEvents.join(' ');
+    if(afterSalesEvents.opened.length||afterSalesEvents.diagnosed.length||
+      afterSalesEvents.escalated.length)
+      eventNotice+=' AFTERSALES: '+
+        [...afterSalesEvents.opened,...afterSalesEvents.diagnosed,
+          ...afterSalesEvents.escalated].join(' ');
     if(missedVisitors)
       eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
         ' left without being served.';
@@ -935,6 +943,22 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'aftersales-inspect':
+        if(career){
+          const id=Number(button.dataset.id);
+          if(window.confirm('Book independent diagnosis for £60? It takes two game days and does not cancel the customer complaint.'))
+            saveResult(E.inspectAfterSales(career,id));
+        }
+        break;
+      case 'aftersales-rectify':
+        if(career){
+          const id=Number(button.dataset.id);
+          const claim=career.afterSalesCases.find(c=>c.id===id);
+          if(claim&&window.confirm('Authorise £'+claim.quote+
+            ' customer rectification? This is a final payment from unreserved cash.'))
+            saveResult(E.rectifyAfterSales(career,id));
+        }
+        break;
       case 'finance-horizon':
         if(career&&CF.HORIZONS.includes(Number(button.dataset.days))){
           // Invalid or unfinished entries never enter a career save.
