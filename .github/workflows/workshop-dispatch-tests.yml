@@ -1,0 +1,33 @@
+name: Workshop dispatch regression
+on:
+  pull_request:
+    paths:
+      - 'workshop.js'
+      - 'workshop-view.js'
+      - 'people.js'
+      - 'trading.js'
+      - 'tests/staff-workshop-impact.test.mjs'
+      - '.github/workflows/workshop-dispatch-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'workshop.js'
+      - 'workshop-view.js'
+      - 'people.js'
+      - 'trading.js'
+      - 'tests/staff-workshop-impact.test.mjs'
+      - '.github/workflows/workshop-dispatch-tests.yml'
+permissions:
+  contents: read
+jobs:
+  dispatch-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check dispatch source syntax
+        run: node --check workshop.js && node --check workshop-view.js && node --check people.js && node --check trading.js
+      - name: Test real workshop allocation, QC and career saves
+        run: node --test tests/staff-workshop-impact.test.mjs
