@@ -71,9 +71,12 @@
     const partsDelay=hash(vehicle.origin+'|parts')%3; // Stable 0–2 day delay.
     const effort=clamp(1+Math.ceil(base/340)+(grade>=4?1:0),2,6);
     const efficiency=method==='internal'&&tech.skills.efficiency>=16?1:0;
-    const duration=clamp(effort-efficiency+(method==='external'?0:1)+partsDelay,2,9);
+    const supervisorDays=method==='internal'?
+      P.supervisorProfile(state).turnaroundDays:0;
+    const duration=clamp(effort-efficiency+(method==='external'?0:1)+
+      partsDelay-supervisorDays,2,9);
     return {method,cost,duration,partsDelay,saving,supplement,
-      technicianId:method==='internal'?tech.id:null,
+      supervisorDays,technicianId:method==='internal'?tech.id:null,
       provider:method==='external'?'Independent external garage':tech.name};
   }
   function start(state,id,method){
@@ -82,9 +85,18 @@
     if(vehicle.status!=='acquired'||vehicle.workshop.stage!=='quoted')
       return fail('stage','Obtain a workshop assessment before booking repairs.');
     const q=quote(state,vehicle,method);
-    if(!q)return method==='internal'&&P.activeTeam(state,'technician').length?
-      fail('busy','All available technicians are assigned to repair or quality-check jobs. Finish a job or outsource this one.'):
-      fail('staff','An available prep technician is required for internal repairs. Use an external garage instead.');
+    if(!q){
+      if(method==='internal'){
+        const busyBays=state.vehicles.filter(v=>v.workshop?.method==='internal'&&
+          ['in-progress','quality-check'].includes(v.workshop.stage)).length;
+        const bays=window.MotorTradePremises?.bays(state)??4;
+        if(busyBays>=bays)return fail('bays',
+          'All '+bays+' physical workshop bays are occupied. Extra technicians assist repairs already in progress, but cannot create extra bays. Finish quality control or expand your workshop.');
+        if(P.activeTeam(state,'technician').length)return fail('busy',
+          'All technicians are assigned to repairs or quality checks. Hire additional technicians, finish a job, or use an external garage.');
+      }
+      return fail('staff','An available prep technician is required for internal repairs. Use an external garage instead.');
+    }
     if(method==='external'&&state.vehicles.filter(v=>v.id!==id&&
        v.workshop?.stage==='in-progress'&&v.workshop.method==='external').length>=2)
       return fail('busy','External garage capacity is full. Try again when a job is completed.');
@@ -100,10 +112,15 @@
     return ok(vehicle.title+' booked with '+q.provider+' for £'+q.cost+
       '. Estimated turnaround '+q.duration+' game days'+
       (q.partsDelay?', including '+q.partsDelay+' parts-wait day(s)':'')+
-      '. This car cannot be advertised until repairs and quality control finish.');
+      (q.supervisorDays?' Supervisor scheduling saved one planned repair day.':'')+
+      '. Spare qualified technicians can assist during later shifts. This car cannot be advertised until repairs and quality control finish.');
   }
   function advance(state){
     const events=[];
+    // Unassigned technicians may support one occupied bay per shift each.
+    // Helpers are consumed once per game day; no one performs two jobs at once.
+    const assistants=P.availableTechnicians(state).sort((a,b)=>
+      b.skills.efficiency-a.skills.efficiency||a.id-b.id);
     for(const v of state.vehicles){
       const job=v.workshop;
       if(!job||job.stage!=='in-progress'||state.day<=job.startedDay)continue;
@@ -114,7 +131,18 @@
         continue;
       }
       job.paused=false;
-      job.remainingDays=Math.max(0,job.remainingDays-1);
+      let progress=1;
+      if(job.method==='internal'&&job.remainingDays>1&&assistants.length){
+        const helper=assistants.shift();
+        if(helper.skills.efficiency>=12){
+          progress=2;
+          helper.workDone++;
+          helper.morale=clamp(helper.morale+1,0,100);
+          events.push(helper.name+' assisted with '+v.title+
+            ', completing one extra day of preparation work.');
+        }
+      }
+      job.remainingDays=Math.max(0,job.remainingDays-progress);
       if(job.remainingDays===0){
         job.stage='quality-check';
         events.push(v.title+' repairs finished. Complete the final quality check in Workshop.');
@@ -155,7 +183,9 @@
       return fail('stage','The repair work must finish before a final quality check.');
     const tech=state.staff.find(x=>x.id===j.technicianId);
     const reliability=tech?.skills.reliability??11;
-    const risk=(v.profile?.grade>=4?25:14)-(j.method==='internal'?Math.max(0,reliability-12):0);
+    const supervisorQC=P.supervisorProfile(state).qcRiskReduction;
+    const risk=Math.max(2,(v.profile?.grade>=4?25:14)-
+      (j.method==='internal'?Math.max(0,reliability-12):0)-supervisorQC);
     const reworkNeeded=j.reworks===0 && hash('quality|'+v.origin)%100<risk;
     if(reworkNeeded){
       const cost=95+(hash(v.origin+'|rectification')%4)*25;
