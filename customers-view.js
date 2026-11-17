@@ -264,7 +264,12 @@
       state.sold.length+' SALES <span>VIEW HISTORY</span></summary>'+
       '<div class="so-history-list">'+state.sold.slice(-5).reverse().map(v=>
         '<div class="so-history-row"><div><strong>'+esc(v.title)+'</strong>'+
-        '<small>DAY '+v.day+' · '+esc(v.color||'COLOUR NOT RECORDED')+'</small></div>'+
+        '<small>DAY '+v.day+' · '+esc(v.color||'COLOUR NOT RECORDED')+
+        (v.buyerPersona?' · '+esc(v.buyerPersona):'')+
+        (v.objectionAction&&v.objectionAction!=='legacy'?
+          ' · CONCERN: '+esc(v.objectionAction.toUpperCase()):'')+
+        (v.customerRemedyCost?' · INSPECTION COST '+cash(v.customerRemedyCost):'')+
+        '</small></div>'+
         '<span>SALE '+cash(v.price)+'</span><span>GROSS '+cash(v.profit)+'</span></div>'
       ).join('')+'</div></details>';
   }
