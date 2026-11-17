@@ -277,6 +277,7 @@
     const check=Q.canServe(state,leadId,salespersonId);
     if(!check.ok)return check;
     const {q,v,existing}=check;
+    const finalOwner= salespersonId===null&&state.showroom.ownerUsed===2;
     // A booked appointment has no deposit and does not reserve the stock.
     // Keep it as a genuine competing viewer until this visitor secures a sale.
     const standby=existing?.status==='booked'?{...existing,standby:null}:null;
@@ -301,7 +302,9 @@
     return ok(c.name+' is viewing '+v.title+
       (rep?' with '+rep.name:' with you')+
       (standby?'. An earlier unsecured appointment remains booked.':'.')+
-      ' Complete a test drive, address objections and negotiate. Other customers may leave while waiting.');
+      ' Complete a test drive, address objections and negotiate.'+
+      (finalOwner?' Your final owner consultation for this session has been used; other waiting visitors may have left.':
+        ' Other customers may leave while waiting.'));
   }
   function testDrive(state,id){
     const c=caseFor(state,id);
