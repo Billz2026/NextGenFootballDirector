@@ -22,7 +22,7 @@ Real Chromium layout workflows separately check the Sales Office, Auction Hall, 
 
 ## Historical reference
 
-`tests/historical-site-regression.mjs` preserves the original 274-test full-site monolith as it existed before this maintenance PR. It remains available for researching previously tested concepts, but **must not be treated as a passing compatibility suite**. Its 127 failures were rooted largely in assumptions that were superseded by the actual game: historical script versions, the former first-month length, paid forecourt expansion, instant vehicle preparation, and fake retail handover adapters.
+`archive/historical-site-regression.mjs` preserves the original 274-test full-site monolith as it existed before this maintenance PR. It remains available for researching previously tested concepts, but **must not be treated as a passing compatibility suite**. Its 127 failures were rooted largely in assumptions that were superseded by the actual game: historical script versions, the former first-month length, paid forecourt expansion, instant vehicle preparation, and fake retail handover adapters.
 
 Those stale tests were **not** relabelled as successes or silently disabled individually. The current active site gate uses production business rules and the domain regressions above. When recovering a useful historical assertion, migrate it into an appropriate active test with genuine setup, rather than restoring the old mock engine.
 
