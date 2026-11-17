@@ -280,7 +280,8 @@ test('genuine market listings remain deterministic when re-opening the same day'
   const paid=E.acquireSeller(s,id,a.sellers[0].ask);
   assert.ok(paid.ok);
   assert.equal(s.vehicles.length,1);
-  assert.ok(!E.marketFor(s).sellers.some(x=>x.id===id),
-    'Purchased stock must not reappear in the daily market');
+  assert.equal(E.acquireSeller(s,id,a.sellers[0].ask).code,'owned',
+    'An already acquired listing must be explicitly blocked from duplicate buying');
+  assert.equal(s.vehicles.length,1,'Attempting to buy the same stock twice cannot create a second car');
   valid(s);
 });
