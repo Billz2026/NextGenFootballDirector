@@ -144,9 +144,15 @@ test('unresolved cases can harm reputation only at 7, 14 and 21 days',()=>{
   assert.equal(s.reputationScore,score,'no repeat reputation penalty on same day');
   until(s,due+21);
   assert.equal(c.penalties,3);
-  assert.equal(s.reputationScore,prior-6);
+  const aftersalesHistory=s.reputationHistory.filter(x=>
+    x.reason.startsWith('Unresolved aftersales complaint for stock'));
+  assert.equal(aftersalesHistory.length,3,
+    'only the three distinct aftersales review dates can charge reputation');
+  assert.equal(aftersalesHistory.reduce((n,x)=>n+x.delta,0),-6);
   until(s,due+29);
   assert.equal(c.penalties,3,'penalty capped to prevent runaway trust losses');
+  assert.equal(s.reputationHistory.filter(x=>
+    x.reason.startsWith('Unresolved aftersales complaint for stock')).length,3);
   valid(s);
 });
 test('insufficient unreserved cash blocks both repairs and diagnosis',()=>{
