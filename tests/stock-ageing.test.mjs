@@ -111,11 +111,11 @@ test('aged listings lose relative appeal unless repriced, with no forced loss',(
   const fair=v.profile.likelySale;
   v.status='listed';v.asking=fair; // read-only demand model test
   const fresh=A.overpricing(s,v);
-  s.day=15;
+  s.day=v.acquiredDay+15;
   const first=A.overpricing(s,v);
-  s.day=30;
+  s.day=v.acquiredDay+30;
   const second=A.overpricing(s,v);
-  s.day=45;
+  s.day=v.acquiredDay+45;
   const third=A.overpricing(s,v);
   assert.ok(first>fresh);
   assert.ok(second>first);
