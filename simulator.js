@@ -152,6 +152,7 @@
   let selectedStockId = null;
   let stockFilter = 'all';
   let selectedWorkshopId = null;
+  let selectedWorkshopLeadId = null; // Pending quote selection; not a booked assignment.
   let workshopFilter = 'all';
   let selectedSalesId = null;
   let salesFilter = 'all';
@@ -362,7 +363,8 @@
     byId('stock-list').innerHTML=view.html;
   }
   function renderWorkshop() {
-    const view=WV.render(career,W,{selectedId:selectedWorkshopId,filter:workshopFilter});
+    const view=WV.render(career,W,{selectedId:selectedWorkshopId,
+      filter:workshopFilter,leadChoice:selectedWorkshopLeadId});
     selectedWorkshopId=view.selectedId;
     byId('workshop-board').innerHTML=view.html;
   }
@@ -969,20 +971,44 @@
         break;
       case 'select-workshop':
         if(career&&career.vehicles.some(v=>v.id===Number(button.dataset.id))){
-          selectedWorkshopId=Number(button.dataset.id);currentPage='workshop';render();
+          const nextId=Number(button.dataset.id);
+          if(selectedWorkshopId!==nextId)selectedWorkshopLeadId=null;
+          selectedWorkshopId=nextId;currentPage='workshop';render();
         }
         break;
       case 'filter-workshop':
         if(career&&WV.FILTERS.includes(button.dataset.filter)){
           workshopFilter=button.dataset.filter;selectedWorkshopId=null;
+          selectedWorkshopLeadId=null;
           currentPage='workshop';render();
         }
         break;
       case 'assess-workshop':
         if(career)saveResult(E.assessStock(career,Number(button.dataset.id)));
         break;
+      case 'choose-workshop-tech':
+        if(career){
+          selectedWorkshopId=Number(button.dataset.id);
+          selectedWorkshopLeadId=Number(button.dataset.tech);
+          currentPage='workshop';render();
+        }
+        break;
       case 'start-workshop':
-        if(career)saveResult(E.startPrep(career,Number(button.dataset.id),button.dataset.method));
+        if(career){
+          const result=E.startPrep(career,Number(button.dataset.id),
+            button.dataset.method,button.dataset.method==='internal'?Number(button.dataset.tech):null);
+          if(result.ok)selectedWorkshopLeadId=null;
+          saveResult(result);
+        }
+        break;
+      case 'priority-workshop':
+        if(career)saveResult(W.priority(career,Number(button.dataset.id),button.dataset.priority));
+        break;
+      case 'reassign-workshop':
+        if(career)saveResult(W.reassign(career,Number(button.dataset.id),Number(button.dataset.tech)));
+        break;
+      case 'assist-workshop':
+        if(career)saveResult(W.assignAssistant(career,Number(button.dataset.id),Number(button.dataset.tech)));
         break;
       case 'finish-workshop':
         if(career)saveResult(E.finishPrep(career,Number(button.dataset.id)));

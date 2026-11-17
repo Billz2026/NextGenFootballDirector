@@ -23,7 +23,8 @@
       assessmentFee:0,method:null,repairCost:ready?vehicle.prepSpent:0,
       remainingDays:0,plannedDays:0,partsDelay:0,startedDay:null,
       completedDay:ready?vehicle.acquiredDay:null,
-      technicianId:null,reworks:0,paused:false};
+      technicianId:null,assistantId:null,priority:'normal',workLog:[],qcLog:[],
+      reworks:0,paused:false};
   }
   const reservedCost=v=>v.status==='acquired' &&
     !['in-progress','quality-check'].includes(v.workshop?.stage)?v.prepBudget:0;
@@ -57,9 +58,11 @@
     return ok('Workshop assessment £'+fee+' completed for '+vehicle.title+'.'+detail+
       ' Choose a repair method; neither option is instantaneous.');
   }
-  function quote(state,vehicle,method){
+  function quote(state,vehicle,method,technicianId=null){
     if(!methods.includes(method))return null;
-    const tech=method==='internal'?P.availableTechnicians(state)[0]:null;
+    const free=method==='internal'?P.availableTechnicians(state):[];
+    const tech=method==='internal'?
+      (technicianId===null?free[0]:free.find(t=>t.id===technicianId)):null;
     const busyBays=state.vehicles.filter(v=>v.workshop?.method==='internal'&&
       ['in-progress','quality-check'].includes(v.workshop.stage)).length;
     if(method==='internal'&&(!tech||busyBays>=(window.MotorTradePremises?.bays(state)??4)))return null;
@@ -82,12 +85,12 @@
       supervisorDays,technicianId:method==='internal'?tech.id:null,
       provider:method==='external'?'Independent external garage':tech.name};
   }
-  function start(state,id,method){
+  function start(state,id,method,technicianId=null){
     const vehicle=find(state,id);
     if(!vehicle)return fail('missing','Vehicle not found.');
     if(vehicle.status!=='acquired'||vehicle.workshop.stage!=='quoted')
       return fail('stage','Obtain a workshop assessment before booking repairs.');
-    const q=quote(state,vehicle,method);
+    const q=quote(state,vehicle,method,technicianId);
     if(!q){
       if(method==='internal'){
         const busyBays=state.vehicles.filter(v=>v.workshop?.method==='internal'&&
@@ -111,43 +114,93 @@
     Object.assign(vehicle.workshop,{stage:'in-progress',method,
       repairCost:q.cost,remainingDays:q.duration,plannedDays:q.duration,
       partsDelay:q.partsDelay,startedDay:state.day,completedDay:null,
-      technicianId:q.technicianId,reworks:0,paused:false});
+      technicianId:q.technicianId,assistantId:null,
+      priority:vehicle.workshop.priority==='urgent'?'urgent':'normal',
+      workLog:vehicle.workshop.workLog??[],qcLog:vehicle.workshop.qcLog??[],
+      reworks:0,paused:false});
     return ok(vehicle.title+' booked with '+q.provider+' for £'+q.cost+
       '. Estimated turnaround '+q.duration+' game days'+
       (q.partsDelay?', including '+q.partsDelay+' parts-wait day(s)':'')+
       (q.supervisorDays?' Supervisor scheduling saved one planned repair day.':'')+
-      '. Spare qualified technicians can assist during later shifts. This car cannot be advertised until repairs and quality control finish.');
+      '. Assign a qualified assistant in Job Dispatch to accelerate repair shifts. This car cannot be advertised until repairs and quality control finish.');
+  }
+  // Dispatch decisions are made by the player; urgent is a scheduling flag,
+  // not an unexplained reduction to repair duration.
+  function priority(state,id,value){
+    const v=find(state,id);
+    if(!v||v.status!=='acquired'||!['unassessed','quoted','in-progress'].includes(v.workshop?.stage))
+      return fail('stage','Only pending or active vehicle preparation can be prioritised.');
+    if(!['normal','urgent'].includes(value))return fail('priority','Invalid job priority.');
+    if((v.workshop.priority??'normal')===value)return fail('unchanged','Job already has this priority.');
+    v.workshop.priority=value;
+    return ok(v.title+' marked '+value.toUpperCase()+'. Job priority changes the dispatch queue; assign labour to improve turnaround.');
+  }
+  function reassign(state,id,technicianId){
+    const v=find(state,id);
+    if(!v||v.workshop?.stage!=='in-progress'||v.workshop.method!=='internal')
+      return fail('stage','Only active in-house repairs can be reassigned.');
+    const j=v.workshop;
+    if(!integer(technicianId)||technicianId<1)return fail('staff','Choose a valid technician.');
+    if(technicianId===j.technicianId)return fail('unchanged','Technician is already the job lead.');
+    const tech=P.availableTechnicians(state).find(x=>x.id===technicianId);
+    if(!tech)return fail('busy','Selected technician is unavailable or already allocated to another job.');
+    j.technicianId=tech.id;
+    j.paused=false;
+    return ok(v.title+' reassigned to '+tech.name+'. Remaining paid repair time is unchanged.');
+  }
+  function assignAssistant(state,id,technicianId){
+    const v=find(state,id);
+    if(!v||v.workshop?.stage!=='in-progress'||v.workshop.method!=='internal')
+      return fail('stage','Only active in-house repairs can have an assistant.');
+    const j=v.workshop;
+    if(technicianId===null||technicianId===0){
+      if(j.assistantId==null)return fail('unchanged','No assistant is allocated to this job.');
+      j.assistantId=null;
+      return ok('Assistant released from '+v.title+'. Future shifts proceed at standard pace.');
+    }
+    if(!integer(technicianId)||technicianId<1||technicianId===j.technicianId)
+      return fail('staff','Choose another qualified technician, not the job lead.');
+    const tech=P.availableTechnicians(state).find(x=>x.id===technicianId);
+    if(!tech)return fail('busy','This assistant is unavailable or already assigned elsewhere.');
+    if(tech.skills.efficiency<12)return fail('skills','Assistants require at least 12 efficiency.');
+    const previous=j.assistantId;
+    j.assistantId=tech.id;
+    return ok(tech.name+' assigned to assist '+v.title+
+      (previous?' (previous assistant released).':'')+
+      '. A worked shift can remove one additional repair day.');
   }
   function advance(state){
     const events=[];
-    // Unassigned technicians may support one occupied bay per shift each.
-    // Helpers are consumed once per game day; no one performs two jobs at once.
-    const assistants=P.availableTechnicians(state).sort((a,b)=>
-      b.skills.efficiency-a.skills.efficiency||a.id-b.id);
     for(const v of state.vehicles){
       const job=v.workshop;
       if(!job||job.stage!=='in-progress'||state.day<=job.startedDay)continue;
       if(job.method==='internal'&&!P.isActive(state,
         state.staff.find(s=>s.id===job.technicianId&&s.role==='technician'))){
         job.paused=true;
-        events.push(v.title+' repair paused: assigned technician is unavailable.');
+        events.push(v.title+' repair paused: assigned technician is unavailable. Reassign in Workshop Dispatch.');
         continue;
       }
       job.paused=false;
-      let progress=1;
-      if(job.method==='internal'&&job.remainingDays>1&&assistants.length){
-        const helper=assistants.shift();
-        if(helper.skills.efficiency>=12){
+      let progress=1,helper=null;
+      if(job.method==='internal'&&job.remainingDays>1&&job.assistantId!=null){
+        const candidate=state.staff.find(s=>s.id===job.assistantId&&s.role==='technician');
+        if(candidate&&P.isActive(state,candidate)&&candidate.skills.efficiency>=12){
+          helper=candidate;
           progress=2;
           helper.workDone++;
           helper.morale=clamp(helper.morale+1,0,100);
           events.push(helper.name+' assisted with '+v.title+
-            ', completing one extra day of preparation work.');
+            ', completing an extra day of preparation work.');
         }
+      }
+      if(job.method==='internal'){
+        (job.workLog??=[]).push({day:state.day,leadId:job.technicianId,
+          assistantId:helper?.id??null,progress:Math.min(progress,job.remainingDays)});
       }
       job.remainingDays=Math.max(0,job.remainingDays-progress);
       if(job.remainingDays===0){
         job.stage='quality-check';
+        job.assistantId=null; // Free the assistant immediately after repair.
         events.push(v.title+' repairs finished. Complete the final quality check in Workshop.');
       }
     }
@@ -172,6 +225,7 @@
     j.repairCost+=chargeAmount;
     j.method='external';
     j.technicianId=null;
+    j.assistantId=null;
     j.remainingDays=Math.max(2,j.remainingDays);
     j.plannedDays+=1;
     j.paused=false;
@@ -197,6 +251,7 @@
           '. Deposit more available cash before authorising rectification.');
       charge(state,cost,'Workshop quality rectification: '+v.title);
       j.repairCost+=cost;
+      (j.qcLog??=[]).push({day:state.day,passed:false,technicianId:j.technicianId});
       j.stage='in-progress';
       j.reworks=1;
       j.remainingDays=1;
@@ -205,10 +260,12 @@
       return ok('Quality check found further work on '+v.title+
         '. £'+cost+' rectification charged and one extra repair day required.');
     }
+    (j.qcLog??=[]).push({day:state.day,passed:true,technicianId:j.technicianId});
     j.stage='ready';
     j.completedDay=state.day;
     j.remainingDays=0;
     j.paused=false;
+    j.assistantId=null;
     v.prepSpent=j.repairCost;
     v.status='prepared';
     if(j.method==='internal')P.worked(state,j.technicianId);
@@ -227,6 +284,20 @@
        (j.completedDay!==null&&(!num(j.completedDay,36500)||j.completedDay>day))||
        (j.technicianId!==null&&(!num(j.technicianId,100000)||j.technicianId===0))||
        (j.method!==null&&!methods.includes(j.method)))return false;
+    // Optional fields preserve unmodified careers saved before dispatch existed.
+    if(j.priority!==undefined&&!['normal','urgent'].includes(j.priority))return false;
+    if(j.assistantId!==undefined&&j.assistantId!==null&&
+      (!num(j.assistantId,100000)||j.assistantId===0||
+        j.assistantId===j.technicianId||j.method!=='internal'||j.stage!=='in-progress'))return false;
+    if(j.workLog!==undefined&&(!Array.isArray(j.workLog)||j.workLog.length>32||
+      !j.workLog.every(x=>x&&num(x.day,36500)&&x.day>=1&&x.day<=day&&
+        num(x.leadId,100000)&&x.leadId>=1&&
+        (x.assistantId===null||(num(x.assistantId,100000)&&x.assistantId>=1&&x.assistantId!==x.leadId))&&
+        [1,2].includes(x.progress))))return false;
+    if(j.qcLog!==undefined&&(!Array.isArray(j.qcLog)||j.qcLog.length>4||
+      !j.qcLog.every(x=>x&&num(x.day,36500)&&x.day>=1&&x.day<=day&&
+        typeof x.passed==='boolean'&&
+        (x.technicianId===null||(num(x.technicianId,100000)&&x.technicianId>=1)))))return false;
     if(vehicle.status==='acquired'&&j.stage==='ready')return false;
     if(vehicle.status!=='acquired'&&j.stage!=='ready')return false;
     if(j.stage==='unassessed'&&(j.assessmentFee!==0||j.repairCost!==0||j.method!==null))return false;
@@ -241,6 +312,7 @@
     return true;
   }
   window.MotorTradeWorkshop=Object.freeze({
-    initial,reservedCost,reserved,assess,quote,start,advance,transfer,quality,valid
+    initial,reservedCost,reserved,assess,quote,start,priority,reassign,assignAssistant,
+    advance,transfer,quality,valid
   });
 })();

@@ -400,3 +400,106 @@
 @media(prefers-reduced-motion:reduce){
   .workshop-page-control .ws-pick{transition:none}
 }
+
+/* Player-controlled workshop dispatch: compact, responsive job assignment. */
+.workshop-page-control .ws-urgent-tag{
+  display:inline-block;margin-top:4px;padding:3px 6px;
+  border:1px solid #bd7a56;border-radius:3px;
+  color:#ffd4a9;background:#523328;
+  font:800 8px/1.2 var(--mono);letter-spacing:.07em;
+}
+.workshop-page-control .ws-priority-control,
+.workshop-page-control .ws-dispatch-panel{
+  min-width:0;margin:8px 0;padding:10px;
+  border:1px solid #455c65;border-radius:5px;
+  background:#122832;
+}
+.workshop-page-control .ws-priority-control{
+  display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;
+}
+.workshop-page-control .ws-priority-control strong,
+.workshop-page-control .ws-dispatch-head strong{
+  color:#e9d8bd;font:850 9px/1.35 var(--mono);letter-spacing:.05em;
+}
+.workshop-page-control .ws-priority-control small,
+.workshop-page-control .ws-dispatch-head small{
+  display:block;color:#91acb5;font:650 9px/1.4 var(--body);
+}
+.workshop-page-control .ws-priority-buttons{display:flex;gap:5px}
+.workshop-page-control .ws-priority-buttons button{
+  min-width:61px;min-height:31px;padding:5px 8px;
+  border-radius:4px;border:1px solid #4d636c;
+  background:#1d3540;color:#bdcfd1;
+  font:800 9px/1.2 var(--mono);cursor:pointer;
+}
+.workshop-page-control .ws-priority-buttons button[aria-pressed="true"]{
+  border-color:#e1b477;background:#675038;color:#fff1d9;
+}
+.workshop-page-control .ws-priority-buttons button[data-priority="urgent"][aria-pressed="true"]{
+  border-color:#d98b64;background:#693c2a;
+}
+.workshop-page-control .ws-dispatch-head{
+  display:flex;justify-content:space-between;gap:8px;align-items:center;
+  margin-bottom:8px;
+}
+.workshop-page-control .ws-dispatch-choices{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
+  margin-top:7px;
+}
+.workshop-page-control .ws-dispatch-choices button{
+  min-width:0;min-height:44px;text-align:left;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+  background:#1b3540;color:#f1e6d4;border:1px solid #425d69;
+  border-radius:4px;padding:7px 9px;cursor:pointer;
+}
+.workshop-page-control .ws-dispatch-choices button[aria-pressed="true"]{
+  border-color:#e4b778;background:#364332;
+}
+.workshop-page-control .ws-dispatch-choices button strong{
+  overflow-wrap:anywhere;font:800 10px/1.25 var(--body);
+}
+.workshop-page-control .ws-dispatch-choices button small{
+  color:#9fb8bf;font:700 8px/1.2 var(--mono);
+}
+.workshop-page-control .ws-dispatch-assignments{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;margin:6px 0 8px;
+}
+.workshop-page-control .ws-dispatch-assignments>div{
+  min-width:0;display:flex;flex-direction:column;gap:3px;
+  border:1px solid #39545e;border-radius:4px;padding:8px;
+}
+.workshop-page-control .ws-dispatch-assignments small{
+  color:#9db3b9;font:750 8px/1.2 var(--mono);
+}
+.workshop-page-control .ws-dispatch-assignments strong{
+  color:#f4e0c1;overflow-wrap:anywhere;font:800 11px/1.3 var(--body);
+}
+.workshop-page-control .ws-dispatch-assignments span{
+  color:#a8c3c6;font:650 8px/1.2 var(--mono);
+}
+.workshop-page-control .ws-dispatch-options{
+  border-top:1px solid #3e5760;padding:7px 0;
+}
+.workshop-page-control .ws-dispatch-options summary{
+  cursor:pointer;color:#dbccae;font:800 9px/1.4 var(--mono);letter-spacing:.02em;
+}
+.workshop-page-control .ws-dispatch-note{
+  margin:8px 0 0;color:#9db5bd;font:550 9px/1.45 var(--body);
+}
+.workshop-page-control .ws-priority-buttons button:focus-visible,
+.workshop-page-control .ws-dispatch-choices button:focus-visible,
+.workshop-page-control .ws-dispatch-options summary:focus-visible{
+  outline:2px solid #f0c98d;outline-offset:2px;
+}
+@media(max-width:550px){
+  .workshop-page-control .ws-dispatch-choices{grid-template-columns:1fr}
+  .workshop-page-control .ws-dispatch-assignments{grid-template-columns:1fr}
+  .workshop-page-control .ws-priority-control{align-items:flex-start}
+}
+
+@media(max-width:490px){
+  /* Keep the assessment decision above the first mobile fold. */
+  .workshop-page-control .ws-capacity + .ws-caveat{display:none}
+  .workshop-page-control .ws-dispatch-note{font-size:9px}
+}

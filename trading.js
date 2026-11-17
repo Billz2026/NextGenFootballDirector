@@ -437,7 +437,9 @@
     const goodSold = s => s && integer(s.id) && typeof s.title === 'string' &&
       integer(s.day) && s.day >= 1 && s.day <= saved.day &&
       cashValue(s.price) && integer(s.profit) && ['cash','part-ex'].includes(s.mode) &&
-      (s.profile==null || I.validProfile(s.profile));
+      (s.profile==null || I.validProfile(s.profile))&&
+      (s.workshopRecord===undefined||W.valid({status:'listed',
+        prepSpent:s.prep,workshop:s.workshopRecord},saved.day));
     const goodLedger = l => l && integer(l.day) && l.day >= 1 && l.day <= saved.day &&
       integer(l.delta) && Math.abs(l.delta) <= 10000000 &&
       typeof l.note === 'string' && l.note.length < 200;
@@ -496,14 +498,19 @@
       stock:saved.vehicles.length,sales:saved.sold.length,
       reputation:P.tier(workforce.reputationScore),messages,
       vehicles:saved.vehicles.map(v => ({
-        ...v,...(saved.version<10?PH.describe(v):{}),workshop:saved.version>=7?{...v.workshop}:W.initial(v),
+        ...v,...(saved.version<10?PH.describe(v):{}),workshop:saved.version>=7?
+          {...v.workshop,
+            ...(v.workshop.workLog?{workLog:v.workshop.workLog.map(x=>({...x}))}:{}),
+            ...(v.workshop.qcLog?{qcLog:v.workshop.qcLog.map(x=>({...x}))}:{})}:W.initial(v),
         profile:saved.version===2?I.legacyProfile(v):
           {...v.profile,knownRepairs:v.profile.knownRepairs.map(x=>({...x})),
             mot:{...v.profile.mot,advisories:[...v.profile.mot.advisories]},
             hiddenFault:v.profile.hiddenFault?{...v.profile.hiddenFault}:null}
       })),
       wholesale:wholesale.map(d=>({...d,...(saved.version<10?PH.describe(d):{})})),
-      sold:saved.sold.map(v => ({...v,...(saved.version<10?PH.describe(v):{}),profile:v.profile?{...v.profile,
+      sold:saved.sold.map(v => ({...v,...(saved.version<10?PH.describe(v):{}),
+        ...(v.workshopRecord?{workshopRecord:JSON.parse(JSON.stringify(v.workshopRecord))}:{}),
+        profile:v.profile?{...v.profile,
         knownRepairs:v.profile.knownRepairs.map(r=>({...r})),
         mot:{...v.profile.mot,advisories:[...v.profile.mot.advisories]},
         hiddenFault:v.profile.hiddenFault?{...v.profile.hiddenFault}:null}:null})),
@@ -716,7 +723,7 @@
     return car?{...car,inspected:!!state.reports?.[id]}:null;
   }
   function assessStock(state,id){return W.assess(state,id);}
-  function startPrep(state,id,method){return W.start(state,id,method);}
+  function startPrep(state,id,method,technicianId=null){return W.start(state,id,method,technicianId);}
   function finishPrep(state,id){return W.quality(state,id);}
   function transferPrep(state,id){return W.transfer(state,id);}
   function advanceWorkshop(state){return W.advance(state);}
@@ -873,6 +880,7 @@
       buyerPersona:buyerType,objectionAction:c.objectionAction,
       priceDiscount:c.priceDiscount||0,profit:realised,
       profile:v.profile?{...v.profile}:null,
+      workshopRecord:JSON.parse(JSON.stringify(v.workshop)),
       exchange:px?px.title:null,allowance:px?agreedAllowance:0
     });
     if(px)addCar(state,px,'part-ex',agreedAllowance,'PX-'+c.agreedDay+'-'+v.id);
