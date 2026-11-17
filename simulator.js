@@ -80,7 +80,7 @@
     return [
       makeMessage(1,1,'BUSINESS SUPPORT','Welcome to the motor trade',
         'Your £45,000 dealership opens with a complete four-person team.',
-        'Your dealership starts with £45,000 in cash, four forecourt spaces and one salaried employee in each essential role: sales, buying, preparation and staff supervision. Their wages cost money every game day, so preserve working capital. Visit the Auction Hall for numbered-lot bidding and the Buying Desk for private sellers.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed: book appointments, arrange test drives, negotiate and complete handover. A part-exchange becomes your next stock vehicle.',
+        'Your dealership starts with £45,000 cash, four permanent forecourt spaces plus two temporary offsite stock positions. Reputation permanently unlocks six forecourt places at 20, eight at 40 and ten at 60 without a manual purchase. Additional offsite stock costs £22 per car per game day. One salaried employee works in each essential role: sales, buying, preparation and staff supervision. Their wages cost money every game day, so preserve working capital. Visit the Auction Hall for numbered-lot bidding and the Buying Desk for private sellers.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed: book appointments, arrange test drives, negotiate and complete handover. A part-exchange becomes your next stock vehicle.',
         'auctionHall'),
       makeMessage(2,1,'BUYING DESK','Three ways to find your next car',
         'Auctions, direct sellers and part-exchanges all supply vehicles.',
@@ -299,10 +299,11 @@
   }
   const prepReserved = () => W.reserved(career);
   function purchaseWarning(cost) {
-    if (career.vehicles.length >= career.capacity)
-      return 'FORECOURT FULL — finish a sale in Vehicle Stock / Sales Office.';
-    if (career.cash < cost + prepReserved())
-      return 'NOT ENOUGH CASH — preserve funds for all vehicle preparation.';
+    if (career.vehicles.length >= SITE.storageLimit(career))
+      return 'ALL PERMANENT AND TEMPORARY STOCK PLACES ARE FULL — sell a vehicle to continue buying.';
+    if (career.cash < cost + prepReserved() +
+        Math.max(0,career.vehicles.length+1-career.capacity)*SITE.OVERFLOW_DAILY_FEE)
+      return 'NOT ENOUGH CASH — protect stock preparation and a day of offsite storage where necessary.';
     return '';
   }
   function details(vehicle) {
@@ -490,8 +491,8 @@
     bindText('starting-capital',money.format(career.startingCapital??E.STARTING_CASH));
     bindText('cash', money.format(career.cash));
     bindText('customer-deposits',money.format(C.heldDeposits(career)));
-    bindText('stock', career.stock + ' / ' + career.capacity);
-    bindText('forecourt-capacity',career.capacity+' vehicles');
+    bindText('stock', career.stock + ' / ' + SITE.storageLimit(career));
+    bindText('forecourt-capacity',career.capacity+' permanent + '+SITE.OVERFLOW_SPACES+' offsite');
     bindText('workshop-bays',String(SITE.bays(career)));
     bindText('premises-daily',money.format(SITE.costs(career).total)+'/day');
     bindText('premises-arrears',money.format(career.premises.arrears));
@@ -588,6 +589,7 @@
     // This keeps reports internally reconcilable with recorded ledger dates.
     const beforeDayReputation=career.reputationScore;
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
+    if(closed)SITE.sync(career);
     career.day += 1;
     E.rollAuctionHall(career);
     auctionPreviewId=null;
