@@ -51,12 +51,12 @@ async function inspect(page,label,mode,width,height){
       'Required management decision must appear without deep scrolling');
   }else if(mode==='normal'){
     assert.equal(await panel.locator('.eo-schedule').count(),2);
-    assert.match(await panel.innerText(),/GAME DAY 30/);
-    assert.match(await panel.innerText(),/GAME DAY 31/);
+    assert.match(await panel.innerText(),/GAME DAY 22/);
+    assert.match(await panel.innerText(),/GAME DAY 23/);
     assert.ok(metrics.mainActionTop<(label==='phone'?860:680));
   }else if(mode==='dealday'){
     assert.equal(await panel.locator('.eo-phase').count(),5);
-    assert.equal(await panel.locator('.eo-activities .trade-button').count(),2);
+    assert.equal(await panel.locator('.eo-activities .trade-button').count(),3);
     assert.match(await panel.innerText(),/DEAL DAY RULES & SESSION EXPIRY/);
     if(label==='phone'){
       assert.ok(metrics.timelineWidth>metrics.timelineClientWidth,
@@ -81,11 +81,15 @@ async function setNormalDay(page,target){
     const E=window.MotorTradeEngine;
     const s=JSON.parse(localStorage.getItem(key));
     for(let next=s.day+1;next<=target;next++){
+      E.showroom.closeWaiting(s,'Day closed without being served.');
       s.day=next;
+      E.rollAuctionHall(s);
       E.staffDay(s);
       E.premisesDay(s);
+      E.stockAgeingDay(s);
       E.advanceWorkshop(s);
       E.advanceCustomers(s);
+      E.advanceAfterSales(s);
     }
     const legal=E.normalize(JSON.parse(JSON.stringify(s)));
     if(!legal)throw Error('Legitimately incurred payroll career invalid at day '+target);
@@ -130,16 +134,16 @@ try{
     await loadCareer(page);
     await inspect(page,label,'normal',width,height);
     assert.equal(await page.locator('.eo-calendar .eo-schedule').count(),2);
-    const day30=await setNormalDay(page,30);
-    assert.ok(day30.cash<ready.cash);
+    const monthEnd=await setNormalDay(page,22);
+    assert.ok(monthEnd.cash<ready.cash);
     await loadCareer(page);
     await inspect(page,label,'dealday',width,height);
     assert.match(await page.locator('.eo-heading-status').innerText(),/09:00/);
-    const cashAtDeal=day30.cash;
+    const cashAtDeal=monthEnd.cash;
     for(let session=1;session<=4;session++){
       await page.locator('#continue-day').click();
       const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
-      assert.equal(state.day,30,'Deal Day sessions must not advance the calendar day');
+      assert.equal(state.day,22,'Deal Day sessions must not advance the calendar day');
       assert.equal(state.deadlineSession,session);
       assert.equal(state.cash,cashAtDeal,'A session change cannot create or charge cash');
     }
@@ -148,15 +152,15 @@ try{
     await page.screenshot({path:'review/diary-last-session-'+label+'.png',fullPage:true});
     await page.locator('#continue-day').click();
     const closed=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
-    assert.equal(closed.day,31);
+    assert.equal(closed.day,23);
     assert.equal(closed.staff.length,4);
     assert.equal(closed.monthlyReports.length,1);
     assert.match(await page.locator('.events-page-control').innerText(),/BOARD MEETING/);
     assert.match(await page.locator('.events-page-control').innerText(),/DECISION REQUIRED/);
     assert.deepEqual(errors,[],'Browser JavaScript must not throw');
     console.log('EVENT_TRANSITION_PASS '+label+' '+JSON.stringify({
-      openingCash:initial.cash,day17Cash:ready.cash,day30Cash:cashAtDeal,
-      month31Cash:closed.cash,staff:closed.staff.length,
+      openingCash:initial.cash,day17Cash:ready.cash,monthEndCash:cashAtDeal,
+      nextMonthCash:closed.cash,staff:closed.staff.length,
       archive:closed.monthlyReports.length}));
     await context.close();
   }

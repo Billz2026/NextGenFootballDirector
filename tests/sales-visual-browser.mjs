@@ -26,22 +26,32 @@ try{
       const v=state.vehicles[0];
       must(E.assessStock(state,v.id),'workshop assessment');
       must(E.startPrep(state,v.id,'external'),'workshop booking');
-      let day=1;
-      while(day<24&&v.status!=='prepared'){
-        state.day=++day;
+      const progress=()=>{
+        E.showroom.closeWaiting(state,'Unserved visitors left at closing');
+        if(state.day===state.monthPlan.endDay){
+          if(!E.monthly.close(state))throw Error('Unable to close real trading month');
+          state.day++;
+          E.rollAuctionHall(state);
+          E.monthly.next(state);
+        }else{
+          state.day++;
+          E.rollAuctionHall(state);
+        }
         E.staffDay(state);
         E.premisesDay(state);
+        E.stockAgeingDay(state);
         E.advanceWorkshop(state);
+        E.advanceCustomers(state);
+        E.advanceAfterSales(state);
+      };
+      while(state.day<35&&v.status!=='prepared'){
+        progress();
         if(v.workshop.stage==='quality-check')
           must(E.finishPrep(state,v.id),'workshop final QC');
       }
       if(v.status!=='prepared')throw Error('Vehicle preparation did not finish');
       must(E.advertise(state,v.id,v.retail),'list for retail');
-      while(day<28&&!E.customers.demand(state,v)){
-        state.day=++day;
-        E.staffDay(state);
-        E.premisesDay(state);
-      }
+      while(state.day<35&&!E.customers.demand(state,v))progress();
       const available=E.customers.demand(state,v);
       if(available)must(E.openCustomer(state,v.id),'open retail enquiry');
       if(!E.normalize(JSON.parse(JSON.stringify(state))))
@@ -61,7 +71,8 @@ try{
     const panel=page.locator('.sales-control');
     await panel.waitFor({state:'visible'});
     assert.equal((await panel.locator('h1').innerText()).replace(/\s+/g,' ').trim(),'RETAIL PIPELINE.');
-    assert.equal(await panel.locator('.so-kpis>div').count(),3);
+    assert.equal(await panel.locator('.so-kpis>div').count(),4,
+      'Retail KPIs include advertised stock, on-site visitors, actions and held deposits');
     assert.equal(await panel.locator('.so-activity').evaluate(x=>x.open),false);
     assert.equal(await panel.locator('.so-register .so-unit').count(),1);
     assert.equal(await panel.locator('.so-quick-price').count(),1);
@@ -81,6 +92,7 @@ try{
         fileWidth:file.scrollWidth,fileClientWidth:file.clientWidth,
         headingCount:panel.querySelectorAll('h1').length,
         fileTop:Math.round(rect('.so-file').top),
+        queueBottom:Math.round(rect('.so-visitor-desk').bottom),
         customerTop:Math.round(rect('.so-customer').top),
         carTop:Math.round(rect('.so-car').top),
         actionTop:Math.round(action?.getBoundingClientRect().top??-1),
@@ -92,16 +104,23 @@ try{
     assert.ok(metrics.panelWidth<=metrics.panelClientWidth+1,'Sales panel overflow');
     assert.ok(metrics.fileWidth<=metrics.fileClientWidth+1,'Selected case overflow');
     assert.ok(metrics.actionTop>=0,'Main customer action must remain present');
+    // Live showroom footfall is now a real, variable-height queue before
+    // the selected case. Judge proximity to that section, not an obsolete
+    // absolute top-of-page pixel number that assumes the queue is missing.
+    assert.ok(metrics.fileTop>=metrics.queueBottom-2,
+      'Retail file should follow the live showroom queue '+JSON.stringify(metrics));
+    assert.ok(metrics.fileTop-metrics.queueBottom<360,
+      'Selected case must follow the visitor desk without wasted space '+JSON.stringify(metrics));
     if(label==='desktop'){
-      assert.ok(metrics.fileTop<450,'Selected case should begin high in desktop viewport');
-      assert.ok(metrics.actionTop<800,'Desktop primary action should not be far below fold');
+      assert.ok(metrics.actionTop-metrics.fileTop<600,
+        'Main customer action should appear inside the selected case '+JSON.stringify(metrics));
       assert.ok(Math.abs(metrics.customerTop-metrics.carTop)<=3,
         'Vehicle and customer case should share a horizontal row on desktop');
     }else{
       assert.ok(metrics.customerTop<metrics.carTop,
         'Phone must show customer actions before full vehicle details');
-      assert.ok(metrics.actionTop<900,
-        'Phone main customer action should be visible without deep scrolling');
+      assert.ok(metrics.actionTop-metrics.customerTop<580,
+        'Phone customer action should be accessible after the queue '+JSON.stringify(metrics));
     }
     await page.screenshot({path:'review/sales-office-'+label+'.png',fullPage:true});
     // Filters and case selection only change presentation, not customer cash.

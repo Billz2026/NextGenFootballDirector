@@ -40,7 +40,8 @@ try{
     assert.equal(await panel.locator('.hq-identity-facts>div').count(),6);
     assert.equal(await panel.locator('.hq-metrics .hq-metric').count(),4);
     assert.equal(await panel.locator('.hq-upgrade').count(),2);
-    assert.equal(await panel.locator('[data-action="upgrade-premises"]:disabled').count(),2);
+    assert.equal(await panel.locator('[data-action="upgrade-premises"]:disabled').count(),1,
+      'Forecourt grows automatically; only workshop investment has an owner-approval button');
     assert.match(await panel.locator('.hq-metrics').innerText(),/4 PHYSICAL BAYS/);
     assert.match(await panel.locator('.hq-metrics').innerText(),/1 active technician/);
     assert.match(await panel.locator('.hq-commit-grid').first().innerText(),/TOTAL COST \/ DAY/);
@@ -92,6 +93,7 @@ try{
       s.reputationScore=20;
       s.reputation=E.people.tier(20);
       s.monthPlan.startingReputation=20;
+      E.premises.sync(s); // Reputation rewards forecourt space without charging £1,800.
       if(!E.normalize(JSON.parse(JSON.stringify(s))))
         throw Error('Unlocked reputation test fixture failed save validation');
       localStorage.setItem(key,JSON.stringify(s));
@@ -100,23 +102,22 @@ try{
     await page.reload({waitUntil:'domcontentloaded'});
     await page.locator('#menu-continue').click();
     await go(page);
-    assert.equal(await panel.locator('[data-action="upgrade-premises"][data-kind="forecourt"]').isDisabled(),false);
+    assert.equal(await panel.locator('[data-action="upgrade-premises"][data-kind="forecourt"]').count(),0,
+      'Permanent forecourt expansion is automatic and must not be charged manually');
     assert.equal(await panel.locator('[data-action="upgrade-premises"][data-kind="workshop"]').isDisabled(),true);
-    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/£1,800/);
-    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/AFTER UPGRADE \/ DAY/);
-    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/£35/);
-    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/£43,200/);
-    await page.screenshot({path:'review/premises-eligible-'+label+'.png',fullPage:true});
-    await panel.locator('[data-action="upgrade-premises"][data-kind="forecourt"]').click();
+    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/AUTO UNLOCK/);
+    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/6 PHYSICAL SPACES/);
+    assert.match(await panel.locator('.hq-upgrade').first().innerText(),/OFFSITE COST/);
     const expanded=await stored(page);
-    assert.equal(expanded.cash,approvedFixture.cash-1800);
+    assert.equal(expanded.cash,approvedFixture.cash,
+      'Reputation-based automatic capacity growth cannot debit cash');
     assert.equal(expanded.capacity,6);
     assert.equal(expanded.premises.forecourtLevel,1);
     assert.equal(expanded.premises.workshopLevel,0);
-    assert.equal(expanded.ledger.filter(x=>x.note.startsWith('Premises investment: forecourt')).length,1);
-    assert.match(await panel.locator('.hq-metrics').innerText(),/0 \/ 6/);
-    assert.match(await panel.locator('.hq-metrics').innerText(),/£281/);
-    assert.equal(await panel.locator('.hq-invest-button').count(),2);
+    assert.equal(expanded.ledger.filter(x=>x.note.startsWith('Premises investment: forecourt')).length,0);
+    assert.match(await panel.locator('.hq-metrics').innerText(),/0 \/ 8/);
+    assert.equal(await panel.locator('.hq-invest-button').count(),1,
+      'Only the workshop has a paid investment control');
     await page.screenshot({path:'review/premises-expanded-'+label+'.png',fullPage:true});
     await page.reload({waitUntil:'domcontentloaded'});
     await page.locator('#menu-continue').click();
@@ -133,8 +134,8 @@ try{
     await context.close();
   }
 
-  // Operational continuity gate: actual UI Continue buttons across a complete
-  // month and every Deal Day session, with two genuinely acquired cars.
+  // Operational continuity gate: all days of the actual first partial month
+  // (November 9–30 = game days 1–22) and all five Deal Day sessions.
   const ctx=await browser.newContext({
     viewport:{width:1440,height:900},deviceScaleFactor:1
   });
@@ -146,6 +147,7 @@ try{
   await page.locator('[data-action="hold-meeting"][data-focus="buying"]').click();
   let state=await stored(page);
   assert.equal(state.meetingHeldMonth,1);
+  const firstMonthTarget=state.monthPlan.unitTarget;
   const purchases=await page.evaluate(key=>{
     const E=window.MotorTradeEngine;
     const s=JSON.parse(localStorage.getItem(key));
@@ -170,7 +172,9 @@ try{
   assert.ok(purchases.reserved>=0);
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('#menu-continue').click();
-  for(let day=2;day<=30;day++){
+  const actualMonthEnd=state.monthPlan.endDay;
+  assert.equal(actualMonthEnd,22,'Calendar-mapped November 30 is game day 22');
+  for(let day=2;day<=actualMonthEnd;day++){
     await page.locator('#continue-day').click();
     state=await stored(page);
     assert.equal(state.day,day,'Game should advance exactly one day');
@@ -187,7 +191,7 @@ try{
     assert.ok(valid.valid,'Saved career must validate at Day '+day);
     assert.equal(valid.opening+valid.income-valid.outgo,valid.bank,
       'Ledger reconciles at Day '+day);
-    if(day===14||day===30){
+    if(day===14||day===actualMonthEnd){
       console.log('PREMISES_MONTH_CHECK '+JSON.stringify({
         day,bank:valid.bank,operating:valid.operating,
         stock:state.vehicles.length,staff:state.staff.length
@@ -198,24 +202,25 @@ try{
   for(let phase=1;phase<=4;phase++){
     await page.locator('#continue-day').click();
     state=await stored(page);
-    assert.equal(state.day,30,'Deal Day session does not advance days');
+    assert.equal(state.day,actualMonthEnd,'Deal Day session does not advance days');
     assert.equal(state.deadlineSession,phase);
     assert.equal(state.cash,lastDayCash,'Deal Day session does not charge wages');
     assert.equal(state.ledger.length,ledgerBefore);
   }
   await page.locator('#continue-day').click();
   state=await stored(page);
-  assert.equal(state.day,31);
+  assert.equal(state.day,23);
   assert.equal(state.monthlyReports.length,1);
   assert.equal(state.monthPlan.month,2);
   assert.equal(state.staff.length,4);
   assert.equal(state.vehicles.length,2);
   assert.equal(state.monthlyReports[0].closingCash,lastDayCash);
   assert.equal(state.monthlyReports[0].soldUnits,0);
-  assert.equal(state.monthlyReports[0].targetUnits,4);
+  assert.equal(state.monthlyReports[0].targetUnits,firstMonthTarget,
+    'Archived November unit target must remain frozen when December gets a new plan');
   const frozen=JSON.stringify(state.monthlyReports[0]);
   await go(page,'business');
-  await page.screenshot({path:'review/premises-month31-desktop.png',fullPage:true});
+  await page.screenshot({path:'review/premises-month23-desktop.png',fullPage:true});
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('#menu-continue').click();
   const restored=await stored(page);
@@ -224,8 +229,8 @@ try{
   assert.equal(restored.vehicles.length,2);
   assert.deepEqual(errors,[]);
   console.log('PREMISES_FULL_MONTH_PASS '+JSON.stringify({
-    purchaseCash:purchases.cash,day30Cash:lastDayCash,
-    day31Cash:state.cash,
+    purchaseCash:purchases.cash,monthEndCash:lastDayCash,
+    nextMonthCash:state.cash,
     month1Operating:state.monthlyReports[0].operatingContribution,
     openingTeam:restored.staff.map(x=>x.name),
     cars:restored.vehicles.map(x=>x.title),
