@@ -405,7 +405,7 @@
     bindText('dashboard-operating',money.format(d.report.operatingContribution));
     // Presentation-only status styling derived from live values; no new saved state.
     const setKpiTone=(binding,tone)=>{
-      const tile=byId(binding)?.closest('.dashboard-kpi');
+      const tile=document.querySelector('.dashboard-control .dashboard-kpis [data-bind="'+binding+'"]')?.closest('.dashboard-kpi');
       if(tile)tile.dataset.tone=tone;
     };
     setKpiTone('cash',career.cash<0?'critical':'neutral');
