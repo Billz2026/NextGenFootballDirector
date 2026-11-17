@@ -1,0 +1,613 @@
+/* The Motor Trade / Buying Desk identity, scoped to the sourcing department.
+   Existing negotiation economics, offer actions, and vehicle reports unchanged. */
+#screen-career .buying-desk-control{color:var(--mt-white,#F4F5F5);}
+#screen-career:has(.buying-desk-control:not([hidden])) .career-topbar{
+  min-height:57px;
+  padding-top:8px;
+  padding-bottom:8px;
+}
+#screen-career:has(.buying-desk-control:not([hidden])) .career-content{
+  padding:9px clamp(17px,2.35vw,32px) 16px;
+}
+#screen-career:has(.buying-desk-control:not([hidden])) .game-notice{
+  margin:7px clamp(17px,2.35vw,32px) 0;
+  padding:7px 11px;
+  line-height:1.35;
+  border:1px solid #514735;
+  border-left:3px solid #B68A42;
+  background:#211E19;
+  color:#E8D7BA;
+}
+/* Heading and trading access level */
+#screen-career .buying-desk-control .buy-page-heading{
+  min-height:40px;
+  margin-bottom:9px;
+}
+#screen-career .buying-desk-control .buy-page-heading h1,
+#screen-career .buying-desk-control .buy-page-heading h1 em{
+  margin:0;
+  font:800 clamp(25px,2.45vw,32px)/1.1 var(--body);
+  letter-spacing:-.035em;
+  color:#F4F5F5;
+}
+#screen-career .buying-desk-control .buy-page-heading p{
+  color:#B1BEC6;
+  font:500 11px/1.4 var(--body);
+  margin-top:4px;
+}
+#screen-career .buying-desk-control .buy-level-strip{
+  min-height:37px;
+  margin-bottom:8px;
+  padding:8px 12px;
+  border:1px solid #3C4243;
+  border-left:3px solid #B68A42;
+  border-radius:6px;
+  background:linear-gradient(120deg,rgba(182,138,66,.08),transparent 65%),#121A21;
+}
+#screen-career .buying-desk-control .buy-level-strip>span,
+#screen-career .buying-desk-control .buy-level-strip>small{
+  color:#AFBBC4;
+  font:700 9px/1.4 var(--body);
+  letter-spacing:.04em;
+}
+#screen-career .buying-desk-control .buy-level-strip strong{
+  color:#DCC19A;
+  font:800 12px/1.3 var(--body);
+  letter-spacing:.01em;
+}
+/* Financial status strip — white neutral figures, amber only for counteroffers. */
+#screen-career .buying-desk-control .buy-desk-stats{
+  background:#121A21;
+  border:1px solid #303A43;
+  border-radius:6px;
+  margin-bottom:9px;
+  padding:0 5px;
+}
+#screen-career .buying-desk-control .buy-stat{
+  min-height:43px;
+  padding:7px 11px;
+  background:transparent;
+  border-right:1px solid #303A43;
+}
+#screen-career .buying-desk-control .buy-stat small{
+  color:#B3C0C7;
+  font:700 9px/1.3 var(--body);
+  letter-spacing:.04em;
+}
+#screen-career .buying-desk-control .buy-stat>strong{
+  color:#F4F5F5;
+  font:800 clamp(16px,1.58vw,21px)/1.15 var(--body);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+#screen-career .buying-desk-control .buy-stat:has(small:first-child:nth-last-child(3))>span{
+  color:#ADB9C1;
+}
+#screen-career .buying-desk-control .buy-stat:has(small:first-child)>span{
+  font:650 9px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .buy-stat:has(small):has(strong):has(span){
+  overflow-wrap:anywhere;
+}
+#screen-career .buying-desk-control .buy-stat:has(small:first-child)>strong:not(.buy-negative){
+  overflow-wrap:anywhere;
+}
+#screen-career .buying-desk-control .buy-stat:has(small:first-child)>small{color:#B3C0C7;}
+/* Lead shortlist and selected vehicle */
+#screen-career .buying-desk-control .buy-main-grid{
+  grid-template-columns:minmax(220px,245px) minmax(0,1fr);
+  gap:9px;
+}
+#screen-career .buying-desk-control .buy-leads,
+#screen-career .buying-desk-control .buy-seller-focus{
+  background:#121A21;
+  border:1px solid #303A43;
+  border-radius:7px;
+  overflow:hidden;
+}
+#screen-career .buying-desk-control .buy-leads-heading,
+#screen-career .buying-desk-control .buy-detail-top{
+  min-height:37px;
+  padding:9px 11px;
+  border-bottom:1px solid #303A43;
+  background:linear-gradient(115deg,rgba(182,138,66,.055),transparent 60%),#182128;
+}
+#screen-career .buying-desk-control .buy-leads-heading h2{
+  color:#F4F5F5;
+  font:800 14px/1.2 var(--body);
+  letter-spacing:-.015em;
+}
+#screen-career .buying-desk-control .buy-leads-heading>span,
+#screen-career .buying-desk-control .buy-detail-top>span:first-child{
+  color:#B6C1C9;
+  font:700 9px/1.35 var(--body);
+  letter-spacing:.045em;
+}
+#screen-career .buying-desk-control .buy-detail-top>span:last-child{
+  color:#D0B78E;
+  font:700 9px/1.35 var(--body);
+}
+#screen-career .buying-desk-control .buy-lead-list{
+  scrollbar-width:thin;
+  scrollbar-color:#46525C transparent;
+}
+#screen-career .buying-desk-control .buy-lead{
+  padding:9px 11px;
+  min-height:83px;
+  gap:5px;
+  border-bottom:1px solid #2C3842;
+  border-left:3px solid transparent;
+  background:transparent;
+  color:#D8DEE2;
+}
+#screen-career .buying-desk-control .buy-lead:hover{
+  background:#1B2730;
+}
+#screen-career .buying-desk-control .buy-lead-selected,
+#screen-career .buying-desk-control .buy-lead-selected:hover{
+  background:#263039;
+  border-left-color:#B9233F;
+}
+#screen-career .buying-desk-control .buy-lead-top>span,
+#screen-career .buying-desk-control .buy-lead-bottom>span{
+  color:#ACB8C1;
+  font:700 9px/1.25 var(--body);
+}
+#screen-career .buying-desk-control .buy-lead-top>b{
+  color:#C3D0D7;
+  font:800 9px/1.25 var(--body);
+}
+#screen-career .buying-desk-control .buy-lead-counter .buy-lead-top>b{color:#E4A44F;}
+#screen-career .buying-desk-control .buy-lead-closed .buy-lead-top>b{color:#EA7775;}
+#screen-career .buying-desk-control .buy-lead-done .buy-lead-top>b{color:#6CC68E;}
+#screen-career .buying-desk-control .buy-lead>strong{
+  color:#F4F5F5;
+  font:750 12px/1.32 var(--body);
+}
+#screen-career .buying-desk-control .buy-lead-facts>span{
+  color:#AAB6BE;
+  font:500 9px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .buy-lead-bottom>b{
+  color:#F4F5F5;
+  font:800 16px/1.2 var(--body);
+  font-variant-numeric:tabular-nums;
+}
+#screen-career .buying-desk-control .buy-leads-tip{
+  border-top:1px solid #303A43;
+  background:#151E25;
+  color:#AAB6BE;
+}
+/* The left vehicle file uses the same neutral slate treatment as Auction Hall. */
+#screen-career .buying-desk-control .buy-vehicle{
+  background:#101820;
+  border-right:1px solid #303A43;
+  padding:10px 12px;
+}
+#screen-career .buying-desk-control .buy-vehicle .vehicle-photo-frame{
+  height:170px;
+  min-height:140px;
+  background:#0D141A;
+}
+#screen-career .buying-desk-control .buy-vehicle .vehicle-card-heading h3{
+  color:#F4F5F5;
+  font:800 clamp(19px,1.95vw,25px)/1.14 var(--body);
+  letter-spacing:-.025em;
+}
+#screen-career .buying-desk-control .buy-vehicle .vehicle-card-heading small{color:#C7B28A;}
+#screen-career .buying-desk-control .buy-vehicle .vehicle-card-heading p,
+#screen-career .buying-desk-control .buy-vehicle .vehicle-card-statline small{color:#AAB6BE;}
+#screen-career .buying-desk-control .buy-vehicle .vehicle-card-statline strong{color:#F4F5F5;}
+#screen-career .buying-desk-control .buy-car-note{
+  color:#ADB9C1;
+  font:500 10px/1.4 var(--body);
+}
+/* Appraisal and offer area */
+#screen-career .buying-desk-control .buy-deal-workspace{
+  background:#121A21;
+}
+#screen-career .buying-desk-control .buy-valuation{
+  padding:11px 13px 10px;
+  border-bottom:1px solid #303A43;
+}
+#screen-career .buying-desk-control .buy-valuation-heading>strong,
+#screen-career .buying-desk-control .buy-trading-heading>strong{
+  color:#F4F5F5;
+  font:800 16px/1.15 var(--body);
+  letter-spacing:-.025em;
+}
+#screen-career .buying-desk-control .buy-valuation-heading>span,
+#screen-career .buying-desk-control .buy-trading-heading>small{
+  color:#B9C5CC;
+  font:700 9px/1.25 var(--body);
+  letter-spacing:.035em;
+}
+#screen-career .buying-desk-control .buy-value-grid{
+  gap:6px;
+  margin:0 0 9px;
+}
+#screen-career .buying-desk-control .buy-value-grid>div{
+  background:#0D141A;
+  border:1px solid #303A43;
+  border-radius:5px;
+  padding:8px 9px;
+}
+#screen-career .buying-desk-control .buy-value-grid small{
+  color:#AFBDC5;
+  font:700 9px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .buy-value-grid strong{
+  color:#F4F5F5;
+  font:800 clamp(16px,1.7vw,21px)/1.15 var(--body);
+  font-variant-numeric:tabular-nums;
+  margin-top:4px;
+  overflow-wrap:anywhere;
+}
+#screen-career .buying-desk-control .buy-budget-table{
+  border:1px solid #303A43;
+  border-radius:5px;
+  margin-bottom:8px;
+  background:#0E151C;
+}
+#screen-career .buying-desk-control .buy-budget-table>div{
+  padding:8px 10px;
+  gap:10px;
+  border-bottom:1px solid #303A43;
+}
+#screen-career .buying-desk-control .buy-budget-table span{
+  color:#B7C3CA;
+  font:650 10px/1.35 var(--body);
+}
+#screen-career .buying-desk-control .buy-budget-table b{
+  color:#F4F5F5;
+  font:800 12px/1.3 var(--body);
+  font-variant-numeric:tabular-nums;
+  text-align:right;
+}
+#screen-career .buying-desk-control .buy-budget-table .buy-budget-total{
+  background:#172129;
+  border-left:3px solid #B68A42;
+  padding:9px 10px;
+}
+#screen-career .buying-desk-control .buy-budget-table .buy-budget-total b{
+  color:#F4F5F5;
+  font:800 20px/1.1 var(--body);
+}
+#screen-career .buying-desk-control .buy-budget-table b.buy-positive,
+#screen-career .buying-desk-control .buy-budget-total b.buy-positive{
+  color:#6CC68E;
+}
+#screen-career .buying-desk-control .buy-budget-table b.buy-negative,
+#screen-career .buying-desk-control .buy-budget-total b.buy-negative,
+#screen-career .buying-desk-control .buy-negative{
+  color:#EA7775;
+}
+#screen-career .buying-desk-control .buy-decision{
+  background:#172129;
+  border:1px solid #3F5057;
+  border-left:3px solid #6CC68E;
+  border-radius:5px;
+  padding:9px 10px;
+}
+#screen-career .buying-desk-control .buy-decision strong{
+  color:#83DDA7;
+  font:800 10px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .buy-decision p{
+  color:#C2CDD3;
+  font:500 10px/1.45 var(--body);
+}
+#screen-career .buying-desk-control .buy-decision-risk{
+  background:#251F19;
+  border-color:#755B3B;
+  border-left-color:#E4A44F;
+}
+#screen-career .buying-desk-control .buy-decision-risk strong{color:#F2BF7A;}
+#screen-career .buying-desk-control .buy-decision-loss{
+  background:#271C20;
+  border-color:#815053;
+  border-left-color:#EA7775;
+}
+#screen-career .buying-desk-control .buy-decision-loss strong{color:#F4A09B;}
+#screen-career .buying-desk-control .buy-trading{
+  padding:11px 13px 12px;
+  border-top:1px solid #303A43;
+}
+#screen-career .buying-desk-control .buy-seller-story{
+  margin:0 0 9px;
+  background:#182128;
+  border-color:#303A43;
+}
+#screen-career .buying-desk-control .buy-seller-story summary{color:#D7C5A6;}
+#screen-career .buying-desk-control .buy-seller-story p{color:#C0CBD1;}
+#screen-career .buying-desk-control .buy-offer-actions{
+  gap:8px;
+}
+#screen-career .buying-desk-control .buy-offer-actions label{
+  color:#B6C2C9;
+  font:750 10px/1.25 var(--body);
+}
+#screen-career .buying-desk-control .buy-offer-actions input{
+  height:44px;
+  min-height:44px;
+  border-radius:5px;
+  border:1px solid #5B6973;
+  background:#0C141A;
+  color:#F4F5F5;
+  font:750 16px/1.1 var(--body);
+  font-variant-numeric:tabular-nums;
+  padding:10px;
+}
+#screen-career .buying-desk-control .buy-offer-actions input:hover{border-color:#93A0AA;}
+#screen-career .buying-desk-control .buy-offer-actions input:focus-visible{
+  border-color:#F4F5F5;
+  outline:2px solid #F4F5F5;
+}
+#screen-career .buying-desk-control .buy-offer-actions .trade-button,
+#screen-career .buying-desk-control .buy-counter-actions .trade-button{
+  min-height:44px;
+  padding:10px 13px;
+  border:1px solid #F4F5F5;
+  border-radius:5px;
+  background:#F4F5F5;
+  color:#10161C;
+  font:800 10px/1.25 var(--body);
+  letter-spacing:.03em;
+}
+#screen-career .buying-desk-control .buy-offer-actions .trade-button:hover:not(:disabled),
+#screen-career .buying-desk-control .buy-counter-actions .trade-button:hover:not(:disabled){
+  background:#FFFFFF;
+  border-color:#FFFFFF;
+}
+#screen-career .buying-desk-control .buy-counter-actions .trade-button-secondary{
+  background:#263039;
+  color:#F4F5F5;
+  border-color:#687783;
+}
+#screen-career .buying-desk-control .buy-counter-actions .trade-button-secondary:hover:not(:disabled){
+  background:#37444E;
+}
+#screen-career .buying-desk-control .buy-counter-actions .trade-button-outline{
+  background:#171F26;
+  color:#DBE3E7;
+  border-color:#5B6973;
+}
+#screen-career .buying-desk-control .buy-counter-actions .trade-button-outline:hover:not(:disabled){
+  background:#2B363F;
+}
+#screen-career .buying-desk-control .buy-counter{
+  margin-bottom:9px;
+  padding:10px 12px;
+  background:#251F19;
+  border:1px solid #755B3B;
+  border-left:3px solid #E4A44F;
+  border-radius:5px;
+}
+#screen-career .buying-desk-control .buy-counter small{color:#E4A44F;}
+#screen-career .buying-desk-control .buy-counter strong{
+  color:#F4F5F5;
+  font:800 16px/1.25 var(--body);
+}
+#screen-career .buying-desk-control .buy-counter p{color:#D4C2AB;}
+#screen-career .buying-desk-control .trade-purchase-warning{
+  border:1px solid #815053;
+  border-left:3px solid #EA7775;
+  background:#271C20;
+  color:#F4B1AC;
+}
+#screen-career .buying-desk-control .trade-feedback-success{
+  border-left:3px solid #6CC68E;
+  background:#182921;
+  color:#A3E3BA;
+}
+#screen-career .buying-desk-control .trade-feedback-warning{
+  border-left:3px solid #E4A44F;
+  background:#2A2019;
+  color:#F4C793;
+}
+#screen-career .buying-desk-control .buy-opening-hint{color:#AAB7BF;}
+#screen-career .buying-desk-control .buy-subordinate-details{
+  border-top:1px solid #303A43;
+  background:#101820;
+}
+#screen-career .buying-desk-control .buy-subordinate-details>details,
+#screen-career .buying-desk-control .buy-seller-story,
+#screen-career .buying-desk-control .buy-deal-terms,
+#screen-career .buying-desk-control .buy-disclosure{
+  border:1px solid #303A43;
+  border-radius:5px;
+  background:#182128;
+}
+#screen-career .buying-desk-control .buy-subordinate-details>details summary,
+#screen-career .buying-desk-control .buy-seller-story summary,
+#screen-career .buying-desk-control .buy-deal-terms summary,
+#screen-career .buying-desk-control .buy-disclosure summary{
+  color:#D8E1E6;
+  font:750 10px/1.35 var(--body);
+  padding:8px 10px;
+}
+#screen-career .buying-desk-control details>summary::after{color:#C9AD80;}
+#screen-career .buying-desk-control .buy-subordinate-details p,
+#screen-career .buying-desk-control .buy-deal-terms p,
+#screen-career .buying-desk-control .buy-disclosure p{
+  color:#B3BEC6;
+  font:500 10px/1.55 var(--body);
+}
+#screen-career .buying-desk-control .buy-disclosure{
+  margin-top:8px;
+}
+#screen-career .buying-desk-control .buy-no-leads{
+  border:1px solid #303A43;
+  border-left:3px solid #B68A42;
+  background:#121A21;
+}
+#screen-career .buying-desk-control .buy-no-leads h2{
+  color:#F4F5F5;
+  font:800 23px/1.2 var(--body);
+}
+#screen-career .buying-desk-control .buy-no-leads p{color:#B4C1C9;}
+/* Shared simulated vehicle report matches the dark desk design. */
+#screen-career .buying-desk-control .intel-panel{
+  margin:0 0 8px;
+  border:1px solid #303A43;
+  background:#0D141A;
+  border-radius:6px;
+}
+#screen-career .buying-desk-control .intel-top{
+  padding:8px 10px;
+  border-bottom:1px solid #303A43;
+  background:#182128;
+}
+#screen-career .buying-desk-control .intel-top>span{
+  color:#C7B28A;
+  font:700 9px/1.35 var(--body);
+}
+#screen-career .buying-desk-control .intel-toggle{
+  min-height:32px;
+  border:1px solid #5B6973;
+  border-radius:5px;
+  background:#263039;
+  color:#F4F5F5;
+  padding:7px 9px;
+  font:750 9px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .intel-toggle:hover{background:#34414A;}
+#screen-career .buying-desk-control .intel-numbers{
+  gap:1px;
+  background:#303A43;
+}
+#screen-career .buying-desk-control .intel-numbers>div{
+  padding:9px 8px;
+  gap:4px;
+  background:#101820;
+}
+#screen-career .buying-desk-control .intel-numbers span{
+  color:#AFBDC5;
+  font:700 9px/1.25 var(--body);
+}
+#screen-career .buying-desk-control .intel-numbers strong{
+  color:#F4F5F5;
+  font:800 clamp(14px,1.3vw,19px)/1.2 var(--body);
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+#screen-career .buying-desk-control .intel-numbers strong.intel-loss{color:#EA7775;}
+#screen-career .buying-desk-control .intel-formula{color:#AFBBC4;}
+#screen-career .buying-desk-control .intel-expanded{
+  border-top:1px solid #303A43;
+  background:#121A21;
+}
+#screen-career .buying-desk-control .intel-grid>div{border-color:#303A43;}
+#screen-career .buying-desk-control .intel-grid small{color:#B2BFC7;}
+#screen-career .buying-desk-control .intel-grid strong{color:#F4F5F5;}
+#screen-career .buying-desk-control .intel-expanded h4{
+  color:#F4F5F5;
+  font:800 13px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .intel-small{color:#B4C0C8;}
+#screen-career .buying-desk-control .intel-repair{
+  border-bottom-color:#303A43;
+  color:#D8DEE2;
+}
+#screen-career .buying-desk-control .intel-repair strong{
+  color:#F4F5F5;
+  font:800 12px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .intel-disclaimer{
+  background:#231E1A;
+  border-left:3px solid #B68A42;
+  color:#D1B992;
+}
+#screen-career .buying-desk-control .intel-foot .trade-button{
+  background:#263039;
+  border:1px solid #596773;
+  color:#F4F5F5;
+  border-radius:5px;
+  font:800 10px/1.3 var(--body);
+}
+#screen-career .buying-desk-control .intel-foot .trade-button:hover{background:#35414A;}
+#screen-career .buying-desk-control .intel-inspected{color:#6CC68E;}
+#screen-career .buying-desk-control .vehicle-spec-proof{
+  background:#172129;
+  border-color:#34424A;
+}
+#screen-career .buying-desk-control .vehicle-spec-proof strong{color:#F4F5F5;}
+#screen-career .buying-desk-control .vehicle-spec-proof p{color:#B5C0C8;}
+#screen-career .buying-desk-control .vehicle-spec-proof a{color:#D6B37C;}
+/* Responsive layout: compact desktop, scroll naturally on mobile. */
+@media(min-width:1450px){
+  #screen-career .buying-desk-control .buy-value-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+@media(max-width:1230px){
+  #screen-career .buying-desk-control .buy-main-grid{
+    grid-template-columns:minmax(198px,225px) minmax(0,1fr);
+  }
+  #screen-career .buying-desk-control .buy-focus-content{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  }
+}
+@media(max-width:1090px){
+  #screen-career .buying-desk-control .buy-main-grid{grid-template-columns:1fr;}
+  #screen-career .buying-desk-control .buy-lead-list{
+    display:flex;
+    flex-direction:row;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:thin;
+  }
+  #screen-career .buying-desk-control .buy-lead{
+    flex:0 0 235px;
+    width:235px;
+    min-height:89px;
+  }
+}
+@media(max-width:760px){
+  #screen-career .buying-desk-control .buy-page-heading h1,
+  #screen-career .buying-desk-control .buy-page-heading h1 em{font-size:26px;}
+  #screen-career .buying-desk-control .buy-focus-content{
+    display:flex;
+    flex-direction:column;
+  }
+  #screen-career .buying-desk-control .buy-deal-workspace{order:0;}
+  #screen-career .buying-desk-control .buy-vehicle{
+    order:1;
+    border-right:0;
+    border-top:1px solid #303A43;
+  }
+  #screen-career .buying-desk-control .buy-mobile-vehicle-context{
+    background:#182128;
+    border-color:#303A43;
+  }
+  #screen-career .buying-desk-control .buy-mobile-vehicle-context strong{color:#F4F5F5;}
+  #screen-career .buying-desk-control .buy-mobile-vehicle-context span{color:#B6C2CA;}
+  #screen-career .buying-desk-control .buy-desk-stats{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #screen-career .buying-desk-control .buy-stat{
+    min-height:43px;
+    border-bottom:1px solid #303A43;
+    border-right:0;
+  }
+  #screen-career .buying-desk-control .buy-stat:nth-child(odd){border-right:1px solid #303A43;}
+  #screen-career .buying-desk-control .buy-stat:nth-last-child(-n+2){border-bottom:0;}
+  #screen-career .buying-desk-control .buy-vehicle .vehicle-photo-frame{height:205px;}
+}
+@media(max-width:490px){
+  #screen-career:has(.buying-desk-control:not([hidden])) .career-content{padding:10px 13px 18px;}
+  #screen-career .buying-desk-control .buy-value-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #screen-career .buying-desk-control .buy-value-grid strong{font-size:18px;}
+  #screen-career .buying-desk-control .buy-offer-actions{
+    grid-template-columns:minmax(0,1fr) minmax(130px,.9fr);
+  }
+  #screen-career .buying-desk-control .buy-lead{flex:0 0 203px;width:203px;min-height:87px;}
+  #screen-career .buying-desk-control .buy-offer-actions .trade-button{min-height:44px;padding:9px 7px;}
+}
+@media(max-width:355px){
+  #screen-career .buying-desk-control .buy-offer-actions{grid-template-columns:1fr;}
+}
+@media(prefers-reduced-motion:reduce){
+  #screen-career .buying-desk-control .buy-lead{transition:none;}
+}

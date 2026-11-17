@@ -109,7 +109,7 @@
         '<div><small>'+label+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<div class="buy-budget-table">'+
         '<div class="buy-budget-total"><span>PROJECTED GROSS CONTRIBUTION</span>'+
-          '<b id="desk-projection-'+esc(car.id)+'" class="'+(quote.expectedMargin<0?'buy-negative':'')+'">'+money(quote.expectedMargin)+'</b></div>'+
+          '<b id="desk-projection-'+esc(car.id)+'" class="'+(quote.expectedMargin<0?'buy-negative':quote.expectedMargin>0?'buy-positive':'buy-neutral')+'">'+money(quote.expectedMargin)+'</b></div>'+
         '<div><span>Cash after offer and estimated preparation</span><b id="desk-headroom-'+esc(car.id)+'"'+
           (remaining<0?' class="buy-negative"':'')+'>'+money(remaining)+'</b></div>'+
       '</div>'+

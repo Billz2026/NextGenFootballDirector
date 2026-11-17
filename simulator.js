@@ -930,7 +930,7 @@
     set('desk-prep',cashText(model.quote.prep));
     set('desk-total',cashText(model.quote.total));
     const margin=set('desk-projection',cashText(model.quote.expectedMargin));
-    if(margin)margin.className=model.quote.expectedMargin<0?'buy-negative':'';
+    if(margin)margin.className=model.quote.expectedMargin<0?'buy-negative':model.quote.expectedMargin>0?'buy-positive':'buy-neutral';
     const headroom=set('desk-headroom',cashText(model.remaining));
     if(headroom)headroom.className=model.remaining<0?'buy-negative':'';
     const signal=byId('desk-signal-'+car.id);
