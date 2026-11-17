@@ -38,7 +38,7 @@ test('calendar follows actual month ends including February',()=>{
 
 test('new careers calculate November 30 as first month-end and normalise',()=>{
   const state=E.createStaffed('Calendar Test Motors',[]);
-  assert.equal(state.version,15);
+  assert.equal(state.version,16);
   assert.equal(state.monthPlan.endDay,22);
   assert.equal(state.staff.length,4);
   assert.ok(E.normalize(JSON.parse(JSON.stringify(state))));
@@ -51,7 +51,7 @@ test('old v14 careers migrate without replacing cash or employees',()=>{
   state.monthPlan.unitTarget=4;
   const restored=E.normalize(JSON.parse(JSON.stringify(state)));
   assert.ok(restored);
-  assert.equal(restored.version,15);
+  assert.equal(restored.version,16);
   assert.equal(restored.cash,45000);
   assert.equal(restored.staff.length,4);
   assert.equal(restored.monthPlan.endDay,22);
@@ -79,7 +79,7 @@ test('retail negotiation allows five real player counters, not a sixth',()=>{
     cashOffer:9400,profile:{likelySale:10300,grade:2}};
   state.vehicles=[vehicle];
   state.customerCases={'1':{id:'C-1-0-1-12',name:'Jordan Brown',
-    vehicleId:1,status:'discussing',counters:0}};
+    vehicleId:1,status:'discussing',counters:0,objectionStatus:'resolved',objectionAction:'legacy'}};
   for(let i=1;i<=5;i++){
     const previous=vehicle.cashOffer;
     const result=C.negotiate(state,vehicle,previous,10300,previous+100);
