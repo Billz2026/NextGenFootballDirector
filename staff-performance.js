@@ -74,9 +74,12 @@
     const leads=new Set(leadDays.keys());
     const ended=new Set(history.filter(h=>['sale','expired','cancelled',
       'no-show','objection-walked'].includes(h.type)).map(h=>h.leadId));
-    const matured=new Set([...leadDays].filter(([leadId,createdDay])=>
-      ended.has(leadId)||state.day-createdDay>=3).map(([leadId])=>leadId));
     const deals=(state.sold||[]).filter(v=>v.salespersonId===id);
+    const soldLeads=new Set(deals.filter(v=>typeof v.customerLeadId==='string')
+      .map(v=>v.customerLeadId));
+    const matured=new Set([...leadDays].filter(([leadId,createdDay])=>
+      ended.has(leadId)||soldLeads.has(leadId)||state.day-createdDay>=3)
+      .map(([leadId])=>leadId));
     const converted=new Set(deals.filter(v=>
       typeof v.customerLeadId==='string'&&leads.has(v.customerLeadId))
       .map(v=>v.customerLeadId)).size;
