@@ -64,7 +64,7 @@
         '<span class="stock-unit-kicker">STOCK '+v.id+' · '+esc(labelSource[v.source]||v.source.toUpperCase())+'</span>'+
         '<strong>'+esc(v.title)+'</strong>'+
         '<small>'+mileage(v.miles)+' · '+esc(v.fuel)+' · '+esc(v.gearbox)+'</small>'+
-        '<span class="stock-unit-bottom"><span class="stock-status stock-status-'+p.tone+'">'+p.label+'</span>'+
+        '<span class="stock-unit-bottom"><span class="stock-status stock-status-'+p.tone+(p.tone==='prep'?' stock-stage-'+(v.workshop?.paused?'paused':v.workshop?.stage||'unassessed'):'')+'">'+p.label+'</span>'+
         '<b class="'+ageClass+'">'+age+' DAYS</b></span>'+
         '<span class="stock-unit-cost">INVESTED '+money(f.invested)+'</span>'+
       '</button></article>';
@@ -129,7 +129,7 @@
       age>=15?'15+ DAYS · DAILY STOCK HOLDING COSTS HAVE STARTED':'';
     return '<section class="stock-dossier" aria-label="Selected vehicle file">'+
       '<div class="stock-dossier-top"><div><span>VEHICLE FILE · STOCK '+v.id+'</span>'+
-      '<strong>'+esc(v.title)+'</strong></div><span class="stock-status stock-status-'+p.tone+'">'+p.label+'</span></div>'+
+      '<strong>'+esc(v.title)+'</strong></div><span class="stock-status stock-status-'+p.tone+(p.tone==='prep'?' stock-stage-'+(v.workshop?.paused?'paused':v.workshop?.stage||'unassessed'):'')+'">'+p.label+'</span></div>'+
       '<div class="stock-dossier-grid"><div class="stock-dossier-vehicle">'+
       VC.heading(v,'stock',source+' · STOCK '+v.id)+
       '<p class="stock-dossier-note">'+esc(v.note||'')+'</p>'+
@@ -141,13 +141,13 @@
       '<div class="stock-finance-summary">'+
         '<div><small>CASH INVESTED</small><strong>'+money(f.invested)+'</strong></div>'+
         '<div><small>LIKELY RETAIL SALE</small><strong>'+money(f.likelySale)+'</strong></div>'+
-        '<div class="stock-summary-contribution'+(f.contribution<0?' stock-margin-loss':'')+
+        '<div class="stock-summary-contribution'+(f.contribution<0?' stock-margin-loss':f.contribution>0?' stock-margin-positive':' stock-margin-neutral')+
           '"><small>PROJECTED GROSS CONTRIBUTION</small><strong>'+money(f.contribution)+'</strong></div>'+
       '</div>'+
-      (risk?'<div class="stock-aged-alert">'+risk+'</div>'+
+      (risk?'<div class="stock-aged-alert'+(age>=45?' stock-aged-critical':'')+'">'+risk+'</div>'+
         '<div class="stock-age-figures"><div><small>STOCK HOLDING / DAY</small><strong>'+money(ageing.daily)+'</strong></div>'+
         '<div><small>MARKET PRICE GUIDE</small><strong>'+money(ageing.target)+'</strong></div>'+
-        '<div><small>GROSS MARGIN AT GUIDE</small><strong class="'+(ageing.expectedMargin<0?'stock-age-loss':'')+'">'+
+        '<div><small>GROSS MARGIN AT GUIDE</small><strong class="'+(ageing.expectedMargin<0?'stock-age-loss':ageing.expectedMargin>0?'stock-age-positive':'stock-age-neutral')+'">'+
         money(ageing.expectedMargin)+'</strong></div></div>'+
         '<p class="stock-age-explainer">Ageing reduces buyer interest at stale asking prices. '+
         'The guide is optional, not a guaranteed sale. Daily charges are separate operating expenses; '+
@@ -178,9 +178,9 @@
     const ageingCount=state.vehicles.filter(v=>AG.age(state,v)>=15).length;
     const dailyCharges=AG.chargeFor(state);
     const head='<div class="stock-kpi-strip">'+metrics.map(([label,number,note])=>
-      '<div class="stock-kpi"><small>'+label+'</small><strong>'+number+
+      '<div class="stock-kpi'+(label==='TOTAL VEHICLE STOCK'&&stats.spaces===0?' stock-kpi-full':'')+'"><small>'+label+'</small><strong>'+number+
       '</strong><span>'+note+'</span></div>').join('')+'</div>'+
-      (ageingCount?'<div class="stock-age-overview"><strong>STOCK AGEING / '+ageingCount+
+      (ageingCount?'<div class="stock-age-overview'+((state.stockAgeingArrears||0)>0?' stock-age-arrears':'')+'"><strong>STOCK AGEING / '+ageingCount+
         ' VEHICLE'+(ageingCount===1?'':'S')+' OVER 15 DAYS</strong><span>'+
         money(dailyCharges)+'/DAY IN HOLDING CHARGES · '+
         money(state.stockAgeingArrears||0)+' UNPAID</span></div>':'');

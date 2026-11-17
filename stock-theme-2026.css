@@ -1,0 +1,135 @@
+
+/* The Motor Trade: Vehicle Stock. Scoped presentation only. */
+#screen-career:has(.stock-page-control:not([hidden])) .career-topbar{min-height:57px;padding-top:8px;padding-bottom:8px}
+#screen-career:has(.stock-page-control:not([hidden])) .career-content{padding:9px clamp(17px,2.35vw,32px) 16px}
+#screen-career:has(.stock-page-control:not([hidden])) .game-notice{margin:7px clamp(17px,2.35vw,32px) 0;padding:7px 11px;background:#211E19;color:#E8D7BA;border:1px solid #514735;border-left:3px solid #B68A42}
+#screen-career .stock-page-control{color:#F4F5F5}
+#screen-career .stock-page-control .stock-page-heading{min-height:39px;margin:0 0 9px}
+#screen-career .stock-page-control .stock-page-heading h1,#screen-career .stock-page-control .stock-page-heading h1 em{color:#F4F5F5;font:800 clamp(25px,2.45vw,32px)/1.1 var(--body);letter-spacing:-.035em}
+#screen-career .stock-page-control .stock-page-heading p{color:#AFBBC4;font:500 11px/1.4 var(--body)}
+/* Financial overview */
+#screen-career .stock-page-control .stock-kpi-strip{padding:0 4px;margin-bottom:8px;background:#121A21;border:1px solid #303A43;border-radius:6px}
+#screen-career .stock-page-control .stock-kpi{min-height:47px;padding:8px 10px;gap:8px;background:transparent;border-right:1px solid #303A43}
+#screen-career .stock-page-control .stock-kpi:last-child{border-right:0}
+#screen-career .stock-page-control .stock-kpi small{color:#B4C1C9;font:700 9px/1.3 var(--body);letter-spacing:.04em}
+#screen-career .stock-page-control .stock-kpi strong{color:#F4F5F5;font:800 clamp(16px,1.65vw,22px)/1.15 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .stock-page-control .stock-kpi-full strong{color:#E4A44F}
+#screen-career .stock-page-control .stock-age-overview{margin:0 0 8px;padding:8px 11px;gap:8px;background:#261F19;border:1px solid #71563B;border-left:3px solid #E4A44F;border-radius:5px}
+#screen-career .stock-page-control .stock-age-overview strong{color:#F1C18D;font:800 9px/1.35 var(--body)}
+#screen-career .stock-page-control .stock-age-overview span{color:#E5C5A2;font:650 9px/1.35 var(--body)}
+#screen-career .stock-page-control .stock-age-overview.stock-age-arrears{background:#291C1F;border-color:#825157;border-left-color:#EA7775}
+#screen-career .stock-page-control .stock-age-arrears span{color:#F4A9A2}
+/* Stock filters */
+#screen-career .stock-page-control .stock-toolbar{padding:8px 11px;gap:10px;background:linear-gradient(115deg,rgba(182,138,66,.055),transparent 60%),#172129;border:1px solid #303A43;border-radius:6px}
+#screen-career .stock-page-control .stock-toolbar-heading strong{color:#F4F5F5;font:800 15px/1.2 var(--body)}
+#screen-career .stock-page-control .stock-toolbar-heading small{color:#AAB6BE;font:700 9px/1.2 var(--body)}
+#screen-career .stock-page-control .stock-filters{gap:6px}
+#screen-career .stock-page-control .stock-filters button{min-height:33px;padding:7px 10px;background:#182128;border:1px solid #39454E;border-radius:5px;color:#C3CDD4;font:750 10px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-filters button:hover{color:#fff;background:#25313B;border-color:#7E8B95}
+#screen-career .stock-page-control .stock-filters button[aria-pressed="true"]{color:#fff;background:#263039;border-color:#63717A;box-shadow:inset 3px 0 #B9233F}
+#screen-career .stock-page-control .stock-filters b{color:inherit}
+#screen-career .stock-page-control .stock-workspace{grid-template-columns:minmax(220px,245px) minmax(0,1fr);gap:9px;margin-top:9px}
+/* Stock register */
+#screen-career .stock-page-control .stock-register,#screen-career .stock-page-control .stock-dossier{min-width:0;background:#121A21;border:1px solid #303A43;border-radius:7px;overflow:hidden}
+#screen-career .stock-page-control .stock-register-title,#screen-career .stock-page-control .stock-dossier-top{min-height:37px;padding:9px 11px;background:linear-gradient(115deg,rgba(182,138,66,.055),transparent 63%),#182128;border-bottom:1px solid #303A43}
+#screen-career .stock-page-control .stock-register-title{color:#F4F5F5;font:800 10px/1.3 var(--body);letter-spacing:.05em}
+#screen-career .stock-page-control .stock-register-title span{color:#AAB6BE;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-register-list{scrollbar-width:thin;scrollbar-color:#4D5962 transparent}
+#screen-career .stock-page-control .stock-unit{padding:8px;grid-template-columns:66px minmax(0,1fr);gap:8px;background:transparent;border-bottom:1px solid #2D3841;transition:background-color .14s}
+#screen-career .stock-page-control .stock-unit:hover{background:#1C2932}
+#screen-career .stock-page-control .stock-unit-selected,#screen-career .stock-page-control .stock-unit-selected:hover{background:#263039;box-shadow:inset 3px 0 #B9233F}
+#screen-career .stock-page-control .stock-unit-thumb .vehicle-photo-frame{height:57px;background:#0D141A;border-radius:5px}
+#screen-career .stock-page-control .stock-unit-kicker{color:#C5AE87;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-unit-select>strong{color:#F4F5F5;font:750 12px/1.28 var(--body)}
+#screen-career .stock-page-control .stock-unit-select>small{color:#AAB6BE;font:500 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-unit-cost{color:#C9D2D7;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-unit-bottom b{color:#AAB6BE;font:800 9px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-age-watch,#screen-career .stock-page-control .stock-age-warning{color:#E4A44F!important}
+#screen-career .stock-page-control .stock-age-critical{color:#EA7775!important}
+#screen-career .stock-page-control .stock-status{padding:4px 6px;border-radius:4px;font:800 9px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-status-prep{color:#EDBC78;background:#292218;border:1px solid #765D3D}
+#screen-career .stock-page-control .stock-status-prep.stock-stage-in-progress{color:#C8D3D9;background:#222C34;border-color:#4B5B64}
+#screen-career .stock-page-control .stock-status-prep.stock-stage-paused{color:#F0A8A3;background:#2B1D20;border-color:#835257}
+#screen-career .stock-page-control .stock-status-ready{color:#8ADDAA;background:#172D21;border:1px solid #3D674A}
+#screen-career .stock-page-control .stock-status-listed{color:#C5D0D8;background:#25313A;border:1px solid #50606A}
+/* Selected vehicle */
+#screen-career .stock-page-control .stock-dossier-top>div>span{color:#CBB48B;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-dossier-top>div>strong{color:#F4F5F5;font:800 clamp(17px,1.7vw,22px)/1.15 var(--body)}
+#screen-career .stock-page-control .stock-dossier-grid{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)}
+#screen-career .stock-page-control .stock-dossier-vehicle{padding:11px 12px;background:#101820;border-right:1px solid #303A43}
+#screen-career .stock-page-control .stock-dossier-vehicle .vehicle-photo-frame{height:169px;min-height:135px;background:#0D141A}
+#screen-career .stock-page-control .stock-dossier-vehicle .vehicle-card-heading p,#screen-career .stock-page-control .stock-dossier-note{color:#ADBAC2;font:500 10px/1.4 var(--body)}
+#screen-career .stock-page-control .stock-dossier-vehicle .vehicle-card-statline strong{color:#F4F5F5}
+#screen-career .stock-page-control .stock-dossier-vehicle .vehicle-card-statline small{color:#AAB6BE}
+#screen-career .stock-page-control .stock-facts>div{padding:7px 9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .stock-page-control .stock-facts small{color:#AAB6BE;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-facts strong{color:#F4F5F5;font:750 11px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-dossier-finance{padding:11px 12px;background:#121A21}
+#screen-career .stock-page-control .stock-finance-heading h3{color:#F4F5F5;font:800 16px/1.2 var(--body)}
+#screen-career .stock-page-control .stock-finance-summary{gap:6px;margin:0}
+#screen-career .stock-page-control .stock-finance-summary>div{padding:9px 10px;background:#0D141A;border:1px solid #303A43;border-radius:5px}
+#screen-career .stock-page-control .stock-finance-summary small{color:#B5C2CA;font:700 9px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-finance-summary strong{color:#F4F5F5;font:800 clamp(16px,1.75vw,22px)/1.15 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .stock-page-control .stock-finance-summary>.stock-summary-contribution{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#172129;border-left:3px solid #B68A42}
+#screen-career .stock-page-control .stock-summary-contribution strong{color:#F4F5F5}
+#screen-career .stock-page-control .stock-summary-contribution.stock-margin-positive strong{color:#6CC68E}
+#screen-career .stock-page-control .stock-summary-contribution.stock-margin-loss{background:#281C20;border-left-color:#EA7775}
+#screen-career .stock-page-control .stock-summary-contribution.stock-margin-loss strong{color:#EA7775}
+/* Ageing exposure */
+#screen-career .stock-page-control .stock-aged-alert{margin:8px 0 0;padding:8px 10px;background:#271F19;border:1px solid #73593A;border-left:3px solid #E4A44F;border-radius:5px;color:#F0C089;font:700 10px/1.4 var(--body)}
+#screen-career .stock-page-control .stock-aged-alert.stock-aged-critical{background:#281C1E;border-color:#7E4B50;border-left-color:#EA7775;color:#F0AAA4}
+#screen-career .stock-page-control .stock-age-figures{margin:7px 0 0;gap:6px}
+#screen-career .stock-page-control .stock-age-figures>div{padding:8px 9px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .stock-page-control .stock-age-figures small{color:#B5C2CA;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-age-figures strong{color:#F4F5F5;font:800 clamp(15px,1.5vw,19px)/1.2 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .stock-page-control .stock-age-figures strong.stock-age-positive{color:#6CC68E}
+#screen-career .stock-page-control .stock-age-figures strong.stock-age-loss{color:#EA7775}
+#screen-career .stock-page-control .stock-age-explainer{color:#B4BEC6;font:500 10px/1.43 var(--body)}
+/* Decisions, pricing, trade exits */
+#screen-career .stock-page-control .stock-action-box{margin:8px 0 0;padding:10px 11px;background:#182128;border:1px solid #34434B;border-left:3px solid #B68A42;border-radius:6px}
+#screen-career .stock-page-control .stock-action-box h4{color:#F4F5F5;font:800 13px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-action-box p{color:#C0CBD1;font:500 10px/1.45 var(--body)}
+#screen-career .stock-page-control .stock-action-box .trade-button,#screen-career .stock-page-control .stock-empty-actions .trade-button{min-height:42px;padding:10px 11px;border:1px solid #F4F5F5;border-radius:5px;background:#F4F5F5;color:#10161C;font:800 10px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-action-box .trade-button:hover:not(:disabled),#screen-career .stock-page-control .stock-empty-actions .trade-button:hover:not(:disabled){background:#fff;border-color:#fff}
+#screen-career .stock-page-control .stock-action-box .trade-button-secondary,#screen-career .stock-page-control .stock-empty-actions .trade-button-secondary{background:#263039;color:#F4F5F5;border-color:#596873}
+#screen-career .stock-page-control .stock-action-box .trade-button-secondary:hover:not(:disabled),#screen-career .stock-page-control .stock-empty-actions .trade-button-secondary:hover:not(:disabled){background:#34414A;border-color:#B5C1C9}
+#screen-career .stock-page-control .stock-action-box .stock-age-reprice{display:block;width:100%;background:#33271D;border:1px solid #927148;color:#F0C089;white-space:normal}
+#screen-career .stock-page-control .stock-action-box .stock-age-reprice:hover:not(:disabled){background:#493522;border-color:#E4A44F}
+#screen-career .stock-page-control .stock-trade-choice{margin-top:9px;padding:9px 0 0;border-top:1px solid #4A5352}
+#screen-career .stock-page-control .stock-trade-choice>strong{color:#E4A44F;font:800 10px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-trade-choice p{color:#BFCBD1;font:500 10px/1.45 var(--body)}
+#screen-career .stock-page-control .stock-trade-choice small{color:#E4A44F}
+#screen-career .stock-page-control .stock-lock-note{color:#F0BD7E}
+#screen-career .stock-page-control .stock-price-action label{color:#B9C6CD;font:750 10px/1.25 var(--body)}
+#screen-career .stock-page-control .stock-price-action input{min-height:42px;height:42px;padding:10px;background:#0D141A;border:1px solid #64717B;border-radius:5px;color:#F4F5F5;font:750 16px/1.1 var(--body);font-variant-numeric:tabular-nums}
+/* Details and technical file */
+#screen-career .stock-page-control .stock-cost-details,#screen-career .stock-page-control .stock-disclosure{margin-top:8px;background:#172129;border:1px solid #303A43;border-radius:5px}
+#screen-career .stock-page-control .stock-cost-details summary,#screen-career .stock-page-control .stock-disclosure summary{padding:9px 11px;color:#D8E1E6;font:750 10px/1.3 var(--body)}
+#screen-career .stock-page-control .stock-cost-details summary::after{color:#CDB58D}
+#screen-career .stock-page-control .stock-cost-table{background:#0D141A;border:1px solid #303A43}
+#screen-career .stock-page-control .stock-cost-table>div{padding:7px 9px;border-bottom:1px solid #303A43}
+#screen-career .stock-page-control .stock-cost-table span{color:#B5C2C9;font:600 10px/1.35 var(--body)}
+#screen-career .stock-page-control .stock-cost-table strong{color:#F4F5F5;font:800 12px/1.35 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .stock-page-control .stock-cost-table .stock-cost-emphasis{background:#20262A;border-top:1px solid #62533D}
+#screen-career .stock-page-control .stock-finance-note,#screen-career .stock-page-control .stock-disclosure p{color:#AFBDC5;font:500 10px/1.5 var(--body)}
+#screen-career .stock-page-control .intel-panel{margin:8px 0 0;background:#0D141A;border:1px solid #303A43}
+#screen-career .stock-page-control .intel-top{padding:8px 10px;background:#182128;border-bottom:1px solid #303A43}
+#screen-career .stock-page-control .intel-top>span{color:#C6B28E;font:700 9px/1.3 var(--body)}
+#screen-career .stock-page-control .intel-toggle{min-height:32px;padding:7px 10px;border:1px solid #56636D;border-radius:5px;background:#263039;color:#F4F5F5;font:750 9px/1.3 var(--body)}
+#screen-career .stock-page-control .intel-expanded{padding:11px;background:#121A21;border-top:1px solid #303A43}
+#screen-career .stock-page-control .intel-grid>div{border-bottom-color:#303A43}
+#screen-career .stock-page-control .intel-grid small,#screen-career .stock-page-control .intel-small{color:#B2BFC7}
+#screen-career .stock-page-control .intel-grid strong,#screen-career .stock-page-control .intel-expanded h4{color:#F4F5F5}
+#screen-career .stock-page-control .intel-repair{color:#D8DEE2;border-bottom-color:#303A43}
+#screen-career .stock-page-control .intel-repair strong{color:#F4F5F5}
+#screen-career .stock-page-control .intel-disclaimer{color:#D1B992;background:#231E1A;border-left:3px solid #B68A42}
+#screen-career .stock-page-control .stock-empty{background:#121A21;border:1px solid #303A43;border-left:3px solid #B68A42}
+#screen-career .stock-page-control .stock-empty h2{color:#F4F5F5;font:800 24px/1.2 var(--body)}
+#screen-career .stock-page-control .stock-empty p,#screen-career .stock-page-control .stock-list-empty{color:#B7C3CA}
+/* Responsive */
+@media(min-width:1101px){#screen-career .stock-page-control .stock-register-list{max-height:clamp(320px,calc(100dvh - 330px),680px);overflow-y:auto;overscroll-behavior:contain}}
+@media(max-width:1330px){#screen-career .stock-page-control .stock-workspace{grid-template-columns:minmax(210px,230px) minmax(0,1fr)}#screen-career .stock-page-control .stock-dossier-grid{grid-template-columns:1fr}#screen-career .stock-page-control .stock-dossier-vehicle{border-right:0;border-bottom:1px solid #303A43}}
+@media(max-width:1100px){#screen-career .stock-page-control .stock-workspace{grid-template-columns:1fr}#screen-career .stock-page-control .stock-register-list{max-height:none;overflow-x:auto;overflow-y:hidden}#screen-career .stock-page-control .stock-dossier-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#screen-career .stock-page-control .stock-dossier-vehicle{border-right:1px solid #303A43;border-bottom:0}}
+@media(max-width:760px){#screen-career .stock-page-control .stock-dossier-grid{display:flex;flex-direction:column}#screen-career .stock-page-control .stock-dossier-finance{order:0}#screen-career .stock-page-control .stock-dossier-vehicle{order:1;border:0;border-top:1px solid #303A43}#screen-career .stock-page-control .stock-toolbar-heading{display:none}#screen-career .stock-page-control .stock-filters{width:100%;overflow-x:auto;flex-wrap:nowrap}#screen-career .stock-page-control .stock-filters button{flex:0 0 auto}#screen-career .stock-page-control .stock-kpi{align-items:flex-start;flex-direction:column;gap:3px}#screen-career .stock-page-control .stock-finance-summary{grid-template-columns:repeat(3,minmax(0,1fr))}#screen-career .stock-page-control .stock-finance-summary>.stock-summary-contribution{grid-column:auto;align-items:flex-start;flex-direction:column;gap:4px}}
+@media(max-width:520px){#screen-career:has(.stock-page-control:not([hidden])) .career-content{padding:10px 13px 18px}#screen-career .stock-page-control .stock-page-heading h1{font-size:25px}#screen-career .stock-page-control .stock-page-heading p{display:none}#screen-career .stock-page-control .stock-kpi{min-height:49px;padding:6px 7px}#screen-career .stock-page-control .stock-kpi strong{font-size:16px}#screen-career .stock-page-control .stock-unit{flex-basis:200px;grid-template-columns:1fr}#screen-career .stock-page-control .stock-unit-thumb,#screen-career .stock-page-control .stock-unit-kicker{display:none}#screen-career .stock-page-control .stock-finance-summary strong{font-size:16px}}
+@media(max-width:360px){#screen-career .stock-page-control .stock-price-action{grid-template-columns:1fr}}
