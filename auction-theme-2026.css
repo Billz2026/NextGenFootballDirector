@@ -547,3 +547,112 @@
 @media(prefers-reduced-motion:reduce){
   #screen-career .auction-hall-control .auction-catalogue-review{transition:none;}
 }
+
+/* The shared vehicle dossier must inherit the Auction Hall palette too. */
+#screen-career .auction-hall-control .intel-panel{
+  margin:0 0 9px;
+  border:1px solid #303A43;
+  background:#0D141A;
+  border-radius:6px;
+  color:#D8DEE2;
+}
+#screen-career .auction-hall-control .intel-top{
+  padding:9px 10px;
+  background:#182128;
+  border-bottom:1px solid #303A43;
+}
+#screen-career .auction-hall-control .intel-top>span{
+  color:#CBB28A;
+  font:700 9px/1.3 var(--body);
+}
+#screen-career .auction-hall-control .intel-toggle{
+  min-height:32px;
+  border:1px solid #5B6973;
+  border-radius:5px;
+  background:#263039;
+  color:#F4F5F5;
+  padding:7px 9px;
+  font:750 9px/1.3 var(--body);
+}
+#screen-career .auction-hall-control .intel-toggle:hover{background:#34414A;}
+#screen-career .auction-hall-control .intel-numbers{
+  gap:1px;
+  background:#303A43;
+}
+#screen-career .auction-hall-control .intel-numbers>div{
+  gap:4px;
+  padding:9px 10px;
+  background:#101820;
+}
+#screen-career .auction-hall-control .intel-numbers span{
+  color:#AFBDC5;
+  font:700 9px/1.25 var(--body);
+}
+#screen-career .auction-hall-control .intel-numbers strong{
+  color:#F4F5F5;
+  font:800 clamp(14px,1.35vw,19px)/1.2 var(--body);
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+#screen-career .auction-hall-control .intel-numbers strong.intel-loss{color:#EA7775;}
+#screen-career .auction-hall-control .intel-formula{
+  color:#AEBAC2;
+  padding:8px 10px;
+  font:500 10px/1.45 var(--body);
+}
+#screen-career .auction-hall-control .intel-expanded{
+  padding:11px 12px;
+  background:#121A21;
+  border-top:1px solid #303A43;
+}
+#screen-career .auction-hall-control .intel-grid>div{border-color:#303A43;}
+#screen-career .auction-hall-control .intel-grid small{color:#B0BCC4;}
+#screen-career .auction-hall-control .intel-grid strong{color:#EEF1F3;}
+#screen-career .auction-hall-control .intel-expanded h4{
+  color:#F4F5F5;
+  font:800 13px/1.3 var(--body);
+}
+#screen-career .auction-hall-control .intel-small{color:#B4C0C7;}
+#screen-career .auction-hall-control .intel-repair{
+  border-color:#303A43;
+  color:#D8DEE2;
+}
+#screen-career .auction-hall-control .intel-repair strong{
+  color:#F4F5F5;
+  font:800 12px/1.3 var(--body);
+}
+#screen-career .auction-hall-control .intel-repair-total{
+  color:#D9C6A5;
+  border-top:1px solid #66563D;
+}
+#screen-career .auction-hall-control .intel-disclaimer{
+  color:#D2B68E;
+  background:#231E1A;
+  border-left:3px solid #B68A42;
+}
+#screen-career .auction-hall-control .intel-inspected{color:#6CC68E;}
+#screen-career .auction-hall-control .intel-closed{color:#E4A44F;}
+#screen-career .auction-hall-control .intel-foot .trade-button{
+  background:#263039;
+  color:#F4F5F5;
+  border:1px solid #596773;
+  border-radius:5px;
+  font:800 10px/1.3 var(--body);
+}
+#screen-career .auction-hall-control .intel-foot .trade-button:hover{
+  background:#35414A;
+  border-color:#C5D0D6;
+}
+#screen-career .auction-hall-control .vehicle-spec-proof{
+  background:#172129;
+  border-color:#34424A;
+}
+#screen-career .auction-hall-control .vehicle-spec-proof strong{color:#F4F5F5;}
+#screen-career .auction-hall-control .vehicle-spec-proof p{color:#B5C0C8;}
+#screen-career .auction-hall-control .vehicle-spec-proof a{color:#D6B37C;}
+@media(max-width:570px){
+  #screen-career .auction-hall-control .intel-panel{margin:0 0 9px;}
+  #screen-career .auction-hall-control .intel-numbers{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
