@@ -11,13 +11,13 @@
  const slot=s=>D.isDealDay(s.day)?s.deadlineSession:0;
  const initial=day=>({day,session:0,turn:0,ownerUsed:0,staffUsed:[],leads:[]});
  const waiting=s=>(s.showroom?.leads||[]).filter(q=>q.status==='waiting');
- function record(s,q,type,detail){
-   s.customerHistory.push({day:s.day,vehicleId:q.vehicleId,leadId:q.customerId,type,detail:detail.slice(0,120)});
+ function record(s,q,type,detail,day=s.day){
+   s.customerHistory.push({day,vehicleId:q.vehicleId,leadId:q.customerId,type,detail:detail.slice(0,120)});
    if(s.customerHistory.length>2000)s.customerHistory.shift();
  }
  function closeWaiting(s,reason){
    const names=[];
-   for(const q of waiting(s)){q.status='lost';q.reason=reason;record(s,q,'showroom-left',reason);names.push(q.name);}
+   for(const q of waiting(s)){q.status='lost';q.reason=reason;record(s,q,'showroom-left',reason,q.createdDay);names.push(q.name);}
    return names;
  }
  function generate(s){
