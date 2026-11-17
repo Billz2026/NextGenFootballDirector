@@ -834,7 +834,16 @@
     await importCareerFile(file);
   });
   document.addEventListener('input', event => {
-    if(!career||!event.target?.id)return;
+    if(!career)return;
+    const field=event.target?.dataset?.forecastField;
+    if(field&&['purchase','prep','extraRepair'].includes(field)){
+      const raw=String(event.target.value).trim();
+      financeScenario[field]=raw===''?0:Number(raw);
+      const output=byId('fin-forecast-results');
+      if(output)output.innerHTML=CF.renderResults(career,E,financeScenario);
+      return; // Changing a scenario must never mutate or persist the career.
+    }
+    if(!event.target?.id)return;
     const match=/^(auction-bid-|seller-offer-)([AS]-[0-9]+-[0-9]+)$/.exec(event.target.id);
     if(!match)return;
     const kind=match[1]==='auction-bid-'?'auction':'seller';
@@ -911,7 +920,8 @@
     if(career?.auctionHall?.phase==='payment'&&
        !['settle-auction','toggle-report','preview-auction','close-auction-preview',
          'menu','resume','dashboard','new-career','select-report','view-promotion','dismiss-promotion',
-          'toggle-career-tools','open-career-tools','export-career','choose-import','restore-career'].includes(button.dataset.action)){
+          'toggle-career-tools','open-career-tools','export-career','choose-import','restore-career',
+          'finance-horizon','finance-reset-plan'].includes(button.dataset.action)){
       currentPage='auctionHall';
       eventNotice='Auction invoice outstanding. Pay the hammer plus buyer fee before other dealership decisions.';
       render();
@@ -920,7 +930,9 @@
     switch (button.dataset.action) {
       case 'finance-horizon':
         if(career&&CF.HORIZONS.includes(Number(button.dataset.days))){
-          financeScenario.horizon=Number(button.dataset.days);
+          // Invalid or unfinished entries never enter a career save.
+          financeScenario={...(CF.validate(financeScenario)||CF.defaults()),
+            horizon:Number(button.dataset.days)};
           renderFinances();
         }
         break;
