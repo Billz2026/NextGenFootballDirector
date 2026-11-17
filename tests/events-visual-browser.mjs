@@ -50,7 +50,7 @@ async function inspect(page,label,mode,width,height){
     assert.ok(metrics.mainActionTop<(label==='phone'?890:700),
       'Required management decision must appear without deep scrolling');
   }else if(mode==='normal'){
-    assert.equal(await panel.locator('.eo-schedule').count(),2);
+    assert.equal(await panel.locator('.eo-schedule').count(),3);
     assert.match(await panel.innerText(),/GAME DAY 22/);
     assert.match(await panel.innerText(),/GAME DAY 23/);
     assert.ok(metrics.mainActionTop<(label==='phone'?860:680));
@@ -133,7 +133,7 @@ try{
     assert.ok(ready.cash<initial.cash);
     await loadCareer(page);
     await inspect(page,label,'normal',width,height);
-    assert.equal(await page.locator('.eo-calendar .eo-schedule').count(),2);
+    assert.equal(await page.locator('.eo-calendar .eo-schedule').count(),3);
     const monthEnd=await setNormalDay(page,22);
     assert.ok(monthEnd.cash<ready.cash);
     await loadCareer(page);
