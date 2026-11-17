@@ -34,16 +34,16 @@
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
   <script src="./vehicle-market.js?v=4" defer></script>
-  <script src="./premises.js?v=1" defer></script>
+  <script src="./premises.js?v=2" defer></script>
   <script src="./people.js?v=8" defer></script>
   <script src="./calendar.js?v=1" defer></script>
   <script src="./monthly.js?v=10" defer></script>
-  <script src="./career-progression.js?v=2" defer></script>
+  <script src="./career-progression.js?v=3" defer></script>
   <script src="./events.js?v=3" defer></script>
   <script src="./showroom-traffic.js?v=1" defer></script>
   <script src="./workshop.js?v=4" defer></script>
-  <script src="./customers.js?v=9" defer></script>
-  <script src="./trading.js?v=24" defer></script>
+  <script src="./customers.js?v=10" defer></script>
+  <script src="./trading.js?v=25" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
   <script src="./people-view.js?v=10" defer></script>
@@ -51,19 +51,19 @@
   <script src="./events-view.js?v=8" defer></script>
   <script src="./workshop-view.js?v=7" defer></script>
   <script src="./customers-view.js?v=13" defer></script>
-  <script src="./premises-view.js?v=4" defer></script>
+  <script src="./premises-view.js?v=5" defer></script>
   <script src="./auction-hall-view.js?v=4" defer></script>
-  <script src="./dashboard-view.js?v=4" defer></script>
+  <script src="./dashboard-view.js?v=5" defer></script>
   <script src="./inbox-office.js?v=3" defer></script>
-  <script src="./buying-desk-view.js?v=4" defer></script>
-  <script src="./stock-view.js?v=2" defer></script>
+  <script src="./buying-desk-view.js?v=5" defer></script>
+  <script src="./stock-view.js?v=3" defer></script>
   <script src="./finance-view.js?v=3" defer></script>
   <script src="./career-storage.js?v=2" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js" defer></script>
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=41" defer></script>
+  <script src="./simulator.js?v=42" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -71,7 +71,7 @@
   <div class="top-stripe" aria-hidden="true"></div>
   <div id="app" role="main">
     <section class="menu-screen" id="screen-menu" aria-labelledby="menu-title">
-      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.42</span></header>
+      <header class="menu-top"><span class="menu-status">PRE-ALPHA · v0.9.43</span></header>
       <div class="menu-layout">
         <div class="menu-lead">
           <div class="brand-lockup brand-lockup-large">
@@ -246,7 +246,7 @@
                   <small data-bind="dashboard-cash-note">Before future bills</small>
                 </button>
                 <button type="button" class="stat-tile dashboard-kpi" data-page="stock" aria-label="Open vehicle stock">
-                  <span>FORECOURT STOCK</span><strong data-bind="stock">0 / 4</strong>
+                  <span>VEHICLE INVENTORY</span><strong data-bind="stock">0 / 4</strong>
                   <small data-bind="dashboard-stock-note">0 listed for sale</small>
                 </button>
                 <button type="button" class="stat-tile dashboard-kpi" data-page="reports" aria-label="Open monthly sales target">
