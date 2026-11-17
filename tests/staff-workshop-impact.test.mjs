@@ -114,20 +114,76 @@ test('active supervisor changes a real final QC outcome, not just a displayed nu
   assert.equal(noManager.vehicles[0].workshop.stage,'in-progress');
   assert.ok(noManager.cash<s.cash,'unsupervised rework must actually cost cash');
 });
-test('available technicians accelerate a busy repair by at most one day each shift',()=>{
+test('dispatch assigns a chosen lead and only manually assigned assistants accelerate work',()=>{
   const s=funded('Assistant Shift Test',42);
   hireTechs(s,2);next(s);cars(s,1);
   const v=s.vehicles[0];E.assessStock(s,v.id);
-  assert.equal(E.startPrep(s,v.id,'internal').ok,true);
+  const crew=P.availableTechnicians(s);
+  assert.equal(crew.length,3);
+  assert.equal(W.quote(s,v,'internal',crew[1].id).technicianId,crew[1].id);
+  assert.equal(E.startPrep(s,v.id,'internal',crew[1].id).ok,true);
+  assert.equal(v.workshop.technicianId,crew[1].id);
+  assert.ok(v.workshop.remainingDays>=2);
   const before=v.workshop.remainingDays;
-  assert.ok(before>=2);
-  const helpers=P.availableTechnicians(s);
-  assert.equal(helpers.length,2);
-  const prev=s.staff.reduce((n,e)=>n+e.workDone,0);
   next(s);
-  assert.equal(v.workshop.remainingDays,before-2);
-  assert.equal(s.staff.reduce((n,e)=>n+e.workDone,0),prev+1,
-    'only one assistant may support one occupied bay in a shift');
+  assert.equal(v.workshop.remainingDays,before-1,'no automatic assistant allocation');
+  const assistant=P.availableTechnicians(s).find(t=>t.skills.efficiency>=12);
+  assert.ok(assistant);
+  assert.equal(W.assignAssistant(s,v.id,assistant.id).ok,true);
+  assert.equal(P.availableTechnicians(s).some(t=>t.id===assistant.id),false,
+    'assistant is reserved and unavailable for competing work');
+  const prev=s.staff.reduce((n,e)=>n+e.workDone,0);
+  const remaining=v.workshop.remainingDays;
+  next(s);
+  assert.equal(v.workshop.remainingDays,Math.max(0,remaining-2));
+  assert.equal(s.staff.reduce((n,e)=>n+e.workDone,0),prev+1);
+  assert.equal(v.workshop.workLog.at(-1).assistantId,assistant.id);
+  assert.equal(v.workshop.workLog.at(-1).leadId,crew[1].id);
+  save(s);
+});
+test('urgent priority is persistent scheduling metadata, not a repair speed cheat',()=>{
+  const s=funded('Urgent Job',42);cars(s,1);
+  const v=s.vehicles[0];E.assessStock(s,v.id);
+  const duration=W.quote(s,v,'internal').duration;
+  assert.equal(W.priority(s,v.id,'urgent').ok,true);
+  assert.equal(W.priority(s,v.id,'urgent').ok,false);
+  assert.equal(E.startPrep(s,v.id,'internal').ok,true);
+  assert.equal(v.workshop.priority,'urgent');
+  assert.equal(v.workshop.plannedDays,duration);
+  save(s);
+});
+test('paused repair can be reassigned to a free technician without double-booking',()=>{
+  const s=funded('Shift Coverage',42);
+  hireTechs(s,2);next(s);cars(s,2);
+  for(const v of s.vehicles)assert.equal(E.assessStock(s,v.id).ok,true);
+  const [a,b]=s.vehicles;
+  const crew=P.availableTechnicians(s);
+  assert.equal(E.startPrep(s,a.id,'internal',crew[0].id).ok,true);
+  assert.equal(E.startPrep(s,b.id,'internal',crew[1].id).ok,true);
+  assert.equal(W.reassign(s,a.id,crew[1].id).code,'busy');
+  const helper=P.availableTechnicians(s)[0];
+  assert.equal(W.assignAssistant(s,a.id,helper.id).ok,true);
+  assert.equal(W.assignAssistant(s,b.id,helper.id).code,'busy');
+  assert.equal(W.assignAssistant(s,a.id,crew[0].id).code,'staff');
+  assert.equal(W.assignAssistant(s,a.id,0).ok,true);
+  crew[0].trainingUntil=s.day+3;
+  next(s);
+  assert.equal(a.workshop.paused,true);
+  assert.equal(W.reassign(s,a.id,helper.id).ok,true);
+  assert.equal(a.workshop.paused,false);
+  assert.equal(a.workshop.technicianId,helper.id);
+  next(s);
+  assert.ok(a.workshop.workLog.some(x=>x.leadId===helper.id));
+  save(s);
+});
+test('legacy workshop jobs without dispatch fields still pass integrity checks',()=>{
+  const s=funded('Legacy Repairs',42);
+  cars(s,1);const v=s.vehicles[0];
+  E.assessStock(s,v.id);E.startPrep(s,v.id,'internal');
+  delete v.workshop.priority;
+  delete v.workshop.assistantId;
+  delete v.workshop.workLog;
+  delete v.workshop.qcLog;
   save(s);
 });
 test('four physical repair bays still limit parallel jobs even with six mechanics',()=>{
