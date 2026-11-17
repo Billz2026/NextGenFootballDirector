@@ -28,7 +28,7 @@
     const fair=Number(v.profile?.likelySale??v.retail);
     const t=tier(age(state,v));
     const min=Math.max(500,Math.floor(v.retail*.5));
-    return Math.max(min,Math.min(75000,round50(fair*(1-t.discount))));
+    return Math.max(min,Math.min(75000,Math.floor(fair*(1-t.discount)/50)*50));
   }
   // The existing enquiry formula uses the same base fair price.
   // Ageing increases the effective overpricing gap only; repricing back
