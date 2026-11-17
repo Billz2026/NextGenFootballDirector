@@ -23,6 +23,8 @@
     const report=E.monthly.statement(state);
     const events=E.events,customers=Object.values(state.customerCases||{});
     const vehicles=state.vehicles||[];
+    const stockLimit=E.premises.storageLimit(state);
+    const offsite=E.premises.overflowUsed(state);
     const showroomWaiting=E.showroom.waiting(state).length;
     const listed=vehicles.filter(v=>v.status==='listed').length;
     const awaitingPrep=vehicles.filter(v=>v.status==='acquired').length;
@@ -93,6 +95,16 @@
       add(7,'prepared',prepared+' prepared vehicle'+(prepared===1?'':'s')+' not yet listed',
         'Set retail asking prices to start attracting buyers.',
         'stock','LIST VEHICLES','attention');
+    if(offsite)
+      add(7.5,'offsite-storage',offsite+' vehicle'+(offsite===1?'':'s')+' in paid offsite storage',
+        money(offsite*E.premises.OVERFLOW_DAILY_FEE)+' charged per game day. Sell stock or free permanent forecourt space to stop paying for temporary holding.',
+        'stock','REVIEW STOCK','attention');
+    if(vehicles.length===stockLimit)
+      add(7.8,'stock-limit','Stock holding fully occupied',
+        'You own '+vehicles.length+' vehicles across '+state.capacity+
+        ' permanent forecourt spaces and '+E.premises.OVERFLOW_SPACES+
+        ' temporary positions. Complete a handover before purchasing again.',
+        'stock','REVIEW STOCK','attention');
     if(vehicles.length===0)
       add(8,'empty-stock','Your forecourt is empty',
         'No cars in stock or ready for retail. Review sourcing options and buying costs.',
@@ -124,7 +136,7 @@
         'finance','REVIEW OPERATING COSTS','attention');
     // Only suggest the next auction if there is room to buy; never pad the
     // management desk with generic advice when the dealership is healthy.
-    if(tasks.length<3&&!auctionOpen&&vehicles.length<state.capacity&&
+    if(tasks.length<3&&!auctionOpen&&vehicles.length<stockLimit&&
        auctionDay>state.day&&state.auctionHall?.phase!=='payment'){
       const gap=auctionDay-state.day;
       add(14,'next-auction','Prepare for Day '+auctionDay+' auction',
