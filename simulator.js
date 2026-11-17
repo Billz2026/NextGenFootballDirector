@@ -19,7 +19,8 @@
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV)
+  const CF = window.MotorTradeCashForecast;
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV || !CF)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -158,6 +159,7 @@
   let salesFilter = 'all';
   let ledgerFilter = 'all';
   let ledgerExpanded = false;
+  let financeScenario = CF.defaults(); // UI-only; never persisted to the career.
   let staffDeskMode = null;
   let staffDeskRole = 'all';
   let staffDeskSelectedId = null;
@@ -374,7 +376,7 @@
     byId('sales-list').innerHTML=view.html;
   }
   function renderFinances() {
-    byId('finance-overview').innerHTML=FV.summary(career,E).html;
+    byId('finance-overview').innerHTML=FV.summary(career,E,{scenario:financeScenario}).html;
     const view=FV.ledger(career,{filter:ledgerFilter,expanded:ledgerExpanded});
     byId('finance-ledger-toolbar').innerHTML=view.controls;
     byId('ledger-list').innerHTML=view.html;
@@ -916,6 +918,15 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'finance-horizon':
+        if(career&&CF.HORIZONS.includes(Number(button.dataset.days))){
+          financeScenario.horizon=Number(button.dataset.days);
+          renderFinances();
+        }
+        break;
+      case 'finance-reset-plan':
+        if(career){financeScenario=CF.defaults();renderFinances();}
+        break;
       case 'view-promotion':
         careerPromotion=null;
         show('reputation');
