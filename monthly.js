@@ -105,13 +105,15 @@
     if(note.startsWith('Staff development:')||
        note.startsWith('Staff welfare intervention:'))return 'training';
     if(note.startsWith('Staff exit and provisional notice payment:'))return 'staffExit';
+    if(note.startsWith('Aftersales independent diagnosis:')||
+       note.startsWith('Aftersales customer rectification:'))return 'aftersales';
     if(note.startsWith('Premises overhead payment'))return 'premisesPayments';
     if(note.startsWith('Premises investment:'))return 'premisesInvestment';
     return 'other';
   }
   const categories=['retailReceipts','auctionPurchases','sellerPurchases',
     'partExchangePurchases','preparation','inspections','payroll','commission',
-    'recruitment','training','staffExit','other','premisesPayments','premisesInvestment'];
+    'recruitment','training','staffExit','aftersales','other','premisesPayments','premisesInvestment'];
   function statement(state){
     const p=state.monthPlan;
     const sales=completed(state.sold,p.startDay,p.endDay);
@@ -133,6 +135,7 @@
     const payrollCost=-(bucket.payroll+bucket.commission+bucket.recruitment+
       bucket.training+bucket.staffExit);
     const prepCost=-bucket.preparation;
+    const afterSalesExpense=-bucket.aftersales;
     const acquisitions=-(bucket.auctionPurchases+bucket.sellerPurchases+
       bucket.partExchangePurchases);
     const soldModes={
@@ -160,7 +163,8 @@
       workshopStage:v.workshop?.stage??'unknown',
       workshopDaysLeft:v.workshop?.remainingDays??0
     }));
-    const operatingContribution=grossMargin-payrollCost-premisesExpense-stockAgeingExpense;
+    const operatingContribution=grossMargin-payrollCost-premisesExpense-
+      stockAgeingExpense-afterSalesExpense;
     const met=saleCount>=p.unitTarget && grossMargin>0&&operatingContribution>0;
     const report={
       month:p.month,monthLabel:CAL.monthLabel(state.day).toUpperCase(),
@@ -179,6 +183,11 @@
       premisesInvestment:-bucket.premisesInvestment,
       premisesArrears:state.premises?.arrears??0,
       stockAgeingExpense,stockAgeingPaid,stockAgeingArrears:state.stockAgeingArrears||0,
+      afterSalesExpense,
+      afterSalesOpen:state.afterSalesCases?.filter(c=>c.openedDay<=p.endDay&&
+        c.status!=='resolved').length??0,
+      afterSalesResolved:state.afterSalesCases?.filter(c=>c.resolvedDay!==null&&
+        c.resolvedDay>=p.startDay&&c.resolvedDay<=p.endDay).length??0,
       operatingContribution,
       openingCash:p.openingCash,closingCash:state.cash,
       cashIn:inflow,cashOut:outflow,netCashChange:inflow-outflow,
@@ -299,14 +308,18 @@
       !Array.isArray(r.customerTrustEvents)||r.customerTrustEvents.length>200||
       !r.ledgerBreakdown||typeof r.ledgerBreakdown!=='object'||
       !categories.every(k=>whole(r.ledgerBreakdown[k])||
-        (['premisesPayments','premisesInvestment'].includes(k)&&r.ledgerBreakdown[k]===undefined))||
+        (['premisesPayments','premisesInvestment','aftersales'].includes(k)&&
+          r.ledgerBreakdown[k]===undefined))||
       !whole(r.staffCosts)||!whole(r.payrollArrears))return false;
     if(r.premisesExpense!==undefined&&(
       !nonneg(r.premisesExpense)||!nonneg(r.premisesPaid)||
       !nonneg(r.premisesInvestment)||!nonneg(r.premisesArrears)||
       !whole(r.operatingContribution)||
       r.operatingContribution!==r.grossAfterStaff-r.premisesExpense-
-        (r.stockAgeingExpense||0)))return false;
+        (r.stockAgeingExpense||0)-(r.afterSalesExpense||0)))return false;
+    if(r.afterSalesExpense!==undefined&&(
+      !nonneg(r.afterSalesExpense)||!nonneg(r.afterSalesOpen)||
+      !nonneg(r.afterSalesResolved)))return false;
     if(r.stockAgeingExpense!==undefined&&(
       !nonneg(r.stockAgeingExpense)||!nonneg(r.stockAgeingPaid)||
       !nonneg(r.stockAgeingArrears)))return false;
