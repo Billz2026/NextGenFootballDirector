@@ -43,7 +43,10 @@
   }
   function summary(state){
     const vehicles=state.vehicles;
-    return {count:vehicles.length,spaces:Math.max(0,state.capacity-vehicles.length),
+    const site=window.MotorTradePremises;
+    return {count:vehicles.length,physical:state.capacity,
+      limit:site.storageLimit(state),offsite:site.overflowUsed(state),
+      spaces:Math.max(0,site.storageLimit(state)-vehicles.length),
       prep:vehicles.filter(v=>group(v)==='prep').length,
       ready:vehicles.filter(v=>group(v)==='ready').length,
       listed:vehicles.filter(v=>group(v)==='listed').length,
@@ -143,8 +146,8 @@
     const value=FILTERS.includes(filter)?filter:'all';
     const stats=summary(state);
     const metrics=[
-      ['ON FORECOURT',stats.count+' / '+state.capacity,
-        stats.spaces+' SPACES AVAILABLE'],
+      ['TOTAL VEHICLE STOCK',stats.count+' / '+stats.limit,
+        stats.physical+' PERMANENT + 2 OFFSITE · '+stats.spaces+' BUYING SPACES FREE'],
       ['CASH INVESTED',money(stats.invested),'IN EXISTING STOCK'],
       ['UNSPENT PREP',money(stats.reserved),'WORKSHOP RESERVE']
     ];
