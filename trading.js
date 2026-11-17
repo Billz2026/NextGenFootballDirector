@@ -8,7 +8,7 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 15;
+  const VERSION = 16;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
@@ -349,7 +349,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -738,15 +738,19 @@
     const motivation=state?D.customerBonus(state,vehicle):0;
     const meetingPush=state?D.meetingBonus(state,'sales'):0;
     const reputationAdvantage=state&&state.reputationScore>=40?50:0;
-    const limit=Math.max(500,Math.min(vehicle.asking-90,
-      fair+Math.round(support/3)+reputationAdvantage+
-      Math.round(motivation*.65)+meetingPush));
-    // Leave credible negotiating room for five smaller owner/customer
-    // exchanges without exaggerating the eventual realistic sale ceiling.
-    const start=Math.max(500,Math.min(limit,vehicle.asking-650+support+
-      motivation+meetingPush,fair-525+support+motivation+meetingPush));
-    const standardPx=pxTemplate(vehicle);
     const customer=state?C.caseFor(state,vehicle.id):null;
+    const temperament=customer?C.behaviour(customer,vehicle):null;
+    const budgetShift=temperament&&customer.objectionAction!=='legacy'?
+      temperament.budget:0;
+    const discount=customer?.priceDiscount||0;
+    const rawLimit=Math.max(500,Math.min(vehicle.asking-90,
+      fair+Math.round(support/3)+reputationAdvantage+
+      Math.round(motivation*.65)+meetingPush+budgetShift));
+    const limit=Math.max(500,rawLimit-discount);
+    const rawStart=Math.max(500,Math.min(rawLimit,vehicle.asking-650+support+
+      motivation+meetingPush+budgetShift,fair-525+support+motivation+meetingPush+budgetShift));
+    const start=Math.max(500,Math.min(limit,rawStart-discount));
+    const standardPx=pxTemplate(vehicle);
     const px=customer?
       customer.preferredMode==='part-ex'?
         (state&&D.isDealDay(state.day)?
@@ -761,9 +765,9 @@
       cashOffer:vehicle.cashOffer === null ? start : vehicle.cashOffer,
       cashLimit:limit,
       pxOffer:Math.max(500,Math.min(vehicle.asking-220+Math.round(support/2)+
-        Math.round(motivation*.8)+meetingPush,
+        Math.round(motivation*.8)+meetingPush+budgetShift,
         fair+50+Math.round(support/3)+reputationAdvantage+
-          Math.round(motivation*.65)+meetingPush)),
+          Math.round(motivation*.65)+meetingPush+budgetShift)-discount),
       exchange:px
     };
   }
@@ -775,6 +779,7 @@
     return C.negotiate(state,v,buyer.cashOffer,buyer.cashLimit,proposal);
   }
   const openCustomer=(state,id)=>C.open(state,id);
+  const respondCustomer=(state,id,choice)=>C.objection(state,id,choice);
   const bookCustomer=(state,id)=>C.book(state,id);
   const competingCustomer=(state,id)=>C.serveCompeting(state,id);
   const testDrive=(state,id)=>C.testDrive(state,id);
@@ -803,6 +808,8 @@
     if(!['cash','part-ex'].includes(mode)||mode!==c.preferredMode)
       return fail('mode','Handover method must match the agreed customer deal.');
     const price=c.price;
+    const remedyCost=c.remedyCost||0;
+    const buyerType=C.behaviour(c,v)?.label||'Buyer';
     const px=mode==='part-ex'?c.exchange:null;
     const agreedAllowance=c.allowance||0;
     if(mode==='part-ex'){
@@ -813,13 +820,16 @@
         return fail('part-ex','The allowance cannot change after the customer agreement.');
       const pendingPrep=W.reserved(state);
       const pxProfile=I.profile({...px,id:'PX-'+c.agreedDay+'-'+v.id,kind:'part-ex'});
-      if(state.cash+price-agreedAllowance<pendingPrep+
+      if(state.cash+price-agreedAllowance<remedyCost+pendingPrep+
         pxProfile.basePrep+(pxProfile.hiddenFault?.cost||0))
         return fail('cash','Insufficient funds to complete this part-exchange and reserve vehicle preparation.');
     }
+    if(remedyCost>0&&state.cash+price-agreedAllowance<
+        W.reserved(state)+remedyCost)
+      return fail('cash','Insufficient funds to fulfil the agreed dealer-funded customer inspection at handover.');
     const result=C.complete(state,id);
     if(!result.ok)return result;
-    const realised=price-v.cost-v.prepSpent;
+    const realised=price-v.cost-v.prepSpent-remedyCost;
     // The customer paid the deposit earlier. On collection they pay only
     // the remaining cash balance; the existing deposit transfers from its
     // segregated holding account. Both credits total the agreed sale price.
@@ -829,6 +839,8 @@
       ' ('+mode+')');
     if(depositApplied)pay(state,depositApplied,
       'Customer deposit applied to retail sale: '+v.title);
+    if(remedyCost)pay(state,-remedyCost,
+      'Customer remedy at handover: '+c.name+' / '+v.title);
     if(px)state.ledger.push({day:state.day,delta:0,
       note:'Part-exchange acquisition: '+px.title+
         ' (non-cash allowance £'+agreedAllowance+')'});
@@ -837,7 +849,9 @@
       id:v.id,title:v.title,source:v.source,day:state.day,mode,price,
       color:v.color,generation:v.generation,origin:v.origin,
       depositApplied,customerBalancePaid:cashBalance,
-      acquisition:v.cost,prep:v.prepSpent,profit:realised,
+      acquisition:v.cost,prep:v.prepSpent,customerRemedyCost:remedyCost,
+      buyerPersona:buyerType,objectionAction:c.objectionAction,
+      priceDiscount:c.priceDiscount||0,profit:realised,
       profile:v.profile?{...v.profile}:null,
       exchange:px?px.title:null,allowance:px?agreedAllowance:0
     });
@@ -856,7 +870,8 @@
         ' already paid; cash balance £'+cashBalance+' received at collection)':
         px?' (cash balance £'+cashBalance+' received after part-exchange allowance)':'')+
       (px?'; part-exchange allowance £'+agreedAllowance+'.':'.')+
-      ' Gross trading margin: £'+realised+' before overheads, tax and aftersales.');
+      (remedyCost?' Dealer-funded inspection £'+remedyCost+' charged at handover.':'')+
+      ' Gross trading margin: £'+realised+' after any agreed inspection cost, before overheads, tax and aftersales.');
   }
   function wholesaleOffer(vehicle){
     // Simplified emergency trade bid. A trade outlet is not a retail sale
@@ -911,7 +926,7 @@
     startAuction,bidLiveAuction,passAuction,nextAuctionLot,rollAuctionHall,
     auctionLot,lotNumber,auctionValid,
     upgradePremises,monthly:M,events:D,
-    customers:C,openCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
+    customers:C,openCustomer,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
     cancelCustomer,advanceCustomers,nextCustomerSession,agreeCustomer,
     workshop:W,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
     wholesaleOffer,disposeStock,hireStaff,decideStaffMorale,
