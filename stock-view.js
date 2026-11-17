@@ -5,7 +5,7 @@
 (() => {
   const VC=window.MotorTradeCards;
   if(!VC)throw new Error('Load vehicle-cards.js before stock-view.js');
-  const esc=VC.esc,money=VC.money;
+  const esc=VC.esc,money=VC.money,AG=window.MotorTradeStockAgeing;
   const mileage=n=>new Intl.NumberFormat('en-GB').format(n)+' mi';
   const FILTERS=Object.freeze(['all','prep','ready','listed']);
   const labelSource={auction:'AUCTION PURCHASE',seller:'PRIVATE SELLER','part-ex':'PART EXCHANGE'};
@@ -55,7 +55,8 @@
   }
   function inventoryRow(v,state,selected){
     const p=phase(v),age=Math.max(0,state.day-v.acquiredDay);
-    const f=figures(v),ageClass=age>=45?'stock-age-critical':age>=30?'stock-age-warning':'';
+    const f=figures(v),ageClass=age>=45?'stock-age-critical':age>=30?'stock-age-warning':
+      age>=15?'stock-age-watch':'';
     return '<article class="stock-unit'+(selected?' stock-unit-selected':'')+'">'+
       '<div class="stock-unit-thumb">'+VC.photo(v,'stock')+'</div>'+
       '<button type="button" class="stock-unit-select" data-action="select-stock" data-id="'+v.id+
@@ -90,6 +91,12 @@
     const locked=v.status==='listed'&&caseRecord&&
       ['agreed','reserved','collectable'].includes(caseRecord.status);
     const price=Number.isSafeInteger(v.asking)?v.asking:v.retail;
+    const ageing=AG.ageInfo(state,v);
+    const planPrice=ageing.target,canReprice=ageing.days>=15&&
+      planPrice<price&&!locked;
+    const canTrade=ageing.days>=30&&
+      (!caseRecord||caseRecord.status==='lost')&&
+      !window.MotorTradeShowroom.waiting(state).some(q=>q.vehicleId===v.id);
     return '<div class="stock-action-box"><h4>NEXT DECISION · '+p.next+'</h4>'+
       (v.status==='listed'?'<p>Advertising is live. Buyer interest and agreements are managed in the Sales Office.</p>':
         '<p>Quality control has passed. Set your asking price to advertise the car.</p>')+
@@ -101,6 +108,15 @@
       '<button type="button" class="trade-button" data-action="list-stock" data-id="'+v.id+
       '"'+(locked?' disabled':'')+'>'+(v.status==='listed'?'UPDATE PRICE':'ADVERTISE VEHICLE')+
       '</button></div>'+
+      (canReprice?'<button type="button" class="trade-button stock-age-reprice" data-action="reprice-aged-stock" data-id="'+v.id+
+        '">APPLY AGEING PRICE GUIDE · '+money(planPrice)+'</button>':'')+
+      (ageing.days>=30?'<div class="stock-trade-choice"><strong>EXIT TO TRADE · LIQUIDATE CAPITAL</strong>'+
+        '<p>Trade bid '+money(window.MotorTradeEngine.wholesaleOffer(v,state.day))+
+        ' before holding charges already incurred. No retail sale credit.</p>'+
+        '<button type="button" class="trade-button trade-button-secondary" data-action="dispose-aged-stock" data-id="'+v.id+
+        '"'+(canTrade?'':' disabled')+'>SELL TO TRADE · RELEASE STOCK SPACE</button>'+
+        (canTrade?'':'<small>Resolve open customer cases or waiting showroom visitors first.</small>')+
+        '</div>':'')+
       (v.status==='listed'?'<button type="button" class="trade-button trade-button-secondary" data-page="sales" data-id="'+v.id+
       '">OPEN SALES OFFICE</button>':'')+'</div>';
   }
@@ -108,8 +124,10 @@
     const f=figures(v),p=phase(v),age=Math.max(0,state.day-v.acquiredDay);
     const grade=v.profile?.grade??3;
     const source=labelSource[v.source]||v.source.toUpperCase();
-    const risk=age>=45?'HIGH STOCK AGE · CAPITAL IS TIED UP':
-      age>=30?'STOCK AGE WARNING · REVIEW PRICING AND DEMAND':'';
+    const ageing=AG.ageInfo(state,v);
+    const risk=age>=45?'45+ DAYS · DAILY HOLDING CHARGE & WEAKER BUYER DEMAND':
+      age>=30?'30+ DAYS · CONSIDER REPRICING OR TRADE EXIT':
+      age>=15?'15+ DAYS · DAILY STOCK HOLDING COSTS HAVE STARTED':'';
     return '<section class="stock-dossier" aria-label="Selected vehicle file">'+
       '<div class="stock-dossier-top"><div><span>VEHICLE FILE · STOCK '+v.id+'</span>'+
       '<strong>'+esc(v.title)+'</strong></div><span class="stock-status stock-status-'+p.tone+'">'+p.label+'</span></div>'+
@@ -127,7 +145,14 @@
         '<div class="stock-summary-contribution'+(f.contribution<0?' stock-margin-loss':'')+
           '"><small>PROJECTED GROSS CONTRIBUTION</small><strong>'+money(f.contribution)+'</strong></div>'+
       '</div>'+
-      (risk?'<div class="stock-aged-alert">'+risk+'</div>':'')+
+      (risk?'<div class="stock-aged-alert">'+risk+'</div>'+
+        '<div class="stock-age-figures"><div><small>STOCK HOLDING / DAY</small><strong>'+money(ageing.daily)+'</strong></div>'+
+        '<div><small>MARKET PRICE GUIDE</small><strong>'+money(ageing.target)+'</strong></div>'+
+        '<div><small>GROSS MARGIN AT GUIDE</small><strong class="'+(ageing.expectedMargin<0?'stock-age-loss':'')+'">'+
+        money(ageing.expectedMargin)+'</strong></div></div>'+
+        '<p class="stock-age-explainer">Ageing reduces buyer interest at stale asking prices. '+
+        'The guide is optional, not a guaranteed sale. Daily charges are separate operating expenses; '+
+        'gross contribution excludes them. If the guide implies a loss, you can hold your price or exit to trade.</p>':'')+
       controls(v,state)+
       '<details class="stock-cost-details"><summary>FULL COST BREAKDOWN & ASSUMPTIONS</summary>'+
         '<div class="stock-cost-table">'+
@@ -151,9 +176,15 @@
       ['CASH INVESTED',money(stats.invested),'IN EXISTING STOCK'],
       ['UNSPENT PREP',money(stats.reserved),'WORKSHOP RESERVE']
     ];
+    const ageingCount=state.vehicles.filter(v=>AG.age(state,v)>=15).length;
+    const dailyCharges=AG.chargeFor(state);
     const head='<div class="stock-kpi-strip">'+metrics.map(([label,number,note])=>
       '<div class="stock-kpi"><small>'+label+'</small><strong>'+number+
-      '</strong><span>'+note+'</span></div>').join('')+'</div>';
+      '</strong><span>'+note+'</span></div>').join('')+'</div>'+
+      (ageingCount?'<div class="stock-age-overview"><strong>STOCK AGEING / '+ageingCount+
+        ' VEHICLE'+(ageingCount===1?'':'S')+' OVER 15 DAYS</strong><span>'+
+        money(dailyCharges)+'/DAY IN HOLDING CHARGES · '+
+        money(state.stockAgeingArrears||0)+' UNPAID</span></div>':'');
     if(!state.vehicles.length)return {selectedId:null,html:head+
       '<div class="trade-empty stock-empty"><h2>YOUR FORECOURT IS EMPTY.</h2>'+
       '<p>Purchase a vehicle at the weekly Auction Hall or negotiate directly with a private seller. New purchases automatically enter this stock register.</p>'+
