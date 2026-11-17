@@ -7,7 +7,7 @@ import {test} from 'node:test';
 const scripts=[
   'vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js',
-  'monthly.js','events.js','workshop.js','showroom-traffic.js','customers.js','trading.js'
+  'monthly.js','events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','trading.js'
 ];
 function engine(){
   const sandbox={window:{},Intl,Date};
