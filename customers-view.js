@@ -15,20 +15,13 @@
   function actions(state,vehicle,E){
     const C=E.customers,c=C.caseFor(state,vehicle.id),id=vehicle.id;
     if(!c){
-      const interest=C.demand(state,vehicle);
-      const walkIn=interest&&C.walkInInterest(state,vehicle);
-      return interest?
-        '<div class="sales-case-highlight"><strong>'+
-        (walkIn?'CUSTOMER AT THE SHOWROOM':'NEW BUYER ENQUIRY')+'</strong>'+
-        '<p>'+(walkIn?
-          'A customer has arrived to ask about this car and its advertised price. Welcome them in, arrange the test drive and negotiate.':
-          'A potential buyer has contacted the dealership. Register the enquiry and book a viewing within 24 hours.')+'</p>'+
-        '<button type="button" class="trade-button" data-action="open-customer" data-id="'+id+
-        '">'+(walkIn?'WELCOME SHOWROOM CUSTOMER':'CONTACT BUYER / OPEN ENQUIRY')+' →</button></div>':
+      const waiting=E.showroom.waiting(state).filter(q=>q.vehicleId===id);
+      return waiting.length?
+        '<div class="sales-case-highlight"><strong>'+waiting.length+' CUSTOMER'+
+        (waiting.length===1?'':'S')+' WAITING FOR THIS CAR</strong>'+
+        '<p>Handle a visitor personally or assign a free salesperson from the showroom queue above. Each visitor has their own patience and negotiating budget.</p></div>':
         '<div class="sales-case-quiet"><strong>NO ACTIVE RETAIL ENQUIRIES</strong>'+
-        '<p>No customer wants to proceed with this particular car right now. Interest may change on another game day'+
-        (E.events.isDealDay(state.day)?' or Deal Day session':'')+
-        '. Review price and stock age; nothing is guaranteed.</p></div>';
+        '<p>No showroom customer is currently waiting for this vehicle. Buyer interest changes with price, reputation and the next game day.</p></div>';
     }
     const rep=E.people.salesRep(state,c);
     const buyer=C.behaviour(c,vehicle);
@@ -54,9 +47,9 @@
         body='<div class="sales-case-highlight"><strong>NEXT-DAY VIEWING · 24-HOUR LIMIT · NO DEPOSIT</strong>'+ 
           '<p>'+esc(c.name)+' is due on <strong>GAME DAY '+c.appointmentDay+
           '</strong>. This appointment is within 24 hours and the customer will attend. The car stays on sale until a paid deposit or completed handover.</p>'+ 
-          (C.competingInterest(state,id)?'<button type="button" class="trade-button" data-action="competing-customer" data-id="'+id+
-          '">SERVE ANOTHER BUYER NOW →</button><p>Another interested buyer can view and test drive now. If they do not purchase, the first booking is preserved.</p>':
-          '<p>No second buyer is ready right now. The original customer can still attend their appointment.</p>')+
+          (E.showroom.waiting(state).some(q=>q.vehicleId===id)?
+          '<p>A real competing visitor is waiting in the showroom queue above. Serving them does not automatically displace the unpaid booking.</p>':
+          '<p>No second buyer is waiting right now. The original customer can still attend their appointment.</p>')+
           '</div>'+cancel;
         break;
       case 'arrived':
@@ -178,20 +171,65 @@
     }
     return who+'<div class="sales-case-content">'+body+'</div>';
   }
+  function showroomDesk(state,E){
+    const Q=E.showroom,waiting=Q.waiting(state),free=Q.availableStaff(state);
+    const capacity=Math.max(0,2-state.showroom.ownerUsed);
+    const summary='<div class="so-visitor-head"><div><small>LIVE SHOWROOM FOOTFALL</small>'+
+      '<h3>VISITORS & STAFF ASSIGNMENTS</h3></div>'+
+      '<span>'+waiting.length+' WAITING · '+capacity+' OWNER SLOT'+(capacity===1?'':'S')+
+      ' · '+free.length+' SALES REP'+(free.length===1?'':'S')+' FREE</span></div>';
+    if(!waiting.length)return '<section class="so-visitor-desk" aria-label="Customer showroom queue">'+summary+
+      '<p class="so-visitor-empty">No visitors currently waiting. Interest changes with advertised stock, pricing and game days. Existing appointments and customer negotiations remain in the retail register.</p></section>';
+    const rows=waiting.slice().sort((a,b)=>a.maxTurns-b.maxTurns||a.vehicleId-b.vehicleId)
+      .map(q=>{
+        const car=state.vehicles.find(v=>v.id===q.vehicleId);
+        const active=E.customers.caseFor(state,q.vehicleId);
+        const ready=Q.canServe(state,q.id);
+        const urgency=q.maxTurns-state.showroom.turn;
+        const urgencyLabel=urgency<=1?'LEAVING SOON':urgency===2?'WAITING':'PATIENT';
+        const reps=free.filter(rep=>Q.canServe(state,q.id,rep.id).ok);
+        const buttons=ready.ok?
+          '<div class="so-visitor-actions">'+
+            '<button class="trade-button" type="button" data-action="welcome-showroom" data-lead="'+esc(q.id)+'">HANDLE MYSELF</button>'+
+            reps.map(rep=>'<button class="trade-button trade-button-secondary" type="button" data-action="assign-showroom" data-lead="'+esc(q.id)+
+              '" data-staff="'+rep.id+'">ASSIGN '+esc(rep.name)+'</button>').join('')+
+          '</div>':reps.length?
+          '<div class="so-visitor-actions">'+reps.map(rep=>'<button class="trade-button trade-button-secondary" type="button" data-action="assign-showroom" data-lead="'+esc(q.id)+
+            '" data-staff="'+rep.id+'">ASSIGN '+esc(rep.name)+'</button>').join('')+'</div>':
+          '<p class="so-visitor-busy">'+esc(ready.message)+'</p>';
+        const booked=active?.status==='booked'?
+          '<p class="so-visitor-warning">Another buyer has an unsecured viewing booked for tomorrow. Serving this visitor may win the car first.</p>':
+          active?.status==='reserved'||active?.status==='collectable'?
+          '<p class="so-visitor-warning">A paid customer arrangement protects this car.</p>':'';
+        return '<article class="so-visitor-entry">'+
+          '<div class="so-visitor-entry-head"><strong>'+esc(q.name)+'</strong>'+
+          '<span class="'+(urgency<=1?'so-visitor-urgent':'')+'">'+urgencyLabel+'</span></div>'+
+          '<p>'+esc(car?.title||'VEHICLE NOT AVAILABLE')+' · STOCK '+q.vehicleId+
+          ' · '+esc(q.purpose)+'</p>'+
+          '<small>'+(q.maxTurns===1?'Impatient buyer':
+            q.maxTurns===2?'Normal waiting tolerance':'Patient buyer')+
+          ' · '+esc(q.preferredMode==='part-ex'?'Possible part-exchange':'Cash buyer')+
+          '</small>'+booked+buttons+'</article>';
+      }).join('');
+    return '<section class="so-visitor-desk" aria-label="Customer showroom queue">'+
+      summary+'<p class="so-visitor-guidance">Serving someone yourself uses one of your two daily consultations and may make impatient visitors leave. A free salesperson can serve in parallel, once per trading day. No appointment holds a car without a deposit.</p>'+
+      '<div class="so-visitor-grid">'+rows+'</div></section>';
+  }
   const FILTERS=Object.freeze(['all','action','appointments','deposits']);
   const STEP=['LEAD / ENQUIRY','VIEWING','TEST DRIVE','AGREEMENT','COLLECTION'];
   function lead(state,v,E){
-    const c=E.customers.caseFor(state,v.id),available=!c&&E.customers.demand(state,v);
+    const c=E.customers.caseFor(state,v.id),
+      queued=E.showroom.waiting(state).filter(q=>q.vehicleId===v.id),
+      available=queued.length>0;
     const title=c?statuses[c.status]||'CUSTOMER CASE':
-      available?(E.customers.walkInInterest(state,v)?
-        'SHOWROOM CUSTOMER WAITING':'BUYER INTEREST TO CONTACT'):'AWAITING BUYER INTEREST';
+      available?(queued.length+' SHOWROOM VISITOR'+(queued.length===1?'':'S')+' WAITING'):'AWAITING BUYER INTEREST';
     const step=!c?(available?0:-1):{
       enquiry:0,booked:1,arrived:1,discussing:2,agreed:3,
       reserved:4,collectable:4,lost:-1
     }[c.status]??-1;
     const actionable=available||!!c&&
       ['enquiry','arrived','discussing','agreed','collectable'].includes(c.status);
-    return {c,available,title,step,actionable,
+    return {c,available,queued:queued.length,title,step,actionable,
       tone:c?.status==='lost'?'lost':
         ['reserved','collectable'].includes(c?.status)?'deposit':
         actionable?'action':c?.status==='booked'?'appointment':'quiet'};
@@ -276,17 +314,19 @@
   function render(state,E,{selectedId=null,filter='all'}={}){
     const s=snapshot(state,E),f=FILTERS.includes(filter)?filter:'all';
     const stats=E.customers.stats(state,state.monthPlan.startDay,state.day);
+    const waiting=E.showroom.waiting(state).length;
     const top='<div class="so-kpis">'+[
       ['ADVERTISED VEHICLES',s.rows.length],
-      ['CUSTOMERS ON SITE',s.rows.filter(r=>['arrived','discussing'].includes(r.caseData.c?.status)).length],
+      ['CUSTOMERS ON SITE',waiting+s.rows.filter(r=>['arrived','discussing'].includes(r.caseData.c?.status)).length],
        ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
     ].map(([name,value])=>
       '<div><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<details class="so-activity"><summary>MONTHLY RETAIL ACTIVITY</summary>'+
       '<p>THIS MONTH · '+stats.enquiries+' RECORDED ENQUIRIES · '+
       stats.appointments+' VIEWINGS BOOKED · '+stats.testDrives+' TEST DRIVES · '+
-      stats.completedSales+' COMPLETED HANDOVERS</p></details>';
-    if(!s.rows.length)return {selectedId:null,html:top+
+      stats.completedSales+' COMPLETED HANDOVERS · '+stats.showroomMissed+
+      ' MISSED SHOWROOM VISITORS</p></details>';
+    if(!s.rows.length)return {selectedId:null,html:top+showroomDesk(state,E)+
       '<div class="trade-empty so-empty"><h2>NO CARS ADVERTISED.</h2>'+
       '<p>Prepare a vehicle, pass workshop quality control, then set the retail price in Vehicle Stock.</p>'+
       '<button type="button" class="trade-button" data-page="stock">OPEN VEHICLE STOCK</button></div>'+
@@ -315,7 +355,7 @@
       '<div class="so-deal-day">DEAL DAY · '+esc(E.events.outlook(state).label)+
       ' · '+esc(E.events.dealSession(state).time)+
       ' — Walk-in enquiries can change between sessions.</div>':'';
-    return {selectedId:selected?.vehicle.id??null,html:top+deadline+toolbar+
+    return {selectedId:selected?.vehicle.id??null,html:top+showroomDesk(state,E)+deadline+toolbar+
       '<div class="so-layout"><aside class="so-register" aria-label="Advertised vehicle and customer cases">'+
       '<header>VEHICLES <span>'+filtered.length+' SHOWN</span></header>'+
       '<div class="so-register-list">'+list+'</div></aside>'+
