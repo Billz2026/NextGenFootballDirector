@@ -8,7 +8,7 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 18;
+  const VERSION = 19;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
@@ -20,6 +20,8 @@
   if (!W) throw new Error('Load workshop.js before trading.js');
   const D = window.MotorTradeEvents;
   if (!D) throw new Error('Load events.js before trading.js');
+  const AG = window.MotorTradeStockAgeing;
+  if(!AG)throw new Error('Load stock-ageing.js before trading.js');
   const M = window.MotorTradeMonthly;
   if (!M) throw new Error('Load monthly.js before trading.js');
   const P = window.MotorTradePeople;
@@ -329,7 +331,7 @@
       vehicles:[],sold:[],wholesale:[],ledger:[],nextId:1,negotiations:{},auctionBids:{},reports:{},
       customerCases:{},customerHistory:[],customerFunds:[],showroom:Q.initial(1),
       auctionHall:initialAuctionHall(1),auctionHistory:[],
-      inboxLedgerCursor:0,
+      inboxLedgerCursor:0,stockAgeingArrears:0,lastStockAgeingDay:1,
       premises:SITE.initial(),...P.initial()
     };
     M.initialize(state);
@@ -356,7 +358,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -405,6 +407,7 @@
     const expectedCapacity=SITE.capacity({premises:site});
     const allowedStock=saved.version>=18?SITE.storageLimit({premises:site}):expectedCapacity;
     if(saved.version>=18&&site.forecourtLevel<SITE.autoLevel(saved.reputationScore))return null;
+    if(saved.version>=19&&!AG.validate(saved))return null;
     if(saved.version>=13&&(!integer(saved.inboxLedgerCursor)||
       saved.inboxLedgerCursor<0||saved.inboxLedgerCursor>saved.ledger?.length))return null;
     if ((saved.version>=10?saved.capacity!==expectedCapacity:![2,CAPACITY].includes(saved.capacity)) || !Array.isArray(saved.vehicles) ||
@@ -490,6 +493,8 @@
       version:VERSION,name:saved.name.trim(),day:saved.day,cash:balance,capacity:expectedCapacity,
       ...(saved.startingCapital===STAFFED_STARTING_CASH?{startingCapital:STAFFED_STARTING_CASH}:{}),
       premises:SITE.clone(site),
+      stockAgeingArrears:saved.version>=19?saved.stockAgeingArrears:0,
+      lastStockAgeingDay:saved.version>=19?saved.lastStockAgeingDay:saved.day,
       inboxLedgerCursor:saved.version>=13?saved.inboxLedgerCursor:saved.ledger.length,
       // Migrate older daily auction saves: keep completed results in history,
       // but remove an obsolete mid-session catalogue on a closed weekday.
@@ -906,19 +911,30 @@
       ' Gross trading margin: £'+realised+' after any agreed inspection cost, before overheads, tax and aftersales.'+
       (expansion?' REPUTATION UNLOCK: forecourt automatically increased to '+expansion.current+' permanent spaces.':''));
   }
-  function wholesaleOffer(vehicle){
+  function wholesaleOffer(vehicle,day=null){
     // Simplified emergency trade bid. A trade outlet is not a retail sale
     // or guaranteed profit; dispose of unprepared stock at a loss.
+    const ageDays=day===null?0:Math.max(0,day-vehicle.acquiredDay);
+    const pressure=ageDays>=45?.95:ageDays>=30?.98:1;
     return Math.max(150,Math.round(Math.min(
-      vehicle.profile?.trade||vehicle.retail*.55,vehicle.cost*.88)/25)*25);
+      vehicle.profile?.trade||vehicle.retail*.55,vehicle.cost*.88)*pressure/25)*25);
   }
   function disposeStock(state,id){
     const vehicle=own(state.vehicles,id);
     if(!vehicle)return fail('missing','Vehicle not found.');
-    if(vehicle.status!=='acquired'||!['unassessed','quoted'].includes(vehicle.workshop?.stage))
-      return fail('stage','Trade disposal is available only before repair work has been booked.');
-    const proceeds=wholesaleOffer(vehicle);
-    const basis=vehicle.cost;
+    const early=vehicle.status==='acquired'&&
+      ['unassessed','quoted'].includes(vehicle.workshop?.stage);
+    const aged=(vehicle.status==='listed'||vehicle.status==='prepared')&&
+      AG.age(state,vehicle)>=30;
+    if(!early&&!aged)return fail('stage',
+      'Trade disposal is available before repairs are booked, or for retail-ready stock aged 30+ days.');
+    const customer=C.caseFor(state,id);
+    if(customer&&customer.status!=='lost')return fail('customer',
+      'Resolve the active customer enquiry or agreement before selling this vehicle to the trade.');
+    if(Q.waiting(state).some(x=>x.vehicleId===id))return fail('viewing',
+      'A showroom visitor is waiting for this vehicle. Serve or close the visitor before trade disposal.');
+    const proceeds=wholesaleOffer(vehicle,state.day);
+    const basis=vehicle.cost+vehicle.prepSpent;
     pay(state,proceeds,'Wholesale stock disposal: '+vehicle.title);
     state.wholesale.push({id:vehicle.id,title:vehicle.title,day:state.day,
       proceeds,basis,profit:proceeds-basis,color:vehicle.color,
@@ -931,6 +947,7 @@
   }
   function totalMargin(state) { return sum(state.sold,'profit')+
     sum(state.wholesale,'profit'); }
+  function stockAgeingDay(state){return AG.advance(state);}
   function premisesDay(state){
     const out=SITE.advance(state);
     SITE.sync(state);
@@ -963,7 +980,7 @@
     upgradePremises,monthly:M,events:D,
     customers:C,showroom:Q,openCustomer,welcomeShowroom,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
     cancelCustomer,advanceCustomers,nextCustomerSession,agreeCustomer,
-    workshop:W,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
+    workshop:W,stockAgeing:AG,stockAgeingDay,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
     wholesaleOffer,disposeStock,hireStaff,decideStaffMorale,
     market,marketFor,marketStatus,sellerApproach,create,createStaffed,normalize,acquireAuction,acquireSeller,walkSeller,
     inspectLead,reportFor,quote:I.quote,
