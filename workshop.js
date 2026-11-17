@@ -71,10 +71,13 @@
     const partsDelay=hash(vehicle.origin+'|parts')%3; // Stable 0–2 day delay.
     const effort=clamp(1+Math.ceil(base/340)+(grade>=4?1:0),2,6);
     const efficiency=method==='internal'&&tech.skills.efficiency>=16?1:0;
-    const supervisorDays=method==='internal'?
+    const possibleSupervisorDays=method==='internal'?
       P.supervisorProfile(state).turnaroundDays:0;
-    const duration=clamp(effort-efficiency+(method==='external'?0:1)+
-      partsDelay-supervisorDays,2,9);
+    const baselineDuration=clamp(effort-efficiency+
+      (method==='external'?0:1)+partsDelay,2,9);
+    const duration=clamp(effort-efficiency+
+      (method==='external'?0:1)+partsDelay-possibleSupervisorDays,2,9);
+    const supervisorDays=baselineDuration-duration;
     return {method,cost,duration,partsDelay,saving,supplement,
       supervisorDays,technicianId:method==='internal'?tech.id:null,
       provider:method==='external'?'Independent external garage':tech.name};
