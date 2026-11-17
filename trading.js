@@ -8,12 +8,14 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 19;
+  const VERSION = 20;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
   if(!MARKET)throw new Error('Load vehicle-market.js before trading.js');
   const C = window.MotorTradeCustomers;
+  const AS = window.MotorTradeAfterSales;
+  if(!AS)throw new Error('Load aftersales.js before trading.js');
   const Q = window.MotorTradeShowroom;
   if(!C||!Q)throw new Error('Load customers.js and showroom-traffic.js before trading.js');
   const W = window.MotorTradeWorkshop;
@@ -332,7 +334,7 @@
       customerCases:{},customerHistory:[],customerFunds:[],showroom:Q.initial(1),
       auctionHall:initialAuctionHall(1),auctionHistory:[],
       inboxLedgerCursor:0,stockAgeingArrears:0,lastStockAgeingDay:1,
-      premises:SITE.initial(),...P.initial()
+      premises:SITE.initial(),...AS.initial(1),...P.initial()
     };
     M.initialize(state);
     Object.assign(state,D.initial());
@@ -358,7 +360,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -441,6 +443,11 @@
       integer(s.day) && s.day >= 1 && s.day <= saved.day &&
       cashValue(s.price) && integer(s.profit) && ['cash','part-ex'].includes(s.mode) &&
       (s.profile==null || I.validProfile(s.profile))&&
+      (s.afterSalesQcCover===undefined||
+        (integer(s.afterSalesQcCover)&&s.afterSalesQcCover>=0&&s.afterSalesQcCover<=8))&&
+      (s.afterSalesTechReliability===undefined||
+        (integer(s.afterSalesTechReliability)&&s.afterSalesTechReliability>=0&&
+          s.afterSalesTechReliability<=20))&&
       (s.customerLeadId===undefined||
         (typeof s.customerLeadId==='string'&&/^C-\d+-\d+-\d+-\d+$/.test(s.customerLeadId)))&&
       (s.workshopRecord===undefined||W.valid({status:'listed',
@@ -457,6 +464,7 @@
     if (!Array.isArray(wholesale)||!wholesale.every(goodWholesale)||
       !saved.vehicles.every(goodVehicle) || !saved.sold.every(goodSold) ||
         !saved.ledger.every(goodLedger)) return null;
+    if(saved.version>=20&&!AS.valid(saved))return null;
     // Older v2 careers do not yet have negotiation history.
     const negotiations = saved.negotiations ?? {};
     const auctionBids = saved.auctionBids ?? {};
@@ -493,6 +501,7 @@
       version:VERSION,name:saved.name.trim(),day:saved.day,cash:balance,capacity:expectedCapacity,
       ...(saved.startingCapital===STAFFED_STARTING_CASH?{startingCapital:STAFFED_STARTING_CASH}:{}),
       premises:SITE.clone(site),
+      ...(saved.version>=20?AS.clone(saved):AS.initial(saved.day)),
       stockAgeingArrears:saved.version>=19?saved.stockAgeingArrears:0,
       lastStockAgeingDay:saved.version>=19?saved.lastStockAgeingDay:saved.day,
       inboxLedgerCursor:saved.version>=13?saved.inboxLedgerCursor:saved.ledger.length,
@@ -820,6 +829,9 @@
   const depositCustomer=(state,id)=>C.deposit(state,id);
   const cancelCustomer=(state,id,reason='buyer')=>C.cancel(state,id,reason);
   const advanceCustomers=state=>C.advanceDay(state);
+  const advanceAfterSales=state=>AS.advance(state);
+  const inspectAfterSales=(state,id)=>AS.inspect(state,id);
+  const rectifyAfterSales=(state,id)=>AS.rectify(state,id);
   const nextCustomerSession=state=>C.nextSession(state);
   function agreeCustomer(state,id,mode,allowance){
     const v=own(state.vehicles,id),c=C.caseFor(state,id);
@@ -888,6 +900,9 @@
       priceDiscount:c.priceDiscount||0,profit:realised,
       profile:v.profile?{...v.profile}:null,
       workshopRecord:JSON.parse(JSON.stringify(v.workshop)),
+      afterSalesQcCover:P.supervisorProfile(state).qcRiskReduction,
+      afterSalesTechReliability:v.workshop?.technicianId?
+        (state.staff.find(e=>e.id===v.workshop.technicianId)?.skills.reliability??12):12,
       customerLeadId:c.id,
       exchange:px?px.title:null,allowance:px?agreedAllowance:0
     });
@@ -979,7 +994,8 @@
     startAuction,bidLiveAuction,passAuction,nextAuctionLot,rollAuctionHall,
     auctionLot,lotNumber,auctionValid,
     upgradePremises,monthly:M,events:D,
-    customers:C,showroom:Q,openCustomer,welcomeShowroom,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
+    customers:C,aftersales:AS,advanceAfterSales,inspectAfterSales,rectifyAfterSales,
+    showroom:Q,openCustomer,welcomeShowroom,respondCustomer,bookCustomer,competingCustomer,testDrive,depositCustomer,
     cancelCustomer,advanceCustomers,nextCustomerSession,agreeCustomer,
     workshop:W,stockAgeing:AG,stockAgeingDay,assessStock,startPrep,finishPrep,transferPrep,advanceWorkshop,prepQuote,
     wholesaleOffer,disposeStock,hireStaff,decideStaffMorale,
