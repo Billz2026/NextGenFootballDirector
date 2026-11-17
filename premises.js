@@ -2,8 +2,10 @@
 /*
  * The Motor Trade v0.9.8 — fictional premises and fixed-cost decisions.
  * Figures are game balancing assumptions, not UK commercial lease quotes.
- * Capital expenditure is a cash investment, not recurring operating expense.
- * Daily overheads accrue even if cash is unavailable; unpaid obligations
+ * Permanent forecourt expansion is an automatic reputation award.
+ * Workshop capital expenditure remains a cash investment, while the two
+ * temporary offsite spaces incur daily operating charges. Daily overheads
+ * accrue even if cash is unavailable; unpaid obligations
  * survive saves and cannot be discharged from reserved vehicle repair money.
  */
 (() => {
@@ -13,7 +15,6 @@
   const OVERFLOW_SPACES=2;
   const OVERFLOW_DAILY_FEE=22;
   const WORK_REP=Object.freeze([40,80]);
-  const FOR_COST=Object.freeze([1800,3600,6500]);
   const WORK_COST=Object.freeze([2600,4800]);
   const integer=Number.isSafeInteger;
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -50,9 +51,9 @@
   function quote(state,kind){
     if(!['forecourt','workshop'].includes(kind))return null;
     const f=kind==='forecourt',level=f?state.premises.forecourtLevel:state.premises.workshopLevel;
-    const sizes=f?FORECOURT:WORKSHOP,rep=f?FOR_REP:WORK_REP,fees=f?FOR_COST:WORK_COST;
+    const sizes=f?FORECOURT:WORKSHOP,rep=f?FOR_REP:WORK_REP;
     if(level>=sizes.length-1)return {kind,maximum:true,automatic:f};
-    const requiredReputation=rep[level],cost=f?0:fees[level];
+    const requiredReputation=rep[level],cost=f?0:WORK_COST[level];
     const after={
       ...state,premises:{...state.premises,[f?'forecourtLevel':'workshopLevel']:level+1}
     };
