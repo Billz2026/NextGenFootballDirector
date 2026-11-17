@@ -740,8 +740,8 @@
     const reputationAdvantage=state&&state.reputationScore>=40?50:0;
     const customer=state?C.caseFor(state,vehicle.id):null;
     const temperament=customer?C.behaviour(customer,vehicle):null;
-    const budgetShift=temperament&&customer.objectionAction!=='legacy'?
-      temperament.budget:0;
+    const budgetShift=(temperament&&customer.objectionAction!=='legacy'?
+      temperament.budget:0)-(customer?.trustPenalty||0);
     const discount=customer?.priceDiscount||0;
     const rawLimit=Math.max(500,Math.min(vehicle.asking-90,
       fair+Math.round(support/3)+reputationAdvantage+
