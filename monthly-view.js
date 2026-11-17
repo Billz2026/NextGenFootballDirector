@@ -21,7 +21,7 @@
   }
   function progress(actual,target,label,asMoney=false){
     const pct=target>0?Math.min(100,Math.round(actual*100/target)):100;
-    return '<div class="report-progress"><div class="report-progress-head"><span>'+esc(label)+
+    return '<div class="report-progress'+(target>0&&actual>=target?' report-progress-hit':'')+'"><div class="report-progress-head"><span>'+esc(label)+
       '</span><strong>'+(asMoney?money(actual)+' / '+money(target):actual+' / '+target)+'</strong></div>'+
       '<div class="report-track"><span style="width:'+pct+'%"></span></div></div>';
   }
@@ -236,23 +236,27 @@
       ' unresolved post-handover customer case'+(r.afterSalesOpen===1?'':'s')]);
     if(r.agedStock)flags.push(['AGEING STOCK',r.agedStock+' vehicle'+(r.agedStock===1?'':'s')+' held for 14+ days']);
     if(r.stockAwaitingPrep)flags.push(['WORKSHOP BACKLOG',r.stockAwaitingPrep+' vehicle'+(r.stockAwaitingPrep===1?'':'s')+' unprepared']);
-    const alerts=(flags.length?flags:[['NO IMMEDIATE FLAGS','No flagged exceptions']]).map(item=>
-      '<div class="mr-flag"><strong>'+item[0]+'</strong><span>'+item[1]+'</span></div>').join('');
+    const alerts=(flags.length?flags:[['NO IMMEDIATE FLAGS','No flagged exceptions']]).map(item=>{
+      const severity=item[0]==='UNPAID BILLS'||item[0]==='OPERATING LOSS'||item[0]==='SALES TARGET MISSED'?'critical':
+        item[0]==='NO IMMEDIATE FLAGS'?'positive':'attention';
+      return '<div class="mr-flag mr-flag-'+severity+'"><strong>'+item[0]+
+        '</strong><span>'+item[1]+'</span></div>';
+    }).join('');
     const top='<div class="mr-overview"><div class="mr-head"><div><small>MONTH '+r.month+' · DAYS '+
       r.startDay+'–'+r.endDay+' · '+(isClosed?'ARCHIVED RESULT':'LIVE POSITION')+
-      '</small><h2>MONTH '+r.month+' SCORECARD</h2></div><b>'+status+'</b></div>'+
+      '</small><h2>MONTH '+r.month+' SCORECARD</h2></div><b class="'+(isClosed?(r.targetMet?'mr-status-positive':'mr-status-critical'):r.targetMet?'mr-status-positive':'mr-status-neutral')+'">'+status+'</b></div>'+
       '<div class="mr-kpis">'+
       cell('VEHICLES HANDED OVER',r.soldUnits+' / '+r.targetUnits,'Monthly target')+
       cell('OPERATING CONTRIBUTION',money(contribution),'After staff, premises and stock ageing costs',
-        contribution<0?'report-value-negative':'report-value-positive')+
-      cell(isClosed?'CLOSING CASH':'CURRENT CASH',money(r.closingCash),'Opening '+money(r.openingCash))+
+        contribution<0?'report-value-negative':contribution>0?'report-value-positive':'')+
+      cell(isClosed?'CLOSING CASH':'CURRENT CASH',money(r.closingCash),'Opening '+money(r.openingCash),r.closingCash<0?'report-value-negative':'')+
       cell('CASH INVESTED IN STOCK',money(r.stockCapital),r.stockCount+' unsold vehicles')+'</div>'+
       '<div class="mr-focus"><section class="mr-panel"><h3>ARE WE ON TARGET?</h3>'+
       progress(r.soldUnits,r.targetUnits,'Completed handovers')+
       progress(r.turnover,r.targetTurnover,'Turnover guide',true)+
       progress(Math.max(0,r.grossMargin),r.targetMargin,'Gross margin guide',true)+
       '<p>Company success requires enough handovers and positive operating contribution.</p></section>'+
-      '<section class="mr-panel"><h3>WHAT NEEDS ATTENTION?</h3>'+alerts+'</section></div>'+      '<div class="mr-mini"><div><small>GROSS TRADE MARGIN</small><strong>'+money(r.grossMargin)+'</strong></div>'+      '<div><small>STOCK AGED 14+ DAYS</small><strong>'+r.agedStock+'</strong></div>'+      '<div><small>RETAIL ENQUIRIES</small><strong>'+(r.customerJourney?r.customerJourney.enquiries:'NOT RECORDED')+'</strong></div>'+      '<div><small>REPUTATION</small><strong>'+r.closingReputation+'/100</strong></div></div></div>';
+      '<section class="mr-panel"><h3>WHAT NEEDS ATTENTION?</h3>'+alerts+'</section></div>'+      '<div class="mr-mini"><div class="'+(r.grossMargin<0?'mr-mini-loss':r.grossMargin>0?'mr-mini-profit':'')+'"><small>GROSS TRADE MARGIN</small><strong>'+money(r.grossMargin)+'</strong></div>'+      '<div class="'+(r.agedStock>0?'mr-mini-warning':'')+'"><small>STOCK AGED 14+ DAYS</small><strong>'+r.agedStock+'</strong></div>'+      '<div><small>RETAIL ENQUIRIES</small><strong>'+(r.customerJourney?r.customerJourney.enquiries:'NOT RECORDED')+'</strong></div>'+      '<div><small>REPUTATION</small><strong>'+r.closingReputation+'/100</strong></div></div></div>';
     const detail=(title,body)=>'<details class="mr-detail"><summary>'+title+
       ' · EXPAND</summary>'+body+'</details>';
     const detailsBody=detail('MONTHLY OBJECTIVES',targets)+detail('CASH FLOW & FINANCES',cash)+
