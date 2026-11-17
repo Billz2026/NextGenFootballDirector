@@ -212,7 +212,7 @@
           '</small>'+booked+buttons+'</article>';
       }).join('');
     return '<section class="so-visitor-desk" aria-label="Customer showroom queue">'+
-      summary+'<p class="so-visitor-guidance">Serving someone yourself uses one of your two daily consultations and may make impatient visitors leave. A free salesperson can serve in parallel, once per trading day. No appointment holds a car without a deposit.</p>'+
+      summary+'<p class="so-visitor-guidance">Serving someone yourself uses one of your two consultations this session and may make impatient visitors leave. A free salesperson can serve in parallel, once per session. No appointment holds a car without a deposit.</p>'+
       '<div class="so-visitor-grid">'+rows+'</div></section>';
   }
   const FILTERS=Object.freeze(['all','action','appointments','deposits']);
