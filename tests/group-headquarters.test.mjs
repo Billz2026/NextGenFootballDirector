@@ -5,7 +5,7 @@ import {runInNewContext} from 'node:vm';
 
 const scripts=['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
-  'empire-progression.js','motor-group.js','dealer-delegation.js','events.js','workshop.js',
+  'empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','events.js','workshop.js',
   'stock-ageing.js','showroom-traffic.js','customers.js','aftersales.js',
   'trading.js','group-headquarters-view.js'];
 const env={window:{},Date,Intl};
@@ -14,10 +14,10 @@ for(const name of scripts)runInNewContext(
   env,{filename:name});
 const {window:W}=env,E=W.MotorTradeEngine,G=W.MotorTradeGroup;
 const copy=s=>JSON.parse(JSON.stringify(s));
-const valid=s=>assert.ok(E.normalize(copy(s)),'career must pass full v21 save validator');
+const valid=s=>assert.ok(E.normalize(copy(s)),'career must pass full v23 save validator');
 function career(name='Boss Motors'){
   const s=E.createStaffed(name,[]);
-  assert.equal(s.version,22);
+  assert.equal(s.version,23);
   s.cash+=700000;
   s.ledger.push({day:s.day,delta:700000,note:'Additional owner equity fixture'});
   s.reputationScore=100;
@@ -51,7 +51,7 @@ test('legacy v20 saved business migrates to v21 without changing money or stock'
   old.version=20;delete old.group;
   const imported=E.normalize(old);
   assert.ok(imported);
-  assert.equal(imported.version,22);
+  assert.equal(imported.version,23);
   assert.equal(imported.cash,s.cash);
   assert.deepEqual(Array.from(imported.ledger,e=>e.delta),Array.from(s.ledger,e=>e.delta));
   assert.deepEqual(Array.from(imported.staff,e=>e.name),Array.from(s.staff,e=>e.name));

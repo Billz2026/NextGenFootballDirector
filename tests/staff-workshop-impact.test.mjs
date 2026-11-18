@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 const scripts=['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
-  'events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','aftersales.js','empire-progression.js','motor-group.js','dealer-delegation.js','trading.js'];
+  'events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','aftersales.js','empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','trading.js'];
 const context={window:{},Date,Intl};
 for(const path of scripts)runInNewContext(
   readFileSync(new URL('../'+path,import.meta.url),'utf8'),context,{filename:path});

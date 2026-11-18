@@ -9,7 +9,7 @@ for(const path of [
   'vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
   'events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js','aftersales.js',
-  'empire-progression.js','motor-group.js','dealer-delegation.js','trading.js','staff-performance.js','people-view.js'
+  'empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','trading.js','staff-performance.js','people-view.js'
 ]){
   runInNewContext(readFileSync(new URL('../'+path,import.meta.url),'utf8'),
     context,{filename:path});
