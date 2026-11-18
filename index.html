@@ -51,6 +51,7 @@
   <link rel="stylesheet" href="./staff-theme-2026.css?v=1">
   <link rel="stylesheet" href="./reputation-theme-2026.css?v=1">
   <link rel="stylesheet" href="./dealership-theme-2026.css?v=1">
+  <link rel="stylesheet" href="./inbox-command-centre.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -95,7 +96,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=51" defer></script>
+  <script src="./simulator.js?v=52" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -336,27 +337,75 @@
               </details>
             </section>
 
-            <section class="career-panel inbox-control" data-panel="inbox" hidden aria-labelledby="inbox-title">
-              <header class="inbox-heading">
-                <div><h1 id="inbox-title">OWNER'S <em>INBOX</em></h1></div>
-                <div class="inbox-heading-actions">
-                  <div class="inbox-stat-strip" aria-label="Inbox status">
-                    <div><strong id="inbox-action-count">0</strong><span>NEEDS ACTION</span></div>
-                    <div><strong id="inbox-unread-summary">0</strong><span>UNREAD</span></div>
-                    <span id="inbox-paid-count" hidden>0</span>
-                  </div>
-                  <button type="button" class="secondary-button" data-action="mark-all-read">MARK ALL READ</button>
+            <section class="career-panel inbox-control inbox-command" data-panel="inbox" hidden aria-labelledby="inbox-title">
+              <header class="inbox-heading ic-hero">
+                <div class="ic-hero-copy">
+                  <p class="ic-eyebrow"><span class="ic-eyebrow-line" aria-hidden="true"></span> THE MOTOR TRADE <span class="ic-eyebrow-slash">/</span> DEALER PRINCIPAL</p>
+                  <h1 id="inbox-title">MANAGEMENT <em>COMMAND CENTRE.</em></h1>
+                  <p class="ic-hero-caption">Your team's running the business. Your job is to make the decisions that matter.</p>
+                </div>
+                <div class="ic-hero-status">
+                  <div class="ic-day-label">LIVE DEALERSHIP OPERATIONS <strong id="inbox-current-day">DAY 01</strong></div>
+                  <p id="inbox-command-summary" class="ic-command-status" role="status" aria-live="polite">Checking management priorities</p>
+                  <span id="inbox-current-date" class="ic-calendar-date">TRADING CALENDAR</span>
                 </div>
               </header>
-              <nav id="inbox-filter-buttons" class="inbox-filters" aria-label="Filter dealership communications"></nav>
+
+              <div class="ic-overview" aria-label="Live management position">
+                <div class="inbox-stat-strip ic-metrics">
+                  <button type="button" class="ic-metric ic-metric-decision" data-action="inbox-view-decisions">
+                    <span class="ic-metric-label">01 / YOUR DECISIONS</span>
+                    <strong id="inbox-action-count" data-tone="neutral">0</strong>
+                    <span class="ic-metric-foot">AUTHORISATIONS WAITING <span aria-hidden="true">↗</span></span>
+                  </button>
+                  <button type="button" class="ic-metric ic-metric-alert" data-action="inbox-view-alerts">
+                    <span class="ic-metric-label">02 / FINANCIAL PRESSURE</span>
+                    <strong id="inbox-critical-count">0</strong>
+                    <span class="ic-metric-foot">UNPAID OBLIGATION TYPES <span aria-hidden="true">↗</span></span>
+                  </button>
+                  <button type="button" class="ic-metric ic-metric-unread" data-action="inbox-view-unread">
+                    <span class="ic-metric-label">03 / INTELLIGENCE</span>
+                    <strong id="inbox-unread-summary" data-tone="neutral">0</strong>
+                    <span class="ic-metric-foot">UNREAD REPORTS &amp; MESSAGES <span aria-hidden="true">↗</span></span>
+                  </button>
+                  <span id="inbox-paid-count" hidden>0</span>
+                </div>
+                <section class="ic-priority" aria-labelledby="inbox-priority-heading">
+                  <div class="ic-priority-head">
+                    <div><small>THE DECISION DESK</small><h2 id="inbox-priority-heading">ON YOUR DESK</h2></div>
+                    <button type="button" data-action="inbox-view-decisions">VIEW QUEUE <span aria-hidden="true">↗</span></button>
+                  </div>
+                  <div id="inbox-priority-list" class="ic-priority-list" aria-live="polite"></div>
+                </section>
+              </div>
+
+              <div class="ic-workspace-label">
+                <div><span class="ic-workspace-kicker">COMMUNICATIONS / INTERNAL</span>
+                  <h2>YOUR BUSINESS CORRESPONDENCE</h2></div>
+                <div class="ic-workspace-tools">
+                  <label class="ic-search" for="inbox-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 5 5"/></svg>
+                    <input type="search" id="inbox-search" placeholder="Find an email, employee or vehicle" autocomplete="off" aria-label="Search all displayed correspondence">
+                  </label>
+                  <button type="button" class="secondary-button ic-mark-read" data-action="mark-all-read">MARK ALL READ</button>
+                </div>
+              </div>
+              <div class="ic-workspace-filters">
+                <nav id="inbox-filter-buttons" class="inbox-filters" aria-label="Filter dealership communications"></nav>
+              </div>
               <div class="inbox-layout panel-card">
                 <div class="inbox-column">
-                  <div class="inbox-column-head"><span>MESSAGES <small id="inbox-filter-count">ALL MAIL</small></span><span id="inbox-unread-count" hidden>0 UNREAD</span></div>
-                  <div class="inbox-list" id="inbox-list"></div>
+                  <div class="inbox-column-head">
+                    <span>MESSAGE REGISTER <small id="inbox-filter-count">0 SHOWN</small></span>
+                    <span id="inbox-unread-count">0 UNREAD</span>
+                  </div>
+                  <div class="inbox-list" id="inbox-list" aria-label="Dealership message list"></div>
                 </div>
-                <div class="inbox-detail" id="inbox-detail"><p>Select a message to read it.</p></div>
+                <div class="inbox-detail" id="inbox-detail" aria-label="Selected message and decisions"><p>Select a message to review it.</p></div>
               </div>
-              <details class="inbox-policy"><summary>How Inbox approvals and receipts work</summary><p>Routine expenses are posted through the business ledger. Paid copies are records, not new payment requests. Reading a message never moves money. Workshop and staff approvals can authorise actual expenditure and are checked before payment.</p></details>
+              <details class="inbox-policy"><summary>OWNER AUTHORITY &amp; FINANCIAL SAFEGUARDS</summary>
+                <p>Viewing or reading mail never moves money. An approval executes only through the existing buying, workshop, sales or staff transaction, subject to the current business position. Paid receipts are historical records, not duplicate invoices.</p>
+              </details>
             </section>
 
             <section class="career-panel auction-hall-control" data-panel="auctionHall" hidden aria-labelledby="auction-hall-title">
