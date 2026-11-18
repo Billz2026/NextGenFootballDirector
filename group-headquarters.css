@@ -77,3 +77,13 @@
 @media(max-width:1240px){#screen-career .mg-location-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#screen-career .mg-operation-strap{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:830px){#screen-career .mg-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#screen-career .mg-record-panels{grid-template-columns:1fr}}
 @media(max-width:650px){#screen-career .mg-header{align-items:flex-start;flex-direction:column}#screen-career .mg-section-heading{align-items:flex-start;flex-direction:column}#screen-career .mg-location-grid{grid-template-columns:1fr}#screen-career .mg-offer,#screen-career .mg-vehicle{align-items:flex-start;flex-direction:column}#screen-career .mg-offer>div:last-child{align-items:stretch;width:100%}#screen-career .mg-operation-strap{grid-template-columns:1fr}#screen-career .mg-transfer{flex-direction:column;align-items:stretch}#screen-career .mg-transfer input{max-width:none;width:100%}#screen-career .mg-ledger-row{grid-template-columns:50px minmax(0,1fr)}#screen-career .mg-ledger-row strong{grid-column:2;text-align:left}}
+
+#screen-career .mg-network{display:flex;flex-direction:column;gap:6px}
+#screen-career .mg-network-site{display:grid;grid-template-columns:minmax(180px,2fr) repeat(4,minmax(74px,1fr));align-items:center;gap:9px;padding:10px 11px;background:#1a2831;border:1px solid #3c4a52;border-radius:5px}
+#screen-career .mg-network-site>div{min-width:0}
+#screen-career .mg-network-site small{display:block;color:#bda883;font:750 9px/1.25 var(--body)}
+#screen-career .mg-network-site strong{display:block;color:#f3f5f6;font:800 12px/1.35 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .mg-network-site span{display:block;color:#acbac3;font:500 10px/1.35 var(--body);margin-top:2px}
+#screen-career .mg-network-site .mg-negative{color:#ef9d92}
+@media(max-width:950px){#screen-career .mg-network-site{grid-template-columns:repeat(4,minmax(0,1fr))}#screen-career .mg-network-site>div:first-child{grid-column:1/-1;border-bottom:1px solid #384650;padding-bottom:8px}}
+@media(max-width:450px){#screen-career .mg-network-site{grid-template-columns:repeat(2,minmax(0,1fr))}#screen-career .mg-network-site>div:first-child{grid-column:1/-1}}
