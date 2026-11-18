@@ -8,7 +8,7 @@ const scripts=[
   'vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
   'events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js',
-  'aftersales.js','empire-progression.js','motor-group.js','trading.js','cashflow-forecast.js','finance-view.js',
+  'aftersales.js','empire-progression.js','motor-group.js','dealer-delegation.js','trading.js','cashflow-forecast.js','finance-view.js',
   'aftersales-view.js','inbox-office.js'
 ];
 for(const path of scripts)runInNewContext(

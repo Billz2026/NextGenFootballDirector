@@ -18,12 +18,13 @@
   const CP = window.MotorTradeCareerProgression;
   const G = window.MotorTradeGroup;
   const GV = window.MotorTradeGroupView;
+  const DELEG = window.MotorTradeDelegation;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -85,7 +86,7 @@
     return [
       makeMessage(1,1,'BUSINESS SUPPORT','Welcome to the motor trade',
         'Your £45,000 dealership opens with a complete four-person team.',
-        'Your dealership starts with £45,000 cash, four permanent forecourt spaces plus two temporary offsite stock positions. Reputation permanently unlocks six forecourt places at 20, eight at 40 and ten at 60 without a manual purchase. Additional offsite stock costs £22 per car per game day. One salaried employee works in each essential role: sales, buying, preparation and staff supervision. Their wages cost money every game day, so preserve working capital. Visit the Auction Hall for numbered-lot bidding and the Buying Desk for private sellers.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed: book appointments, arrange test drives, negotiate and complete handover. A part-exchange becomes your next stock vehicle.',
+        'Your dealership starts with £45,000 cash, four permanent forecourt spaces plus two temporary offsite stock positions. Reputation permanently unlocks six forecourt places at 20, eight at 40 and ten at 60 without a manual purchase. Additional offsite stock costs £22 per car per game day. One salaried employee works in each essential role: sales, buying, preparation and staff supervision. Their wages cost money every game day, so preserve working capital. Visit the Auction Hall for numbered-lot bidding and the Buying Desk for private sellers.\n\nA car needs workshop assessment, timed repairs and a passed final quality check before advertising. Once listed, customer enquiries are not guaranteed. Your active sales team handles normal walk-ins, test drives, negotiations and handovers when you advance the trading session. Your supervisor escalates sales outside company pricing authority to the Inbox. You can take over any customer personally in Sales Office. A part-exchange becomes your next stock vehicle.',
         'auctionHall'),
       makeMessage(2,1,'BUYING DESK','Three ways to find your next car',
         'Auctions, direct sellers and part-exchanges all supply vehicles.',
@@ -424,7 +425,7 @@
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
     byId('dashboard-operating-strip').innerHTML=DV.operations(d,career);
-    byId('dashboard-career-progress').innerHTML=CP.dashboard(career);
+    byId('dashboard-career-progress').innerHTML=DELEG.brief(career)+CP.dashboard(career);
     bindText('dashboard-cash-note',d.reserved?
       money.format(d.reserved)+' earmarked for repairs':'Before future operating bills');
     bindText('dashboard-stock-note',d.listed+' listed · '+d.awaitingPrep+' awaiting prep');
@@ -625,6 +626,17 @@
       render();
       return;
     }
+    const beforeDayReputation=career.reputationScore;
+    const delegated=DELEG.process(career,E);
+    if(DELEG.pending(career).length){
+      currentPage='inbox';
+      eventNotice='Your sales supervisor needs a management decision before the current trading session can close. '+
+        'Approve, counter, reject or take over the live customer offer.';
+      lastTradeResult=null;
+      persistCareer();
+      render();
+      return;
+    }
     if(D.isDealDay(career.day)&&career.deadlineSession<D.PHASES.length-1){
       const event=D.advanceSession(career);
       E.nextCustomerSession(career);
@@ -644,7 +656,6 @@
     const missedVisitors=E.showroom.closeWaiting(career,'Left at close of business without being served.').length;
     // Close the actual calendar month BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
-    const beforeDayReputation=career.reputationScore;
     if(career.day===career.monthPlan.endDay)G.closeMonth(career);
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
     if(closed)SITE.sync(career);
@@ -727,6 +738,10 @@
     if(missedVisitors)
       eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
         ' left without being served.';
+    if(delegated.processed&&(delegated.served||delegated.completed||delegated.lost))
+      eventNotice+=' SALES TEAM: '+delegated.served+' visitors served, '+
+        delegated.completed+' actual handovers and '+delegated.lost+
+        ' declined test drives or walkaways.';
     if(groupEvent.events.length)eventNotice+=' GROUP HQ: '+groupEvent.events.join(' ');
     if(closed){
       const id=career.messages.reduce((n,message)=>Math.max(n,message.id),0)+1;
@@ -1007,6 +1022,31 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'delegate-decision':
+        if(career){
+          const outcome=DELEG.decide(career,E,button.dataset.id,button.dataset.decision);
+          if(outcome.ok&&button.dataset.decision==='taken-over'){
+            selectedSalesId=DELEG.requestForMessage(career,
+              {reference:'sales-approval:'+button.dataset.id.slice(3)})?.vehicleId||null;
+            currentPage='sales';
+          }else currentPage='inbox';
+          saveResult(outcome);
+        }
+        break;
+      case 'delegate-takeover':
+        if(career){
+          const id=Number(button.dataset.id);
+          selectedSalesId=id;
+          currentPage='sales';
+          saveResult(DELEG.takeOver(career,E,id));
+        }
+        break;
+      case 'delegate-mode':
+        if(career)saveResult(DELEG.setMode(career,button.dataset.enabled==='true'));
+        break;
+      case 'delegate-policy':
+        if(career)saveResult(DELEG.setPolicy(career,button.dataset.policy));
+        break;
       case 'group-view-original':
         if(career)show('dashboard');
         break;

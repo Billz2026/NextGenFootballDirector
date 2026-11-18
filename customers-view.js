@@ -19,11 +19,36 @@
       return waiting.length?
         '<div class="sales-case-highlight"><strong>'+waiting.length+' CUSTOMER'+
         (waiting.length===1?'':'S')+' WAITING FOR THIS CAR</strong>'+
-        '<p>Handle a visitor personally or assign a free salesperson from the showroom queue above. Each visitor has their own patience and negotiating budget.</p></div>':
+        '<p>Your sales team will serve available visitors when the trading session advances. You can still intervene personally using the showroom queue. Each visitor has an independent negotiating budget and may leave.</p></div>':
         '<div class="sales-case-quiet"><strong>NO ACTIVE RETAIL ENQUIRIES</strong>'+
         '<p>No showroom customer is currently waiting for this vehicle. Buyer interest changes with price, reputation and the next game day.</p></div>';
     }
     const rep=E.people.salesRep(state,c);
+    // Staff-owned cases are managed by their adviser. The principal may
+    // take over at any point, but should not need to click every routine
+    // viewing, test drive, objection and collection button.
+    if(state.delegation?.enabled&&c.salespersonId!==null&&
+      c.salespersonId!==undefined&&c.status!=='lost'){
+      const approval=window.MotorTradeDelegation?.pending(state)
+        .find(r=>r.customerId===c.id);
+      const guide=approval?
+        'The supervisor has requested your decision on this customer offer. Open Needs Action in Inbox.':
+        c.status==='booked'?
+          'The viewing is booked for Day '+c.appointmentDay+'. Your salesperson will handle it after the customer arrives.':
+        c.status==='reserved'?
+          'The customer has paid a deposit; your salesperson will handle collection when due.':
+        'Your salesperson will handle the next customer step when this trading session is advanced.';
+      return '<div class="sales-case-highlight dp-staff-case">'+
+        '<strong>STAFF-LED CUSTOMER · '+esc(rep?.name||'Assigned sales employee')+'</strong>'+
+        '<p>'+esc(c.name)+' · '+esc(statuses[c.status]||c.status)+
+        '. '+esc(guide)+'</p>'+
+        '<div class="dp-staff-case-actions"><button type="button" class="trade-button" '+
+        'data-action="delegate-takeover" data-id="'+vehicle.id+'">'+
+        'TAKE OVER THIS CUSTOMER</button>'+
+        (approval?'<button type="button" class="trade-button trade-button-secondary" data-page="inbox">'+
+          'OPEN SUPERVISOR DECISION</button>':'')+
+        '</div></div>';
+    }
     const buyer=C.behaviour(c,vehicle);
     // Customer name and case status are already in the selected-case header.
     // Keep channel and responsible adviser in the compact metadata line.

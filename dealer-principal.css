@@ -1,0 +1,34 @@
+/* Dealer Principal delegated retail management — accessible, deliberate UI. */
+#screen-career .dp-brief{margin:0 0 11px;padding:13px 15px;background:#121b23;border:1px solid #68563b;border-left:3px solid #bd965c;border-radius:7px;color:#f4f5f6}
+#screen-career .dp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+#screen-career .dp-head small{display:block;font:800 10px/1.4 var(--body);letter-spacing:.055em;color:#d2b88c}
+#screen-career .dp-head h3{margin:4px 0;color:#f3f6f7;font:800 clamp(17px,1.7vw,22px)/1.23 var(--body)}
+#screen-career .dp-head p{color:#b8c6cf;font:500 12px/1.48 var(--body)}
+#screen-career .dp-mode{flex:0 0 auto;padding:6px 9px;border:1px solid #8f754c;border-radius:4px;background:#2e281f;color:#e1c79e;font:800 10px/1.3 var(--body)}
+#screen-career .dp-stats{margin:10px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#screen-career .dp-stats>div{padding:10px 12px;background:#192630;border:1px solid #394750;border-radius:5px}
+#screen-career .dp-stats small{display:block;color:#b5c5cf;font:750 10px/1.3 var(--body)}
+#screen-career .dp-stats strong{display:block;margin-top:5px;color:#f5f6f7;font:850 clamp(20px,1.9vw,27px)/1.1 var(--body)}
+#screen-career .dp-actions{display:flex;flex-wrap:wrap;gap:7px}
+#screen-career .dp-actions button{min-height:37px;background:#293841;color:#f2f4f6;border:1px solid #62717c;border-radius:5px;padding:8px 10px;font:800 11px/1.3 var(--body);cursor:pointer}
+#screen-career .dp-actions button:hover{background:#354650}
+#screen-career .dp-rules{display:block;margin-top:10px;color:#b8c4cc;font:550 11px/1.5 var(--body)}
+#screen-career .dp-staff-case{border-left:3px solid #b6935d;background:#17242c;padding:12px 14px;border-radius:5px}
+#screen-career .dp-staff-case>strong{color:#e8c899;font:800 12px/1.35 var(--body)}
+#screen-career .dp-staff-case p{color:#e2e8eb;font:500 12px/1.55 var(--body);margin:7px 0 10px}
+#screen-career .dp-staff-case-actions{display:flex;flex-wrap:wrap;gap:7px}
+#screen-career .dp-staff-case-actions button{min-height:37px}
+@media(max-width:650px){#screen-career .dp-head{flex-direction:column;gap:8px}#screen-career .dp-stats{grid-template-columns:repeat(3,minmax(0,1fr))}#screen-career .dp-brief{padding:11px}#screen-career .dp-stats>div{padding:9px 7px}#screen-career .dp-stats small{font-size:9px}#screen-career .dp-actions{flex-direction:column}#screen-career .dp-actions button{width:100%}}
+
+#screen-career .dp-policies{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#screen-career .dp-policies button{min-width:0;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:112px;padding:10px;background:#182630;border:1px solid #40515c;border-radius:6px;color:#e4e9ed;cursor:pointer}
+#screen-career .dp-policies button:hover{background:#253640}
+#screen-career .dp-policies button.dp-policy-current{border-color:#bf995f;background:#30291f}
+#screen-career .dp-policies strong{font:800 12px/1.25 var(--body);color:#e6cb9f}
+#screen-career .dp-policies small{font:700 10px/1.4 var(--body);color:#e0e6e9}
+#screen-career .dp-policies span{font:500 10px/1.45 var(--body);color:#b8c7cf}
+@media(max-width:740px){#screen-career .dp-policies{grid-template-columns:1fr}#screen-career .dp-policies button{min-height:70px}}
+
+#screen-career .dp-policy-details{margin-top:9px;border:1px solid #42505a;border-radius:5px;background:#18242d}
+#screen-career .dp-policy-details summary{cursor:pointer;color:#e2c99e;padding:9px 10px;font:800 11px/1.35 var(--body);list-style-position:inside}
+#screen-career .dp-policy-details .dp-policies{margin:0 9px 9px}
