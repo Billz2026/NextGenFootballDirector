@@ -220,3 +220,170 @@
   #screen-setup .manager-setup-lead {margin-bottom:11px}
   #screen-setup .manager-setup-right {min-height:390px}
 }
+
+
+/* Phase 1B: compact entry-level manager CV and personal record */
+#screen-setup .manager-setup-left {
+  max-height:calc(100svh - 94px);
+  overflow-x:hidden;overflow-y:auto;
+  scrollbar-color:#56636c #121a21;
+  overscroll-behavior:contain;
+}
+#screen-setup .manager-setup-left h1 {font-size:clamp(29px,2.25vw,35px);margin-bottom:10px}
+#screen-setup .manager-setup-lead {margin-bottom:13px;line-height:1.5}
+#screen-setup .manager-setup-brand {margin-bottom:12px}
+#screen-setup .manager-step-heading {margin:13px 0 7px}
+#screen-setup .manager-profile-grid {
+  margin:12px 0 9px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+#screen-setup .manager-profile-field {min-width:0}
+#screen-setup .manager-profile-grid .input-label {
+  display:block;margin-bottom:5px;
+  color:#b6c2ca;font:700 9px/1.25 var(--body);
+  letter-spacing:.045em;
+}
+#screen-setup .manager-profile-grid input,
+#screen-setup .manager-profile-grid select,
+#screen-setup .manager-profile-grid output {
+  display:flex;align-items:center;
+  width:100%;height:39px;min-height:39px;max-width:100%;
+  padding:7px 10px;border:1px solid #47545e;border-radius:4px;
+  background:#0d141b;color:#f1f3f4;
+  font:650 11px/1.3 var(--body);
+}
+#screen-setup .manager-profile-grid input[type="date"] {color-scheme:dark;font-size:12px}
+#screen-setup .manager-profile-grid output {
+  color:#d9c29c;background:#1b2329;border-color:#4b483e;
+}
+#screen-setup .manager-profile-grid select {
+  padding-right:19px;cursor:pointer;
+  white-space:nowrap;text-overflow:ellipsis;
+}
+#screen-setup .manager-profile-grid :is(input,select):focus-visible {
+  outline:2px solid #f4f5f5;outline-offset:1px;
+}
+#screen-setup .manager-cv-teaser {
+  padding:10px 11px;
+  border:1px solid #3f4a52;border-left:3px solid #b9a37e;
+  background:#171f26;border-radius:4px;
+}
+#screen-setup .manager-cv-teaser div {
+  display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;
+  color:#d9e0e4;font:800 9px/1.2 var(--body);
+  letter-spacing:.06em;
+}
+#screen-setup .manager-cv-teaser div span {color:#d2b686}
+#screen-setup .manager-cv-teaser p {
+  margin:6px 0 4px;color:#f0f1f1;font:650 11px/1.5 var(--body);
+}
+#screen-setup .manager-cv-teaser small {
+  display:block;color:#adbbc4;font:500 10px/1.45 var(--body);
+}
+#screen-setup .manager-setup-facts {margin:12px 0 10px}
+#screen-setup .manager-setup-facts div {padding:7px 9px}
+#screen-setup .manager-setup-facts strong {font-size:16px}
+#screen-setup .manager-setup-disclaimer {font-size:10px;line-height:1.5}
+#screen-setup .manager-setup-submit:disabled {
+  background:#6e777e;border-color:#6e777e;
+  color:#1c252c;cursor:not-allowed;box-shadow:none;
+}
+#screen-career .manager-cv-page {
+  color:#f4f5f5;font-family:var(--body);
+  max-width:1170px;margin:0 auto;
+}
+#screen-career .manager-cv-page-head {margin:0 0 17px}
+#screen-career .manager-cv-page-head .section-overline {
+  font:700 10px/1.35 var(--body);color:#c6ad86;letter-spacing:.085em;
+}
+#screen-career .manager-cv-page-head h1 {
+  font:800 clamp(26px,2.8vw,37px)/1.1 var(--body);
+  letter-spacing:-.04em;margin:6px 0 7px;color:#f4f5f5;
+}
+#screen-career .manager-cv-page-head h1 em {color:#d1b891}
+#screen-career .manager-cv-page-head>p:last-child {
+  color:#b3c0c7;font:500 12px/1.6 var(--body);
+}
+#screen-career .manager-cv-layout {
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(290px,.9fr);
+  align-items:start;gap:12px;
+}
+#screen-career .manager-cv-side {display:flex;flex-direction:column;gap:12px}
+#screen-career .manager-cv-panel {
+  border:1px solid #33404a;border-radius:5px;
+  background:#121a21;padding:19px;
+}
+#screen-career .manager-cv-kicker {
+  color:#c1a780;font:750 9px/1.35 var(--body);
+  letter-spacing:.09em;margin-bottom:6px;
+}
+#screen-career .manager-cv-panel h2 {
+  color:#f4f5f5;font:800 clamp(18px,2.1vw,25px)/1.15 var(--body);
+  letter-spacing:-.03em;margin:0 0 6px;
+}
+#screen-career .manager-cv-subtitle {
+  color:#b3c0c7;font:550 11px/1.55 var(--body);
+  margin-bottom:17px;
+}
+#screen-career .manager-cv-details {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;
+}
+#screen-career .manager-cv-detail {
+  padding:10px 6px 10px 0;min-width:0;
+  border-top:1px solid #303c44;
+}
+#screen-career .manager-cv-detail small,
+#screen-career .manager-cv-metrics small {
+  display:block;color:#9eafb8;font:700 9px/1.3 var(--body);
+  letter-spacing:.035em;
+}
+#screen-career .manager-cv-detail strong {
+  display:block;color:#eff1f2;
+  font:700 12px/1.5 var(--body);
+  overflow-wrap:anywhere;margin-top:4px;
+}
+#screen-career .manager-cv-metrics {
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 11px;
+}
+#screen-career .manager-cv-metrics div {
+  border:1px solid #384650;background:#19242c;
+  border-radius:4px;padding:11px;
+}
+#screen-career .manager-cv-metrics strong {
+  display:block;margin-top:5px;
+  color:#e8d0a8;font:800 23px/1.2 var(--body);
+}
+#screen-career .manager-cv-probation {
+  padding:10px 12px;color:#eed2a0;
+  background:#25241f;border:1px solid #66553e;
+  border-left:3px solid #bd9862;border-radius:4px;
+  font:750 11px/1.45 var(--body);
+}
+#screen-career .manager-cv-explainer {
+  margin-top:10px;color:#b3c0c7;
+  font:500 11px/1.65 var(--body);
+}
+#screen-career .manager-cv-review {
+  display:grid;grid-template-columns:70px minmax(0,1fr);
+  align-items:center;gap:4px 11px;border-top:1px solid #33414a;
+  padding:10px 0;color:#b4c1ca;font:550 10px/1.35 var(--body);
+}
+#screen-career .manager-cv-review strong {color:#eef0f1;font-weight:750}
+#screen-career .manager-cv-review span:last-child {grid-column:2}
+#screen-career .manager-cv-no-reviews {
+  color:#aab9c2;border-top:1px solid #33414a;padding-top:12px;
+  font:500 11px/1.65 var(--body);
+}
+@media(max-width:780px){
+  #screen-setup .manager-setup-left {max-height:none;overflow:visible}
+  #screen-setup .manager-profile-grid {gap:8px}
+  #screen-career .manager-cv-layout {grid-template-columns:1fr}
+}
+@media(max-width:410px){
+  #screen-setup .manager-profile-grid {grid-template-columns:1fr}
+  #screen-career .manager-cv-details {grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce) {
+  #screen-setup .manager-setup-left {scroll-behavior:auto}
+}
