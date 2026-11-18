@@ -198,6 +198,37 @@
   }
   function showroomDesk(state,E){
     const Q=E.showroom,waiting=Q.waiting(state),free=Q.availableStaff(state);
+    if(state.delegation?.enabled&&E.people.supervisor(state)){
+      // The principal does not assign visitors or run normal viewings. The
+      // supervisor triages this queue as the next retail session advances.
+      const summary='<div class="so-visitor-head"><div><small>SUPERVISOR-RUN SHOWROOM</small>'+
+        '<h3>CUSTOMER ALLOCATION & STAFF COVERAGE</h3></div>'+
+        '<span>'+waiting.length+' VISITORS WAITING · '+free.length+
+        ' SALES ADVISERS AVAILABLE</span></div>';
+      const queue=waiting.slice().sort((a,b)=>a.maxTurns-b.maxTurns||
+        a.vehicleId-b.vehicleId||a.id.localeCompare(b.id));
+      const rows=queue.map(q=>{
+        const vehicle=state.vehicles.find(v=>v.id===q.vehicleId);
+        const urgent=q.maxTurns-state.showroom.turn<=1;
+        return '<article class="so-visitor-entry">'+
+          '<div class="so-visitor-entry-head"><strong>'+esc(q.name)+'</strong>'+
+          '<span class="'+(urgent?'so-visitor-urgent':'')+'">'+
+          (urgent?'PRIORITY · LEAVING SOON':'WAITING FOR ALLOCATION')+'</span></div>'+
+          '<p>'+esc(vehicle?.title||'UNAVAILABLE STOCK')+' · STOCK '+q.vehicleId+
+          ' · '+esc(q.purpose)+'</p>'+
+          '<small>'+esc(q.preferredMode==='part-ex'?'POTENTIAL PART-EXCHANGE':'CASH BUYER')+
+          ' · Your supervisor selects a qualified adviser automatically</small></article>';
+      }).join('');
+      return '<section class="so-visitor-desk" aria-label="Supervisor-managed showroom queue">'+
+        summary+'<p class="so-visitor-guidance">Your supervisor assigns available salespeople based on capability and workload. '+
+        'Advisers handle viewings, test drives, negotiation and handover. '+
+        'Only exceptions outside their authority are referred to you through Inbox. '+
+        'Unserved visitors may still leave; staff capacity and customer patience are real.</p>'+
+        (rows?'<div class="so-visitor-grid">'+rows+'</div>':
+          '<p class="so-visitor-empty">No visitors waiting. Your sales team continues working active customers and appointments.</p>')+
+        '<div class="so-visitor-actions"><button class="trade-button trade-button-secondary" type="button" '+
+        'data-page="inbox">OPEN MANAGEMENT INBOX</button></div></section>';
+    }
     const slots=Q.ownerSlots(state),capacity=slots.regularLeft;
     const summary='<div class="so-visitor-head"><div><small>LIVE SHOWROOM FOOTFALL</small>'+
       '<h3>VISITORS & STAFF ASSIGNMENTS</h3></div>'+
