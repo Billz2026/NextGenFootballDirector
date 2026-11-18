@@ -567,7 +567,7 @@
   function managerDraftCV(){
     return {
       dateOfBirth:byId('manager-dob').value,
-      hometown:byId('manager-hometown').value.trim().replace(/\\s+/g,' '),
+      hometown:byId('manager-hometown').value.trim().replace(/\s+/g,' '),
       previousRole:byId('manager-background').value,
       experienceYears:Number(byId('manager-experience').value),
       qualification:byId('manager-qualification').value
