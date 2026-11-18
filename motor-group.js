@@ -219,6 +219,7 @@
       const profit=offered-v.cost-v.prep;
       b.sales.push({id:v.id,day,title:v.title,price:offered,cost:v.cost,
         prep:v.prep,profit,source:'branch',marketTier:v.marketTier,
+        acquiredDay:v.acquiredDay,listedDay:v.listedDay,
         customerId:lead.id,manager:b.manager.name});
       b.inventory=b.inventory.filter(x=>x.id!==v.id);
       b.trust=clamp(b.trust+(profit>0?1:-3),0,100);
@@ -271,9 +272,14 @@
         b.openingCapital!==CAPITAL||b.setupCost!==cityOf(b.city).setup||
         b.rent!==cityOf(b.city).rent||!managerOf(b.manager?.id)||
         b.manager.name!==managerOf(b.manager.id).name||
+        b.manager.salary!==managerOf(b.manager.id).salary||
+        b.manager.ability!==managerOf(b.manager.id).ability||
+        b.manager.care!==managerOf(b.manager.id).care||
         !Array.isArray(b.staff)||b.staff.length!==4||
-        !b.staff.every(p=>['manager','sales','buyer','technician'].includes(p.role)&&
-          typeof p.name==='string'&&nonneg(p.salary))||
+        !b.staff.every((p,i)=>p.role===['manager','sales','buyer','technician'][i]&&
+          p.name===[b.manager.name,'Branch Sales Executive','Branch Vehicle Buyer',
+            'Branch Preparation Technician'][i]&&
+          p.salary===[b.manager.salary,1850,1850,1925][i])||
         !integer(b.trust)||b.trust<0||b.trust>100||
         !nonneg(b.payrollArrears)||!nonneg(b.rentArrears)||
         !integer(b.nextStockId)||b.nextStockId<1||
@@ -310,12 +316,46 @@
           v.listedDay===null)))return false;
       if(!b.sales.every(v=>typeof v.title==='string'&&nonneg(v.price)&&nonneg(v.cost)&&
         nonneg(v.prep)&&integer(v.day)&&v.day>=b.openedDay&&v.day<=b.lastProcessedDay&&
+        integer(v.acquiredDay)&&v.acquiredDay>=b.openedDay&&
+        integer(v.listedDay)&&v.listedDay>v.acquiredDay&&v.listedDay<v.day&&
         v.profit===v.price-v.cost-v.prep&&typeof v.customerId==='string'))return false;
       if(!b.enquiries.every(x=>integer(x.day)&&x.day>=b.openedDay&&
         x.day<=b.lastProcessedDay&&integer(x.vehicleId)&&
         typeof x.id==='string'&&typeof x.accepted==='boolean'&&nonneg(x.offered)))return false;
-      if(!b.accruals.every(x=>integer(x.day)&&x.day>b.openedDay&&
-        x.day<=b.lastProcessedDay&&nonneg(x.payroll)&&nonneg(x.rent)))return false;
+      if(b.accruals.length!==b.lastProcessedDay-b.openedDay||
+        !b.accruals.every((x,i)=>x.day===b.openedDay+i+1&&
+          x.payroll===payroll(b)&&x.rent===b.rent))return false;
+      // Every customer receipt, vehicle acquisition and preparation bill must
+      // match genuine stock/sales records, not an arbitrary ledger credit.
+      const vehicles=[...b.inventory,...b.sales];
+      const stockPaid=-b.ledger.filter(x=>x.kind==='stock').reduce((n,x)=>n+x.delta,0);
+      const prepPaid=-b.ledger.filter(x=>x.kind==='preparation').reduce((n,x)=>n+x.delta,0);
+      const received=b.ledger.filter(x=>x.kind==='sale').reduce((n,x)=>n+x.delta,0);
+      if(stockPaid!==vehicles.reduce((n,v)=>n+v.cost,0)||
+        prepPaid!==vehicles.filter(v=>!('status' in v)||v.status!=='queued')
+          .reduce((n,v)=>n+v.prep,0)||
+        received!==b.sales.reduce((n,v)=>n+v.price,0))return false;
+      if(!b.sales.every(s=>b.enquiries.some(e=>e.id===s.customerId&&
+        e.vehicleId===s.id&&e.day===s.day&&e.accepted&&e.offered===s.price)))return false;
+      // Internal movements must be paired one-for-one across both accounts.
+      const transfers=(branchKind,hqNote,opposite)=>{
+        const external=state.ledger.filter(x=>x.note===hqNote);
+        const internal=b.ledger.filter(x=>x.kind===branchKind);
+        const key=(day,amount)=>day+'|'+amount;
+        const tally=items=>{
+          const out=new Map();
+          for(const x of items){
+            const k=key(x.day,opposite?-x.delta:x.delta);
+            out.set(k,(out.get(k)||0)+1);
+          }
+          return out;
+        };
+        const a=tally(internal),z=tally(external);
+        if(a.size!==z.size)return false;
+        return [...a].every(([key,count])=>z.get(key)===count);
+      };
+      if(!transfers('transfer-in','Group capital transfer to '+b.id,true)||
+         !transfers('transfer-out','Group capital return from '+b.id,true))return false;
       const paid=b.ledger.filter(x=>x.kind==='payroll').reduce((n,x)=>n-x.delta,0);
       const rented=b.ledger.filter(x=>x.kind==='rent').reduce((n,x)=>n-x.delta,0);
       if(b.accruals.reduce((n,x)=>n+x.payroll,0)-paid!==b.payrollArrears||
