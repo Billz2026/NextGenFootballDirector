@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const files=['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
-  'empire-progression.js','motor-group.js','dealer-delegation.js','events.js',
+  'empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','events.js',
   'workshop.js','stock-ageing.js','showroom-traffic.js','customers.js',
   'aftersales.js','trading.js','inbox-office.js'];
 const window={};
@@ -14,7 +14,7 @@ for(const file of files)vm.runInNewContext(
   readFileSync(new URL('../'+file,import.meta.url),'utf8'),ctx,{filename:file});
 const E=window.MotorTradeEngine,D=window.MotorTradeDelegation,IN=window.MotorTradeInbox;
 const copy=s=>JSON.parse(JSON.stringify(s));
-const valid=s=>assert.ok(E.normalize(copy(s)),'v22 career save must reload');
+const valid=s=>assert.ok(E.normalize(copy(s)),'v23 career save must reload');
 function tick(s){
   const closing=s.day===s.monthPlan.endDay;
   if(closing){window.MotorTradeGroup.closeMonth(s);E.monthly.close(s);}
