@@ -150,6 +150,7 @@
   let currentPage = 'dashboard';
   let selectedMessageId = null;
   let inboxFilter = 'all';
+  let inboxSearch = ''; // UI-only. Never changes or migrates the career save.
   let eventNotice = '';
   let lastTradeResult = null;
   let careerPromotion = null; // Transient recognition; tier remains derived from saved reputation.
@@ -183,6 +184,21 @@
   function bindText(name, value) {
     for (const node of all('[data-bind="' + name + '"]')) node.textContent = value;
   }
+  function financePressure() {
+    if(!career)return [];
+    return [
+      ['UNPAID PAYROLL',career.payrollArrears||0],
+      ['PREMISES ARREARS',career.premises?.arrears||0],
+      ['STOCK AGEING ARREARS',career.stockAgeingArrears||0]
+    ].filter(([,amount])=>amount>0);
+  }
+  function inboxMatch(message) {
+    const needle=inboxSearch.trim().toLocaleLowerCase();
+    if(!needle)return true;
+    return [message.from,message.subject,message.preview,message.body,
+      IN.labels[IN.infer(message)]].some(value=>
+      String(value||'').toLocaleLowerCase().includes(needle));
+  }
   function renderMessageRow(message, compact) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -199,14 +215,17 @@
       (liveLiability?' inbox-row-critical':'');
     if (!compact) button.setAttribute('aria-pressed', String(message.id === selectedMessageId));
     const stamp = message.day === 1 ? 'DAY 01' : 'DAY ' + String(message.day).padStart(2, '0');
+    const initials={operations:'OP',staff:'HR',accounts:'FN',sales:'SA',reports:'RP'};
+    const status=pending?'DECISION REQUIRED':liveLiability?'CASH PRESSURE':
+      message.read?IN.labels[category]||'REPORT':'NEW · '+(IN.labels[category]||'REPORT');
     button.innerHTML =
-      '<span class="message-icon" aria-hidden="true">✉</span>' +
+      '<span class="message-icon" aria-hidden="true">'+
+        (compact?'✉':initials[category]||'MT')+'</span>' +
       '<span class="message-copy">' +
         '<span class="message-from"><span>' + escapeText(message.from) + '</span><time>' + stamp + '</time></span>' +
         '<span class="message-title">' + escapeText(message.subject) + '</span>' +
-        (!compact&&pending?'<span class="inbox-message-tags"><b class="inbox-tag-action">'+
-          (String(message.reference||'').startsWith('aftersales:')?'ACTION REQUIRED':'APPROVAL REQUIRED')+
-          '</b></span>':'') +
+        (!compact?'<span class="inbox-message-tags"><b class="'+
+          (pending||liveLiability?'inbox-tag-action':'')+'">'+escapeText(status)+'</b></span>':'') +
         '<span class="message-summary">' + escapeText(message.preview) + '</span>' +
       '</span>' +
       (message.read ? '' : '<span class="message-unread" aria-label="Unread"></span>');
