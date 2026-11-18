@@ -396,12 +396,13 @@
 }
 @media(max-width:680px){
   #screen-career .inbox-command .ic-hero{
-    min-height:0;padding:10px 11px;gap:5px;flex-direction:column;align-items:stretch;
+    min-height:0;padding:8px 10px;gap:4px;flex-direction:column;align-items:stretch;
   }
+  #screen-career .inbox-command .ic-eyebrow{display:none}
   #screen-career .inbox-command .ic-hero-status{
     align-items:center;justify-content:flex-start;flex-wrap:wrap;
-    border:0;border-top:1px solid #34414a;padding:7px 0 0;
-    gap:7px;text-align:left;
+    border:0;border-top:1px solid #34414a;padding:5px 0 0;
+    gap:5px;text-align:left;
   }
   #screen-career .inbox-command .ic-command-status{
     max-width:none;padding:4px 7px;text-align:left;
@@ -411,6 +412,9 @@
     grid-template-columns:repeat(3,minmax(0,1fr));height:62px;
   }
   #screen-career .inbox-command .ic-metric{height:62px;padding:7px 6px;column-gap:3px}
+  #screen-career .inbox-command .ic-metric:first-child{
+    grid-column:auto;min-height:0;
+  }
   #screen-career .inbox-command .ic-metric-label{font-size:8px}
   #screen-career .inbox-command .ic-metric-foot{display:none}
   #screen-career .inbox-command .ic-metric strong,
