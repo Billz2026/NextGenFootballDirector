@@ -53,12 +53,12 @@ function approvalScenario(){
   return {s,v,req};
 }
 
-test('v21 migrates to v22 with the original cash, staff and inventory',()=>{
+test('v21 migrates to v23 with the original cash, staff and inventory',()=>{
   const original=E.createStaffed('Legacy Owner QA',[]);
-  assert.equal(original.version,22);
+  assert.equal(original.version,23);
   const old=copy(original);old.version=21;delete old.delegation;
   const x=E.normalize(old);
-  assert.ok(x);assert.equal(x.version,22);
+  assert.ok(x);assert.equal(x.version,23);
   assert.equal(x.cash,original.cash);
   assert.equal(x.staff.length,original.staff.length);
   assert.equal(x.sold.length,0);
