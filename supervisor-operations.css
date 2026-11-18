@@ -30,3 +30,12 @@
 #screen-career details.op-brief .op-expanded{padding:0 13px 13px}
 #screen-career details.op-brief:not([open]) .op-brief-head h3{font-size:16px}
 #screen-career details.op-brief:not([open]) .op-brief-head p{font-size:11px}
+
+#screen-career .op-activity{margin-top:10px;padding:10px;background:#17242e;border:1px solid #3c4b55;border-radius:5px}
+#screen-career .op-activity h4{color:#e3c99d;font:800 11px/1.35 var(--body);margin:0 0 7px}
+#screen-career .op-activity-row{display:grid;grid-template-columns:112px 1fr auto;gap:7px;align-items:center;border-top:1px solid #34454e;padding:8px 2px}
+#screen-career .op-activity-row small{color:#c3ac88;font:750 9px/1.35 var(--body)}
+#screen-career .op-activity-row span{color:#d5dfe4;font:500 11px/1.4 var(--body)}
+#screen-career .op-activity-row strong{font:800 11px/1.35 var(--body);color:#e6c99c}
+#screen-career .op-activity>p{color:#b8c7d0;font:500 11px/1.5 var(--body)}
+@media(max-width:650px){#screen-career .op-activity-row{grid-template-columns:1fr auto}#screen-career .op-activity-row small{grid-column:1/-1}}
