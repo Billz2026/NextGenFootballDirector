@@ -19,12 +19,13 @@
   const G = window.MotorTradeGroup;
   const GV = window.MotorTradeGroupView;
   const DELEG = window.MotorTradeDelegation;
+  const OPS = window.MotorTradeOperations;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !OPS || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -425,7 +426,7 @@
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
     byId('dashboard-operating-strip').innerHTML=DV.operations(d,career);
-    byId('dashboard-career-progress').innerHTML=DELEG.brief(career)+CP.dashboard(career);
+    byId('dashboard-career-progress').innerHTML=DELEG.brief(career)+OPS.brief(career)+CP.dashboard(career);
     bindText('dashboard-cash-note',d.reserved?
       money.format(d.reserved)+' earmarked for repairs':'Before future operating bills');
     bindText('dashboard-stock-note',d.listed+' listed · '+d.awaitingPrep+' awaiting prep');
@@ -685,6 +686,7 @@
     const premisesEvent=E.premisesDay(career);
     const ageingEvent=E.stockAgeingDay(career);
     const workshopEvents=E.advanceWorkshop(career);
+    const operationsEvent=OPS.process(career,E);
     const customerEvents=E.advanceCustomers(career);
     const afterSalesEvents=E.advanceAfterSales(career);
     const groupEvent=G.advance(career);
@@ -728,6 +730,11 @@
       eventNotice+=' '+ageingEvent.alerts.join(' ');
     if(workshopEvents.length)
       eventNotice+=' WORKSHOP: '+workshopEvents.join(' ');
+    if(operationsEvent.processed&&(operationsEvent.buy||operationsEvent.work.length))
+      eventNotice+=' SUPERVISOR: '+[
+        ...(operationsEvent.buy?[operationsEvent.buy]:[]),
+        ...operationsEvent.work
+      ].slice(0,3).join(' ');
     if(customerEvents.length)
       eventNotice+=' CUSTOMERS: '+customerEvents.join(' ');
     if(afterSalesEvents.opened.length||afterSalesEvents.diagnosed.length||
@@ -1022,6 +1029,26 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'ops-decision':
+        if(career&&['approved','declined'].includes(button.dataset.decision)){
+          const request=career.operations.requests.find(r=>r.id===button.dataset.id);
+          if(request&&button.dataset.decision==='approved'&&window.confirm(
+            'Approve '+money.format(request.amount)+' for '+request.title+
+            '? This will use real dealership cash only if the live transaction passes all checks.')){
+            currentPage='inbox';
+            saveResult(OPS.decide(career,E,request.id,'approved'));
+          }else if(request&&button.dataset.decision==='declined'){
+            currentPage='inbox';
+            saveResult(OPS.decide(career,E,request.id,'declined'));
+          }
+        }
+        break;
+      case 'ops-mode':
+        if(career)saveResult(OPS.setMode(career,button.dataset.enabled==='true'));
+        break;
+      case 'ops-policy':
+        if(career)saveResult(OPS.setPolicy(career,button.dataset.policy));
+        break;
       case 'delegate-decision':
         if(career){
           const outcome=DELEG.decide(career,E,button.dataset.id,button.dataset.decision);
