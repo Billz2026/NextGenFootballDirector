@@ -7,7 +7,11 @@ const KEY='the-motor-trade-career-v1';
 const browser=await chromium.launch({headless:true});
 mkdirSync('review',{recursive:true});
 try{
-  for(const [device,width,height] of [['desktop',1440,900],['phone',390,844]]){
+  for(const [device,width,height] of [
+    ['desktop-100-percent',1400,750],
+    ['desktop-wide',1692,900],
+    ['phone',390,844]
+  ]){
     const ctx=await browser.newContext({viewport:{width,height},
       deviceScaleFactor:1,hasTouch:width<600});
     const page=await ctx.newPage(),errors=[];
@@ -66,12 +70,40 @@ try{
     const panel=page.locator('.inbox-command');
     await panel.waitFor({state:'visible'});
     assert.match((await panel.locator('h1').innerText()).replace(/\s+/g,' '),
-      /MANAGEMENT COMMAND CENTRE/);
+      /Management Inbox/i);
     assert.equal((await panel.locator('#inbox-action-count').innerText()).trim(),'1');
     assert.equal((await panel.locator('#inbox-current-day').innerText()).trim(),
       'DAY '+String(fixture.day).padStart(2,'0'));
     assert.equal(await panel.locator('.ic-metric').count(),3);
     assert.ok(await panel.locator('#inbox-priority-list .ic-priority-item').count()>=1);
+    const compact=await panel.evaluate(node=>{
+      const box=x=>{const r=x.getBoundingClientRect();return {top:r.top,bottom:r.bottom,
+        width:r.width,height:r.height};};
+      return {hero:box(node.querySelector('.ic-hero')),
+        overview:box(node.querySelector('.ic-overview')),
+        metrics:box(node.querySelector('.ic-metric')),
+        priority:box(node.querySelector('.ic-priority')),
+        mail:box(node.querySelector('.inbox-layout')),
+        reader:box(node.querySelector('#inbox-detail')),
+        titleFont:getComputedStyle(node.querySelector('h1')).fontFamily,
+        titleSize:parseFloat(getComputedStyle(node.querySelector('h1')).fontSize)};
+    });
+    assert.ok(compact.hero.height<=83,
+      'The command header must stay compact: '+JSON.stringify(compact));
+    assert.ok(compact.metrics.height<=90,
+      'Summary figures must not become oversized cards: '+JSON.stringify(compact));
+    assert.ok(compact.titleFont.includes('DM Sans'),
+      'Inbox titles should use refined legible text, not condensed game display type');
+    assert.ok(compact.titleSize<=29,'Oversized typographic title');
+    if(width>=1200){
+      assert.ok(compact.mail.top<395,
+        'Correspondence must start within the upper part of the desktop: '+JSON.stringify(compact));
+      assert.ok(compact.mail.height>=300,
+        'The message register and reader must have usable space: '+JSON.stringify(compact));
+      assert.ok(compact.mail.bottom<=height+3,
+        'The correspondence panel must fit the desktop viewport at 100%: '+JSON.stringify(compact));
+      assert.ok(compact.priority.height<=85,'The decision desk should be a compact band');
+    }
     assert.match(await panel.locator('#inbox-command-summary').innerText(),
       /1 LIVE DECISION AWAITING AUTHORITY/);
     const widths=await panel.evaluate(node=>({
