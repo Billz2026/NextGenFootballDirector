@@ -21,6 +21,8 @@
   if(!OPS)throw new Error('Load supervisor-operations.js before trading.js');
   const AU=window.MotorTradeAuctionAgent;
   if(!AU)throw new Error('Load auction-supervisor.js before trading.js');
+  const MC=window.MotorTradeManagerCareer;
+  if(!MC)throw new Error('Load manager-career.js before trading.js');
   const C = window.MotorTradeCustomers;
   const AS = window.MotorTradeAfterSales;
   if(!AS)throw new Error('Load aftersales.js before trading.js');
@@ -505,6 +507,7 @@
     if(saved.version>=22&&!DELEG.valid(saved.delegation,saved))return null;
     if(saved.version>=23&&!OPS.valid(saved.operations,saved))return null;
     if(saved.version>=24&&!AU.valid(saved.auctionAgent,saved))return null;
+    if(saved.managerCareer!==undefined&&!MC.valid(saved.managerCareer,saved))return null;
     const ids = [...saved.vehicles,...saved.sold,...wholesale].map(v => v.id);
     if (new Set(ids).size !== ids.length || ids.some(id => id >= saved.nextId)) return null;
     // Do not rebase historical £12,500 saves. The opening capital marker
@@ -522,6 +525,7 @@
       delegation:saved.version>=22?DELEG.clone(saved.delegation):DELEG.initial(),
       operations:saved.version>=23?OPS.clone(saved.operations):OPS.initial(),
       auctionAgent:saved.version>=24?AU.clone(saved.auctionAgent):AU.initial(),
+      ...(saved.managerCareer?{managerCareer:MC.clone(saved.managerCareer)}:{}),
       ...(saved.version>=20?AS.clone(saved):AS.initial(saved.day)),
       stockAgeingArrears:saved.version>=19?saved.stockAgeingArrears:0,
       lastStockAgeingDay:saved.version>=19?saved.lastStockAgeingDay:saved.day,
@@ -569,6 +573,7 @@
     if(!DELEG.valid(restored.delegation,restored))return null;
     if(!OPS.valid(restored.operations,restored))return null;
     if(!AU.valid(restored.auctionAgent,restored))return null;
+    if(!MC.valid(restored.managerCareer,restored))return null;
     // v17 and earlier owned stock and legacy costs are validated first.
     // A reputation unlock is then granted without a fabricated capital debit.
     SITE.sync(restored);
