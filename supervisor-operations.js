@@ -106,9 +106,12 @@
     return r;
   }
   function bestQuote(state,E,v){
-    const internal=E.prepQuote(state,v.id,'internal');
+    const internal=P.availableTechnicians(state)
+      .map(t=>E.prepQuote(state,v.id,'internal',t.id)).filter(Boolean);
     const external=E.prepQuote(state,v.id,'external');
-    return [internal,external].filter(Boolean).sort((a,b)=>a.cost-b.cost||a.duration-b.duration)[0]||null;
+    return [...internal,...(external?[external]:[])]
+      .sort((a,b)=>(a.cost+a.duration*75)-(b.cost+b.duration*75)||
+        a.duration-b.duration)[0]||null;
   }
   function autoWorkshop(state,E){
     const notes=[],d=state.operations;
@@ -124,12 +127,45 @@
         continue;
       }
       if(v.status!=='acquired')continue;
+      if(v.workshop?.stage==='in-progress'&&v.workshop.method==='internal'){
+        const lead=state.staff.find(x=>x.id===v.workshop.technicianId);
+        if(!lead||!P.isActive(state,lead)){
+          const replacement=P.availableTechnicians(state)
+            .sort((a,b)=>b.skills.efficiency-a.skills.efficiency)[0];
+          if(replacement){
+            const moved=E.workshop.reassign(state,v.id,replacement.id);
+            if(moved.ok){track(state,'assignment',v.id,0,moved.message);notes.push(moved.message);}
+          }else if(state.cash>=protect(state)+125&&
+            v.workshop.repairCost+125<=d.maxRepair){
+            const moved=E.transferPrep(state,v.id);
+            if(moved.ok){track(state,'repair',v.id,125,moved.message);notes.push(moved.message);}
+          }
+        }else if(v.workshop.remainingDays>1&&v.workshop.assistantId===null){
+          const aide=P.availableTechnicians(state)
+            .filter(t=>t.skills.efficiency>=12)
+            .sort((a,b)=>b.skills.efficiency-a.skills.efficiency)[0];
+          if(aide){
+            const assigned=E.workshop.assignAssistant(state,v.id,aide.id);
+            if(assigned.ok){track(state,'assignment',v.id,0,assigned.message);notes.push(assigned.message);}
+          }
+        }
+        continue;
+      }
       if(v.workshop?.stage==='quality-check'){
         const result=E.finishPrep(state,v.id);
         if(result.ok){
           track(state,'quality',v.id,v.workshop.repairCost,
             'Technician performed genuine final quality control: '+result.message);
           notes.push(result.message);
+        }else if(result.code==='cash'){
+          const ref='workshop-qc-funding:'+v.id;
+          if(!state.messages.some(m=>m.reference===ref))
+            window.MotorTradeInbox?.emit(state,{
+              from:'WORKSHOP SUPERVISOR',category:'accounts',
+              subject:'URGENT · QC rectification funding shortfall · '+v.title,
+              preview:'QC cannot finish until the original dealership has enough unreserved cash.',
+              body:result.message+'\n\nThe technician has retained the vehicle in quality control. No unapproved debt or completion has been recorded. Restore funding to resume automatic QC.',
+              linkPage:'finance',reference:ref});
         }
         continue;
       }
@@ -164,42 +200,33 @@
     const score=margin-Math.max(0,cost-12000)*.16;
     return {car:c,cost,prep,margin:Math.round(margin),score};
   }
+  // The principal handles all private-seller negotiations. Buyers scout
+  // real leads and send market intelligence, never spend cash automatically.
   function autoBuy(state,E){
-    const d=state.operations;
-    if(!leader(state)||!worker(state))return null;
-    if(state.vehicles.length>=Math.min(d.maxStock,window.MotorTradePremises?.storageLimit(state)||d.maxStock))
-      return null;
-    if(state.day%2===0)return null; // At most one sourcing cycle every second game day.
-    const leads=E.marketFor(state).sellers
-      .filter(c=>!state.vehicles.some(v=>v.origin===c.id)&&
-        !state.negotiations?.[c.id]&&
-        c.marketTier!=='new')
+    if(!leader(state)||!worker(state)||state.day%7!==1)return null;
+    const candidates=E.marketFor(state).sellers
+      .filter(c=>!state.vehicles.some(v=>v.origin===c.id)&&c.marketTier!=='new')
       .map(c=>evaluate(state,E,c)).filter(Boolean)
-      .filter(o=>o.cost+o.prep+protect(state)<state.cash&&o.margin>300)
+      .filter(o=>o.margin>=state.operations.minMargin)
       .sort((a,b)=>b.score-a.score);
-    const within=leads.filter(x=>x.cost<=d.maxPurchase&&
-      x.margin>=d.minMargin);
-    const selected=within[0]||leads[0];
-    if(!selected)return null;
-    if(!within.length){
-      if(selected.margin>=d.minMargin||selected.cost<=d.maxPurchase)
-        propose(state,'buy',{sellerId:selected.car.id,title:selected.car.title,
-          amount:selected.cost,margin:selected.margin});
-      return null;
-    }
-    const c=selected.car;
-    const discount=Math.min(150,P.buyerDiscount(state));
-    const offer=Math.max(100,c.ask-discount);
-    const result=E.acquireSeller(state,c.id,offer);
-    if(result.ok){
-      track(state,'purchase',state.vehicles.at(-1).id,offer,
-        'Buyer acquired '+c.title+' through genuine seller negotiation.');
-      return result.message;
-    }
-    // The seller may counter or leave. That is an actual game outcome, not
-    // a fictional acquisition; any counter remains in the Buying Desk.
-    track(state,'attempt',0,offer,'Buyer attempted '+c.title+': '+result.message);
-    return result.message;
+    const option=candidates[0];
+    if(!option)return null;
+    const c=option.car,buyer=worker(state);
+    const body='I have reviewed current private-seller listings and recommend you negotiate this vehicle personally.\n\n'+
+      'VEHICLE: '+c.title+'\nASKING PRICE: '+gbp(c.ask)+
+      '\nESTIMATED RETAIL: '+gbp(c.retail)+
+      '\nKNOWN PREPARATION ALLOWANCE: '+gbp(option.prep)+
+      '\nPROJECTED GROSS MARGIN AT ASKING: '+gbp(option.margin)+
+      '\n\nI will not offer, counter or spend money for you. Open Buying Desk to decide your price and negotiate this owner.';
+    const sent=window.MotorTradeInbox?.emit(state,{
+      from:'VEHICLE BUYER · '+buyer.name,category:'operations',
+      subject:'BUYER INTELLIGENCE · '+c.title,
+      preview:'Seller asking '+gbp(c.ask)+' · potential gross '+gbp(option.margin)+
+        '. Owner negotiation recommended.',
+      body,linkPage:'auctions',reference:'private-buyer-tip:'+state.day});
+    if(sent)track(state,'recommendation',0,c.ask,
+      'Buyer recommended '+c.title+'; no offer or payment was made.');
+    return sent?'Buyer recommended '+c.title+' for your negotiation. See Inbox.':null;
   }
   function process(state,E){
     const d=state.operations;
@@ -223,19 +250,9 @@
       return {ok:true,message:r.title+' declined. No cash charged. The vehicle may remain unsold or the supplier opportunity may disappear.'};
     }
     if(r.kind==='buy'){
-      const seller=E.marketFor(state).sellers.find(c=>c.id===r.sellerId);
-      if(!seller||seller.ask!==r.amount)
-        return {ok:false,message:'The supplier price has changed. This approval is no longer valid.'};
-      if(state.cash<protect(state)+seller.ask+
-        seller.profile.basePrep+(seller.profile.hiddenFault?.cost||0))
-        return {ok:false,message:'Insufficient cash after protecting wages, premises and workshop commitments.'};
-      // Approval is permission, not a fictional purchase. Seller can still
-      // counter, and the actual engine must confirm acquisition.
-      const result=E.acquireSeller(state,seller.id,seller.ask);
-      if(!result.ok)return result;
-      close(state,r,'approved','Dealer Principal authorised genuine seller purchase '+seller.title+'.');
-      track(state,'purchase',state.vehicles.at(-1).id,seller.ask,result.message);
-      return {ok:true,message:'Purchase authorised. '+result.message};
+      // Existing v23 buying approvals become referrals only; never cash spends.
+      close(state,r,'approved','Owner acknowledged buyer recommendation without purchasing stock.');
+      return {ok:true,message:'Buyer recommendation acknowledged. £0 spent. Negotiate this owner personally in Buying Desk.'};
     }
     const v=state.vehicles.find(x=>x.id===r.vehicleId);
     if(!v)return {ok:false,message:'Vehicle no longer belongs to this dealership.'};
@@ -269,7 +286,7 @@
   function brief(state){
     const d=state.operations;const requests=pending(state);
     const today=d.history.filter(x=>x.day===state.day);
-    const purchase=today.filter(x=>x.kind==='purchase').length;
+    const purchase=today.filter(x=>x.kind==='recommendation').length;
     const repairs=today.filter(x=>x.kind==='repair'||x.kind==='quality').length;
     const selected=POLICIES.find(p=>p.maxPurchase===d.maxPurchase&&
       p.maxRepair===d.maxRepair);
@@ -282,7 +299,7 @@
       '<h3>SUPERVISOR OPERATIONS · '+(d.enabled?'ACTIVE':'HANDS-ON')+'</h3>'+
       '<p>Manager-run buying and preparation · Click to review authority and operating results.</p></div>'+
       '<span>'+requests.length+' DECISIONS</span></summary><div class="op-expanded">'+
-      '<div class="op-brief-metrics"><div><small>BUYER PURCHASES TODAY</small><strong>'+purchase+'</strong></div>'+
+      '<div class="op-brief-metrics"><div><small>BUYER INTELLIGENCE TODAY</small><strong>'+purchase+'</strong></div>'+
       '<div><small>REPAIR / QC JOBS TODAY</small><strong>'+repairs+'</strong></div>'+
       '<div><small>UNRESOLVED APPROVALS</small><strong>'+requests.length+'</strong></div></div>'+
       '<div class="op-brief-actions"><button type="button" data-page="inbox">OPEN APPROVALS</button>'+
@@ -314,7 +331,7 @@
       '. Approval uses real cash and live stock availability; declining leaves the risk unresolved.</small>'+
       '</div><div class="inbox-approval-choices">'+
       '<button type="button" class="trade-button" data-action="ops-decision" data-id="'+r.id+
-      '" data-decision="approved">APPROVE COST</button>'+
+      '" data-decision="approved">'+(r.kind==='buy'?'ACKNOWLEDGE LEAD · £0':'APPROVE COST')+'</button>'+
       '<button type="button" class="trade-button trade-button-outline" data-action="ops-decision" data-id="'+r.id+
       '" data-decision="declined">DECLINE REQUEST</button>'+
       '<button type="button" class="trade-button trade-button-secondary" data-page="'+
@@ -356,7 +373,7 @@
     }
     return d.history.every(x=>x&&integer(x.day)&&x.day>=1&&x.day<=state.day&&
       ['proposal','purchase','attempt','assessment','repair','quality','listing',
-        'policy','approved','declined','expired'].includes(x.kind)&&
+        'assignment','recommendation','policy','approved','declined','expired'].includes(x.kind)&&
       integer(x.vehicleId)&&x.vehicleId>=0&&cash(x.amount)&&
       typeof x.note==='string'&&x.note.length<=170);
   }
