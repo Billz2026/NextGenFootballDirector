@@ -6,6 +6,14 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### Phase 7B — Compact premium Inbox and refined typography (18 November 2026)
+
+- **Actual one-screen command desk:** Removed the oversized promotional hero, vertically inflated KPI cards and tall decision box. The Inbox now has a slim management header, shared three-metric strip, one compact next-approval preview, search/filter bar and two-pane mail workspace, with the message register and reader independently scrollable. At normal desktop sizes, this prioritises the actual work instead of making the player scroll past a decorative landing page.
+- **Premium typography:** Replaced condensed promotional heading treatment with measured DM Sans headings and body copy, calm weights/letter spacing, and JetBrains Mono for relevant numerical counts. Subdued graphite surfaces, thin dividers and restrained champagne accents replace stacked heavy cards and oversized decorative gold graphics.
+- **Real priorities retained:** Owner approval, financial arrears and unread counts still derive from the current career. The desk previews the next urgent matter and indicates when others are pending; the full list stays accessible. Search, department filters, payment safeguards, and every original approval action remain unchanged.
+- **Responsive rather than compressed:** Desktop uses a fixed available viewport height so the register and decision reader stay in the same working screen at 100% zoom. Smaller devices shift to stacked correspondence and readable controls without cutting off approvals. Browser regression includes a typical 1400×750 desktop viewport, a larger desktop and a phone, with compactness and font checks.
+- **No save migration or financial rule changes:** This is a display and Inbox-priority refinement only, not a change to trading, workshop, customer management or the cash ledger.
+
 ### Phase 7 — Dealer Principal premium Inbox command centre (18 November 2026)
 
 - **Full operational command centre:** Replaces the basic owner's mail heading with a premium graphite-and-brass executive workspace. An at-a-glance briefing shows the live game day/date and a current owner-authorisation status, along with three *real* measurements: decisions requiring authority, types of outstanding financial arrears and unread communications.
