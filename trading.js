@@ -8,7 +8,7 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 23;
+  const VERSION = 24;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
@@ -19,6 +19,8 @@
   if(!DELEG)throw new Error('Load dealer-delegation.js before trading.js');
   const OPS=window.MotorTradeOperations;
   if(!OPS)throw new Error('Load supervisor-operations.js before trading.js');
+  const AU=window.MotorTradeAuctionAgent;
+  if(!AU)throw new Error('Load auction-supervisor.js before trading.js');
   const C = window.MotorTradeCustomers;
   const AS = window.MotorTradeAfterSales;
   if(!AS)throw new Error('Load aftersales.js before trading.js');
@@ -341,7 +343,7 @@
       auctionHall:initialAuctionHall(1),auctionHistory:[],
       inboxLedgerCursor:0,stockAgeingArrears:0,lastStockAgeingDay:1,
       premises:SITE.initial(),group:GROUP.initial(),delegation:DELEG.initial(),
-      operations:OPS.initial(),...AS.initial(1),...P.initial()
+      operations:OPS.initial(),auctionAgent:AU.initial(),...AS.initial(1),...P.initial()
     };
     M.initialize(state);
     Object.assign(state,D.initial());
@@ -367,7 +369,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -502,6 +504,7 @@
     // policy. v21 and older owners retain every historical transaction.
     if(saved.version>=22&&!DELEG.valid(saved.delegation,saved))return null;
     if(saved.version>=23&&!OPS.valid(saved.operations,saved))return null;
+    if(saved.version>=24&&!AU.valid(saved.auctionAgent,saved))return null;
     const ids = [...saved.vehicles,...saved.sold,...wholesale].map(v => v.id);
     if (new Set(ids).size !== ids.length || ids.some(id => id >= saved.nextId)) return null;
     // Do not rebase historical £12,500 saves. The opening capital marker
@@ -518,6 +521,7 @@
       group:saved.version>=21?GROUP.clone(saved.group):GROUP.initial(),
       delegation:saved.version>=22?DELEG.clone(saved.delegation):DELEG.initial(),
       operations:saved.version>=23?OPS.clone(saved.operations):OPS.initial(),
+      auctionAgent:saved.version>=24?AU.clone(saved.auctionAgent):AU.initial(),
       ...(saved.version>=20?AS.clone(saved):AS.initial(saved.day)),
       stockAgeingArrears:saved.version>=19?saved.stockAgeingArrears:0,
       lastStockAgeingDay:saved.version>=19?saved.lastStockAgeingDay:saved.day,
@@ -564,6 +568,7 @@
     if(!GROUP.valid(restored.group,restored))return null;
     if(!DELEG.valid(restored.delegation,restored))return null;
     if(!OPS.valid(restored.operations,restored))return null;
+    if(!AU.valid(restored.auctionAgent,restored))return null;
     // v17 and earlier owned stock and legacy costs are validated first.
     // A reputation unlock is then granted without a fabricated capital debit.
     SITE.sync(restored);
