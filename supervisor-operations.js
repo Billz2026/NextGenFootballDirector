@@ -209,7 +209,8 @@
     const candidates=E.marketFor(state).sellers
       .filter(c=>!state.vehicles.some(v=>v.origin===c.id)&&c.marketTier!=='new')
       .map(c=>evaluate(state,E,c)).filter(Boolean)
-      .filter(o=>o.margin>=state.operations.minMargin)
+      .filter(o=>o.margin>=state.operations.minMargin&&
+        o.cost<=state.operations.maxPurchase)
       .sort((a,b)=>b.score-a.score);
     const option=candidates[0];
     if(!option)return null;
@@ -299,7 +300,7 @@
     return '<details class="op-brief" aria-label="Supervisor operations dashboard">'+
       '<summary class="op-brief-head"><div><small>DEALER PRINCIPAL · PURCHASING AND WORKSHOP</small>'+
       '<h3>SUPERVISOR OPERATIONS · '+(d.enabled?'ACTIVE':'HANDS-ON')+'</h3>'+
-      '<p>Manager-run buying and preparation · Click to review authority and operating results.</p></div>'+
+      '<p>Staff scout private sellers while you negotiate. Workshop preparation is delegated. Review budgets and team results.</p></div>'+
       '<span>'+requests.length+' DECISIONS</span></summary><div class="op-expanded">'+
       '<div class="op-brief-metrics"><div><small>BUYER INTELLIGENCE TODAY</small><strong>'+purchase+'</strong></div>'+
       '<div><small>REPAIR / QC JOBS TODAY</small><strong>'+repairs+'</strong></div>'+
@@ -307,13 +308,13 @@
       '<div class="op-brief-actions"><button type="button" data-page="inbox">OPEN APPROVALS</button>'+
       '<button type="button" data-action="ops-mode" data-enabled="'+(!d.enabled)+'">'+
       (d.enabled?'PAUSE AUTOMATION':'RESUME SUPERVISOR')+'</button></div>'+
-      '<details class="op-brief-settings"><summary>ADJUST SUPERVISOR SPENDING POLICY · '+
+      '<details class="op-brief-settings"><summary>ADJUST SOURCING AND WORKSHOP POLICY · '+
       escape(selected?.name||'CUSTOM')+'</summary>'+
       '<div class="op-options">'+POLICIES.map(p=>{
         const chosen=p.key===selected?.key;
         return '<button type="button" data-action="ops-policy" data-policy="'+p.key+'" class="'+
           (chosen?'op-selected':'')+'"><strong>'+p.name+(chosen?' · ACTIVE':'')+'</strong>'+
-          '<small>Buy up to '+gbp(p.maxPurchase)+' · repairs up to '+gbp(p.maxRepair)+
+          '<small>Scout cars up to '+gbp(p.maxPurchase)+' · repairs up to '+gbp(p.maxRepair)+
           ' incl. £170 QC contingency · expected margin '+gbp(p.minMargin)+
           ' · max '+p.maxStock+' cars</small><span>'+p.note+'</span></button>';
       }).join('')+'</div></details>'+
