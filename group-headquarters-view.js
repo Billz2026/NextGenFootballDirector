@@ -65,7 +65,8 @@
           '<button type="button" class="mg-action" data-action="group-open" data-city="'+
           esc(city.key)+'" '+(q.ok?'':'disabled')+'>'+
           (q.ok?'OPEN '+esc(city.name.toUpperCase())+' BRANCH':
-          (q.shortfall?'CASH SHORT '+money(q.shortfall):esc(q.why)))+'</button>'+
+          (q.rank<10?'LOCKED · RANK 10 REQUIRED':
+            q.shortfall?'CASH SHORT '+money(q.shortfall):esc(q.why)))+'</button>'+
           '</article>';
       }).join('')+'</div></section>';
   }
