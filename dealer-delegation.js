@@ -331,6 +331,7 @@
       ' discount from asking, minimum '+gbp(d.minGross)+' gross margin, and part-exchange '+
       'allowance up to '+gbp(d.maxPartExchange)+
       '. Expensive or weak-margin deals require supervisor approval. No sale is guaranteed.</small>'+
+      '<details class="dp-policy-details"><summary>EDIT SALES AUTHORITY POLICY</summary>'+
       '<div class="dp-policies">'+POLICIES.map(p=>{
         const active=d.maxDiscount===p.maxDiscount&&d.minGross===p.minGross&&
           d.maxPartExchange===p.maxPartExchange;
@@ -340,7 +341,7 @@
           '<small>'+gbp(p.maxDiscount)+' maximum discount · '+gbp(p.minGross)+
           ' minimum gross margin · up to '+gbp(p.maxPartExchange)+
           ' part-exchange allowance</small><span>'+p.benefit+'</span></button>';
-      }).join('')+'</div></section>';
+      }).join('')+'</div></details></section>';
   }
   function valid(d,state){
     if(!d||typeof d.enabled!=='boolean'||!num(d.maxDiscount)||
