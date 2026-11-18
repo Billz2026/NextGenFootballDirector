@@ -202,12 +202,12 @@
           '<small>'+label+'</small><strong>'+esc(value)+'</strong><span>'+note+
         '</span></div>').join('')+'</div>';
     const main='<div class="rep-main-grid">'+
-      '<section class="rep-panel"><div class="rep-panel-head"><div><small>CAREER PROGRESSION</small>'+
-        '<h3>REPUTATION LEVELS</h3></div><span>5 TIERS</span></div>'+
-        '<div class="rep-stage-list">'+tierRows+'</div>'+
-        '<p class="rep-panel-note">Tier limits are recalculated from your current score. '+
-        'Staffing and premises changes also require available capacity and cash.</p></section>'+
-      '<section class="rep-panel"><div class="rep-panel-head"><div><small>WHAT SHAPES THE SCORE</small>'+
+      '<details class="rep-trust-tiers"><summary><span>CUSTOMER TRUST BANDS · 0–100</span>'+
+      '<small>5 TRUST BRACKETS · NOT CAREER RANKS</small></summary>'+
+      '<div class="rep-trust-content"><p class="rep-trust-copy">These five customer-trust brackets control existing staffing, stock access and premises rules. The separate 100-rank prestige career is displayed in full above.</p>'+
+      '<div class="rep-stage-list">'+tierRows+'</div>'+
+      '<p class="rep-panel-note">Trust bands follow the live 0–100 score and can fall. Already-earned permanent forecourt spaces remain owned. Other unlocks still require available capital.</p></div></details>'+
+      '<section class="rep-panel"><div class="rep-panel-head"><div><small>WHAT SHAPES CUSTOMER TRUST</small>'+
         '<h3>BUILDING TRUST</h3></div><span>REAL GAME EVENTS</span></div>'+
         '<div class="rep-drivers"><div><strong>BUILDS REPUTATION</strong>'+
         '<p>Completed handovers of good-condition cars; strong customer care and fair prices.</p></div>'+

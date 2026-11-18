@@ -169,6 +169,84 @@
     return {points,rank,trustReady,current,next,branch,upcomingBranch,
       blocked,remaining,needed,stats:s,requirements:next?requirements(next.rank,s,state):[]};
   }
+  // Rank 0 is the starting Prestige Dealer position. Ranks 1–100 are all
+  // individually displayed, with one major promotion after every ten ranks.
+  // The list is derived from the same status calculation as gameplay.
+  function rankPath(state,p=status(state)){
+    return Array.from({length:MAX_RANK+1},(_,rank)=>{
+      const stage=STAGES.find(s=>s.rank===rank)||null;
+      const achieved=p.trustReady&&rank<p.rank;
+      const current=p.trustReady&&rank===p.rank;
+      const locked=!achieved&&!current;
+      const gateBlocked=!!p.blocked&&p.blocked.stage.rank===rank;
+      return {rank,points:rank*POINTS_PER_RANK,stage,
+        status:achieved?'achieved':current?'current':'locked',
+        locked,gateBlocked};
+    });
+  }
+  function pathway(state,p){
+    const ranks=rankPath(state,p);
+    const origin=ranks[0];
+    const originState=origin.status.toUpperCase();
+    const originRow='<div class="empire-origin empire-rank-'+origin.status+'">'+
+      '<div><small>CAREER FOUNDATION</small><strong>RANK 00 · PRESTIGE DEALER</strong>'+
+      '<p>Enter the prestige career at 80/100 customer trust. One original dealership.</p></div>'+
+      '<span class="empire-origin-status">'+originState+'</span></div>';
+    const chapters=Array.from({length:10},(_,i)=>{
+      const first=i*10+1,last=first+9,stage=STAGES[i+1];
+      const unlocked=p.trustReady&&p.rank>=last;
+      const active=p.trustReady&&p.rank>=first-1&&p.rank<last;
+      const chapterState=unlocked?'achieved':active?'current':'locked';
+      const gateChecks=requirements(last,p.stats,state);
+      const complete=gateChecks.filter(check=>check.met).length;
+      const blocked=!!p.blocked&&p.blocked.stage.rank===last;
+      const gateStatus=unlocked?'ACHIEVED':blocked?'PROMOTION BLOCKED':'LOCKED';
+      const tiles=ranks.slice(first,last+1).map(r=>{
+        const isGate=!!r.stage;
+        const title=isGate?stage.title:'Progress toward '+stage.title;
+        const statusLabel=r.gateBlocked?'LOCKED · GATE':r.status.toUpperCase();
+        return '<div class="empire-path-rank empire-rank-'+r.status+
+          (isGate?' empire-rank-promotion':'')+
+          (r.gateBlocked?' empire-rank-gated':'')+
+          '" aria-label="Rank '+r.rank+', '+fmt(r.points)+' prestige points, '+
+          esc(title)+', '+esc(statusLabel)+'">'+
+          '<small>RANK '+String(r.rank).padStart(2,'0')+'</small>'+
+          '<strong>'+fmt(r.points)+' <span>PTS</span></strong>'+
+          '<em>'+esc(statusLabel)+'</em>'+
+          '</div>';
+      }).join('');
+      const gateRows=gateChecks.map(check=>{
+        const future=/future (?:stock|expansion)/i.test(check.name);
+        return '<div class="empire-gate-check '+(check.met?'empire-done':'empire-locked')+'">'+
+          '<span aria-hidden="true">'+(check.met?'◆':'◇')+'</span>'+
+          '<span><strong>'+esc(check.name)+'</strong>'+
+          (future?'<small>Requires a planned future game system</small>':'')+'</span>'+
+          '<em>'+esc(check.detail)+'</em></div>';
+      }).join('');
+      return '<section class="empire-path-chapter empire-chapter-'+chapterState+
+        '" aria-label="Ranks '+first+' to '+last+', '+esc(stage.title)+'">'+
+        '<div class="empire-chapter-heading"><div><small>CHAPTER '+String(i+1).padStart(2,'0')+
+        ' · RANKS '+String(first).padStart(2,'0')+'–'+last+'</small>'+
+        '<h4>'+esc(stage.title)+'</h4></div>'+
+        '<span class="empire-chapter-state">'+(unlocked?'ACHIEVED':active?'CURRENT CHAPTER':'LOCKED')+'</span></div>'+
+        '<div class="empire-rank-grid" role="group" aria-label="All ranks '+first+' to '+last+'">'+tiles+'</div>'+
+        '<div class="empire-gate-summary"><div><strong>RANK '+last+' PROMOTION GATE</strong>'+
+        '<small>'+complete+' / '+gateChecks.length+' REQUIREMENTS MET</small></div>'+
+        '<span class="empire-gate-state '+(blocked?'empire-gate-blocked':'')+'">'+gateStatus+'</span></div>'+
+        '<div class="empire-gate-checks">'+gateRows+'</div></section>';
+    }).join('');
+    return '<section class="empire-pathway" aria-label="Complete 100-rank career pathway">'+
+      '<div class="empire-path-heading"><div><small>COMPLETE MOTOR TRADE CAREER</small>'+
+      '<h3>THE FULL 100-RANK PATHWAY</h3>'+
+      '<p>Every rank from 1 to 100 is shown below, including its point target. '+
+      'Major promotions require both points and business results.</p></div>'+
+      '<span>100 RANKS · 2,000 PTS</span></div>'+
+      '<div class="empire-legend" aria-label="Rank status key">'+
+      '<span class="empire-legend-achieved">◆ ACHIEVED</span>'+
+      '<span class="empire-legend-current">◆ CURRENT</span>'+
+      '<span class="empire-legend-locked">◇ LOCKED</span></div>'+
+      originRow+chapters+'</section>';
+  }
   function render(state){
     const p=status(state),progress=clamp(p.points-p.rank*POINTS_PER_RANK,0,POINTS_PER_RANK);
     const head=p.blocked?'PROMOTION HELD — BUSINESS REQUIREMENTS OUTSTANDING':
@@ -179,9 +257,6 @@
       '<div class="empire-check '+(c.met?'empire-done':'empire-missing')+'">'+
       '<span aria-hidden="true">'+(c.met?'◆':'◇')+'</span><strong>'+esc(c.name)+'</strong>'+
       '<small>'+esc(c.detail)+'</small></div>').join('');
-    const chapterRows=STAGES.map(s=>
-      '<div class="empire-roadmap-row"><span>RANK '+s.rank+'</span><strong>'+
-      esc(s.title)+'</strong><em>'+(p.rank>=s.rank?'EARNED':'LOCKED')+'</em></div>').join('');
     return '<section class="empire-panel" aria-label="One hundred rank empire career">'+
       '<div class="empire-heading"><div><small>CAREER PRESTIGE / MOTOR GROUP DEVELOPMENT</small>'+
       '<h3>'+esc(p.current.title)+'</h3><p>Separate from the live 0–100 customer trust score.</p></div>'+
@@ -202,8 +277,7 @@
       ', up to '+p.upcomingBranch.cap+' sites — '+esc(p.upcomingBranch.scope)+'.':
       'Maximum branch permission tier reached.')+'</p>'+
       '<small>Branch permission is a roadmap only. Additional sites, franchise agreements and country-specific trading are not yet available in this release.</small></div>'+
-      '<details class="empire-roadmap"><summary>VIEW THE ELEVEN MAJOR CAREER STAGES</summary>'+
-      '<div>'+chapterRows+'</div></details>'+
+      pathway(state,p)+
       '<p class="empire-method">Points are calculated from recorded profitable handovers (maximum 20 per calendar month), archived profitable monthly targets, clean operating months and one-time milestones. Unpaid bills and incomplete promotion conditions can block the highest ranks. Existing saves earn credit automatically, without modifying transactions.</p>'+
       '</section>';
   }
@@ -220,6 +294,6 @@
   }
   window.MotorTradeEmpire=Object.freeze({
     MAX_POINTS,MAX_RANK,POINTS_PER_RANK,STAGES,BRANCH_STAGES,
-    stats,earnedPoints,requirements,status,render,branchBrief
+    stats,earnedPoints,requirements,status,rankPath,pathway,render,branchBrief
   });
 })();

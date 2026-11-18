@@ -6,6 +6,13 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### Reputation pathway refinement — all 100 ranks visible (18 November 2026)
+
+- **Complete, visible career ladder:** The Reputation screen lists every unlockable prestige rank 1–100 (20–2,000 points) in ten chapters, plus Rank 0 as the existing Prestige foundation. Each rank shows its exact points requirement and an ACHIEVED, CURRENT or LOCKED status; major promotion gates show their actual business conditions and whether the gate is blocked.
+- **Future requirements are honest:** High-rank gates involving additional trading branches, international operations or ultra-luxury inventory are explicitly labelled as planned systems. Merely earning the points does not falsely show those promotions as completed.
+- **Separate systems clearly:** The original five **customer trust** brackets (0–100) are under a named, collapsed "Customer Trust Bands" explanation; they are no longer presented as the full career ladder. The 100-rank prestige pathway remains fully visible without another expansion control.
+- **No career mutation:** Presentation is derived from the existing career data and progression engine. No new payments, unlocks, save migrations or changes to the customer trust mechanics. Includes regression checks for the complete pathway and locked-status accuracy.
+
 ### Empire Prestige phase 1 — 100 ranks and expansion roadmap (18 November 2026)
 
 - **Separate long-term progression:** The existing 0–100 customer-trust score, staffing unlocks, market access, workshop rules and forecourt capacity remain untouched. A new prestige career path runs from Rank 0 to Rank 100 (2,000 points total), with eleven named major career stages.
