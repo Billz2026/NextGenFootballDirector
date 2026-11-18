@@ -21,12 +21,13 @@
   const DELEG = window.MotorTradeDelegation;
   const OPS = window.MotorTradeOperations;
   const AU = window.MotorTradeAuctionAgent;
+  const MC = window.MotorTradeManagerCareer;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !OPS || !AU || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !OPS || !AU || !MC || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -174,6 +175,7 @@
   let selectedMonth = 'current'; // Current-day input, retained while opening a report.
   let selectedGroupBranchId = 'original'; // UI selection only; no duplicate saved branch
   let groupManagerChoice = 'm1';
+  let selectedEmployerId = MC.firstJobs()[0]?.id || null;
 
   function gameDate(day) {
     return new Date(START_DATE_UTC + (day - 1) * MS_PER_DAY);
@@ -561,6 +563,60 @@
     renderEvents();
   }
 
+  // The 50 dealership names are fictional. Locked employers remain visible
+  // but cannot be selected with a new manager's initial reputation.
+  function renderManagerEmployers(){
+    const search=byId('employer-search').value.trim().toLowerCase();
+    const mode=byId('employer-filter').value;
+    const eligible=MC.DEALERS.filter(d=>MC.eligible(d,MC.START_REPUTATION));
+    const chosen=MC.dealer(selectedEmployerId);
+    const available=chosen&&MC.eligible(chosen,MC.START_REPUTATION)?chosen:null;
+    const matches=MC.DEALERS.filter(d=>
+      (!search||[d.name,d.city,d.focus,d.tier].some(s=>s.toLowerCase().includes(search)))&&
+      (mode==='all'||(mode==='available')===MC.eligible(d,MC.START_REPUTATION))
+    );
+    byId('employer-count').textContent=eligible.length+' AVAILABLE · '+(50-eligible.length)+' LOCKED';
+    byId('employer-list').innerHTML=matches.map(d=>{
+      const unlocked=MC.eligible(d,MC.START_REPUTATION);
+      const stars='★'.repeat(d.stars)+'☆'.repeat(5-d.stars);
+      return '<button type="button" class="manager-employer" data-action="select-employer" data-employer="'+
+        escapeText(d.id)+'" '+(unlocked?'':'disabled ')+'aria-pressed="'+
+        String(unlocked&&available?.id===d.id)+'">'+
+        '<span class="manager-employer-top"><span>'+escapeText(d.city.toUpperCase())+
+        '</span><span class="manager-employer-stars" aria-label="'+d.stars+' of 5 stars">'+stars+'</span></span>'+
+        '<strong class="manager-employer-name">'+escapeText(d.name)+'</strong>'+
+        '<span class="manager-employer-focus">'+escapeText(d.focus)+'</span>'+
+        '<span class="manager-employer-status">'+
+        (unlocked?'AVAILABLE · '+d.monthlyTarget+' SALES / MONTH':
+          'LOCKED · REQUIRES '+d.requiredReputation+'/100 MANAGER REP')+
+        '</span></button>';
+    }).join('')||'<p class="manager-empty-filter">No companies match this search. Try another city or filter.</p>';
+    byId('manager-employer-name').textContent=available?.name||'Select an employer';
+    byId('manager-employer-description').textContent=available?
+      available.city+' · '+available.focus+' · '+available.tierLabel:
+      'Choose an accessible independent from the employer list.';
+    byId('manager-opening-cash').textContent=available?money.format(available.openingCash):'—';
+    byId('manager-board-target').textContent=available?
+      available.monthlyTarget+' sales / month':'—';
+    byId('manager-career-submit').disabled=!available;
+  }
+
+  function renderManagerStatus(){
+    const strip=byId('manager-career-strip'),m=career?.managerCareer;
+    const dealer=m?MC.dealer(m.employerId):null;
+    strip.hidden=!m||!dealer;
+    byId('manager-sidebar-role').textContent=dealer?'MANAGED · '+dealer.city.toUpperCase():
+      'INDEPENDENT MOTOR TRADER';
+    byId('sidebar-career-label').textContent=dealer?'YOUR EMPLOYER':'YOUR DEALERSHIP';
+    if(!dealer)return;
+    strip.innerHTML='<span>MANAGER <strong>'+escapeText(m.managerName)+
+      '</strong> · '+escapeText(dealer.name)+'</span>'+
+      '<span class="manager-strip-stats"><span>MANAGER REP <b>'+
+      m.reputation+'/100</b></span><span>BOARD CONFIDENCE <b>'+
+      m.boardConfidence+'/100</b></span><span>BOARD EXPECTATION <b>'+
+      dealer.monthlyTarget+' SALES / MONTH</b></span></span>';
+  }
+
   function render() {
     const menu = byId('screen-menu');
     menu.hidden = screen !== 'menu';
@@ -572,6 +628,7 @@
     byId('menu-setting-motion').setAttribute('aria-pressed', String(display.motion));
     byId('screen-setup').hidden = screen !== 'setup';
     byId('screen-career').hidden = screen !== 'career';
+    if(screen==='setup')renderManagerEmployers();
     byId('menu-continue').hidden = !career;
     byId('menu-continue').className = 'action-btn action-btn-primary';
     byId('menu-new-career').className = career ? 'action-btn action-btn-secondary' : 'action-btn action-btn-primary';
@@ -598,6 +655,7 @@
         career.name + ' / Day ' + String(career.day).padStart(2, '0');
     }
     if (screen !== 'career' || !career) return;
+    renderManagerStatus();
     const promotionLayer=byId('career-promotion');
     promotionLayer.hidden=!careerPromotion;
     if(careerPromotion){
@@ -732,7 +790,10 @@
     // This keeps reports internally reconcilable with recorded ledger dates.
     if(career.day===career.monthPlan.endDay)G.closeMonth(career);
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
-    if(closed)SITE.sync(career);
+    if(closed){
+      MC.review(career,closed);
+      SITE.sync(career);
+    }
     career.day += 1;
     E.rollAuctionHall(career);
     auctionPreviewId=null;
@@ -907,20 +968,32 @@
       return;
     }
     const input = byId('dealership-name');
-    const name = input.value.trim().replace(/\s+/g, ' ');
-    if (name.length < 2 || name.length > 36) {
-      input.setCustomValidity('Enter a name between 2 and 36 characters.');
+    const managerName = input.value.trim().replace(/\s+/g, ' ');
+    if (managerName.length < 2 || managerName.length > 36) {
+      input.setCustomValidity('Enter a manager name between 2 and 36 characters.');
       input.reportValidity();
       return;
     }
     input.setCustomValidity('');
+    const employer=MC.dealer(selectedEmployerId);
+    if(!MC.eligible(employer,MC.START_REPUTATION)){
+      window.alert('This company does not accept an entry-level manager. Choose an available independent.');
+      return;
+    }
     const existing = SAVES.status(E.normalize);
     if ((career || existing.hasPrimary) &&
-      !window.confirm('Replace the saved dealership? This overwrites the current browser career. ' +
-        'Use CAREER SAVES to export it first. A recent valid save may be recoverable locally.')) return;
+      !window.confirm('Start a new management career at '+employer.name+'? This replaces the current browser save. '+
+        'Export your existing career first if you want to keep it; a recent valid local backup may remain available.'))return;
     const previousAccount=ACCOUNT?.activeAccount || null;
     if(ACCOUNT && !ACCOUNT.startGuestMode())return;
-    const newCareer = E.createStaffed(name, welcomeMessages());
+    const newCareer = E.createStaffed(employer.name, []);
+    const appointment=MC.enrol(newCareer,managerName,employer.id);
+    if(!appointment.ok){
+      if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
+      window.alert(appointment.message);
+      return;
+    }
+    newCareer.messages=MC.welcome(newCareer);
     const result = SAVES.save(newCareer, E.normalize, {force:true, backupPrevious:true});
     if (!result.ok) {
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
@@ -929,7 +1002,7 @@
       render();
       return;
     }
-    openRecoveredCareer(newCareer, 'Career created and saved on this device. Use CAREER SAVES to export an independent backup.');
+    openRecoveredCareer(newCareer, 'Manager appointed at '+employer.name+'. Your career is saved on this device. Export a backup from CAREER SAVES.');
   }
 
   function downloadCareer() {
@@ -1014,6 +1087,8 @@
     startCareer();
   });
   byId('dealership-name').addEventListener('input', event => event.target.setCustomValidity(''));
+  byId('employer-search').addEventListener('input', renderManagerEmployers);
+  byId('employer-filter').addEventListener('change', renderManagerEmployers);
   byId('career-import-file').addEventListener('change', async event => {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -1131,6 +1206,14 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'select-employer': {
+        const candidate=MC.dealer(button.dataset.employer);
+        if(screen==='setup'&&MC.eligible(candidate,MC.START_REPUTATION)){
+          selectedEmployerId=candidate.id;
+          renderManagerEmployers();
+        }
+        break;
+      }
       case 'auction-agent':
         if(career){
           const id=button.dataset.id;
