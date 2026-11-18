@@ -22,7 +22,7 @@ const engineScripts=[
   'vehicle-market.js','premises.js','people.js','calendar.js',
   'monthly.js','career-progression.js','events.js','showroom-traffic.js',
   'workshop.js','stock-ageing.js','customers.js','aftersales.js',
-  'trading.js','vehicle-cards.js','vehicle-view.js','staff-performance.js',
+  'empire-progression.js','motor-group.js','trading.js','vehicle-cards.js','vehicle-view.js','staff-performance.js',
   'people-view.js','monthly-view.js','events-view.js','workshop-view.js',
   'customers-view.js','aftersales-view.js','premises-view.js',
   'auction-hall-view.js','dashboard-view.js','inbox-office.js',

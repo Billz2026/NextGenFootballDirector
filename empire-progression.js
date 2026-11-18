@@ -40,7 +40,10 @@
     name,met:current>=target,detail:fmt(current)+' / '+fmt(target)
   });
   function stats(state){
-    const sold=Array.isArray(state.sold)?state.sold:[];
+    const originalSales=Array.isArray(state.sold)?state.sold:[];
+    const branchSales=(state.group?.branches||[]).flatMap(b=>Array.isArray(b.sales)?b.sales:[]);
+    const sold=[...originalSales,...branchSales].sort((a,b)=>
+      (a.day||0)-(b.day||0));
     const reports=Array.isArray(state.monthlyReports)?state.monthlyReports:[];
     const wins=Array.isArray(state.auctionHistory)?
       state.auctionHistory.filter(r=>r.kind==='won').length:0;
@@ -118,7 +121,7 @@
       case 50:return [achieved('Luxury handovers',s.luxurySales,50),
         achieved('Highest recorded cash (£)',s.bestCash,500000),
         achieved('Profitable target-achieving months',s.profitableMonths,15),
-        achieved('Operating branches (future expansion)',s.branchCount,2)];
+        achieved('Operating branches',s.branchCount,2)];
       case 60:return [achieved('Ultra-luxury handovers (future stock)',s.ultraSales,10),
         achieved('Operating branches (future expansion)',s.branchCount,3)];
       case 70:return [achieved('Ultra-luxury handovers (future stock)',s.ultraSales,25),
@@ -276,21 +279,25 @@
       '<p>'+(p.upcomingBranch?'Next branch milestone: Rank '+p.upcomingBranch.rank+
       ', up to '+p.upcomingBranch.cap+' sites — '+esc(p.upcomingBranch.scope)+'.':
       'Maximum branch permission tier reached.')+'</p>'+
-      '<small>Branch permission is a roadmap only. Additional sites, franchise agreements and country-specific trading are not yet available in this release.</small></div>'+
+      '<small>Branch permission is a roadmap only. Rank 10 permits one real manager-operated UK satellite via Group HQ. Additional sites, franchise agreements and international trading are not yet available.</small></div>'+
       pathway(state,p)+
       '<p class="empire-method">Points are calculated from recorded profitable handovers (maximum 20 per calendar month), archived profitable monthly targets, clean operating months and one-time milestones. Unpaid bills and incomplete promotion conditions can block the highest ranks. Existing saves earn credit automatically, without modifying transactions.</p>'+
       '</section>';
   }
   function branchBrief(state){
     const p=status(state);
-    return '<section class="hq-empire-brief" aria-label="Future motor group expansion">'+
+    const hasSatellite=(state.group?.branches?.length||0)>0;
+    return '<section class="hq-empire-brief" aria-label="Motor group expansion">'+
       '<div><small>LONG-TERM GROUP STRATEGY</small><h3>BUILD A MOTOR GROUP</h3>'+
       '<p>Prestige rank '+p.rank+'/100 · '+fmt(p.points)+'/2,000 points. '+
       (p.upcomingBranch?'Next branch milestone at Rank '+p.upcomingBranch.rank+
         ' (up to '+p.upcomingBranch.cap+' sites).':'Top branch permission tier reached.')+
       '</p></div><span>EXPANSION ROADMAP</span>'+
-      '<p>Multiple independently trading branches, acquisitions and manufacturer franchises are future development stages. No site is opened and no cash is charged by this preview.</p>'+
-      '<button type="button" data-page="reputation">VIEW CAREER ROADMAP ↗</button></section>';
+      '<p>'+(hasSatellite?'Your second UK site is trading under its appointed branch manager. '+
+      'Further acquisitions, franchises and international operations are future development stages.':
+      'A second UK site is now playable from Rank 10, with its own cash, stock and staff bills. '+
+      'No site is opened and no cash is charged by this preview.')+'</p>'+
+      '<button type="button" data-page="group">OPEN GROUP HEADQUARTERS ↗</button></section>';
   }
   window.MotorTradeEmpire=Object.freeze({
     MAX_POINTS,MAX_RANK,POINTS_PER_RANK,STAGES,BRANCH_STAGES,
