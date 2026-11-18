@@ -227,7 +227,10 @@
     const stats={ok:true,processed:true,served:0,completed:0,lost:0,escalated:0,assigned:0};
     const active=window.MotorTradePeople.activeTeam(state,'sales');
     const supervisor=window.MotorTradePeople.supervisor(state);
-    const used=new Set(state.showroom?.staffUsed||[]);
+    // Walk-in staffUsed is accounted for by Q.availableStaff. Existing live
+    // assigned cases must still be progressed once, even if they were first
+    // welcomed earlier in this same session.
+    const used=new Set();
     const count=r=>{
       if(r.completed)stats.completed++;
       if(r.lost)stats.lost++;
