@@ -670,6 +670,7 @@
     const dealer=m?MC.dealer(m.employerId):null;
     strip.hidden=!m||!dealer;
     byId('manager-profile-nav').hidden=!m;
+    byId('group-owner-nav').hidden=!!m;
     byId('manager-sidebar-role').textContent=dealer?'MANAGED · '+dealer.city.toUpperCase():
       'INDEPENDENT MOTOR TRADER';
     byId('sidebar-career-label').textContent=dealer?'YOUR EMPLOYER':'YOUR DEALERSHIP';
@@ -800,7 +801,8 @@
       careerPromotion = null;
     } else if (career && Object.prototype.hasOwnProperty.call(PAGES, pageOrScreen)) {
       screen = 'career';
-      currentPage = pageOrScreen;
+      currentPage = career.managerCareer&&pageOrScreen==='group'?
+        'manager':pageOrScreen;
     }
     eventNotice = '';
     lastTradeResult = null;
@@ -1267,6 +1269,11 @@
     if (!button) return;
     const destination = button.dataset.page;
     if (destination && Object.prototype.hasOwnProperty.call(PAGES, destination)) {
+      if(destination==='group'&&career?.managerCareer){
+        currentPage='manager';
+        eventNotice='Group HQ acquisitions and branch ownership are reserved for owners. Your career is as a salaried dealership manager.';
+        render();return;
+      }
       const id=Number(button.dataset.id);
       if(career&&Number.isSafeInteger(id)&&career.vehicles.some(v=>v.id===id)){
         if(destination==='workshop'){selectedWorkshopId=id;workshopFilter='all';}
@@ -1287,6 +1294,11 @@
       eventNotice='Auction invoice outstanding. Pay the hammer plus buyer fee before other dealership decisions.';
       render();
       return;
+    }
+    if(career?.managerCareer&&button.dataset.action?.startsWith('group-')){
+      currentPage='manager';
+      eventNotice='Group ownership and capital transfers require the company owner. This manager career does not authorise them.';
+      render();return;
     }
     switch (button.dataset.action) {
       case 'select-employer': {
