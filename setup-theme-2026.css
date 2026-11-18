@@ -1,0 +1,254 @@
+/* The Motor Trade | New-career screen, 2026 management-shell alignment.
+   Presentation only: registration, starting funds and career creation stay intact.
+   Scoped to #screen-setup to preserve the approved main menu and game screens. */
+#screen-setup.setup-screen {
+  --setup-bg:#080a0d;
+  --setup-panel:#121a21;
+  --setup-raised:#172129;
+  --setup-line:#303b44;
+  --setup-ink:#f4f5f5;
+  --setup-secondary:#d8dee2;
+  --setup-muted:#aab6be;
+  --setup-gold:#bda77f;
+  --setup-red:#b9233f;
+  background:
+    radial-gradient(ellipse 55% 55% at 19% 45%,rgba(51,63,71,.16),transparent 80%),
+    var(--setup-bg);
+  color:var(--setup-ink);
+  font-family:var(--body);
+}
+#screen-setup .setup-header {
+  min-height:55px;
+  padding:10px clamp(22px,4vw,60px);
+  border-bottom:1px solid var(--setup-line);
+  background:#0b1117;
+  color:var(--setup-muted);
+  font:700 10px/1.3 var(--body);
+  letter-spacing:.085em;
+}
+#screen-setup .setup-header > span {
+  color:#aab6be;
+}
+#screen-setup .quiet-button {
+  padding:9px 0;
+  border:0;
+  background:transparent;
+  color:var(--setup-secondary);
+  font:750 10px/1.2 var(--body);
+  letter-spacing:.065em;
+}
+#screen-setup .quiet-button:hover {color:#fff}
+#screen-setup .setup-layout {
+  width:min(1280px,calc(100% - 88px));
+  min-height:calc(100svh - 60px);
+  grid-template-columns:minmax(0,1fr) minmax(410px,.94fr);
+  gap:clamp(35px,5vw,90px);
+  align-items:center;
+  padding:22px 0 31px;
+}
+#screen-setup .setup-intro {min-width:0}
+#screen-setup .brand-lockup-setup {
+  align-items:flex-start;
+  margin-bottom:44px;
+}
+#screen-setup .brand-lockup-setup .parent-wordmark {
+  width:155px;
+  max-width:155px;
+  height:auto;
+  filter:drop-shadow(0 2px 7px rgba(0,0,0,.22));
+}
+#screen-setup .brand-lockup-setup .trade-wordmark {
+  margin-top:0;
+  color:var(--setup-ink);
+  font:800 23px/1 var(--body);
+  letter-spacing:-.028em;
+  text-shadow:none;
+}
+#screen-setup .brand-lockup-setup .trade-wordmark b {color:var(--setup-ink)}
+#screen-setup .brand-lockup-setup .trade-wordmark b span {color:var(--setup-red)}
+#screen-setup .setup-intro .section-overline {
+  margin-bottom:14px;
+  color:var(--setup-gold);
+  font:750 10px/1.3 var(--body);
+  letter-spacing:.12em;
+}
+#screen-setup .setup-intro h1 {
+  max-width:660px;
+  margin:0 0 18px;
+  color:var(--setup-ink);
+  font:800 clamp(39px,4.45vw,64px)/1.03 var(--body);
+  letter-spacing:-.055em;
+  text-wrap:balance;
+}
+#screen-setup .setup-intro h1 em {
+  display:block;
+  color:var(--setup-ink);
+  font:inherit;
+}
+#screen-setup .setup-intro h1 em::after {
+  content:"";
+  display:block;
+  width:46px;
+  height:3px;
+  margin-top:19px;
+  background:var(--setup-red);
+}
+#screen-setup .setup-intro > p:last-child {
+  max-width:450px;
+  color:#b7c2ca;
+  font:500 13px/1.75 var(--body);
+}
+#screen-setup .setup-card {
+  overflow:hidden;
+  background:var(--setup-panel);
+  border:1px solid var(--setup-line);
+  border-top:2px solid var(--setup-red);
+  border-radius:6px;
+  box-shadow:0 15px 42px rgba(0,0,0,.22);
+}
+#screen-setup .setup-card-top {
+  padding:14px 22px;
+  background:#151e25;
+  border-bottom:1px solid var(--setup-line);
+  color:var(--setup-secondary);
+  font:750 10px/1.25 var(--body);
+  letter-spacing:.07em;
+}
+#screen-setup .setup-card-top span:last-child {
+  color:var(--setup-gold);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0;
+}
+#screen-setup .setup-card form {padding:20px 22px 21px}
+#screen-setup .input-label {
+  margin-bottom:7px;
+  color:#dce3e6;
+  font:750 10px/1.3 var(--body);
+  letter-spacing:.06em;
+}
+#screen-setup .setup-card input {
+  height:48px;
+  width:100%;
+  padding:11px 13px;
+  background:#0d141b;
+  border:1px solid #4a5964;
+  border-radius:4px;
+  color:var(--setup-ink);
+  font:750 17px/1.25 var(--body);
+}
+#screen-setup .setup-card input:focus {
+  outline:2px solid #dfe5e9;
+  outline-offset:1px;
+  border-color:#dfe5e9;
+}
+#screen-setup .field-help {
+  margin-top:7px;
+  color:var(--setup-muted);
+  font:500 10px/1.5 var(--body);
+}
+#screen-setup .setup-facts {
+  gap:9px;
+  margin:17px 0;
+}
+#screen-setup .setup-facts > div {
+  min-height:68px;
+  padding:10px 12px;
+  gap:6px;
+  border:1px solid #33404a;
+  border-radius:4px;
+  background:var(--setup-raised);
+}
+#screen-setup .setup-facts span {
+  color:#aab6be;
+  font:750 9px/1.25 var(--body);
+  letter-spacing:.06em;
+}
+#screen-setup .setup-facts strong {
+  color:var(--setup-ink);
+  font:750 19px/1.15 var(--body);
+  letter-spacing:-.025em;
+}
+#screen-setup .notice-box {
+  margin:0;
+  padding:12px 13px;
+  background:#0e151b;
+  border:1px solid #34414b;
+  border-left:2px solid #8b795d;
+  border-radius:4px;
+  color:#b3c0c8;
+  font:500 10px/1.6 var(--body);
+}
+#screen-setup .setup-submit {
+  min-height:47px;
+  margin-top:15px;
+  padding:11px 15px 11px 18px;
+  border:1px solid #f4f5f5;
+  border-radius:4px;
+  background:#f4f5f5;
+  box-shadow:inset 4px 0 var(--setup-red);
+  color:#10171d;
+  font:800 11px/1.3 var(--body);
+  letter-spacing:.09em;
+  transition:background-color .16s,border-color .16s;
+}
+#screen-setup .setup-submit:hover {
+  background:#fff;
+  border-color:#fff;
+}
+#screen-setup .setup-submit span {
+  font-size:19px;
+  line-height:1;
+}
+#screen-setup :is(button,input):focus-visible {
+  outline:2px solid #f4f5f5;
+  outline-offset:3px;
+}
+@media (max-width:1020px) {
+  #screen-setup .setup-layout {
+    width:calc(100% - 56px);
+    gap:30px;
+    grid-template-columns:minmax(0,1fr) minmax(360px,1fr);
+  }
+  #screen-setup .setup-intro h1 {font-size:clamp(38px,4.8vw,52px)}
+}
+@media (max-width:780px) {
+  #screen-setup .setup-layout {
+    width:min(560px,calc(100% - 36px));
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:25px;
+    padding:27px 0 37px;
+  }
+  #screen-setup .brand-lockup-setup {margin-bottom:22px}
+  #screen-setup .brand-lockup-setup .parent-wordmark {max-width:133px}
+  #screen-setup .brand-lockup-setup .trade-wordmark {font-size:20px}
+  #screen-setup .setup-intro h1 {font-size:clamp(35px,7vw,49px)}
+  #screen-setup .setup-intro h1 em::after {margin-top:12px}
+  #screen-setup .setup-intro > p:last-child {font-size:12px}
+  #screen-setup .setup-card {width:100%}
+}
+@media (max-width:570px) {
+  #screen-setup .setup-header {padding:10px 17px;font-size:9px}
+  #screen-setup .setup-layout {width:calc(100% - 30px);gap:21px;padding:22px 0 30px}
+  #screen-setup .setup-intro h1 {font-size:clamp(32px,9vw,43px)}
+  #screen-setup .setup-card-top {padding:13px 15px}
+  #screen-setup .setup-card form {padding:17px 15px 19px}
+  #screen-setup .setup-facts {gap:8px;margin:15px 0}
+  #screen-setup .setup-facts > div {padding:10px;min-height:64px}
+  #screen-setup .setup-facts strong {font-size:clamp(14px,4.1vw,18px)}
+  #screen-setup .notice-box {font-size:10px}
+  #screen-setup .setup-submit {min-height:48px}
+}
+@media (max-height:700px) and (min-width:781px) {
+  #screen-setup .setup-layout {padding-top:12px;padding-bottom:15px}
+  #screen-setup .brand-lockup-setup {margin-bottom:22px}
+  #screen-setup .setup-intro h1 {font-size:clamp(38px,3.9vw,53px)}
+  #screen-setup .setup-intro h1 em::after {margin-top:13px}
+  #screen-setup .setup-card form {padding-top:15px;padding-bottom:16px}
+}
+@media (prefers-reduced-motion:reduce) {
+  #screen-setup .setup-submit {transition:none}
+}
