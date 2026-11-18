@@ -5,6 +5,25 @@
    and persistent AI-dealership economies ship in later phases. */
 (() => {
   const START_REPUTATION = 5;
+  const CAREER_START_UTC=Date.UTC(2026,10,9);
+  const DAY_MS=86400000;
+  const BACKGROUNDS=Object.freeze({
+    'sales-assistant':'Sales Assistant',
+    'junior-sales':'Junior Sales Executive',
+    'buying-assistant':'Vehicle Buying Assistant',
+    'service-admin':'Service Administrator',
+    'vehicle-prep':'Vehicle Preparation Assistant'
+  });
+  const QUALIFICATIONS=Object.freeze({
+    'gcse':'GCSEs / equivalent',
+    'sales-level2':'Level 2 Sales / Customer Service',
+    'vehicle-level2':'Level 2 Motor Vehicle',
+    'business-level3':'Level 3 Business Administration'
+  });
+  const DEFAULT_CV=Object.freeze({
+    dateOfBirth:'2001-06-15',hometown:'Birmingham',
+    previousRole:'sales-assistant',experienceYears:2,qualification:'gcse'
+  });
   const DEALERS = Object.freeze([
   {
     "id": "dealer-01",
@@ -200,10 +219,10 @@
   },
   {
     "id": "dealer-17",
-    "name": "High Street Auto Select",
-    "city": "Bradford",
-    "focus": "Budget MPVs",
-    "openingCash": 36000,
+    "name": "West London Trade Cars",
+    "city": "London",
+    "focus": "Urban hatchbacks and part-exchanges",
+    "openingCash": 46000,
     "monthlyTarget": 2,
     "tier": "INDEPENDENT",
     "tierLabel": "Entry-level independents",
@@ -615,15 +634,43 @@
   const eligible=(entry,rep=START_REPUTATION)=>!!entry&&whole(rep,0,100)&&rep>=entry.requiredReputation;
   const firstJobs=()=>DEALERS.filter(d=>eligible(d,START_REPUTATION));
   const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
-  function initial(name,employerId){
+  // Age derives from DOB and the in-game date, never a disconnected age field.
+  function ageAt(dateOfBirth,day=1){
+    if(typeof dateOfBirth!=='string'||!/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.test(dateOfBirth)||
+      !whole(day,1,36500))return null;
+    const [year,month,date]=dateOfBirth.split('-').map(Number);
+    const born=new Date(Date.UTC(year,month-1,date));
+    if(born.toISOString().slice(0,10)!==dateOfBirth)return null;
+    const now=new Date(CAREER_START_UTC+(day-1)*DAY_MS);
+    let age=now.getUTCFullYear()-year;
+    if(now.getUTCMonth()+1<month||
+       (now.getUTCMonth()+1===month&&now.getUTCDate()<date))age--;
+    return age;
+  }
+  const safeText=v=>typeof v==='string'&&v===v.trim()&&v.length>=2&&
+    v.length<=40&&!/[<>]/.test(v)&&!v.includes(String.fromCharCode(10))&&
+    !v.includes(String.fromCharCode(13));
+  const cvValid=cv=>{
+    if(!cv||typeof cv!=='object'||Array.isArray(cv))return false;
+    const age=ageAt(cv.dateOfBirth,1);
+    return age!==null&&age>=21&&age<=65&&safeText(cv.hometown)&&
+      Object.hasOwn(BACKGROUNDS,cv.previousRole)&&
+      whole(cv.experienceYears,1,3)&&Object.hasOwn(QUALIFICATIONS,cv.qualification);
+  };
+  const cvCopy=cv=>({
+    dateOfBirth:cv.dateOfBirth,hometown:cv.hometown,
+    previousRole:cv.previousRole,experienceYears:cv.experienceYears,
+    qualification:cv.qualification
+  });
+  function initial(name,employerId,cv=DEFAULT_CV){
     const d=dealer(employerId);
-    if(!validName(name)||!d||!eligible(d))return null;
+    if(!validName(name)||!d||!eligible(d)||!cvValid(cv))return null;
     return {managerName:name,reputation:START_REPUTATION,employerId:d.id,
-      startedDay:1,boardConfidence:65,lastReviewMonth:0,reviews:[],
+      cv:cvCopy(cv),startedDay:1,boardConfidence:65,lastReviewMonth:0,reviews:[],
       history:[{day:1,employerId:d.id,type:'appointed'}]};
   }
-  function enrol(state,managerName,employerId){
-    const profile=initial(managerName,employerId);
+  function enrol(state,managerName,employerId,cv=DEFAULT_CV){
+    const profile=initial(managerName,employerId,cv);
     if(!profile||state.day!==1||state.sold.length||state.ledger.length)
       return {ok:false,message:'Choose an available entry-level dealership to start a new career.'};
     const d=dealer(employerId);
@@ -648,8 +695,9 @@
       {id:1,day:1,from:'BOARD OF DIRECTORS',category:'operations',
         subject:'Your appointment · '+d.name,
         preview:'You are appointed dealership manager. Monthly board expectation: '+d.monthlyTarget+' retail handovers.',
-        body:'WELCOME, '+m.managerName+'\n\nYour appointment as dealership manager of '+d.name+
+        body:'WELCOME, '+m.managerName+'\n\nYour initial appointment as acting dealership manager of '+d.name+
           ' in '+d.city+' is confirmed. The company owns its premises, vehicles, cash and staff. Your personal reputation is separate from the dealership customer trust score.\n\n'+
+          'Your first 90 game days form a probationary appointment. You have no previous manager posts on your CV, and the board expects evidence of competence rather than instant promotion.\n\n'+
           'Initial company working cash: £'+d.openingCash.toLocaleString('en-GB')+
           '. Board expectation: '+d.monthlyTarget+' completed retail handovers in a trading month and positive operating contribution. The board will review your actual monthly results.\n\n'+
           'This is the first stage of Manager Career. Other dealerships are currently a career-world catalogue; interviews, transfers, resignations and dismissals are planned, not yet playable.',
@@ -700,6 +748,7 @@
     const d=dealer(m.employerId);
     if(!d||!validName(m.managerName)||!whole(m.reputation,0,100)||
       !whole(m.boardConfidence,0,100)||m.startedDay!==1||
+      (m.cv!==undefined&&!cvValid(m.cv))||
       !whole(m.lastReviewMonth,0,1200)||m.lastReviewMonth>Math.max(0,Math.ceil(state.day/28))||
       !Array.isArray(m.reviews)||m.reviews.length>100||
       !Array.isArray(m.history)||m.history.length!==1||
@@ -721,10 +770,13 @@
   const clone=m=>m?{
     managerName:m.managerName,reputation:m.reputation,employerId:m.employerId,
     startedDay:m.startedDay,boardConfidence:m.boardConfidence,
+    ...(m.cv?{cv:cvCopy(m.cv)}:{}),
     lastReviewMonth:m.lastReviewMonth,reviews:m.reviews.map(r=>({...r})),
     history:m.history.map(h=>({...h}))
   }:null;
   window.MotorTradeManagerCareer=Object.freeze({
-    START_REPUTATION,DEALERS,dealer,eligible,firstJobs,initial,enrol,welcome,review,valid,clone
+    START_REPUTATION,CAREER_START_UTC,BACKGROUNDS,QUALIFICATIONS,
+    DEFAULT_CV,DEALERS,dealer,eligible,firstJobs,ageAt,cvValid,
+    initial,enrol,welcome,review,valid,clone
   });
 })();
