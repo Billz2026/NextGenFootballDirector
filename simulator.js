@@ -50,6 +50,7 @@
   const MAX_DAY = 36500;
   const PAGES = Object.freeze({
     dashboard: 'DASHBOARD',
+    manager: 'MANAGER PROFILE',
     inbox: 'INBOX',
     auctions: 'BUYING DESK',
     auctionHall: 'AUCTION HALL',
@@ -175,7 +176,7 @@
   let selectedMonth = 'current'; // Current-day input, retained while opening a report.
   let selectedGroupBranchId = 'original'; // UI selection only; no duplicate saved branch
   let groupManagerChoice = 'm1';
-  let selectedEmployerId = MC.firstJobs()[0]?.id || null;
+  let selectedEmployerId = null;
 
   function gameDate(day) {
     return new Date(START_DATE_UTC + (day - 1) * MS_PER_DAY);
@@ -563,6 +564,69 @@
     renderEvents();
   }
 
+  function managerDraftCV(){
+    return {
+      dateOfBirth:byId('manager-dob').value,
+      hometown:byId('manager-hometown').value.trim().replace(/\\s+/g,' '),
+      previousRole:byId('manager-background').value,
+      experienceYears:Number(byId('manager-experience').value),
+      qualification:byId('manager-qualification').value
+    };
+  }
+  function renderManagerDraftCV(){
+    const cv=managerDraftCV(),age=MC.ageAt(cv.dateOfBirth);
+    byId('manager-age').textContent=age!==null&&age>=21&&age<=65?
+      age+' years':'Age 21–65 required';
+    byId('manager-cv-teaser').textContent=
+      (age===null?'Age not set':age+' years')+' · '+(cv.hometown||'Home town not set')+
+      ' · '+(MC.BACKGROUNDS[cv.previousRole]||'Previous role not set')+
+      ' · '+cv.experienceYears+' year'+(cv.experienceYears===1?'':'s')+' trade experience';
+    byId('manager-career-submit').disabled=
+      !MC.cvValid(cv)||!MC.eligible(MC.dealer(selectedEmployerId),MC.START_REPUTATION);
+  }
+
+  function renderManagerCV(){
+    const node=byId('manager-profile-content'),m=career?.managerCareer;
+    if(!m){node.innerHTML='';return;}
+    const employer=MC.dealer(m.employerId),cv=m.cv;
+    const age=cv?MC.ageAt(cv.dateOfBirth,career.day):null;
+    const fields=[
+      ['FULL NAME',m.managerName],
+      ['DATE OF BIRTH',cv?cv.dateOfBirth:'Not recorded (earlier career)'],
+      ['CURRENT AGE',age===null?'Not recorded':age+' years'],
+      ['HOME TOWN',cv?cv.hometown:'Not recorded'],
+      ['PREVIOUS POSITION',cv?(MC.BACKGROUNDS[cv.previousRole]||'Unknown'):'Not recorded'],
+      ['MOTOR TRADE EXPERIENCE',cv?cv.experienceYears+' year'+(cv.experienceYears===1?'':'s'):'Not recorded'],
+      ['EDUCATION / TRAINING',cv?(MC.QUALIFICATIONS[cv.qualification]||'Unknown'):'Not recorded'],
+      ['PREVIOUS MANAGEMENT POSTS','None — first managerial appointment']
+    ];
+    const personal=fields.map(([label,value])=>'<div class="manager-cv-detail"><small>'+
+      escapeText(label)+'</small><strong>'+escapeText(value)+'</strong></div>').join('');
+    const latest=m.reviews.slice(-6).reverse().map(r=>
+      '<div class="manager-cv-review"><span>MONTH '+r.month+'</span><strong>'+
+      r.units+' / '+r.target+' retail sales</strong><span>'+
+      money.format(r.contribution)+' operating contribution</span><span>'+
+      (r.achieved?'Target achieved':'Below board expectation')+'</span></div>'
+    ).join('')||'<p class="manager-cv-no-reviews">No completed month yet. Your first board review will use genuine retail sales and operating results.</p>';
+    const trial=career.day<=90?
+      'Day '+career.day+' of 90 — initial probationary appointment':
+      'Initial 90 days elapsed — formal confirmation is not yet implemented';
+    node.innerHTML='<div class="manager-cv-layout">'+
+      '<section class="manager-cv-panel"><p class="manager-cv-kicker">PERSONAL DETAILS & PREVIOUS EXPERIENCE</p>'+
+      '<h2>'+escapeText(m.managerName)+'</h2>'+
+      '<p class="manager-cv-subtitle">Entry-level motor-trade manager · Conservative starting CV</p>'+
+      '<div class="manager-cv-details">'+personal+'</div></section>'+
+      '<div class="manager-cv-side"><section class="manager-cv-panel"><p class="manager-cv-kicker">CURRENT APPOINTMENT</p>'+
+      '<h2>'+escapeText(employer?.name||career.name)+'</h2>'+
+      '<p class="manager-cv-subtitle">'+escapeText(employer?.city||'United Kingdom')+' · Acting Dealership Manager</p>'+
+      '<div class="manager-cv-metrics"><div><small>MANAGER REPUTATION</small><strong>'+m.reputation+'/100</strong></div>'+
+      '<div><small>BOARD CONFIDENCE</small><strong>'+m.boardConfidence+'/100</strong></div></div>'+
+      '<p class="manager-cv-probation">'+escapeText(trial)+'</p>'+
+      '<p class="manager-cv-explainer">A small independent has taken a chance on you. Your CV has no prior managerial record. Board reviews are active, but sackings, contract renewal and job transfers are still planned.</p></section>'+
+      '<section class="manager-cv-panel"><p class="manager-cv-kicker">BOARD REVIEW HISTORY</p>'+
+      '<h2>Performance record</h2>'+latest+'</section></div></div>';
+  }
+
   // The 50 dealership names are fictional. Locked employers remain visible
   // but cannot be selected with a new manager's initial reputation.
   function renderManagerEmployers(){
@@ -590,7 +654,7 @@
         (unlocked?'AVAILABLE · '+d.monthlyTarget+' SALES / MONTH':
           'LOCKED · REQUIRES '+d.requiredReputation+'/100 MANAGER REP')+
         '</span></button>';
-    }).join('')||'<p class="manager-empty-filter">No companies match this search. Try another city or filter.</p>';
+    }).join('')||'<p class="manager-empty-filter">No matching vacancies for this city and filter. Try switching to All 50 or searching another location.</p>';
     byId('manager-employer-name').textContent=available?.name||'Select an employer';
     byId('manager-employer-description').textContent=available?
       available.city+' · '+available.focus+' · '+available.tierLabel:
@@ -598,13 +662,14 @@
     byId('manager-opening-cash').textContent=available?money.format(available.openingCash):'—';
     byId('manager-board-target').textContent=available?
       available.monthlyTarget+' sales / month':'—';
-    byId('manager-career-submit').disabled=!available;
+    renderManagerDraftCV();
   }
 
   function renderManagerStatus(){
     const strip=byId('manager-career-strip'),m=career?.managerCareer;
     const dealer=m?MC.dealer(m.employerId):null;
     strip.hidden=!m||!dealer;
+    byId('manager-profile-nav').hidden=!m;
     byId('manager-sidebar-role').textContent=dealer?'MANAGED · '+dealer.city.toUpperCase():
       'INDEPENDENT MOTOR TRADER';
     byId('sidebar-career-label').textContent=dealer?'YOUR EMPLOYER':'YOUR DEALERSHIP';
@@ -725,6 +790,7 @@
     toast.hidden = !lastTradeResult;
     toast.className = 'trade-feedback-toast' + (lastTradeResult?.ok ? ' trade-feedback-toast-success' : ' trade-feedback-toast-warning');
     toast.textContent = lastTradeResult?.message || '';
+    renderManagerCV();
     renderInbox();
     renderTrading();
   }
@@ -982,6 +1048,11 @@
       return;
     }
     input.setCustomValidity('');
+    const cv=managerDraftCV();
+    if(!MC.cvValid(cv)){
+      window.alert('Choose a valid date of birth (21–65 at career start), home town and entry-level CV.');
+      return;
+    }
     const employer=MC.dealer(selectedEmployerId);
     if(!MC.eligible(employer,MC.START_REPUTATION)){
       window.alert('This company does not accept an entry-level manager. Choose an available independent.');
@@ -994,7 +1065,7 @@
     const previousAccount=ACCOUNT?.activeAccount || null;
     if(ACCOUNT && !ACCOUNT.startGuestMode())return;
     const newCareer = E.createStaffed(employer.name, []);
-    const appointment=MC.enrol(newCareer,managerName,employer.id);
+    const appointment=MC.enrol(newCareer,managerName,employer.id,cv);
     if(!appointment.ok){
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
       window.alert(appointment.message);
@@ -1094,6 +1165,11 @@
     startCareer();
   });
   byId('dealership-name').addEventListener('input', event => event.target.setCustomValidity(''));
+  for(const id of ['manager-dob','manager-hometown','manager-experience',
+    'manager-background','manager-qualification']){
+    byId(id).addEventListener('input',renderManagerDraftCV);
+    byId(id).addEventListener('change',renderManagerDraftCV);
+  }
   byId('employer-search').addEventListener('input', renderManagerEmployers);
   byId('employer-filter').addEventListener('change', renderManagerEmployers);
   byId('career-import-file').addEventListener('change', async event => {
