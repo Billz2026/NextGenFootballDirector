@@ -273,11 +273,11 @@
     const repairs=today.filter(x=>x.kind==='repair'||x.kind==='quality').length;
     const selected=POLICIES.find(p=>p.maxPurchase===d.maxPurchase&&
       p.maxRepair===d.maxRepair);
-    return '<section class="op-brief" aria-label="Supervisor operations dashboard">'+
-      '<div class="op-brief-head"><div><small>DEALER PRINCIPAL · PURCHASING AND WORKSHOP</small>'+
+    return '<details class="op-brief" aria-label="Supervisor operations dashboard">'+
+      '<summary class="op-brief-head"><div><small>DEALER PRINCIPAL · PURCHASING AND WORKSHOP</small>'+
       '<h3>SUPERVISOR OPERATIONS · '+(d.enabled?'ACTIVE':'HANDS-ON')+'</h3>'+
-      '<p>Real supplier purchases, paid repairs, QC and listings. Routine decisions stay with staff.</p></div>'+
-      '<span>'+requests.length+' DECISIONS</span></div>'+
+      '<p>Manager-run buying and preparation · Click to review authority and operating results.</p></div>'+
+      '<span>'+requests.length+' DECISIONS</span></summary><div class="op-expanded">'+
       '<div class="op-brief-metrics"><div><small>BUYER PURCHASES TODAY</small><strong>'+purchase+'</strong></div>'+
       '<div><small>REPAIR / QC JOBS TODAY</small><strong>'+repairs+'</strong></div>'+
       '<div><small>UNRESOLVED APPROVALS</small><strong>'+requests.length+'</strong></div></div>'+
@@ -293,7 +293,7 @@
           '<small>Buy up to '+gbp(p.maxPurchase)+' · repairs up to '+gbp(p.maxRepair)+
           ' incl. £170 QC contingency · expected margin '+gbp(p.minMargin)+
           ' · max '+p.maxStock+' cars</small><span>'+p.note+'</span></button>';
-      }).join('')+'</div></details></section>';
+      }).join('')+'</div></details></div></details>';
   }
   function controls(state,message){
     const r=requestForMessage(state,message);
