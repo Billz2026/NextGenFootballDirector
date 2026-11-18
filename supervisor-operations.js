@@ -170,7 +170,9 @@
         continue;
       }
       if(v.workshop?.stage==='unassessed'){
-        if(!P.active(state,'technician'))continue;
+        // A supervisor can commission an external diagnostic if the in-house
+        // technician is unavailable. The real engine charges the higher £55
+        // external assessment rate and subsequent external repairs.
         if(state.cash<protect(state)+65)continue;
         const result=E.assessStock(state,v.id);
         if(result.ok){track(state,'assessment',v.id,v.workshop.assessmentFee,
