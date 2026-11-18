@@ -780,6 +780,9 @@
     }
     const promotion=CP.promotion(beforeDayReputation,career.reputationScore);
     if(promotion)careerPromotion=promotion;
+    // The owner works from Inbox whenever a fresh auction mandate arrives;
+    // compulsory month-end management meetings still take precedence.
+    if(auctionEvent.pending&&currentPage!=='events')currentPage='inbox';
     persistCareer();
     render();
   }
