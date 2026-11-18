@@ -72,7 +72,8 @@
       return {key:'empire',label:p.rank===100?'WORLD-CLASS LUXURY DEALER':
         'REACH PRESTIGE RANK '+(p.rank+1),
         progress:Math.min(p.points,target),target,
-        display:p.points+' / '+target+' points',
+        display:p.blocked?'RANK '+p.rank+' · '+p.points+'/2,000 points':
+          p.points+' / '+target+' points',
         description:!p.trustReady?'Reach and maintain 80/100 customer trust.':
           p.blocked?'Promotion held: complete the Rank '+p.blocked.stage.rank+' business requirements.':
           p.rank===100?'Ultimate career rank achieved. Maintain trading standards.':
