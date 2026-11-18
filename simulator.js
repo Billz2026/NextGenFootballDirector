@@ -788,12 +788,11 @@
     }
     const promotion=CP.promotion(beforeDayReputation,career.reputationScore);
     if(promotion)careerPromotion=promotion;
-    // Inbox is the Dealer Principal's daily control centre. Staff-led
-    // sales and workshop activity is managed automatically; keep special
-    // compulsory management sessions on Events.
-    if(currentPage!=='events'&&career.delegation?.enabled)
-      currentPage='inbox';
-    else if(auctionEvent.pending&&currentPage!=='events')
+    // Return the Dealer Principal to Inbox after each normal trading day.
+    // Preserve Events only when a NEW month-end report, Deal Day or an
+    // outstanding compulsory meeting genuinely needs management attention.
+    const mandatoryEvent=!!closed||enteringDealDay||D.meetingBlocksContinue(career);
+    if(!mandatoryEvent&&(career.delegation?.enabled||auctionEvent.pending))
       currentPage='inbox';
     persistCareer();
     render();
