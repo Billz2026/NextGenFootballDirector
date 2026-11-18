@@ -20,12 +20,13 @@
   const GV = window.MotorTradeGroupView;
   const DELEG = window.MotorTradeDelegation;
   const OPS = window.MotorTradeOperations;
+  const AU = window.MotorTradeAuctionAgent;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !OPS || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !OPS || !AU || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -627,6 +628,15 @@
       render();
       return;
     }
+    AU.review(career,E);
+    if(AU.pending(career).length){
+      currentPage='inbox';
+      eventNotice='Auction supervisor has requested your maximum bid or attendance decision. Review the live lot before ending the trading day.';
+      lastTradeResult=null;
+      persistCareer();
+      render();
+      return;
+    }
     const beforeDayReputation=career.reputationScore;
     const delegated=DELEG.process(career,E);
     if(DELEG.pending(career).length){
@@ -687,6 +697,7 @@
     const ageingEvent=E.stockAgeingDay(career);
     const workshopEvents=E.advanceWorkshop(career);
     const operationsEvent=OPS.process(career,E);
+    const auctionEvent=AU.review(career,E);
     const customerEvents=E.advanceCustomers(career);
     const afterSalesEvents=E.advanceAfterSales(career);
     const groupEvent=G.advance(career);
@@ -735,6 +746,9 @@
         ...(operationsEvent.buy?[operationsEvent.buy]:[]),
         ...operationsEvent.work
       ].slice(0,3).join(' ');
+    if(auctionEvent.pending)
+      eventNotice+=' AUCTION ADVISER: '+auctionEvent.pending+
+        ' live lot recommendation waiting in Inbox.';
     if(customerEvents.length)
       eventNotice+=' CUSTOMERS: '+customerEvents.join(' ');
     if(afterSalesEvents.opened.length||afterSalesEvents.diagnosed.length||
@@ -1029,6 +1043,29 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'auction-agent':
+        if(career){
+          const id=button.dataset.id;
+          const action=button.dataset.decision;
+          const cap=inputNumber('auction-agent-cap-'+id);
+          const request=career.auctionAgent.requests.find(r=>r.id===id);
+          if(request&&action==='delegate'){
+            const total=cap+request.fee;
+            if(Number.isSafeInteger(cap)&&window.confirm(
+              'Authorise your supervisor to bid up to '+money.format(cap)+
+              ' hammer, PLUS '+money.format(request.fee)+
+              ' buyer fee (maximum '+money.format(total)+
+              ' before workshop preparation)? If the hammer falls within your limit, payment will be settled automatically.')){
+              currentPage='inbox';
+              saveResult(AU.decide(career,E,id,'delegate',cap));
+            }
+          }else if(request&&['pass','attend'].includes(action)){
+            const result=AU.decide(career,E,id,action,null);
+            currentPage=action==='attend'?'auctionHall':'inbox';
+            saveResult(result);
+          }
+        }
+        break;
       case 'ops-decision':
         if(career&&['approved','declined'].includes(button.dataset.decision)){
           const request=career.operations.requests.find(r=>r.id===button.dataset.id);
