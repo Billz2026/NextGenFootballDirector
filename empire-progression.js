@@ -132,6 +132,7 @@
         achieved('Operating branches (future expansion)',s.branchCount,12),
         achieved('Countries operated in (future expansion)',s.countries,2)];
       case 100:return [achieved('Consecutive profitable months',s.consecutiveMonths,12),
+        achieved('Luxury handovers in last 100 sales',s.last100Luxury,100),
         achieved('Ultra-luxury handovers (future stock)',s.ultraSales,25),
         achieved('Operating branches (future expansion)',s.branchCount,10),
         achieved('Countries operated in (future expansion)',s.countries,3),
@@ -158,7 +159,8 @@
         break;
       }
     }
-    const current=STAGES.filter(x=>x.rank<=rank).at(-1);
+    const current=trustReady?STAGES.filter(x=>x.rank<=rank).at(-1):
+      {rank:0,title:'BUILD CUSTOMER TRUST TO ENTER PRESTIGE'};
     const next=STAGES.find(x=>x.rank>rank)||null;
     const branch=BRANCH_STAGES.filter(x=>x.rank<=rank).at(-1);
     const upcomingBranch=BRANCH_STAGES.find(x=>x.rank>rank)||null;
