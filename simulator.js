@@ -1044,6 +1044,9 @@
       case 'delegate-mode':
         if(career)saveResult(DELEG.setMode(career,button.dataset.enabled==='true'));
         break;
+      case 'delegate-policy':
+        if(career)saveResult(DELEG.setPolicy(career,button.dataset.policy));
+        break;
       case 'group-view-original':
         if(career)show('dashboard');
         break;
