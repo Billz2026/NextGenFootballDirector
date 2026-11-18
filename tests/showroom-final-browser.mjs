@@ -16,6 +16,9 @@ try{
     const fixture=await page.evaluate(key=>{
       const E=window.MotorTradeEngine,Q=E.showroom;
       const s=E.createStaffed('Patient Customer Test Motors',[]);
+      // Owner consultation controls remain available as an explicit
+      // hands-on override, but are hidden in normal supervisor-led mode.
+      ok(window.MotorTradeDelegation.setMode(s,false),'owner hands-on mode');
       const seller=E.marketFor(s).sellers[0];
       function ok(x,stage){if(!x.ok)throw Error(stage+' '+JSON.stringify(x))}
       ok(E.acquireSeller(s,seller.id,seller.ask),'purchase');
