@@ -694,6 +694,10 @@
     const operationsEvent=OPS.process(career,E);
     const auctionEvent=AU.review(career,E);
     const customerEvents=E.advanceCustomers(career);
+    // Run the supervisor-led sales desk at opening on the newly advanced day.
+    // Arriving appointments and new walk-ins are handled without requiring
+    // the proprietor to open Sales Office or allocate staff manually.
+    const openingSales=DELEG.process(career,E);
     const afterSalesEvents=E.advanceAfterSales(career);
     const groupEvent=G.advance(career);
     if(!groupEvent.ok)throw new Error('Satellite group calendar integrity failure');
@@ -754,10 +758,14 @@
     if(missedVisitors)
       eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
         ' left without being served.';
-    if(delegated.processed&&(delegated.served||delegated.completed||delegated.lost))
-      eventNotice+=' SALES TEAM: '+delegated.served+' visitors served, '+
-        delegated.completed+' actual handovers and '+delegated.lost+
-        ' declined test drives or walkaways.';
+    const staffServed=delegated.served+openingSales.served;
+    const staffHandovers=delegated.completed+openingSales.completed;
+    const staffLost=delegated.lost+openingSales.lost;
+    const staffAssigned=(delegated.assigned||0)+(openingSales.assigned||0);
+    if(staffServed||staffHandovers||staffLost||staffAssigned)
+      eventNotice+=' SALES SUPERVISOR: '+staffAssigned+' customer allocations, '+
+        staffServed+' showroom visitors served, '+staffHandovers+
+        ' actual handovers and '+staffLost+' failed test drives or walkaways.';
     if(groupEvent.events.length)eventNotice+=' GROUP HQ: '+groupEvent.events.join(' ');
     if(closed){
       const id=career.messages.reduce((n,message)=>Math.max(n,message.id),0)+1;
@@ -780,9 +788,13 @@
     }
     const promotion=CP.promotion(beforeDayReputation,career.reputationScore);
     if(promotion)careerPromotion=promotion;
-    // The owner works from Inbox whenever a fresh auction mandate arrives;
-    // compulsory month-end management meetings still take precedence.
-    if(auctionEvent.pending&&currentPage!=='events')currentPage='inbox';
+    // Inbox is the Dealer Principal's daily control centre. Staff-led
+    // sales and workshop activity is managed automatically; keep special
+    // compulsory management sessions on Events.
+    if(currentPage!=='events'&&career.delegation?.enabled)
+      currentPage='inbox';
+    else if(auctionEvent.pending&&currentPage!=='events')
+      currentPage='inbox';
     persistCareer();
     render();
   }
