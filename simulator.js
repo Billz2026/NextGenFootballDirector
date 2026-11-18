@@ -1049,7 +1049,9 @@
           const request=career.auctionAgent.requests.find(r=>r.id===id);
           if(request&&action==='delegate'){
             const total=cap+request.fee;
-            if(Number.isSafeInteger(cap)&&window.confirm(
+            if(!Number.isSafeInteger(cap)){
+              saveResult({ok:false,message:'Enter a valid whole-pound maximum hammer bid before authorising the supervisor.'});
+            }else if(window.confirm(
               'Authorise your supervisor to bid up to '+money.format(cap)+
               ' hammer, PLUS '+money.format(request.fee)+
               ' buyer fee (maximum '+money.format(total)+
@@ -1067,9 +1069,10 @@
       case 'ops-decision':
         if(career&&['approved','declined'].includes(button.dataset.decision)){
           const request=career.operations.requests.find(r=>r.id===button.dataset.id);
-          if(request&&button.dataset.decision==='approved'&&window.confirm(
+          if(request&&button.dataset.decision==='approved'&&
+             (request.kind==='buy'||window.confirm(
             'Approve '+money.format(request.amount)+' for '+request.title+
-            '? This will use real dealership cash only if the live transaction passes all checks.')){
+            '? This will use real dealership cash only if the live transaction passes all checks.'))){
             currentPage='inbox';
             saveResult(OPS.decide(career,E,request.id,'approved'));
           }else if(request&&button.dataset.decision==='declined'){
