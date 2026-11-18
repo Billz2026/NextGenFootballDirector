@@ -273,6 +273,10 @@
     const repairs=today.filter(x=>x.kind==='repair'||x.kind==='quality').length;
     const selected=POLICIES.find(p=>p.maxPurchase===d.maxPurchase&&
       p.maxRepair===d.maxRepair);
+    const activity=d.history.slice(-5).reverse().map(r=>
+      '<div class="op-activity-row"><small>DAY '+r.day+' · '+escape(r.kind.toUpperCase())+'</small>'+
+      '<span>'+escape(r.note)+'</span>'+
+      (r.amount>0?'<strong>'+gbp(r.amount)+'</strong>':'')+'</div>').join('');
     return '<details class="op-brief" aria-label="Supervisor operations dashboard">'+
       '<summary class="op-brief-head"><div><small>DEALER PRINCIPAL · PURCHASING AND WORKSHOP</small>'+
       '<h3>SUPERVISOR OPERATIONS · '+(d.enabled?'ACTIVE':'HANDS-ON')+'</h3>'+
@@ -293,7 +297,10 @@
           '<small>Buy up to '+gbp(p.maxPurchase)+' · repairs up to '+gbp(p.maxRepair)+
           ' incl. £170 QC contingency · expected margin '+gbp(p.minMargin)+
           ' · max '+p.maxStock+' cars</small><span>'+p.note+'</span></button>';
-      }).join('')+'</div></details></div></details>';
+      }).join('')+'</div></details>'+
+      '<section class="op-activity"><h4>RECENT TEAM DECISIONS</h4>'+
+      (activity||'<p>No delegated transactions recorded yet.</p>')+
+      '</section></div></details>';
   }
   function controls(state,message){
     const r=requestForMessage(state,message);
