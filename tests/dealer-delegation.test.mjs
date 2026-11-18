@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const files=['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
-  'empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','events.js',
+  'empire-progression.js','motor-group.js','dealer-delegation.js','supervisor-operations.js','auction-supervisor.js','events.js',
   'workshop.js','stock-ageing.js','showroom-traffic.js','customers.js',
   'aftersales.js','trading.js','inbox-office.js'];
 const window={};
@@ -55,10 +55,10 @@ function approvalScenario(){
 
 test('v21 migrates to v23 with the original cash, staff and inventory',()=>{
   const original=E.createStaffed('Legacy Owner QA',[]);
-  assert.equal(original.version,23);
+  assert.equal(original.version,24);
   const old=copy(original);old.version=21;delete old.delegation;
   const x=E.normalize(old);
-  assert.ok(x);assert.equal(x.version,23);
+  assert.ok(x);assert.equal(x.version,24);
   assert.equal(x.cash,original.cash);
   assert.equal(x.staff.length,original.staff.length);
   assert.equal(x.sold.length,0);
