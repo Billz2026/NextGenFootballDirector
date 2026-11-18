@@ -65,7 +65,8 @@ try{
     await page.locator('.career-nav [data-page="inbox"]').evaluate(x=>x.click());
     const panel=page.locator('.inbox-command');
     await panel.waitFor({state:'visible'});
-    assert.match(await panel.locator('h1').innerText(),/MANAGEMENT COMMAND CENTRE/);
+    assert.match((await panel.locator('h1').innerText()).replace(/\s+/g,' '),
+      /MANAGEMENT COMMAND CENTRE/);
     assert.equal((await panel.locator('#inbox-action-count').innerText()).trim(),'1');
     assert.equal((await panel.locator('#inbox-current-day').innerText()).trim(),
       'DAY '+String(fixture.day).padStart(2,'0'));
