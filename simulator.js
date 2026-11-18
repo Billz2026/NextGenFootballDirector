@@ -728,6 +728,19 @@
     const trial=career.day<=90?
       'Day '+career.day+' of 90 — initial probationary appointment':
       'Initial 90 days elapsed — formal confirmation is not yet implemented';
+    const recruitment=m.recruitment?
+      '<section class="manager-cv-panel"><p class="manager-cv-kicker">FIRST EMPLOYMENT · RECRUITMENT RECORD</p>'+
+      '<h2>Application & interview</h2><div class="manager-cv-details">'+
+      '<div class="manager-cv-detail"><small>APPLICATIONS SUBMITTED</small><strong>'+
+      m.recruitment.applications+'</strong></div>'+
+      '<div class="manager-cv-detail"><small>PREVIOUS REJECTIONS</small><strong>'+
+      m.recruitment.rejected+'</strong></div>'+
+      '<div class="manager-cv-detail"><small>INTERVIEW QUESTIONS</small><strong>'+
+      m.recruitment.questionsAsked+'</strong></div>'+
+      '<div class="manager-cv-detail"><small>INTERVIEW ASSESSMENT</small><strong>'+
+      m.recruitment.interviewPercent+'/100</strong></div></div>'+
+      '<p class="manager-cv-explainer">Interview passed and the employment offer accepted. The record '+
+      'is saved with your career, separately from your employer’s finances.</p></section>':'';
     node.innerHTML='<div class="manager-cv-layout">'+
       '<section class="manager-cv-panel"><p class="manager-cv-kicker">PERSONAL DETAILS & PREVIOUS EXPERIENCE</p>'+
       '<h2>'+escapeText(m.managerName)+'</h2>'+
@@ -740,6 +753,7 @@
       '<div><small>BOARD CONFIDENCE</small><strong>'+m.boardConfidence+'/100</strong></div></div>'+
       '<p class="manager-cv-probation">'+escapeText(trial)+'</p>'+
       '<p class="manager-cv-explainer">A small independent has taken a chance on you. Your CV has no prior managerial record. Board reviews are active, but sackings, contract renewal and job transfers are still planned.</p></section>'+
+      recruitment+
       '<section class="manager-cv-panel"><p class="manager-cv-kicker">BOARD REVIEW HISTORY</p>'+
       '<h2>Performance record</h2>'+latest+'</section></div></div>';
   }
