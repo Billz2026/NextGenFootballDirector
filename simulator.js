@@ -275,20 +275,17 @@
           'New exceptions will appear here when a supervisor needs you.')+
         '</p></div>';
     }else{
-      desk.innerHTML=actionMail.slice(0,2).map((m,i)=>
+      desk.innerHTML=actionMail.slice(0,1).map((m,i)=>
         '<button type="button" class="ic-priority-item" data-action="read-message" '+
           'data-origin="priority" data-id="'+m.id+'" aria-label="Review approval: '+
           escapeText(m.subject)+'">'+
           '<span class="ic-priority-number">'+String(i+1).padStart(2,'0')+'</span>'+
           '<span class="ic-priority-text"><strong>'+escapeText(m.subject)+'</strong>'+
-          '<small>'+escapeText(m.from)+' · DAY '+m.day+'</small></span>'+
+          '<small>'+escapeText(m.from)+' · DAY '+m.day+
+          (actionMail.length>1?' · '+(actionMail.length-1)+' MORE PENDING':'')+
+          '</small></span>'+
           '<span class="ic-priority-chevron" aria-hidden="true">↗</span></button>'
-      ).join('')+(actionMail.length>2?
-        '<button type="button" class="ic-priority-item" data-action="inbox-view-decisions">'+
-        '<span class="ic-priority-number">+</span><span class="ic-priority-text"><strong>'+
-        (actionMail.length-2)+' MORE DECISION'+(actionMail.length-2===1?'':'S')+
-        ' WAITING</strong><small>Open the complete approval queue</small></span>'+
-        '<span class="ic-priority-chevron" aria-hidden="true">↗</span></button>':'');
+      ).join('');
     }
 
     const searchBox=byId('inbox-search');
