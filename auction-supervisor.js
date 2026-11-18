@@ -56,6 +56,7 @@
   }
   function review(s,E){
     const a=s.auctionAgent;
+    if(a.day!==s.day){a.day=s.day;a.mode='delegate';}
     expire(s);
     if(!E.auctionDay(s.day)||a.mode==='owner')return {ok:true,pending:pending(s).length};
     const supervisor=E.people.supervisor(s);
