@@ -1474,7 +1474,7 @@
     }
     // A hammered lot creates a binding invoice. Do not allow other purchases,
     // workshops, payroll decisions or time progression to spend its funds.
-    if(career?.auctionHall?.phase==='payment'&&
+    if(screen==='career'&&career?.auctionHall?.phase==='payment'&&
        !['settle-auction','toggle-report','preview-auction','close-auction-preview',
          'menu','resume','dashboard','new-career','select-report','view-promotion','dismiss-promotion',
           'toggle-career-tools','open-career-tools','export-career','choose-import','restore-career',
