@@ -459,9 +459,13 @@
   }
   function renderBusiness(){
     byId('premises-view').innerHTML=SITE_VIEW.render(career,SITE);
-    const group=GV.render(career,selectedGroupBranchId,groupManagerChoice);
-    selectedGroupBranchId=group.selectedId;
-    byId('group-view').innerHTML=group.html;
+    // Group HQ is a comparatively expensive data view: only build its
+    // independent supplier quotes when the player actually opens it.
+    if(currentPage==='group'){
+      const group=GV.render(career,selectedGroupBranchId,groupManagerChoice);
+      selectedGroupBranchId=group.selectedId;
+      byId('group-view').innerHTML=group.html;
+    }
   }
   function renderPeople() {
     const view=PV.staffDesk(career,P,{mode:staffDeskMode,role:staffDeskRole,
