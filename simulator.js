@@ -628,15 +628,10 @@
       render();
       return;
     }
+    // An auction recommendation is optional. Ignoring it until close
+    // forfeits the opportunity rather than trapping the whole dealership.
+    // A *committed* live bid/payment still uses the hard auction guards above.
     AU.review(career,E);
-    if(AU.pending(career).length){
-      currentPage='inbox';
-      eventNotice='Auction supervisor has requested your maximum bid or attendance decision. Review the live lot before ending the trading day.';
-      lastTradeResult=null;
-      persistCareer();
-      render();
-      return;
-    }
     const beforeDayReputation=career.reputationScore;
     const delegated=DELEG.process(career,E);
     if(DELEG.pending(career).length){
