@@ -50,7 +50,7 @@ test('supervisor genuinely bids, pays hammer and fee exactly once within hard ca
 });
 test('too-tight bidder mandate loses to actual rival, not an invented victory',()=>{
   const {s,req}=first(),before=s.cash;
-  const result=A.decide(s,E,req.id,'delegate',req.guide+100);
+  const result=A.decide(s,E,req.id,'delegate',Math.ceil((req.guide+100)/100)*100);
   assert.ok(result.ok,result.message);
   assert.equal(s.cash,before);
   assert.equal(s.vehicles.length,0);
