@@ -6,6 +6,14 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### Empire Prestige phase 1 — 100 ranks and expansion roadmap (18 November 2026)
+
+- **Separate long-term progression:** The existing 0–100 customer-trust score, staffing unlocks, market access, workshop rules and forecourt capacity remain untouched. A new prestige career path runs from Rank 0 to Rank 100 (2,000 points total), with eleven named major career stages.
+- **Earned credit only:** Prestige is calculated from confirmed profitable retail handovers (capped at 20 points per calendar month), archived profitable months and clean operating history, plus bounded one-time sales and turnover milestones. It cannot be farmed by reopening screens or replaying a saved deal. Existing careers receive deterministic back-credit without cash, ledger or save-schema migrations.
+- **Hard promotion gates:** At major ranks, a player must also meet actual recorded targets for sales, turnover, auction buying, profitable months and later luxury trading. The final stages reference future ultra-luxury inventory and branch management; these are *not* represented as attainable or launched systems yet.
+- **Branch expansion plan:** The Reputation and My Dealership views now show branch-capacity milestones: a second UK site at Rank 10, regional and national networks, then international luxury groups. This is an **unlocked-permission roadmap only**; additional trading branches, acquisitions, multi-currency accounts and manufacturer-franchise agreements are **not implemented** in phase 1. The original dealership continues to operate as before.
+- **Save integrity:** No career schema/version change, new write path, invented transactions, staff costs or automatic expansion. Tests in `tests/empire-progression.test.mjs` cover historical credit, per-month cap, rank gates and no mutation. The first playable independent second branch will require a separately tested economic model and save migration.
+
 ### v0.9.44 — Workshop staffing, in-house teamwork and supervisor accountability (17 November 2026)
 
 - **Technician hiring slots are no longer incorrectly tied to the number of workshop bays.** Reputation permits four hires initially, six at 40 and eight at 80. An existing Boss Motors career at reputation 42 can now employ up to six technicians even if it still owns the starting four-bay workshop. Employment caps continue to account for sales, buyer and supervisor roles, and salaries, onboarding fees and the three-day cash protection rule remain.
