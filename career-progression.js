@@ -62,12 +62,23 @@
       description:(s.next.min-s.score)+' more reputation point'+(s.next.min-s.score===1?'':'s')+
         '. '+s.next.reward,
       page:'reputation',action:'VIEW REPUTATION'
-    }:{
-      key:'reputation',label:'MAINTAIN PRESTIGE STANDING',
-      progress:1,target:1,display:'100-point scale',
-      description:'Highest career tier reached. Reputation can still fall if standards slip.',
-      page:'reputation',action:'VIEW REPUTATION'
-    };
+    }:(()=>{
+      const p=window.MotorTradeEmpire?.status(state);
+      if(!p)return {key:'reputation',label:'MAINTAIN PRESTIGE STANDING',
+        progress:1,target:1,display:'100-point scale',
+        description:'Maintain customer trust to keep your highest tier.',
+        page:'reputation',action:'VIEW REPUTATION'};
+      const target=Math.min(2000,(p.rank+1)*20);
+      return {key:'empire',label:p.rank===100?'WORLD-CLASS LUXURY DEALER':
+        'REACH PRESTIGE RANK '+(p.rank+1),
+        progress:Math.min(p.points,target),target,
+        display:p.points+' / '+target+' points',
+        description:!p.trustReady?'Reach and maintain 80/100 customer trust.':
+          p.blocked?'Promotion held: complete the Rank '+p.blocked.stage.rank+' business requirements.':
+          p.rank===100?'Ultimate career rank achieved. Maintain trading standards.':
+          p.remaining+' points to the next rank. Branch expansion begins at Rank 10.',
+        page:'reputation',action:'VIEW EMPIRE ROADMAP'};
+    })();
     return [careerGoal,monthGoal,reputationGoal];
   }
   function milestones(state){
@@ -99,11 +110,15 @@
   }
   function dashboard(state){
     const s=standing(state);
+    const p=window.MotorTradeEmpire?.status(state);
+    const statusText=p&&s.score>=80?
+      'PRESTIGE RANK '+p.rank+' · '+p.points+'/2,000':
+      s.current.name+' · '+s.score+'/100';
     return '<section class="cp-dashboard" aria-label="Live career objectives">'+
       '<div class="cp-dashboard-head"><div><small>CAREER PROGRESSION</small>'+
       '<h2>YOUR NEXT THREE GOALS</h2></div>'+
       '<button type="button" data-page="reputation" class="cp-current-tier">'+
-      safe(s.current.name)+' · '+s.score+'/100 ↗</button></div>'+
+      safe(statusText)+' ↗</button></div>'+
       '<div class="cp-goals">'+goals(state).map(goalCard).join('')+'</div></section>';
   }
   function reputation(state){
@@ -114,7 +129,8 @@
       '<span><strong>'+safe(m.name)+'</strong><small>'+safe(m.detail)+'</small></span>'+
       '<em>'+(m.earned?(Number.isSafeInteger(m.day)?'DAY '+m.day:'EARNED'):'LOCKED')+
       '</em></div>').join('');
-    return '<section class="cp-reputation" aria-label="Career targets and achievements">'+
+    return (window.MotorTradeEmpire?.render(state)||'')+
+      '<section class="cp-reputation" aria-label="Career targets and achievements">'+
       '<div class="cp-section-head"><div><small>BUSINESS OBJECTIVES</small>'+
       '<h3>YOUR NEXT THREE GOALS</h3></div><span>REAL RESULTS ONLY</span></div>'+
       '<div class="cp-goals">'+goals(state).map(goalCard).join('')+'</div>'+
@@ -147,8 +163,9 @@
     if(!sale||state.sold.length<=beforeSales)return '';
     const delta=state.reputationScore-beforeRep,s=standing(state);
     const repText='Reputation '+(delta>0?'+':'')+delta+' ('+state.reputationScore+'/100).';
-    const next=s.next?' '+(s.next.min-s.score)+' points to '+s.next.name+'.':
-      ' Prestige tier held.';
+    const p=window.MotorTradeEmpire?.status(state);
+    const next=s.next?' '+(s.next.min-s.score)+' customer trust points to '+s.next.name+'.':
+      p?' Prestige rank '+p.rank+'/100, '+p.points+'/2,000 points.':' Prestige tier held.';
     const first=beforeSales===0?' First retail handover completed.':'';
     const profitable=sale.profit>0&&!(state.sold||[]).slice(0,-1).some(v=>v.profit>0)?
       ' First profitable sale milestone earned.':'';
