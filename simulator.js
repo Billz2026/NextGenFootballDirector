@@ -872,6 +872,7 @@
     careerPromotion = null;
     selectedMessageId = null;
     inboxFilter='all';
+    inboxSearch='';
     lastTradeResult = null;
     selectedMonth = 'current';
     expandedReportId = null;
@@ -1081,7 +1082,17 @@
         '<p>'+VC.esc(model.position.text)+'</p>';
     }
   });
+  document.addEventListener('input',event=>{
+    if(event.target?.id!=='inbox-search'||!career)return;
+    inboxSearch=String(event.target.value||'').slice(0,110);
+    selectedMessageId=null;
+    renderInbox();
+  });
   document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&document.activeElement?.id==='inbox-search'){
+      inboxSearch='';selectedMessageId=null;
+      renderInbox();return;
+    }
     if(!careerPromotion||screen!=='career')return;
     const layer=byId('career-promotion');
     if(event.key==='Escape'){
@@ -1701,6 +1712,26 @@
         }
         break;
       }
+      case 'inbox-view-decisions':
+      case 'inbox-view-unread':
+        if(career){
+          inboxFilter=button.dataset.action==='inbox-view-decisions'?'action':'unread';
+          inboxSearch='';selectedMessageId=null;currentPage='inbox';
+          render();
+        }
+        break;
+      case 'inbox-view-alerts':
+        if(career){
+          if(financePressure().length)show('finance');
+          else{
+            inboxFilter='accounts';inboxSearch='';selectedMessageId=null;
+            currentPage='inbox';render();
+          }
+        }
+        break;
+      case 'inbox-back-to-list':
+        byId('inbox-list')?.scrollIntoView({block:'start',behavior:display.motion?'smooth':'auto'});
+        break;
       case 'filter-inbox':
         if(career&&IN.categories.includes(button.dataset.filter)){
           inboxFilter=button.dataset.filter;
@@ -1753,9 +1784,15 @@
         const message = career.messages.find(m => m.id === id);
         if (!message) break;
         selectedMessageId = id;
+        if(button.dataset.origin==='priority'){
+          inboxFilter='action';
+          inboxSearch='';
+        }
         message.read = true;
         persistCareer();
         show('inbox');
+        if(window.innerWidth<=780)
+          byId('inbox-detail')?.scrollIntoView({block:'start',behavior:display.motion?'smooth':'auto'});
         break;
       }
       case 'mark-all-read':
