@@ -22,3 +22,11 @@
 #screen-career .op-options small{color:#dce5ea;font:650 10px/1.45 var(--body)}
 #screen-career .op-options span{color:#b6c5cd;font:500 10px/1.45 var(--body)}
 @media(max-width:700px){#screen-career .op-brief-head{flex-direction:column}#screen-career .op-options{grid-template-columns:1fr}#screen-career .op-brief-metrics>div{padding:8px 5px}#screen-career .op-brief-metrics small{font-size:9px}#screen-career .op-brief-actions{flex-direction:column}#screen-career .op-brief-actions button{width:100%}}
+
+#screen-career details.op-brief{padding:0}
+#screen-career details.op-brief>summary{list-style:none;cursor:pointer;padding:10px 13px}
+#screen-career details.op-brief>summary::-webkit-details-marker{display:none}
+#screen-career details.op-brief>summary:focus-visible{outline:2px solid #d9bc83;outline-offset:-3px}
+#screen-career details.op-brief .op-expanded{padding:0 13px 13px}
+#screen-career details.op-brief:not([open]) .op-brief-head h3{font-size:16px}
+#screen-career details.op-brief:not([open]) .op-brief-head p{font-size:11px}
