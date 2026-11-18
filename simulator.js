@@ -1787,6 +1787,10 @@
         if(button.dataset.origin==='priority'){
           inboxFilter='action';
           inboxSearch='';
+        }else if(inboxFilter==='unread'){
+          // Reading an unread item must not immediately remove the selected
+          // mail from the reader and replace it with the next unread item.
+          inboxFilter='all';
         }
         message.read = true;
         persistCareer();
