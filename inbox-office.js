@@ -35,6 +35,9 @@
         v.workshop?.stage==='quoted')||null;
   }
   function needsAction(m,state){
+    const auctions=window.MotorTradeAuctionAgent;
+    if(auctions?.pending(state).some(r=>m.reference==='auction-advice:'+r.id))
+      return true;
     const operations=window.MotorTradeOperations;
     if(operations?.pending(state).some(r=>m.reference==='supervisor-ops:'+r.id))
       return true;
@@ -341,6 +344,8 @@
     '</article>';
   }
   function quoteControls(message,state,engine){
+    if((message.reference||'').startsWith('auction-advice:'))
+      return window.MotorTradeAuctionAgent?.controls(state,message)||'';
     if((message.reference||'').startsWith('supervisor-ops:'))
       return window.MotorTradeOperations?.controls(state,message)||'';
     if((message.reference||'').startsWith('repair:')&&
