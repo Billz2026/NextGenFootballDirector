@@ -18,12 +18,13 @@
   const CP = window.MotorTradeCareerProgression;
   const G = window.MotorTradeGroup;
   const GV = window.MotorTradeGroupView;
+  const DELEG = window.MotorTradeDelegation;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !DELEG || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -424,7 +425,7 @@
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
     byId('dashboard-operating-strip').innerHTML=DV.operations(d,career);
-    byId('dashboard-career-progress').innerHTML=CP.dashboard(career);
+    byId('dashboard-career-progress').innerHTML=DELEG.brief(career)+CP.dashboard(career);
     bindText('dashboard-cash-note',d.reserved?
       money.format(d.reserved)+' earmarked for repairs':'Before future operating bills');
     bindText('dashboard-stock-note',d.listed+' listed · '+d.awaitingPrep+' awaiting prep');
@@ -625,6 +626,17 @@
       render();
       return;
     }
+    const beforeDayReputation=career.reputationScore;
+    const delegated=DELEG.process(career,E);
+    if(DELEG.pending(career).length){
+      currentPage='inbox';
+      eventNotice='Your sales supervisor needs a management decision before the current trading session can close. '+
+        'Approve, counter, reject or take over the live customer offer.';
+      lastTradeResult=null;
+      persistCareer();
+      render();
+      return;
+    }
     if(D.isDealDay(career.day)&&career.deadlineSession<D.PHASES.length-1){
       const event=D.advanceSession(career);
       E.nextCustomerSession(career);
@@ -644,7 +656,6 @@
     const missedVisitors=E.showroom.closeWaiting(career,'Left at close of business without being served.').length;
     // Close the actual calendar month BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
-    const beforeDayReputation=career.reputationScore;
     if(career.day===career.monthPlan.endDay)G.closeMonth(career);
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
     if(closed)SITE.sync(career);
@@ -727,6 +738,10 @@
     if(missedVisitors)
       eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
         ' left without being served.';
+    if(delegated.processed&&(delegated.served||delegated.completed||delegated.lost))
+      eventNotice+=' SALES TEAM: '+delegated.served+' visitors served, '+
+        delegated.completed+' actual handovers and '+delegated.lost+
+        ' declined test drives or walkaways.';
     if(groupEvent.events.length)eventNotice+=' GROUP HQ: '+groupEvent.events.join(' ');
     if(closed){
       const id=career.messages.reduce((n,message)=>Math.max(n,message.id),0)+1;
@@ -1007,6 +1022,28 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'delegate-decision':
+        if(career){
+          const outcome=DELEG.decide(career,E,button.dataset.id,button.dataset.decision);
+          if(outcome.ok&&button.dataset.decision==='taken-over'){
+            selectedSalesId=DELEG.requestForMessage(career,
+              {reference:'sales-approval:'+button.dataset.id.slice(3)})?.vehicleId||null;
+            currentPage='sales';
+          }else currentPage='inbox';
+          saveResult(outcome);
+        }
+        break;
+      case 'delegate-takeover':
+        if(career){
+          const id=Number(button.dataset.id);
+          selectedSalesId=id;
+          currentPage='sales';
+          saveResult(DELEG.takeOver(career,E,id));
+        }
+        break;
+      case 'delegate-mode':
+        if(career)saveResult(DELEG.setMode(career,button.dataset.enabled==='true'));
+        break;
       case 'group-view-original':
         if(career)show('dashboard');
         break;
