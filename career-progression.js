@@ -17,6 +17,11 @@
     maximumFractionDigits:0}).format(n);
   const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
   const number=n=>Number.isFinite(n)?n:0;
+  // Career-wide milestones count completed handovers at every genuinely
+  // trading site. The original Sales Office remains branch-specific.
+  const allSales=state=>[...(state.sold||[]),
+    ...(state.group?.branches||[]).flatMap(b=>b.sales||[])].sort((a,b)=>
+    (a.day||0)-(b.day||0));
   function standing(state){
     const score=clamp(number(state.reputationScore),0,100);
     const idx=LEVELS.reduce((at,l,i)=>score>=l.min?i:at,0);
@@ -24,7 +29,8 @@
       previous:LEVELS[idx-1]||null,index:idx};
   }
   function goals(state){
-    const s=standing(state),sold=state.sold||[];
+    const s=standing(state),sold=allSales(state);
+    const multi=(state.group?.branches?.length||0)>0;
     const report=window.MotorTradeMonthly.statement(state);
     const profit=sold.find(x=>x.profit>0);
     const count=sold.length;
@@ -40,12 +46,12 @@
         progress:count,target,display:count+' / '+target,
         percentage:(count-prior)/(target-prior)*100,
         description:'Only completed handovers count. Currently '+count+' sold.',
-        page:'sales',action:'OPEN SALES OFFICE'};
+        page:multi?'group':'sales',action:multi?'VIEW GROUP SALES':'OPEN SALES OFFICE'};
     }
     const soldUnits=number(report.soldUnits),targetUnits=Math.max(1,number(report.targetUnits));
     const contribution=number(report.operatingContribution);
     const monthGoal={
-      key:'monthly',label:'MONTH '+state.monthPlan.month+' BUSINESS TARGET',
+      key:'monthly',label:(multi?'BRANCH 1 · ':'')+'MONTH '+state.monthPlan.month+' BUSINESS TARGET',
       progress:Math.min(soldUnits,targetUnits),target:targetUnits,
       display:soldUnits+' / '+targetUnits+' sales',
       description:soldUnits>=targetUnits?
@@ -83,7 +89,7 @@
     return [careerGoal,monthGoal,reputationGoal];
   }
   function milestones(state){
-    const sold=state.sold||[],reports=state.monthlyReports||[];
+    const sold=allSales(state),reports=state.monthlyReports||[];
     const profit=sold.find(v=>v.profit>0);
     const auction=(state.auctionHistory||[]).find(x=>x.kind==='won');
     // Auction result history is bounded; ownership still proves a past purchase.
