@@ -238,7 +238,10 @@
       }
     }
     for(const c of Object.values(state.customerCases||{})){
-      if(c?.status==='booked'&&Number.isSafeInteger(c.appointmentDay)&&c.appointmentDay>=state.day)
+      // Routine staff-led appointments are handled by the assigned adviser.
+      // Do not bury important owner approvals under "confirm attendance" mail.
+      if(c?.status==='booked'&&Number.isSafeInteger(c.appointmentDay)&&c.appointmentDay>=state.day&&
+        (!state.delegation?.enabled||c.salespersonId==null))
         changed=emit(state,{from:'SALES OFFICE',category:'sales',
           subject:'Customer viewing booked · '+c.name,
           preview:'Viewing scheduled for game day '+c.appointmentDay+'. No deposit has been paid.',
