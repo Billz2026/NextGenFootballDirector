@@ -362,7 +362,8 @@
         (r.status==='pending'?(r.resolvedDay!==null||r.outcome!==''):
           (!num(r.resolvedDay)||r.resolvedDay<r.day||r.resolvedDay>state.day||
             typeof r.outcome!=='string'||r.outcome.length>150))||
-        !state.messages.some(m=>m.reference==='sales-approval:'+r.customerId))return false;
+        (r.status==='pending'&&
+          !state.messages.some(m=>m.reference==='sales-approval:'+r.customerId)))return false;
       seen.add(r.id);
     }
     return d.audit.every(r=>r&&num(r.day)&&r.day>=1&&r.day<=state.day&&
