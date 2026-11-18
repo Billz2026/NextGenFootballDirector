@@ -179,7 +179,7 @@
       '<small>Guide '+gbp(r.guide)+' · Suggested maximum '+gbp(r.suggested)+
       ' · Buyer fee '+gbp(r.fee)+'. Authorising a maximum permits settlement up to that hammer bid plus the stated fee.</small></div>'+
       '<label for="auction-agent-cap-'+esc(r.id)+'">YOUR MAXIMUM HAMMER BID (£)</label>'+
-      '<input id="auction-agent-cap-'+esc(r.id)+'" type="number" min="'+(r.guide+100)+
+      '<input id="auction-agent-cap-'+esc(r.id)+'" type="number" min="'+(Math.ceil((r.guide+100)/100)*100)+
       '" max="100000" step="100" value="'+r.suggested+'">'+
       '<div class="inbox-approval-choices">'+
       '<button type="button" class="trade-button" data-action="auction-agent" data-id="'+esc(r.id)+
