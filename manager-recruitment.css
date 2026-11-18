@@ -1,0 +1,168 @@
+/* Manager Career - Vacancy screening and 5–10-question interviews.
+   A discrete candidate/recruitment surface; does not change trading engine. */
+#screen-recruitment.recruitment-screen {
+  min-height:100svh;background:#080a0d;color:#f4f5f5;font-family:var(--body);
+}
+#screen-recruitment .recruitment-topbar {
+  display:flex;justify-content:space-between;align-items:center;
+  min-height:53px;padding:10px clamp(18px,4vw,60px);
+  background:#0b1117;border-bottom:1px solid #303b44;
+  color:#b6c4ce;font:750 10px/1.3 var(--body);letter-spacing:.075em;
+}
+#screen-recruitment .quiet-button {
+  color:#dfe5e9;font:750 10px var(--body);background:transparent;border:0;
+}
+#screen-recruitment .recruitment-shell {
+  width:min(1300px,calc(100% - 50px));margin:0 auto;
+  display:grid;grid-template-columns:minmax(265px,.64fr) minmax(450px,1fr);
+  gap:16px;padding:28px 0 35px;align-items:start;
+}
+#screen-recruitment .recruitment-company,
+#screen-recruitment .recruitment-main {
+  background:#121a21;border:1px solid #303b44;border-radius:6px;
+  min-width:0;
+}
+#screen-recruitment .recruitment-company {padding:24px}
+#screen-recruitment .recruitment-company h1 {
+  font:800 clamp(29px,3.3vw,44px)/1.08 var(--body);
+  letter-spacing:-.045em;margin:11px 0 14px;
+}
+#screen-recruitment .recruitment-company h1 em {color:#d5b789}
+#screen-recruitment .recruitment-lead {
+  color:#b5c1c9;font:500 12px/1.7 var(--body);margin:0 0 20px;
+}
+#screen-recruitment .recruitment-company-details,
+#screen-recruitment .recruitment-sidebar-note {
+  border:1px solid #35434d;background:#172129;border-radius:5px;
+  padding:14px;margin-bottom:12px;
+}
+#screen-recruitment .recruitment-company-details small,
+#screen-recruitment .recruitment-sidebar-note small {
+  display:block;color:#b6c2cb;font:750 9px/1.4 var(--body);
+  letter-spacing:.065em;
+}
+#screen-recruitment .recruitment-company-details strong {
+  display:block;font:800 18px/1.25 var(--body);margin:4px 0 6px;
+}
+#screen-recruitment .recruitment-company-details p,
+#screen-recruitment .recruitment-sidebar-note p {
+  color:#b6c3cb;font:500 11px/1.6 var(--body);
+}
+#screen-recruitment .recruitment-back,
+#screen-setup .application-reset {
+  border:1px solid #51606a;border-radius:4px;background:#172129;
+  color:#d7e0e4;font:750 10px/1.35 var(--body);
+  padding:10px 13px;cursor:pointer;
+}
+#screen-recruitment .recruitment-back:hover,
+#screen-setup .application-reset:hover {background:#29343c}
+#screen-recruitment .recruitment-main {
+  padding:24px 26px 26px;min-height:410px;
+}
+#screen-recruitment .recruitment-eyebrow {
+  display:flex;justify-content:space-between;gap:9px;align-items:center;
+  color:#d0b68b;font:750 10px/1.4 var(--body);letter-spacing:.07em;
+}
+#screen-recruitment .recruitment-stage-title {
+  font:800 clamp(21px,2.7vw,30px)/1.2 var(--body);
+  letter-spacing:-.03em;color:#f4f5f5;margin:13px 0 10px;
+}
+#screen-recruitment .recruitment-stage-copy {
+  color:#bac6cc;font:500 12px/1.75 var(--body);
+  margin:0 0 18px;
+}
+#screen-recruitment .recruitment-progress {
+  display:flex;gap:6px;margin:14px 0 23px;
+}
+#screen-recruitment .recruitment-progress span {
+  flex:1;height:4px;background:#39434c;border-radius:30px;
+}
+#screen-recruitment .recruitment-progress span.complete {background:#bca47c}
+#screen-recruitment .recruitment-question {
+  font:750 clamp(17px,2vw,23px)/1.42 var(--body);
+  color:#f3f4f5;letter-spacing:-.012em;margin:0 0 20px;
+}
+#screen-recruitment .recruitment-answer-list {
+  display:flex;flex-direction:column;gap:9px;
+}
+#screen-recruitment .recruitment-answer {
+  width:100%;min-height:59px;display:flex;align-items:start;
+  gap:12px;text-align:left;border:1px solid #40505a;
+  border-radius:5px;background:#172129;color:#e2e8eb;
+  font:600 12px/1.5 var(--body);padding:13px 15px;
+}
+#screen-recruitment .recruitment-answer:hover {background:#21313b}
+#screen-recruitment .recruitment-answer[aria-pressed="true"] {
+  border-color:#d4b98c;background:#292d2d;
+  box-shadow:inset 3px 0 #b9233f;
+}
+#screen-recruitment .recruitment-answer-index {
+  flex:0 0 23px;color:#dbc39e;font:800 12px/1.35 var(--body);
+}
+#screen-recruitment .recruitment-actions {
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:22px;
+}
+#screen-recruitment .recruitment-primary {
+  min-height:45px;display:inline-flex;justify-content:space-between;
+  gap:15px;align-items:center;padding:12px 18px;
+  background:#f4f5f5;border:1px solid #f4f5f5;color:#0b1117;
+  box-shadow:inset 3px 0 #b9233f;border-radius:4px;
+  font:800 11px/1.25 var(--body);letter-spacing:.035em;
+}
+#screen-recruitment .recruitment-primary:hover {background:#fff}
+#screen-recruitment .recruitment-primary:disabled {
+  opacity:.5;cursor:not-allowed;
+}
+#screen-recruitment .recruitment-secondary {
+  padding:11px 15px;min-height:45px;background:#172129;
+  border:1px solid #5d6a74;color:#dce4e7;border-radius:4px;
+  font:750 11px/1.2 var(--body);
+}
+#screen-recruitment .recruitment-secondary:hover {background:#283640}
+#screen-recruitment .recruitment-result {
+  border:1px solid #5f5a49;background:#1c2427;
+  padding:15px;border-radius:5px;margin:16px 0;
+}
+#screen-recruitment .recruitment-result.positive {
+  border-color:#54725c;background:#1a2922;
+}
+#screen-recruitment .recruitment-result.negative {
+  border-color:#79584f;background:#30221f;
+}
+#screen-recruitment .recruitment-result strong {
+  display:block;font:800 15px/1.35 var(--body);margin-bottom:7px;
+}
+#screen-recruitment .recruitment-result p {
+  color:#cad4d9;font:500 11px/1.6 var(--body);
+}
+#screen-recruitment .recruitment-save-warning {
+  margin-top:12px;border:1px solid #b28c64;padding:9px;
+  color:#f0d1a4;font:550 11px/1.5 var(--body);
+}
+#screen-recruitment button:focus-visible,
+#screen-setup .application-reset:focus-visible {
+  outline:2px solid #f4f5f5;outline-offset:3px;
+}
+#screen-setup .application-candidate-notice {
+  margin-top:12px;font:600 10px/1.55 var(--body);
+  color:#e1c795;border:1px solid #5f543f;
+  background:#221f1b;padding:10px 12px;
+}
+#screen-setup .application-reset {
+  display:block;width:100%;margin-top:11px;
+}
+#screen-setup .manager-employer.already-applied {
+  background:#131b21;border-color:#465057;
+}
+#screen-setup .manager-employer.already-applied .manager-employer-status {
+  color:#d4b992;
+}
+@media(max-width:790px){
+  #screen-recruitment .recruitment-shell {
+    width:calc(100% - 28px);grid-template-columns:1fr;gap:11px;
+    padding-top:15px;
+  }
+  #screen-recruitment .recruitment-company,
+  #screen-recruitment .recruitment-main {padding:17px}
+  #screen-recruitment .recruitment-company h1 {font-size:30px}
+}
