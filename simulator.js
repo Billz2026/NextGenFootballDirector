@@ -575,7 +575,7 @@
       (!search||[d.name,d.city,d.focus,d.tier].some(s=>s.toLowerCase().includes(search)))&&
       (mode==='all'||(mode==='available')===MC.eligible(d,MC.START_REPUTATION))
     );
-    byId('employer-count').textContent=eligible.length+' AVAILABLE · '+(50-eligible.length)+' LOCKED';
+    byId('manager-employer-count').textContent=eligible.length+' AVAILABLE · '+(50-eligible.length)+' LOCKED';
     byId('employer-list').innerHTML=matches.map(d=>{
       const unlocked=MC.eligible(d,MC.START_REPUTATION);
       const stars='★'.repeat(d.stars)+'☆'.repeat(5-d.stars);
