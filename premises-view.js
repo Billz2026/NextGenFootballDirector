@@ -180,7 +180,8 @@
       ['stock','VEHICLE STOCK'],['workshop','WORKSHOP'],
       ['staff','YOUR STAFF'],['reports','MANAGEMENT REPORTS']].map(([page,title])=>
       '<button type="button" data-page="'+page+'">'+title+'</button>').join('')+'</nav>';
-    return '<div class="hq-control">'+head+metrics+cost+upgradeHead+
+    return '<div class="hq-control">'+head+metrics+cost+
+      (window.MotorTradeEmpire?.branchBrief(state)||'')+upgradeHead+
       '<div class="hq-upgrades">'+card(state,site,'forecourt')+
         card(state,site,'workshop')+'</div>'+shortcuts+more+'</div>';
   }
