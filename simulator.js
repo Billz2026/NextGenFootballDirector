@@ -608,6 +608,11 @@
     byId('manager-sidebar-role').textContent=dealer?'MANAGED · '+dealer.city.toUpperCase():
       'INDEPENDENT MOTOR TRADER';
     byId('sidebar-career-label').textContent=dealer?'YOUR EMPLOYER':'YOUR DEALERSHIP';
+    byId('inbox-manager-role').textContent=dealer?'DEALERSHIP MANAGER':'DEALER PRINCIPAL';
+    byId('dashboard-career-kicker').textContent=dealer?
+      'YOUR EMPLOYER / LIVE MANAGEMENT OVERVIEW':'YOUR DEALERSHIP / LIVE MANAGEMENT OVERVIEW';
+    byId('business-role-caption').textContent=dealer?
+      'EMPLOYING DEALERSHIP · OPENING CASH':'INDEPENDENT MOTOR TRADER · STARTING CAPITAL';
     if(!dealer)return;
     strip.innerHTML='<span>MANAGER <strong>'+escapeText(m.managerName)+
       '</strong> · '+escapeText(dealer.name)+'</span>'+
@@ -674,7 +679,9 @@
     const date = gameDate(career.day);
     const short = dateShort.format(date).toUpperCase();
     bindText('company', career.name);
-    bindText('starting-capital',money.format(career.startingCapital??E.STARTING_CASH));
+    bindText('starting-capital',money.format(career.managerCareer?
+      (MC.dealer(career.managerCareer.employerId)?.openingCash??career.cash):
+      (career.startingCapital??E.STARTING_CASH)));
     bindText('cash', money.format(career.cash));
     bindText('customer-deposits',money.format(C.heldDeposits(career)));
     bindText('stock', career.stock + ' / ' + SITE.storageLimit(career));
