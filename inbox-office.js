@@ -35,6 +35,12 @@
         v.workshop?.stage==='quoted')||null;
   }
   function needsAction(m,state){
+    const operations=window.MotorTradeOperations;
+    if(operations?.pending(state).some(r=>m.reference==='supervisor-ops:'+r.id))
+      return true;
+    if(String(m.reference||'').startsWith('repair:')&&
+      operations?.managesRepair(state,state.vehicles.find(v=>
+        v.id===Number(String(m.reference).slice(7)))||{}))return false;
     const delegation=window.MotorTradeDelegation;
     if(delegation?.pending(state).some(r=>m.reference==='sales-approval:'+r.customerId))
       return true;
@@ -138,6 +144,7 @@
     }
     for(const car of state.vehicles){
       if(car.status!=='acquired'||car.workshop?.stage!=='quoted')continue;
+      if(window.MotorTradeOperations?.managesRepair(state,car))continue;
       const internal=engine.prepQuote(state,car.id,'internal');
       const external=engine.prepQuote(state,car.id,'external');
       const text=[
@@ -334,6 +341,12 @@
     '</article>';
   }
   function quoteControls(message,state,engine){
+    if((message.reference||'').startsWith('supervisor-ops:'))
+      return window.MotorTradeOperations?.controls(state,message)||'';
+    if((message.reference||'').startsWith('repair:')&&
+      window.MotorTradeOperations?.managesRepair(state,state.vehicles.find(v=>
+        v.id===Number(String(message.reference).slice(7)))||{}))
+      return '<div class="inbox-resolved">Workshop supervision handles this quote. Check current supervisor requests for any approval needed.</div>';
     if((message.reference||'').startsWith('sales-approval:'))
       return window.MotorTradeDelegation?.controls(state,message)||'';
     const car=actionFor(message,state);
