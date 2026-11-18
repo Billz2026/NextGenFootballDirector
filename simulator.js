@@ -586,6 +586,8 @@
         '<button class="recruitment-primary" type="button" data-action="return-to-job-search">OPEN VACANCIES →</button>';
       return;
     }
+    byId('recruitment-vacancies-link').hidden=
+      ['invited','interview','offered'].includes(attempt.stage);
     const company=MC.dealer(attempt.employerId),candidate=jobSearch.candidate;
     byId('recruitment-company-details').innerHTML='<small>APPOINTMENT AT</small>'+
       '<strong>'+escapeText(company.name)+'</strong><p>'+
