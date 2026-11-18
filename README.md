@@ -6,6 +6,15 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### Phase 7 — Dealer Principal premium Inbox command centre (18 November 2026)
+
+- **Full operational command centre:** Replaces the basic owner's mail heading with a premium graphite-and-brass executive workspace. An at-a-glance briefing shows the live game day/date and a current owner-authorisation status, along with three *real* measurements: decisions requiring authority, types of outstanding financial arrears and unread communications.
+- **Actionable management queue:** The priority desk surfaces up to two genuine live owner approval messages, with an explicit link to the full decision queue. Messages can be selected directly from the priority desk without changing pricing or triggering any cash movements.
+- **Substantial correspondence workspace:** Larger two-pane desktop reader, sender department badges, clearer urgency and financial warning states, readable inspection/amount tables, and prominent original approve/reject/counter/takeover controls. On mobile, the inbox becomes a well-spaced stacked list with an accessible return-to-list button.
+- **Real navigation and search:** Decision/Finance/Unread overview cards take the owner to the matching live view. Search scans message sender, subject, preview, body and inferred department *within the chosen filter*. Clicking an unread message keeps that message in the reader rather than immediately replacing it with the next one. No new message persistence fields or game save migration are required.
+- **Transaction integrity:** The redesign **does not create or settle deals**. Every action continues through the existing, separately validated sales, workshop, auction, staff or finance engine. Reading, searching and filtering never modifies the cash ledger.
+- **Desktop + mobile regression:** `tests/inbox-command-browser.mjs` creates a genuine vehicle and live supervisor sales-price exception using original engine mechanics; checks owner priority navigation, unread/search filtering, real action controls, page overflow, save validation, and that opening the approval cannot move cash or create sales.
+
 ### Phase 6 — Supervisor-assigned retail and Inbox-first owner management (18 November 2026)
 
 - **Supervisor-driven sales allocation:** A working supervisor now matches new showroom visitors to available sales employees using sales, care, negotiation and reliability skills, morale, assigned workload and customer part-exchange preferences. Prioritise impatient visitors. New online/telephone enquiries receive a supervisor-selected employee on first contact. Existing live staff-managed customers receive priority before new walk-ins; replacements are allocated when an assigned employee is no longer available. Staff cannot serve unlimited visitors in one session.

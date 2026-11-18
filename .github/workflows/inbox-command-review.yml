@@ -1,0 +1,55 @@
+name: Inbox command centre visual and financial regression
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'inbox-command-centre.css'
+      - 'inbox-polish.css'
+      - 'inbox-theme-2026.css'
+      - 'simulator.js'
+      - 'inbox-office.js'
+      - 'tests/inbox-command-browser.mjs'
+      - '.github/workflows/inbox-command-review.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'inbox-command-centre.css'
+      - 'inbox-polish.css'
+      - 'inbox-theme-2026.css'
+      - 'simulator.js'
+      - 'inbox-office.js'
+      - 'tests/inbox-command-browser.mjs'
+      - '.github/workflows/inbox-command-review.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax
+        run: node --check simulator.js && node --check tests/inbox-command-browser.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Serve game
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/inbox-command-server.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+      - name: Verify management decisions and premium desktop and mobile layout
+        run: node tests/inbox-command-browser.mjs
+      - name: Upload command centre screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: inbox-command-centre-desktop-mobile
+          path: review/inbox-command-*.png
+          retention-days: 7
+          if-no-files-found: warn
