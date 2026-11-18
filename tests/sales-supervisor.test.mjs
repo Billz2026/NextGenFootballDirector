@@ -10,7 +10,8 @@ const files=['vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'workshop.js','stock-ageing.js','showroom-traffic.js','customers.js',
   'aftersales.js','trading.js','inbox-office.js','vehicle-cards.js',
   'customers-view.js'];
-const window={},ctx={window,Date,Intl};
+const window={},ctx={window,Date,Intl,
+  document:{addEventListener(){}}};
 for(const path of files)vm.runInNewContext(
   readFileSync(new URL('../'+path,import.meta.url),'utf8'),ctx,{filename:path});
 const E=window.MotorTradeEngine,D=window.MotorTradeDelegation,
