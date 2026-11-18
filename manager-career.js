@@ -700,7 +700,7 @@
           'Your first 90 game days form a probationary appointment. You have no previous manager posts on your CV, and the board expects evidence of competence rather than instant promotion.\n\n'+
           'Initial company working cash: £'+d.openingCash.toLocaleString('en-GB')+
           '. Board expectation: '+d.monthlyTarget+' completed retail handovers in a trading month and positive operating contribution. The board will review your actual monthly results.\n\n'+
-          'This is the first stage of Manager Career. Other dealerships are currently a career-world catalogue; interviews, transfers, resignations and dismissals are planned, not yet playable.',
+          'You successfully completed the recruitment interview and accepted a management appointment. Your original CV and recruitment outcome are retained on your Manager Profile. Transfers, resignations and dismissals are planned but are not yet playable.',
         linkPage:'dashboard',read:false},
       {id:2,day:1,from:'OPERATIONS SUPERVISOR',category:'staff',
         subject:'Your opening team is ready',
@@ -743,12 +743,20 @@
       linkPage:'reports',reference:'board-review:'+report.month});
     return result;
   }
+  function recruitmentValid(r,d){
+    return !!r&&r.employerId===d.id&&
+      whole(r.interviewPercent,0,100)&&whole(r.composite,0,100)&&
+      whole(r.threshold,40,100)&&whole(r.questionsAsked,5,10)&&
+      whole(r.applications,1,20)&&whole(r.rejected,0,r.applications-1)&&
+      r.interviewPercent>=45&&r.composite>=r.threshold;
+  }
   function valid(m,state){
     if(m==null)return true; // Historical owner-operated careers remain valid.
     const d=dealer(m.employerId);
     if(!d||!validName(m.managerName)||!whole(m.reputation,0,100)||
       !whole(m.boardConfidence,0,100)||m.startedDay!==1||
       (m.cv!==undefined&&!cvValid(m.cv))||
+      (m.recruitment!==undefined&&!recruitmentValid(m.recruitment,d))||
       !whole(m.lastReviewMonth,0,1200)||m.lastReviewMonth>Math.max(0,Math.ceil(state.day/28))||
       !Array.isArray(m.reviews)||m.reviews.length>100||
       !Array.isArray(m.history)||m.history.length!==1||
@@ -771,6 +779,7 @@
     managerName:m.managerName,reputation:m.reputation,employerId:m.employerId,
     startedDay:m.startedDay,boardConfidence:m.boardConfidence,
     ...(m.cv?{cv:cvCopy(m.cv)}:{}),
+    ...(m.recruitment?{recruitment:{...m.recruitment}}:{}),
     lastReviewMonth:m.lastReviewMonth,reviews:m.reviews.map(r=>({...r})),
     history:m.history.map(h=>({...h}))
   }:null;
