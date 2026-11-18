@@ -54,6 +54,7 @@
   <link rel="stylesheet" href="./inbox-command-centre.css?v=1">
   <link rel="stylesheet" href="./inbox-compact-premium.css?v=1">
   <link rel="stylesheet" href="./setup-theme-2026.css?v=1">
+  <link rel="stylesheet" href="./manager-career.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -74,6 +75,7 @@
   <script src="./stock-ageing.js?v=1" defer></script>
   <script src="./customers.js?v=14" defer></script>
   <script src="./aftersales.js?v=1" defer></script>
+  <script src="./manager-career.js?v=1" defer></script>
   <script src="./trading.js?v=32" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
@@ -197,32 +199,50 @@
     </section>
 
     <section class="setup-screen" id="screen-setup" hidden aria-labelledby="setup-title">
-      <header class="setup-header"><button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button><span>NEW CAREER / STEP 01</span></header>
-      <div class="setup-layout">
-        <div class="setup-intro">
-          <div class="brand-lockup brand-lockup-setup">
-            <img class="parent-wordmark" src="./assets/nextgen-header-wordmark-2026.webp" alt="NextGen Sessions" width="1600" height="663">
-            <span class="trade-wordmark" aria-hidden="true">MOTOR <b>TRADE<span>.</span></b></span>
+      <header class="setup-header"><button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button><span>NEW MANAGER CAREER / FIRST APPOINTMENT</span></header>
+      <div class="manager-setup-layout">
+        <div class="manager-setup-left">
+          <div class="manager-setup-brand">
+            <img src="./assets/nextgen-header-wordmark-2026.webp" width="1600" height="663" alt="NextGen Sessions">
+            <span>THE MOTOR <b>TRADE.</b></span>
           </div>
-          <p class="section-overline">THE JOURNEY BEGINS</p>
-          <h1 id="setup-title">BUILD YOUR <em>DEALERSHIP.</em></h1>
-          <p>Every trader starts somewhere. Name your business, take control of your starting cash, and enter your new office.</p>
-        </div>
-        <div class="setup-card">
-          <div class="setup-card-top"><span>DEALERSHIP REGISTRATION</span><span>01 / 01</span></div>
+          <p class="manager-kicker">MANAGER CAREER · APPOINTMENT 01</p>
+          <h1 id="setup-title">CHOOSE YOUR FIRST <em>DEALERSHIP.</em></h1>
+          <p class="manager-setup-lead">Start as an unknown manager and earn your reputation through real dealership results. There are 50 fictional companies in the career world, but only entry-level appointments are initially available.</p>
           <form id="career-form">
-            <label class="input-label" for="dealership-name">DEALERSHIP NAME</label>
-            <input id="dealership-name" name="dealershipName" type="text" maxlength="36" minlength="2" value="First Lot Motors" autocomplete="organization" required>
-            <p class="field-help">Use 2–36 characters. You can build your own dealership identity.</p>
-            <div class="setup-facts">
-              <div><span>STARTING CASH</span><strong>£45,000</strong></div>
-              <div><span>FORECOURT CAPACITY</span><strong>4 vehicles</strong></div>
-              <div><span>OPENING TEAM</span><strong>4 salaried staff</strong></div>
-              <div><span>STARTING STOCK</span><strong>None</strong></div>
+            <div class="manager-step-heading"><span>01</span> CREATE YOUR MANAGER</div>
+            <label class="input-label" for="dealership-name">MANAGER NAME</label>
+            <input id="dealership-name" name="dealershipName" type="text" maxlength="36" minlength="2" value="Alex Morgan" autocomplete="name" required>
+            <p class="field-help">Your personal management record is independent of the dealership.</p>
+            <div class="manager-step-heading"><span>02</span> SELECT YOUR FIRST EMPLOYER</div>
+            <div class="manager-choice-panel" aria-live="polite">
+              <strong id="manager-employer-name">Select a dealership</strong>
+              <p id="manager-employer-description">Choose an accessible independent from the employer list.</p>
             </div>
-            <p class="notice-box">Your sales executive, buyer, prep technician and supervisor are employed from Day 1. Salaries cost cash every game day and further hiring is optional. Trade in a fictional UK market: auction bids, walk-in sellers, stock preparation, retail enquiries and part-exchanges. Prices and margins are illustrative; VAT, taxes and consumer claims are not yet modelled; staff and premises overheads are included in management results.</p>
-            <button class="primary-button setup-submit" type="submit">BEGIN CAREER <span aria-hidden="true">→</span></button>
+            <div class="manager-setup-facts" aria-label="Selected dealership appointment">
+              <div><small>EMPLOYER CASH</small><strong id="manager-opening-cash">—</strong></div>
+              <div><small>BOARD SALES TARGET</small><strong id="manager-board-target">—</strong></div>
+              <div><small>STARTING MANAGER REP</small><strong>5 / 100</strong></div>
+              <div><small>OPENING TEAM</small><strong>4 salaried staff</strong></div>
+            </div>
+            <p class="manager-setup-disclaimer">The dealership owns its stock, cash, staff and premises. You manage its performance. Initial job selection and monthly board reviews are playable now; resignations, job offers, dismissals and simulated rival-company trading will arrive in later career updates. Existing owner saves remain separate.</p>
+            <button class="manager-setup-submit" id="manager-career-submit" type="submit">BEGIN MANAGEMENT CAREER <span aria-hidden="true">→</span></button>
           </form>
+        </div>
+        <div class="manager-setup-right" aria-labelledby="manager-employer-heading">
+          <div class="manager-setup-right-head">
+            <div><p class="manager-kicker">UK DEALERSHIP JOB MARKET</p><h2 id="manager-employer-heading">Choose your first employer</h2><p>Apply to any entry-level dealership. Higher tiers are shown but currently locked.</p></div>
+            <span class="manager-employer-count" id="manager-employer-count">20 AVAILABLE</span>
+          </div>
+          <div class="manager-employer-tools">
+            <input id="employer-search" type="search" placeholder="Search dealership or city" aria-label="Search dealerships" autocomplete="off">
+            <select id="employer-filter" aria-label="Filter employer availability">
+              <option value="all">All 50</option>
+              <option value="available">Available</option>
+              <option value="locked">Locked</option>
+            </select>
+          </div>
+          <div class="manager-employer-register" id="employer-list" role="group" aria-label="Available and locked dealerships"></div>
         </div>
       </div>
     </section>
@@ -237,7 +257,7 @@
           <div class="sidebar-career sidebar-career-featured" aria-label="Your dealership">
             <span class="section-overline">YOUR DEALERSHIP</span>
             <strong data-bind="company">FIRST LOT MOTORS</strong>
-            <small>INDEPENDENT MOTOR TRADER</small>
+            <small id="manager-sidebar-role">INDEPENDENT MOTOR TRADER</small>
           </div>
           <div class="sidebar-rule"></div>
           <p class="nav-heading">DEPARTMENTS</p>
@@ -288,6 +308,8 @@
                 <div><p class="section-overline">YOUR DEALERSHIP / LIVE MANAGEMENT OVERVIEW</p><h1 id="dashboard-title">DEALERSHIP <em>OVERVIEW.</em></h1></div>
                 <span class="dashboard-day-tag" data-bind="day-label">DAY 01</span>
               </div>
+
+              <div id="manager-career-strip" hidden aria-live="polite"></div>
 
               <div class="stat-grid dashboard-kpis" role="group" aria-label="Live dealership key figures">
                 <button type="button" class="stat-tile dashboard-kpi" data-page="finance" aria-label="Open finances">
