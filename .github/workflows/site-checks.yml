@@ -21,6 +21,8 @@ on:
       - 'trading.js'
       - 'motor-group.js'
       - 'dealer-delegation.js'
+      - 'supervisor-operations.js'
+      - 'supervisor-operations.css'
       - 'dealer-principal.css'
       - 'group-headquarters-view.js'
       - 'group-headquarters.css'
@@ -68,6 +70,8 @@ on:
       - 'trading.js'
       - 'motor-group.js'
       - 'dealer-delegation.js'
+      - 'supervisor-operations.js'
+      - 'supervisor-operations.css'
       - 'dealer-principal.css'
       - 'group-headquarters-view.js'
       - 'group-headquarters.css'
@@ -105,7 +109,7 @@ jobs:
         with:
           node-version: '22'
       - name: Check game JavaScript syntax
-        run: node --check vehicle-intel.js && node --check vehicle-photos.js && node --check vehicle-accuracy.js && node --check vehicle-market.js && node --check vehicle-cards.js && node --check vehicle-view.js && node --check premises.js && node --check premises-view.js && node --check people.js && node --check people-view.js && node --check monthly.js && node --check monthly-view.js && node --check events.js && node --check events-view.js && node --check workshop.js && node --check workshop-view.js && node --check customers.js && node --check aftersales.js && node --check stock-ageing.js && node --check showroom-traffic.js && node --check cashflow-forecast.js && node --check customers-view.js && node --check motor-group.js && node --check dealer-delegation.js && node --check group-headquarters-view.js && node --check trading.js && node --check auction-hall-view.js && node --check buying-desk-view.js && node --check stock-view.js && node --check finance-view.js && node --check dashboard-view.js && node --check inbox-office.js && node --check career-storage.js && node --check cloud-config.js && node --check cloud-careers.js && node --check cloud-account-ui.js && node --check simulator.js
+        run: node --check vehicle-intel.js && node --check vehicle-photos.js && node --check vehicle-accuracy.js && node --check vehicle-market.js && node --check vehicle-cards.js && node --check vehicle-view.js && node --check premises.js && node --check premises-view.js && node --check people.js && node --check people-view.js && node --check monthly.js && node --check monthly-view.js && node --check events.js && node --check events-view.js && node --check workshop.js && node --check workshop-view.js && node --check customers.js && node --check aftersales.js && node --check stock-ageing.js && node --check showroom-traffic.js && node --check cashflow-forecast.js && node --check customers-view.js && node --check motor-group.js && node --check dealer-delegation.js && node --check supervisor-operations.js && node --check group-headquarters-view.js && node --check trading.js && node --check auction-hall-view.js && node --check buying-desk-view.js && node --check stock-view.js && node --check finance-view.js && node --check dashboard-view.js && node --check inbox-office.js && node --check career-storage.js && node --check cloud-config.js && node --check cloud-careers.js && node --check cloud-account-ui.js && node --check simulator.js
       - name: Validate current site, financial ledger and cross-feature career interactions
         run: |
-          node --test tests/site.test.mjs tests/career-storage.test.mjs tests/cloud-careers.test.mjs tests/showroom-traffic.test.mjs tests/customer-behaviour.test.mjs tests/staff-workshop-impact.test.mjs tests/staff-performance.test.mjs tests/aftersales.test.mjs tests/stock-ageing.test.mjs tests/cashflow-forecast.test.mjs tests/group-headquarters.test.mjs tests/dealer-delegation.test.mjs
+          node --test tests/site.test.mjs tests/career-storage.test.mjs tests/cloud-careers.test.mjs tests/showroom-traffic.test.mjs tests/customer-behaviour.test.mjs tests/staff-workshop-impact.test.mjs tests/staff-performance.test.mjs tests/aftersales.test.mjs tests/stock-ageing.test.mjs tests/cashflow-forecast.test.mjs tests/group-headquarters.test.mjs tests/dealer-delegation.test.mjs tests/supervisor-operations.test.mjs
