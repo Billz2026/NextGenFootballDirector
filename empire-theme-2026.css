@@ -1,0 +1,44 @@
+/* The Motor Trade: Empire Prestige phase 1. All colours match the premium reputation/HQ theme. */
+#screen-career .empire-panel{background:#101920;border:1px solid #6d593e;border-left:3px solid #b68a42;border-radius:7px;padding:14px;margin:0 0 10px;color:#f4f5f5}
+#screen-career .empire-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+#screen-career .empire-heading small,#screen-career .hq-empire-brief small{color:#c9af86;font:700 10px/1.35 var(--body);letter-spacing:.075em}
+#screen-career .empire-heading h3{font:800 clamp(20px,2.15vw,28px)/1.16 var(--body);letter-spacing:-.025em;margin:4px 0}
+#screen-career .empire-heading p{color:#b7c4cc;font:500 12px/1.5 var(--body)}
+#screen-career .empire-heading>span{flex:0 0 auto;border:1px solid #776244;border-radius:5px;background:#28251f;color:#e0c69f;padding:8px 12px;font:800 12px/1.2 var(--body)}
+#screen-career .empire-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#screen-career .empire-metrics>div{background:#17242e;border:1px solid #34424a;border-radius:6px;padding:11px 13px}
+#screen-career .empire-metrics small{display:block;color:#aebdc7;font:700 10px/1.35 var(--body);margin-bottom:4px}
+#screen-career .empire-metrics strong{display:block;color:#f2f4f5;font:800 clamp(22px,2.2vw,29px)/1.15 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .empire-metrics strong span{color:#afbec5;font:600 13px/1.4 var(--body)}
+#screen-career .empire-progress{height:8px;background:#364149;overflow:hidden;border-radius:20px;margin:14px 0 7px}
+#screen-career .empire-progress>div{height:100%;background:#b68a42;border-radius:20px}
+#screen-career .empire-next{color:#e1c18c;font:750 11px/1.45 var(--body);margin-bottom:14px}
+#screen-career .empire-section-title{display:flex;justify-content:space-between;gap:8px;margin:0 0 8px}
+#screen-career .empire-section-title strong{font:800 12px/1.3 var(--body);color:#fff}
+#screen-career .empire-section-title span{font:750 11px/1.35 var(--body);color:#d6ba8e}
+#screen-career .empire-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#screen-career .empire-check{display:grid;grid-template-columns:18px minmax(0,1fr);gap:2px 7px;padding:10px;background:#17232b;border:1px solid #39444c;border-radius:5px}
+#screen-career .empire-check>span{grid-row:span 2;color:#e0b77c;font-size:16px}
+#screen-career .empire-check strong{color:#f2f3f4;font:700 11px/1.35 var(--body)}
+#screen-career .empire-check small{color:#adbcc5;font:600 11px/1.3 var(--body);font-variant-numeric:tabular-nums}
+#screen-career .empire-check.empire-done{border-color:#44634d;background:#182820}
+#screen-career .empire-check.empire-done>span{color:#8ad5a6}
+#screen-career .empire-branch{margin-top:11px;padding:11px 12px;background:#1a252b;border:1px solid #5c503b;border-radius:5px}
+#screen-career .empire-branch strong{font:800 12px/1.25 var(--body);color:#e5cb9f}
+#screen-career .empire-branch p{font:600 12px/1.55 var(--body);color:#e4e7e8;margin-top:5px}
+#screen-career .empire-branch small{display:block;font:500 11px/1.5 var(--body);color:#b5c2ca;margin-top:6px}
+#screen-career .empire-roadmap{border:1px solid #34424c;background:#15222a;border-radius:5px;margin-top:10px}
+#screen-career .empire-roadmap summary{cursor:pointer;padding:11px;color:#dec494;font:750 11px/1.3 var(--body)}
+#screen-career .empire-roadmap-row{display:grid;grid-template-columns:85px minmax(0,1fr) 75px;gap:8px;align-items:center;padding:9px 12px;border-top:1px solid #303e46;font:600 11px/1.3 var(--body)}
+#screen-career .empire-roadmap-row>span{color:#c2ad89}
+#screen-career .empire-roadmap-row>strong{color:#e9eef0;font-weight:700}
+#screen-career .empire-roadmap-row>em{color:#aabac4;font-style:normal;text-align:right;font-size:10px}
+#screen-career .empire-method{margin-top:12px;color:#aebbc4;font:500 11px/1.5 var(--body)}
+#screen-career .hq-empire-brief{margin:0 0 10px;padding:13px 14px;background:#121b22;border:1px solid #5c503b;border-left:3px solid #b68a42;border-radius:6px}
+#screen-career .hq-empire-brief h3{color:#f2f4f5;font:800 17px/1.2 var(--body);margin-top:3px}
+#screen-career .hq-empire-brief p{color:#b7c5ce;font:500 12px/1.5 var(--body);margin-top:8px}
+#screen-career .hq-empire-brief>span{display:inline-block;background:#28251f;color:#dfc99f;padding:4px 7px;border-radius:4px;font:700 10px/1.3 var(--body);margin-top:9px}
+#screen-career .hq-empire-brief button{background:#27353d;border:1px solid #67737b;color:#f1f3f4;border-radius:5px;padding:9px 12px;margin-top:12px;min-height:35px;font:750 11px/1.3 var(--body);cursor:pointer}
+#screen-career .hq-empire-brief button:hover{background:#34444c}
+@media(max-width:850px){#screen-career .empire-checks{grid-template-columns:1fr}}
+@media(max-width:600px){#screen-career .empire-panel{padding:11px}#screen-career .empire-heading{flex-wrap:wrap}#screen-career .empire-metrics{grid-template-columns:1fr}#screen-career .empire-roadmap-row{grid-template-columns:70px minmax(0,1fr) 60px}#screen-career .empire-heading p{font-size:11px}}
