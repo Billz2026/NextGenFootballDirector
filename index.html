@@ -55,6 +55,7 @@
   <link rel="stylesheet" href="./inbox-compact-premium.css?v=1">
   <link rel="stylesheet" href="./setup-theme-2026.css?v=1">
   <link rel="stylesheet" href="./manager-career.css?v=3">
+  <link rel="stylesheet" href="./manager-recruitment.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -76,6 +77,7 @@
   <script src="./customers.js?v=14" defer></script>
   <script src="./aftersales.js?v=1" defer></script>
   <script src="./manager-career.js?v=4" defer></script>
+  <script src="./manager-recruitment.js?v=1" defer></script>
   <script src="./trading.js?v=33" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
@@ -199,7 +201,7 @@
     </section>
 
     <section class="setup-screen" id="screen-setup" hidden aria-labelledby="setup-title">
-      <header class="setup-header"><button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button><span>NEW MANAGER CAREER / FIRST APPOINTMENT</span></header>
+      <header class="setup-header"><button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button><span>NEW MANAGER CAREER / JOB APPLICATIONS</span></header>
       <div class="manager-setup-layout">
         <div class="manager-setup-left">
           <div class="manager-setup-brand">
@@ -207,8 +209,8 @@
             <span>THE MOTOR <b>TRADE.</b></span>
           </div>
           <p class="manager-kicker">MANAGER CAREER · APPOINTMENT 01</p>
-          <h1 id="setup-title">CHOOSE YOUR FIRST <em>DEALERSHIP.</em></h1>
-          <p class="manager-setup-lead">Start as an unknown manager and earn your reputation through real dealership results. There are 50 fictional companies in the career world, but only entry-level appointments are initially available.</p>
+          <h1 id="setup-title">APPLY FOR YOUR FIRST <em>MANAGEMENT JOB.</em></h1>
+          <p class="manager-setup-lead">Start with a modest motor-trade CV. Choose a vacancy, submit an application and earn an interview invitation. Only a successful interview can lead to an employment offer.</p>
           <form id="career-form">
             <div class="manager-step-heading"><span>01</span> CREATE YOUR MANAGER</div>
             <label class="input-label" for="dealership-name">MANAGER NAME</label>
@@ -234,13 +236,15 @@
               <div><small>STARTING MANAGER REP</small><strong>5 / 100</strong></div>
               <div><small>OPENING TEAM</small><strong>4 salaried staff</strong></div>
             </div>
-            <p class="manager-setup-disclaimer">The company owns its money, cars and staff. Your first 90 game days are probationary, with monthly board reviews. Background and qualifications form your CV; they do not yet alter selling or hiring probabilities. Transfers, resignations and dismissals are not playable yet.</p>
-            <button class="manager-setup-submit" id="manager-career-submit" type="submit">BEGIN MANAGEMENT CAREER <span aria-hidden="true">→</span></button>
+            <p class="manager-setup-disclaimer">You are applying for a job, not buying this business. The owner reviews your CV and interview. Rejection is possible. Only accepting an actual offer creates the managed dealership.</p>
+            <p id="application-candidate-notice" class="application-candidate-notice" hidden>Your CV is locked while job applications are active. To change your details, you must restart the job search.</p>
+            <button class="manager-setup-submit" id="manager-career-submit" type="submit">APPLY FOR THIS VACANCY <span aria-hidden="true">→</span></button>
+            <button type="button" id="restart-job-search" class="application-reset" data-action="restart-job-search" hidden>RESTART JOB SEARCH WITH A NEW CV</button>
           </form>
         </div>
         <div class="manager-setup-right" aria-labelledby="manager-employer-heading">
           <div class="manager-setup-right-head">
-            <div><p class="manager-kicker">UK DEALERSHIP JOB MARKET</p><h2 id="manager-employer-heading">Choose your first employer</h2><p>Apply to any entry-level dealership. Higher tiers are shown but currently locked.</p></div>
+            <div><p class="manager-kicker">UK MOTOR TRADE JOB CENTRE</p><h2 id="manager-employer-heading">Current management vacancies</h2><p>Shortlisting and interviews are required. More established employers remain inaccessible at entry level.</p></div>
             <span class="manager-employer-count" id="manager-employer-count">20 AVAILABLE</span>
           </div>
           <div class="manager-employer-tools">
@@ -254,6 +258,27 @@
           <div class="manager-employer-register" id="employer-list" role="group" aria-label="Available and locked dealerships"></div>
         </div>
       </div>
+    </section>
+
+    <section class="recruitment-screen" id="screen-recruitment" hidden aria-labelledby="recruitment-title">
+      <header class="recruitment-topbar">
+        <button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button>
+        <span>MANAGER CAREER / RECRUITMENT PROCESS</span>
+      </header>
+      <main class="recruitment-shell">
+        <aside class="recruitment-company">
+          <p class="manager-kicker">THE MOTOR TRADE / APPOINTMENTS</p>
+          <h1 id="recruitment-title">Management <em>interview</em></h1>
+          <p class="recruitment-lead">Your answers help determine whether the owner will offer you the role. Good answers improve your chances; an appointment is not automatic.</p>
+          <div class="recruitment-company-details" id="recruitment-company-details"></div>
+          <div class="recruitment-sidebar-note" id="recruitment-candidate-summary"></div>
+          <button type="button" class="recruitment-back" data-action="return-to-job-search" id="recruitment-vacancies-link">VIEW OTHER VACANCIES</button>
+        </aside>
+        <div class="recruitment-main">
+          <div id="recruitment-stage" aria-live="polite"></div>
+          <p class="recruitment-save-warning" id="recruitment-save-warning" role="status" hidden>Unable to save application progress in this browser. Keep this tab open.</p>
+        </div>
+      </main>
     </section>
 
     <section class="game-screen" id="screen-career" hidden aria-label="Career mode">
