@@ -19,7 +19,7 @@
       return waiting.length?
         '<div class="sales-case-highlight"><strong>'+waiting.length+' CUSTOMER'+
         (waiting.length===1?'':'S')+' WAITING FOR THIS CAR</strong>'+
-        '<p>Your sales team will serve available visitors when the trading session advances. You can still intervene personally using the showroom queue. Each visitor has an independent negotiating budget and may leave.</p></div>':
+        '<p>The supervisor automatically allocates visitors to available sales advisers. Routine viewings, negotiations and handovers need no owner action; customers can still leave if capacity is insufficient.</p></div>':
         '<div class="sales-case-quiet"><strong>NO ACTIVE RETAIL ENQUIRIES</strong>'+
         '<p>No showroom customer is currently waiting for this vehicle. Buyer interest changes with price, reputation and the next game day.</p></div>';
     }
@@ -285,7 +285,13 @@
       enquiry:0,booked:1,arrived:1,discussing:2,agreed:3,
       reserved:4,collectable:4,lost:-1
     }[c.status]??-1;
-    const actionable=available||!!c&&
+    const automated=state.delegation?.enabled&&!!E.people.supervisor(state);
+    const supervisorApproval=automated&&!!c&&
+      !!window.MotorTradeDelegation?.pending(state).some(r=>r.customerId===c.id);
+    const ownerIntervention=!!c&&c.salespersonId==null&&
+      ['enquiry','arrived','discussing','agreed','collectable'].includes(c.status);
+    const actionable=automated?(supervisorApproval||ownerIntervention):
+      available||!!c&&
       ['enquiry','arrived','discussing','agreed','collectable'].includes(c.status);
     return {c,available,queued:queued.length,title,step,actionable,
       tone:c?.status==='lost'?'lost':
@@ -350,7 +356,9 @@
         '<div class="so-figures-strong"><span>AGREED SALE PRICE</span><strong>'+cash(c.price)+'</strong></div>':'')+
       '</div><p class="so-caveat">Valuations are fictional. A sale is recorded only after handover.</p>'+
       '</section><section class="so-customer"><div class="so-customer-heading">'+
-      '<div><small>SALES CASE MANAGEMENT</small><h4>NEXT CUSTOMER ACTION</h4></div>'+
+      '<div><small>SALES CASE MANAGEMENT</small><h4>'+
+      (state.delegation?.enabled&&E.people.supervisor(state)?
+        'SUPERVISOR CASE STATUS':'NEXT CUSTOMER ACTION')+'</h4></div>'+
       (c?'<span>'+esc(c.name)+'</span>':'')+'</div>'+
       actions(state,v,E)+'</section></div></article>';
   }
@@ -373,12 +381,14 @@
     const s=snapshot(state,E),f=FILTERS.includes(filter)?filter:'all';
     const stats=E.customers.stats(state,state.monthPlan.startDay,state.day);
     const waiting=E.showroom.waiting(state).length;
+    const automatic=state.delegation?.enabled&&!!E.people.supervisor(state);
+    const requiredLabel=automatic?'OWNER EXCEPTIONS':'ACTION REQUIRED';
     const top='<div class="so-kpis">'+[
       ['ADVERTISED VEHICLES',s.rows.length],
       ['CUSTOMERS ON SITE',waiting+s.rows.filter(r=>['arrived','discussing'].includes(r.caseData.c?.status)).length],
-       ['ACTION REQUIRED',s.attention],['HELD DEPOSITS',cash(s.held)]
+       [requiredLabel,s.attention],['HELD DEPOSITS',cash(s.held)]
     ].map(([name,value])=>
-      '<div class="'+(name==='ACTION REQUIRED'&&value>0?'so-kpi-attention':name==='CUSTOMERS ON SITE'&&value>0?'so-kpi-occupied':'so-kpi-neutral')+'"><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
+      '<div class="'+((name==='ACTION REQUIRED'||name==='OWNER EXCEPTIONS')&&value>0?'so-kpi-attention':name==='CUSTOMERS ON SITE'&&value>0?'so-kpi-occupied':'so-kpi-neutral')+'"><small>'+name+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
       '<details class="so-activity"><summary>MONTHLY RETAIL ACTIVITY</summary>'+
       '<p>THIS MONTH · '+stats.enquiries+' RECORDED ENQUIRIES · '+
       stats.appointments+' VIEWINGS BOOKED · '+stats.testDrives+' TEST DRIVES · '+
@@ -390,7 +400,7 @@
       '<button type="button" class="trade-button" data-page="stock">OPEN VEHICLE STOCK</button></div>'+
       history(state)};
     const filterDefs=[['all','ALL VEHICLES',s.rows.length],
-      ['action','ACTION REQUIRED',s.attention],
+      ['action',automatic?'OWNER EXCEPTIONS':'ACTION REQUIRED',s.attention],
       ['appointments','APPOINTMENTS',s.appointments],
       ['deposits','DEPOSIT HELD',s.deposits]];
     const toolbar='<div class="so-toolbar"><strong>RETAIL CASE REGISTER</strong>'+
