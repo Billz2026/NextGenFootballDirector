@@ -54,7 +54,7 @@
   <link rel="stylesheet" href="./inbox-command-centre.css?v=1">
   <link rel="stylesheet" href="./inbox-compact-premium.css?v=1">
   <link rel="stylesheet" href="./setup-theme-2026.css?v=1">
-  <link rel="stylesheet" href="./manager-career.css?v=1">
+  <link rel="stylesheet" href="./manager-career.css?v=2">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -75,7 +75,7 @@
   <script src="./stock-ageing.js?v=1" defer></script>
   <script src="./customers.js?v=14" defer></script>
   <script src="./aftersales.js?v=1" defer></script>
-  <script src="./manager-career.js?v=2" defer></script>
+  <script src="./manager-career.js?v=3" defer></script>
   <script src="./trading.js?v=33" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
@@ -213,7 +213,16 @@
             <div class="manager-step-heading"><span>01</span> CREATE YOUR MANAGER</div>
             <label class="input-label" for="dealership-name">MANAGER NAME</label>
             <input id="dealership-name" name="dealershipName" type="text" maxlength="36" minlength="2" value="Alex Morgan" autocomplete="name" required>
-            <p class="field-help">Your personal management record is independent of the dealership.</p>
+            <p class="field-help">Your personal identity is independent of the dealership.</p>
+            <div class="manager-profile-grid">
+              <div class="manager-profile-field"><label class="input-label" for="manager-dob">DATE OF BIRTH</label><input id="manager-dob" name="dateOfBirth" type="date" value="2001-06-15" min="1960-11-10" max="2005-11-09" required></div>
+              <div class="manager-profile-field"><label class="input-label" for="manager-age">AGE AT CAREER START</label><output id="manager-age" for="manager-dob">25 years</output></div>
+              <div class="manager-profile-field"><label class="input-label" for="manager-hometown">HOME TOWN</label><input id="manager-hometown" name="hometown" type="text" maxlength="40" minlength="2" value="Birmingham" autocomplete="address-level2" required></div>
+              <div class="manager-profile-field"><label class="input-label" for="manager-experience">MOTOR TRADE EXPERIENCE</label><select id="manager-experience" name="experienceYears"><option value="1">1 year</option><option value="2" selected>2 years</option><option value="3">3 years</option></select></div>
+              <div class="manager-profile-field"><label class="input-label" for="manager-background">MOST RECENT ROLE</label><select id="manager-background" name="previousRole"><option value="sales-assistant" selected>Sales Assistant</option><option value="junior-sales">Junior Sales Executive</option><option value="buying-assistant">Vehicle Buying Assistant</option><option value="service-admin">Service Administrator</option><option value="vehicle-prep">Vehicle Preparation Assistant</option></select></div>
+              <div class="manager-profile-field"><label class="input-label" for="manager-qualification">EDUCATION / TRAINING</label><select id="manager-qualification" name="qualification"><option value="gcse" selected>GCSEs / equivalent</option><option value="sales-level2">Level 2 Sales / Customer Service</option><option value="vehicle-level2">Level 2 Motor Vehicle</option><option value="business-level3">Level 3 Business Administration</option></select></div>
+            </div>
+            <div class="manager-cv-teaser" aria-live="polite"><div><strong>ENTRY-LEVEL CV</strong><span>90-DAY PROBATION</span></div><p id="manager-cv-teaser">25 years · Birmingham · Sales Assistant · 2 years trade experience</p><small>No prior dealership management appointments. Limited track record.</small></div>
             <div class="manager-step-heading"><span>02</span> SELECT YOUR FIRST EMPLOYER</div>
             <div class="manager-choice-panel" aria-live="polite">
               <strong id="manager-employer-name">Select a dealership</strong>
@@ -225,7 +234,7 @@
               <div><small>STARTING MANAGER REP</small><strong>5 / 100</strong></div>
               <div><small>OPENING TEAM</small><strong>4 salaried staff</strong></div>
             </div>
-            <p class="manager-setup-disclaimer">The dealership owns its stock, cash, staff and premises. You manage its performance. Initial job selection and monthly board reviews are playable now; resignations, job offers, dismissals and simulated rival-company trading will arrive in later career updates. Existing owner saves remain separate.</p>
+            <p class="manager-setup-disclaimer">The company owns its money, cars and staff. Your first 90 game days are probationary, with monthly board reviews. Background and qualifications form your CV; they do not yet alter selling or hiring probabilities. Transfers, resignations and dismissals are not playable yet.</p>
             <button class="manager-setup-submit" id="manager-career-submit" type="submit">BEGIN MANAGEMENT CAREER <span aria-hidden="true">→</span></button>
           </form>
         </div>
@@ -262,6 +271,7 @@
           <div class="sidebar-rule"></div>
           <p class="nav-heading">DEPARTMENTS</p>
           <nav class="career-nav" aria-label="Career navigation">
+            <button type="button" data-page="manager" id="manager-profile-nav" hidden><span class="nav-icon"><svg viewBox="0 0 24 24" class="nav-svg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2M19 4h3m-1-2v4"/></svg></span> Manager Profile</button>
             <button type="button" data-page="dashboard" aria-current="page"><span class="nav-icon"><svg viewBox="0 0 24 24" class="nav-svg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Dashboard</button>
             <button type="button" data-page="inbox"><span class="nav-icon"><svg viewBox="0 0 24 24" class="nav-svg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span> Inbox <span class="nav-unread" data-bind="unread" hidden>3</span></button>
             <button type="button" data-page="auctionHall"><span class="nav-icon"><svg viewBox="0 0 24 24" class="nav-svg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 7 8 8M12 4l8 8M7 10l8 8M4 21l7-7M3 21h8"/><path d="M10 2 7 5l11 11 3-3z"/></svg></span> Auction Hall</button>
@@ -303,6 +313,10 @@
 
           <div class="career-content">
             <div id="events-banner" class="events-banner" aria-live="polite"></div>
+            <section class="career-panel manager-cv-page" data-panel="manager" hidden aria-labelledby="manager-profile-title">
+              <header class="manager-cv-page-head"><p class="section-overline">MANAGEMENT CAREER / PERSONAL RECORD</p><h1 id="manager-profile-title">MANAGER PROFILE <em>&amp; CV</em></h1><p>Your qualifications, experience, performance history and career standing. This profile belongs to you, not the dealership.</p></header>
+              <div id="manager-profile-content" aria-live="polite"></div>
+            </section>
             <section class="career-panel dashboard-control" data-panel="dashboard" aria-labelledby="dashboard-title">
               <div class="dashboard-heading">
                 <div><p class="section-overline" id="dashboard-career-kicker">YOUR DEALERSHIP / LIVE MANAGEMENT OVERVIEW</p><h1 id="dashboard-title">DEALERSHIP <em>OVERVIEW.</em></h1></div>
