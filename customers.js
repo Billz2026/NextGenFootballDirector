@@ -191,9 +191,14 @@
       terms:'in-person',prepCost:0,exchange:null,
       objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
       remedyCost:0,priceDiscount:0,trustPenalty:0,
-      salespersonId:P.salesRep(state,id)?.id??null
+      salespersonId:state.delegation?.enabled?null:(P.salesRep(state,id)?.id??null)
     };
     state.customerCases[String(id)]=c;
+    // On first contact the active supervisor selects the adviser using
+    // sales skill, customer requirements and existing case workload.
+    // Retain historical P.salesRep fallback for manual/legacy careers.
+    if(state.delegation?.enabled)
+      window.MotorTradeDelegation?.assign(state,c);
     vehicle.cashOffer=null;
     append(state,c,'enquiry',c.channel);
     return ok(c.name+' contacted the dealership about '+vehicle.title+
