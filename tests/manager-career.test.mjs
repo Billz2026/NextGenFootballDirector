@@ -98,3 +98,65 @@ test('existing owner-mode staffed careers remain loadable and unmodified',()=>{
   assert.equal(restored.managerCareer,undefined);
   assert.equal(restored.cash,45000);
 });
+
+test('manager age follows DOB and the fictional game calendar',()=>{
+  assert.equal(MC.ageAt('2001-11-10',1),24);
+  assert.equal(MC.ageAt('2001-11-10',2),25);
+  assert.equal(MC.ageAt('2001-02-29',1),null,'invalid calendar date');
+  assert.equal(MC.ageAt('2005-11-10',1),20);
+  assert.equal(MC.ageAt('1960-11-10',1),65);
+  assert.ok(MC.cvValid({...MC.DEFAULT_CV,dateOfBirth:'2005-11-09'}));
+  assert.equal(MC.cvValid({...MC.DEFAULT_CV,dateOfBirth:'2005-11-10'}),false);
+  assert.equal(MC.cvValid({...MC.DEFAULT_CV,dateOfBirth:'1950-01-01'}),false);
+});
+
+test('player-selected conservative CV survives real engine save and reload',()=>{
+  const d=MC.firstJobs()[0];
+  const details={dateOfBirth:'2000-11-10',hometown:'Coventry',
+    previousRole:'buying-assistant',experienceYears:1,qualification:'vehicle-level2'};
+  const s=E.createStaffed(d.name,[]);
+  assert.equal(MC.enrol(s,'Jordan Hayes',d.id,details).ok,true);
+  s.messages=MC.welcome(s);
+  const r=E.normalize(clone(s));
+  assert.ok(r);
+  assert.equal(r.managerCareer.managerName,'Jordan Hayes');
+  assert.deepEqual({...r.managerCareer.cv},details);
+  assert.equal(MC.ageAt(r.managerCareer.cv.dateOfBirth,r.day),25);
+  assert.equal(r.managerCareer.history.length,1);
+  assert.equal(r.managerCareer.history[0].type,'appointed');
+  assert.equal(r.managerCareer.reputation,5);
+});
+
+test('invalid or exaggerated first CV cannot bypass entry-level employment',()=>{
+  const d=MC.firstJobs()[0];
+  for(const invalid of [
+    {...MC.DEFAULT_CV,experienceYears:12},
+    {...MC.DEFAULT_CV,previousRole:'general-manager'},
+    {...MC.DEFAULT_CV,dateOfBirth:'2008-03-01'},
+    {...MC.DEFAULT_CV,dateOfBirth:'2001-02-29'},
+    {...MC.DEFAULT_CV,hometown:'<script>'},
+    {...MC.DEFAULT_CV,qualification:'mba'}
+  ]){
+    const state=E.createStaffed(d.name,[]);
+    assert.equal(MC.enrol(state,'Jordan Hayes',d.id,invalid).ok,false);
+    assert.equal(state.managerCareer,undefined);
+    assert.equal(state.cash,45000);
+  }
+});
+
+test('existing manager careers from before the CV update survive without fabricated identity',()=>{
+  const old=start(MC.firstJobs()[0]);
+  delete old.managerCareer.cv;
+  const r=E.normalize(clone(old));
+  assert.ok(r);
+  assert.equal(r.managerCareer.cv,undefined);
+  assert.equal(r.managerCareer.reputation,5);
+});
+
+test('beginner in London can search for at least one real selectable in-game employer',()=>{
+  const london=MC.firstJobs().filter(d=>d.city==='London');
+  assert.ok(london.length>=1);
+  assert.ok(london.some(d=>d.name==='West London Trade Cars'));
+  const s=start(london[0]);
+  assert.ok(E.normalize(clone(s)));
+});
