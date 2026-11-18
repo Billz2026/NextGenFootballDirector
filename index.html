@@ -52,6 +52,7 @@
   <link rel="stylesheet" href="./reputation-theme-2026.css?v=1">
   <link rel="stylesheet" href="./dealership-theme-2026.css?v=1">
   <link rel="stylesheet" href="./inbox-command-centre.css?v=1">
+  <link rel="stylesheet" href="./inbox-compact-premium.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -96,7 +97,7 @@
   <script src="./cloud-config.js?v=1" defer></script>
   <script src="./cloud-careers.js?v=1" defer></script>
   <script src="./cloud-account-ui.js?v=1" defer></script>
-  <script src="./simulator.js?v=52" defer></script>
+  <script src="./simulator.js?v=53" defer></script>
   <title>The Motor Trade | UK Car Dealer Simulator</title>
 </head>
 <body>
@@ -340,12 +341,11 @@
             <section class="career-panel inbox-control inbox-command" data-panel="inbox" hidden aria-labelledby="inbox-title">
               <header class="inbox-heading ic-hero">
                 <div class="ic-hero-copy">
-                  <p class="ic-eyebrow"><span class="ic-eyebrow-line" aria-hidden="true"></span> THE MOTOR TRADE <span class="ic-eyebrow-slash">/</span> DEALER PRINCIPAL</p>
-                  <h1 id="inbox-title">MANAGEMENT <em>COMMAND CENTRE.</em></h1>
-                  <p class="ic-hero-caption">Your team's running the business. Your job is to make the decisions that matter.</p>
+                  <p class="ic-eyebrow">THE MOTOR TRADE <span class="ic-eyebrow-slash">/</span> DEALER PRINCIPAL</p>
+                  <h1 id="inbox-title">Management <em>Inbox</em></h1>
                 </div>
                 <div class="ic-hero-status">
-                  <div class="ic-day-label">LIVE DEALERSHIP OPERATIONS <strong id="inbox-current-day">DAY 01</strong></div>
+                  <span id="inbox-current-day" class="ic-day-label">DAY 01</span>
                   <p id="inbox-command-summary" class="ic-command-status" role="status" aria-live="polite">Checking management priorities</p>
                   <span id="inbox-current-date" class="ic-calendar-date">TRADING CALENDAR</span>
                 </div>
@@ -354,25 +354,25 @@
               <div class="ic-overview" aria-label="Live management position">
                 <div class="inbox-stat-strip ic-metrics">
                   <button type="button" class="ic-metric ic-metric-decision" data-action="inbox-view-decisions">
-                    <span class="ic-metric-label">01 / YOUR DECISIONS</span>
+                    <span class="ic-metric-label">APPROVALS</span>
                     <strong id="inbox-action-count" data-tone="neutral">0</strong>
-                    <span class="ic-metric-foot">AUTHORISATIONS WAITING <span aria-hidden="true">↗</span></span>
+                    <span class="ic-metric-foot">YOUR DECISIONS <span aria-hidden="true">↗</span></span>
                   </button>
                   <button type="button" class="ic-metric ic-metric-alert" data-action="inbox-view-alerts">
-                    <span class="ic-metric-label">02 / FINANCIAL PRESSURE</span>
+                    <span class="ic-metric-label">FINANCIAL RISKS</span>
                     <strong id="inbox-critical-count">0</strong>
-                    <span class="ic-metric-foot">UNPAID OBLIGATION TYPES <span aria-hidden="true">↗</span></span>
+                    <span class="ic-metric-foot">ARREARS TYPES <span aria-hidden="true">↗</span></span>
                   </button>
                   <button type="button" class="ic-metric ic-metric-unread" data-action="inbox-view-unread">
-                    <span class="ic-metric-label">03 / INTELLIGENCE</span>
+                    <span class="ic-metric-label">UNREAD MAIL</span>
                     <strong id="inbox-unread-summary" data-tone="neutral">0</strong>
-                    <span class="ic-metric-foot">UNREAD REPORTS &amp; MESSAGES <span aria-hidden="true">↗</span></span>
+                    <span class="ic-metric-foot">NEW REPORTS <span aria-hidden="true">↗</span></span>
                   </button>
                   <span id="inbox-paid-count" hidden>0</span>
                 </div>
                 <section class="ic-priority" aria-labelledby="inbox-priority-heading">
                   <div class="ic-priority-head">
-                    <div><small>THE DECISION DESK</small><h2 id="inbox-priority-heading">ON YOUR DESK</h2></div>
+                    <div><small>MANAGEMENT PRIORITY</small><h2 id="inbox-priority-heading">Next decision</h2></div>
                     <button type="button" data-action="inbox-view-decisions">VIEW QUEUE <span aria-hidden="true">↗</span></button>
                   </div>
                   <div id="inbox-priority-list" class="ic-priority-list" aria-live="polite"></div>
@@ -380,12 +380,12 @@
               </div>
 
               <div class="ic-workspace-label">
-                <div><span class="ic-workspace-kicker">COMMUNICATIONS / INTERNAL</span>
-                  <h2>YOUR BUSINESS CORRESPONDENCE</h2></div>
+                <div><span class="ic-workspace-kicker">HEAD OFFICE / MESSAGES</span>
+                  <h2>Correspondence</h2></div>
                 <div class="ic-workspace-tools">
                   <label class="ic-search" for="inbox-search">
                     <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 5 5"/></svg>
-                    <input type="search" id="inbox-search" placeholder="Find an email, employee or vehicle" autocomplete="off" aria-label="Search all displayed correspondence">
+                    <input type="search" id="inbox-search" placeholder="Search messages" autocomplete="off" aria-label="Search all displayed correspondence">
                   </label>
                   <button type="button" class="secondary-button ic-mark-read" data-action="mark-all-read">MARK ALL READ</button>
                 </div>
@@ -396,7 +396,7 @@
               <div class="inbox-layout panel-card">
                 <div class="inbox-column">
                   <div class="inbox-column-head">
-                    <span>MESSAGE REGISTER <small id="inbox-filter-count">0 SHOWN</small></span>
+                    <span>MESSAGES <small id="inbox-filter-count">0 SHOWN</small></span>
                     <span id="inbox-unread-count">0 UNREAD</span>
                   </div>
                   <div class="inbox-list" id="inbox-list" aria-label="Dealership message list"></div>
