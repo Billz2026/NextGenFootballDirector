@@ -191,7 +191,7 @@
       terms:'in-person',prepCost:0,exchange:null,
       objectionStatus:'unraised',objectionAction:'none',evidenceTried:false,
       remedyCost:0,priceDiscount:0,trustPenalty:0,
-      salespersonId:P.salesRep(state,id)?.id??null
+      salespersonId:state.delegation?.enabled?null:(P.salesRep(state,id)?.id??null)
     };
     state.customerCases[String(id)]=c;
     // On first contact the active supervisor selects the adviser using
