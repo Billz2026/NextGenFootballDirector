@@ -338,24 +338,23 @@
       if(!b.sales.every(s=>b.enquiries.some(e=>e.id===s.customerId&&
         e.vehicleId===s.id&&e.day===s.day&&e.accepted&&e.offered===s.price)))return false;
       // Internal movements must be paired one-for-one across both accounts.
-      const transfers=(branchKind,hqNote,opposite)=>{
+      const transfers=(branchKind,hqNote)=>{
         const external=state.ledger.filter(x=>x.note===hqNote);
         const internal=b.ledger.filter(x=>x.kind===branchKind);
-        const key=(day,amount)=>day+'|'+amount;
-        const tally=items=>{
+        const tally=(items,reverse=false)=>{
           const out=new Map();
           for(const x of items){
-            const k=key(x.day,opposite?-x.delta:x.delta);
-            out.set(k,(out.get(k)||0)+1);
+            const key=x.day+'|'+(reverse?-x.delta:x.delta);
+            out.set(key,(out.get(key)||0)+1);
           }
           return out;
         };
-        const a=tally(internal),z=tally(external);
+        const a=tally(internal),z=tally(external,true);
         if(a.size!==z.size)return false;
         return [...a].every(([key,count])=>z.get(key)===count);
       };
-      if(!transfers('transfer-in','Group capital transfer to '+b.id,true)||
-         !transfers('transfer-out','Group capital return from '+b.id,true))return false;
+      if(!transfers('transfer-in','Group capital transfer to '+b.id)||
+         !transfers('transfer-out','Group capital return from '+b.id))return false;
       const paid=b.ledger.filter(x=>x.kind==='payroll').reduce((n,x)=>n-x.delta,0);
       const rented=b.ledger.filter(x=>x.kind==='rent').reduce((n,x)=>n-x.delta,0);
       if(b.accruals.reduce((n,x)=>n+x.payroll,0)-paid!==b.payrollArrears||
