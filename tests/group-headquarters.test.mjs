@@ -53,8 +53,8 @@ test('legacy v20 saved business migrates to v21 without changing money or stock'
   assert.ok(imported);
   assert.equal(imported.version,21);
   assert.equal(imported.cash,s.cash);
-  assert.deepEqual(Array.from(imported.ledger,e=>e.delta),s.ledger.map(e=>e.delta));
-  assert.deepEqual(Array.from(imported.staff,e=>e.name),s.staff.map(e=>e.name));
+  assert.deepEqual(Array.from(imported.ledger,e=>e.delta),Array.from(s.ledger,e=>e.delta));
+  assert.deepEqual(Array.from(imported.staff,e=>e.name),Array.from(s.staff,e=>e.name));
   assert.equal(imported.group.branches.length,0);
   valid(imported);
 });
