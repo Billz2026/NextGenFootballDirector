@@ -10,7 +10,7 @@
   const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const gbp=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n);
   const STATUSES=['pending','approved','declined','taken-over','expired'];
-  const ACTIONS=['approved','declined','taken-over','counter','sale','lost','booked','viewed','exception','stalled'];
+  const ACTIONS=['approved','declined','taken-over','counter','sale','lost','booked','viewed','exception','stalled','assignment','reassignment'];
   const POLICIES=Object.freeze([
     {key:'cautious',name:'PROTECT MARGINS',maxDiscount:150,minGross:1200,maxPartExchange:2500,
       benefit:'More margin protection; more potential lost deals and supervisor requests.'},
@@ -41,6 +41,39 @@
       note:String(description).slice(0,180)});
     if(d.audit.length>220)d.audit.splice(0,d.audit.length-220);
   };
+  // The active supervisor selects a suitable adviser, factoring skills and
+  // the existing case load. This is a staff assignment, never an owner click.
+  // No supervisor means there is no authority to make new allocations.
+  function recommendRep(state,customer,available=null){
+    const P=window.MotorTradePeople,supervisor=P?.supervisor(state);
+    if(!state.delegation?.enabled||!supervisor)return null;
+    let team=P.activeTeam(state,'sales');
+    if(available)team=team.filter(r=>available.some(x=>x.id===r.id));
+    if(!team.length)return null;
+    const activeCases=Object.values(state.customerCases||{});
+    const score=r=>{
+      const skills=r.skills;
+      const load=activeCases.filter(c=>c.id!==customer?.id&&c.salespersonId===r.id&&
+        ['enquiry','booked','arrived','discussing','agreed','reserved','collectable'].includes(c.status)).length;
+      const sales=skills.sales||1,care=skills.care||1,
+        negotiation=skills.negotiation||1,reliability=skills.reliability||1;
+      return sales*4+care*(customer?.preferredMode==='part-ex'?2:3)+
+        negotiation*(customer?.preferredMode==='part-ex'?4:2)+
+        reliability*2+Math.round((r.morale||70)/10)-load*22;
+    };
+    return team.slice().sort((a,b)=>score(b)-score(a)||a.id-b.id)[0];
+  }
+  function assign(state,customer,available=null){
+    const selected=recommendRep(state,customer,available);
+    if(!selected)return null;
+    const previous=customer.salespersonId;
+    customer.salespersonId=selected.id;
+    const supervisor=window.MotorTradePeople.supervisor(state);
+    log(state,previous&&previous!==selected.id?'reassignment':'assignment',customer.vehicleId,
+      supervisor.name+' allocated '+customer.name+' to '+selected.name+
+      ' for '+(customer.preferredMode==='part-ex'?'part-exchange':'cash')+' sales handling.');
+    return selected;
+  }
   function authority(state,v,c,buyers){
     const d=state.delegation;
     const basis=v.cost+v.prepSpent+(c.remedyCost||0);
@@ -189,28 +222,57 @@
     expire(state);
     const session=state.deadlineSession||0;
     if(!d.enabled||d.lastRunDay===state.day&&d.lastRunSession===session)
-      return {ok:true,processed:false,served:0,completed:0,lost:0,escalated:0};
+      return {ok:true,processed:false,served:0,completed:0,lost:0,escalated:0,assigned:0};
     d.lastRunDay=state.day;d.lastRunSession=session;
-    const stats={ok:true,processed:true,served:0,completed:0,lost:0,escalated:0};
-    // Existing booked appointments get a fair chance to progress first.
-    for(const c of [...Object.values(state.customerCases||{})]){
-      const r=step(state,E,c);
+    const stats={ok:true,processed:true,served:0,completed:0,lost:0,escalated:0,assigned:0};
+    const active=window.MotorTradePeople.activeTeam(state,'sales');
+    const supervisor=window.MotorTradePeople.supervisor(state);
+    const used=new Set(state.showroom?.staffUsed||[]);
+    const count=r=>{
       if(r.completed)stats.completed++;
       if(r.lost)stats.lost++;
       if(r.escalated)stats.escalated++;
+    };
+    // An already-arrived customer or due collection takes priority over new
+    // walk-ins. Booked future appointments do not consume a working slot.
+    const priority={collectable:0,arrived:1,discussing:2,agreed:3,enquiry:4};
+    const cases=Object.values(state.customerCases||{}).filter(c=>
+      Object.hasOwn(priority,c.status)).sort((a,b)=>
+      priority[a.status]-priority[b.status]||a.createdDay-b.createdDay||a.vehicleId-b.vehicleId);
+    for(const c of cases){
+      if(c.salespersonId==null)continue; // owner explicitly took over
+      if(!active.some(r=>r.id===c.salespersonId)){
+        if(!supervisor)continue;
+        const replacement=active.filter(r=>!used.has(r.id));
+        if(!replacement.length)continue;
+        if(assign(state,c,replacement))stats.assigned++;
+      }
+      if(used.has(c.salespersonId))continue;
+      const result=step(state,E,c);
+      if(result.done){
+        used.add(c.salespersonId);
+        count(result);
+      }
     }
-    const candidates=[...E.showroom.waiting(state)];
-    for(const q of candidates){
-      const rep=E.showroom.availableStaff(state)[0];
-      if(!rep)break;
+    // Only an active supervisor allocates new showroom traffic. Patience is
+    // genuinely limited; if all advisers are occupied, visitors may leave.
+    if(!supervisor)return stats;
+    const queue=[...E.showroom.waiting(state)].sort((a,b)=>
+      a.maxTurns-b.maxTurns||a.vehicleId-b.vehicleId||a.id.localeCompare(b.id));
+    for(const q of queue){
+      const free=E.showroom.availableStaff(state).filter(rep=>
+        !used.has(rep.id)&&E.showroom.canServe(state,q.id,rep.id).ok);
+      if(!free.length)continue;
+      const rep=recommendRep(state,q,free);
+      if(!rep)continue;
       const served=E.welcomeShowroom(state,q.id,rep.id);
       if(!served.ok)continue;
-      stats.served++;
+      stats.served++;stats.assigned++;
       const c=state.customerCases[String(q.vehicleId)];
-      const r=step(state,E,c);
-      if(r.completed)stats.completed++;
-      if(r.lost)stats.lost++;
-      if(r.escalated)stats.escalated++;
+      log(state,'assignment',q.vehicleId,supervisor.name+' assigned '+q.name+
+        ' to '+rep.name+' for a showroom viewing.');
+      const result=step(state,E,c);
+      used.add(rep.id);count(result);
     }
     return stats;
   }
@@ -372,7 +434,7 @@
       typeof r.note==='string'&&r.note.length<=180);
   }
   window.MotorTradeDelegation=Object.freeze({
-    initial,clone,valid,process,decide,takeOver,setMode,setPolicy,POLICIES,controls,brief,pending,
+    initial,clone,valid,process,assign,recommendRep,decide,takeOver,setMode,setPolicy,POLICIES,controls,brief,pending,
     requestForMessage,authority,expire
   });
 })();
