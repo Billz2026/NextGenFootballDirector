@@ -11,6 +11,33 @@
   const number=n=>Number(n).toLocaleString('en-GB');
   const tile=(label,value,note)=>'<div class="mg-kpi"><small>'+esc(label)+'</small>'+
     '<strong>'+esc(value)+'</strong><span>'+esc(note)+'</span></div>';
+  function network(state){
+    const mainMonth=window.MotorTradeMonthly?.statement(state);
+    const branches=state.group?.branches||[];
+    const rows=[{
+      name:state.name+' · original',city:'FOUNDING SITE',
+      cash:state.cash,stock:state.vehicles.length,
+      sales:state.sold.length,operating:mainMonth?.operatingContribution??0,
+      note:'Owner managed · monthly operating contribution'
+    },...branches.map(b=>{
+      const o=G.operating(b);
+      return {name:b.name,city:b.city.toUpperCase(),cash:b.cash,
+        stock:b.inventory.length,sales:b.sales.length,operating:o.contribution,
+        note:'Manager operated · contribution since opening'};
+    })];
+    return '<section class="mg-section" aria-label="Group branch performance comparison">'+
+      '<div class="mg-section-heading"><div><small>LIVE GROUP OWNERSHIP / DISTINCT CASH ACCOUNTS</small>'+
+      '<h3>YOUR DEALERSHIP NETWORK</h3>'+
+      '<p>Each branch trades from its own cash. Performance periods are labelled; these figures must not be compared as the same reporting period.</p>'+
+      '</div></div><div class="mg-network">'+rows.map(r=>
+      '<div class="mg-network-site"><div><small>'+esc(r.city)+'</small>'+
+      '<strong>'+esc(r.name)+'</strong><span>'+esc(r.note)+'</span></div>'+
+      '<div><small>CASH</small><strong>'+money(r.cash)+'</strong></div>'+
+      '<div><small>STOCK</small><strong>'+r.stock+'</strong></div>'+
+      '<div><small>SALES</small><strong>'+r.sales+'</strong></div>'+
+      '<div><small>OPERATING</small><strong class="'+(r.operating<0?'mg-negative':'')+'">'+
+      money(r.operating)+'</strong></div></div>').join('')+'</div></section>';
+  }
   function opening(state,managerId){
     const stage=E.status(state),canReach=stage.rank>=10;
     const manager=G.MANAGERS.find(m=>m.id===managerId)||G.MANAGERS[0];
@@ -163,7 +190,7 @@
       tile('TRADING SITES',totals.branches+' / 2','Second site available from Rank 10')+
       tile('OWNED VEHICLES',number(totals.groupStock),'All branch inventories')+
       tile('COMPLETED SALES',number(totals.groupSales),'All recorded handovers')+
-      '</div>'+tabs+body+
+      '</div>'+network(state)+tabs+body+
       '<p class="mg-footnote">Branch 1 continues using the full original dealership simulator. The second site currently uses an autonomous manager-run trading model with separate accounts, stock and payroll. Additional franchises and international sites remain in development.</p></div>'};
   }
   window.MotorTradeGroupView=Object.freeze({render});
