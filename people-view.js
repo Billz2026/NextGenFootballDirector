@@ -191,7 +191,7 @@
       '<div class="rep-next"><span>'+(next?
         '<strong>'+points+' POINT'+(points===1?'':'S')+' TO '+esc(next.name)+'</strong>'+
         ' · NEXT TIER AT '+firstTarget:
-        '<strong>HIGHEST REPUTATION TIER</strong> · KEEP CUSTOMER TRUST HIGH')+
+        '<strong>HIGHEST CUSTOMER TRUST TIER</strong> · EMPIRE CAREER RANKS CONTINUE BELOW')+
         '</span><span>CURRENT SCORE '+score+' / 100</span></div></section>';
     const metrics='<div class="rep-kpis">'+
       [['VEHICLES HANDED OVER',String(sales.length),'Completed retail sales'],
@@ -225,15 +225,13 @@
       (more.length?'<details class="rep-more"><summary>VIEW '+more.length+
         ' MORE RECORDED CHANGES</summary><div class="rep-history-all">'+
         more.map(entry).join('')+'</div></details>':'')+'</section>';
-    const future='<details class="rep-future"><summary>LONG-TERM PRESTIGE TARGET & MARKET ELIGIBILITY</summary>'+
-      '<div class="rep-future-body"><p><strong>Live market rules:</strong> Modern stock needs £18,500 opening cash and 15 reputation; '+
-      'premium stock needs £42,000 and 40 reputation; luxury stock needs £110,000 and 65 reputation; ' +
-      'delivery-mileage new-car allocations require £180,000 opening cash and 85 reputation. '+
-      'The market checks cash and the monthly starting reputation, not just the tier name.</p>'+
-      '<p><strong>Future development concept:</strong> a separate prestige-seller milestone of 80+ reputation '+
-      'and £500,000 lifetime sales turnover. You currently have '+score+
-      ' reputation and '+cashNumber+' in completed turnover. '+
-      'That separate milestone is not an additional unlock in this version.</p></div></details>';
+    const future='<details class="rep-future"><summary>CURRENT VEHICLE MARKET ACCESS RULES</summary>'+
+      '<div class="rep-future-body"><p><strong>Existing stock tiers:</strong> Modern stock requires £18,500 opening cash and 15 customer trust; '+
+      'premium needs £42,000 and 40 trust; luxury needs £110,000 and 65 trust; '+
+      'delivery-mileage allocations need £180,000 and 85 trust. These are distinct from the '+
+      'new 2,000-point career prestige ranks. The market uses opening cash and monthly starting trust.</p>'+
+      '<p><strong>Multi-branch development:</strong> Branch limits shown in the empire roadmap are future permissions, '+
+      'not functioning additional dealerships. The current career still operates one site.</p></div></details>';
     return '<div class="rep-control">'+scoreHero+metrics+
       (window.MotorTradeCareerProgression?.reputation(state)||'')+
       main+history+future+
