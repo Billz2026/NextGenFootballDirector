@@ -8,13 +8,15 @@
   const STARTING_CASH = 12500; // legacy career basis, retained for old saves
   const STAFFED_STARTING_CASH = 45000; // fully salaried new-dealership career
   const CAPACITY = 4;
-  const VERSION = 21;
+  const VERSION = 22;
   const PH = window.MotorTradePhotos;
   if(!PH)throw new Error('Load vehicle-photos.js before trading.js');
   const MARKET = window.MotorTradeMarket;
   if(!MARKET)throw new Error('Load vehicle-market.js before trading.js');
   const GROUP=window.MotorTradeGroup;
   if(!GROUP)throw new Error('Load motor-group.js before trading.js');
+  const DELEG=window.MotorTradeDelegation;
+  if(!DELEG)throw new Error('Load dealer-delegation.js before trading.js');
   const C = window.MotorTradeCustomers;
   const AS = window.MotorTradeAfterSales;
   if(!AS)throw new Error('Load aftersales.js before trading.js');
@@ -336,7 +338,8 @@
       customerCases:{},customerHistory:[],customerFunds:[],showroom:Q.initial(1),
       auctionHall:initialAuctionHall(1),auctionHistory:[],
       inboxLedgerCursor:0,stockAgeingArrears:0,lastStockAgeingDay:1,
-      premises:SITE.initial(),group:GROUP.initial(),...AS.initial(1),...P.initial()
+      premises:SITE.initial(),group:GROUP.initial(),delegation:DELEG.initial(),
+      ...AS.initial(1),...P.initial()
     };
     M.initialize(state);
     Object.assign(state,D.initial());
@@ -362,7 +365,7 @@
     return state;
   }
   function normalize(saved) {
-    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,VERSION].includes(saved.version) ||
+    if (!saved || ![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,VERSION].includes(saved.version) ||
       typeof saved.name !== 'string' || saved.name.trim().length < 2 ||
       saved.name.trim().length > 36 || !integer(saved.day) ||
       saved.day < 1 || saved.day > MAX_DAY || !Array.isArray(saved.messages)) return null;
@@ -371,7 +374,7 @@
       typeof m.subject === 'string' && typeof m.preview === 'string' &&
       typeof m.body === 'string' && typeof m.read === 'boolean' &&
       (m.category===undefined||['operations','staff','accounts','sales','reports'].includes(m.category))&&
-      (m.decision===undefined||['approved','declined'].includes(m.decision))&&
+      (m.decision===undefined||['approved','declined','taken-over'].includes(m.decision))&&
       (m.reference===undefined||m.reference===null||
         (typeof m.reference==='string'&&m.reference.length>0&&m.reference.length<=150))&&
       (m.linkPage === null || ['dashboard','inbox','auctions','stock','sales','finance','staff','reputation','reports','business','workshop','events','auctionHall'].includes(m.linkPage)));
@@ -493,6 +496,9 @@
     // Version 21 adds separately accounted satellite branches. Old careers
     // safely receive an empty Group HQ; their existing ledger stays intact.
     if(saved.version>=21&&!GROUP.valid(saved.group,saved))return null;
+    // Staff-led retail authority is a separate, strictly validated saved
+    // policy. v21 and older owners retain every historical transaction.
+    if(saved.version>=22&&!DELEG.valid(saved.delegation,saved))return null;
     const ids = [...saved.vehicles,...saved.sold,...wholesale].map(v => v.id);
     if (new Set(ids).size !== ids.length || ids.some(id => id >= saved.nextId)) return null;
     // Do not rebase historical £12,500 saves. The opening capital marker
@@ -507,6 +513,7 @@
       ...(saved.startingCapital===STAFFED_STARTING_CASH?{startingCapital:STAFFED_STARTING_CASH}:{}),
       premises:SITE.clone(site),
       group:saved.version>=21?GROUP.clone(saved.group):GROUP.initial(),
+      delegation:saved.version>=22?DELEG.clone(saved.delegation):DELEG.initial(),
       ...(saved.version>=20?AS.clone(saved):AS.initial(saved.day)),
       stockAgeingArrears:saved.version>=19?saved.stockAgeingArrears:0,
       lastStockAgeingDay:saved.version>=19?saved.lastStockAgeingDay:saved.day,
@@ -551,6 +558,7 @@
     if(!Q.valid(restored,saved))return null;
     if(!auctionValid(restored))return null;
     if(!GROUP.valid(restored.group,restored))return null;
+    if(!DELEG.valid(restored.delegation,restored))return null;
     // v17 and earlier owned stock and legacy costs are validated first.
     // A reputation unlock is then granted without a fabricated capital debit.
     SITE.sync(restored);
