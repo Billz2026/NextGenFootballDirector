@@ -73,6 +73,9 @@ test('one staff adviser cannot serve unlimited showroom visitors in a session',(
   const {s}=stock('Sales Capacity QA');
   const available=E.people.activeTeam(s,'sales');
   assert.equal(available.length,1);
+  // Generated demand legitimately varies by day. Search for a real
+  // naturally occurring two-visitor session rather than assuming one.
+  for(let i=0;i<20&&E.showroom.waiting(s).length<2;i++)tick(s);
   const initialQueue=E.showroom.waiting(s).length;
   assert.ok(initialQueue>=2,'there should be competing live visitors');
   D.process(s,E);
