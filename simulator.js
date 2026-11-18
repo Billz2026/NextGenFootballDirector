@@ -233,36 +233,75 @@
   }
   function renderInbox() {
     if(!career)return;
-    const ordered=IN.filtered(career.messages,career,inboxFilter);
     const recent=IN.filtered(career.messages,career,'all');
-    const preview=byId('dashboard-inbox');
-    const spotlight=[...recent.filter(m=>IN.needsAction(m,career)),
-      ...recent.filter(m=>!IN.needsAction(m,career)&&!m.read),
-      ...recent.filter(m=>!IN.needsAction(m,career)&&m.read)].slice(0,2);
-    preview.replaceChildren(...spotlight.map(m=>renderMessageRow(m,true)));
-    const list=byId('inbox-list');
-    list.replaceChildren(...ordered.map(m=>renderMessageRow(m,false)));
+    const actionMail=recent.filter(m=>IN.needsAction(m,career));
+    const alerts=financePressure();
     const unread=unreadCount();
     const counts=IN.counters(career.messages,career);
     const actions=counts.action;
+    const spotlight=[...actionMail,
+      ...recent.filter(m=>!IN.needsAction(m,career)&&!m.read),
+      ...recent.filter(m=>!IN.needsAction(m,career)&&m.read)].slice(0,2);
+    byId('dashboard-inbox').replaceChildren(...spotlight.map(m=>renderMessageRow(m,true)));
     byId('widget-unread-label').textContent=unread+' UNREAD'+
       (actions?' · '+actions+' APPROVAL'+(actions===1?'':'S'):'');
-    byId('inbox-unread-count').textContent=unread+' UNREAD';
-    const markAllRead=byId('screen-career').querySelector('.inbox-heading [data-action="mark-all-read"]');
-    if(markAllRead)markAllRead.hidden=unread===0;
     byId('inbox-action-count').textContent=String(actions);
     byId('inbox-action-count').dataset.tone=actions>0?'attention':'neutral';
+    byId('inbox-critical-count').textContent=String(alerts.length);
+    byId('inbox-critical-count').dataset.tone=alerts.length?'critical':'neutral';
     byId('inbox-unread-summary').textContent=String(unread);
     byId('inbox-unread-summary').dataset.tone=unread>0?'unread':'neutral';
+    byId('inbox-unread-count').textContent=unread+' UNREAD';
     byId('inbox-paid-count').textContent=String(
       career.messages.filter(m=>m.subject.startsWith('PAID COPY')).length);
-    byId('inbox-filter-count').textContent=String(ordered.length)+' SHOWN';
+    byId('inbox-current-day').textContent='DAY '+String(career.day).padStart(2,'0');
+    byId('inbox-current-date').textContent=gameDate(career.day).toLocaleDateString('en-GB',
+      {weekday:'short',day:'2-digit',month:'long',year:'numeric'}).toUpperCase();
+    const status=byId('inbox-command-summary');
+    status.dataset.tone=actions?'attention':alerts.length?'urgent':'clear';
+    status.textContent=actions?
+      actions+' LIVE DECISION'+(actions===1?'':'S')+' AWAITING AUTHORITY':
+      alerts.length?alerts.length+' FINANCIAL ISSUE'+(alerts.length===1?'':'S')+
+        ' NEED ATTENTION':'NO OWNER AUTHORISATIONS PENDING';
+    const markAllRead=byId('screen-career').querySelector('.inbox-command [data-action="mark-all-read"]');
+    if(markAllRead)markAllRead.hidden=unread===0;
+
+    const desk=byId('inbox-priority-list');
+    if(!actionMail.length){
+      desk.innerHTML='<div class="ic-priority-clear"><strong>YOUR DESK IS CLEAR</strong>'+
+        '<p>No approvals are waiting. Your staff can continue normal trading. '+
+        (alerts.length?'Review '+alerts.length+' unpaid obligation type'+
+          (alerts.length===1?'':'s')+' in Finances.':
+          'New exceptions will appear here when a supervisor needs you.')+
+        '</p></div>';
+    }else{
+      desk.innerHTML=actionMail.slice(0,2).map((m,i)=>
+        '<button type="button" class="ic-priority-item" data-action="read-message" '+
+          'data-origin="priority" data-id="'+m.id+'" aria-label="Review approval: '+
+          escapeText(m.subject)+'">'+
+          '<span class="ic-priority-number">'+String(i+1).padStart(2,'0')+'</span>'+
+          '<span class="ic-priority-text"><strong>'+escapeText(m.subject)+'</strong>'+
+          '<small>'+escapeText(m.from)+' · DAY '+m.day+'</small></span>'+
+          '<span class="ic-priority-chevron" aria-hidden="true">↗</span></button>'
+      ).join('')+(actionMail.length>2?
+        '<button type="button" class="ic-priority-item" data-action="inbox-view-decisions">'+
+        '<span class="ic-priority-number">+</span><span class="ic-priority-text"><strong>'+
+        (actionMail.length-2)+' MORE DECISION'+(actionMail.length-2===1?'':'S')+
+        ' WAITING</strong><small>Open the complete approval queue</small></span>'+
+        '<span class="ic-priority-chevron" aria-hidden="true">↗</span></button>':'');
+    }
+
+    const searchBox=byId('inbox-search');
+    if(searchBox&&searchBox.value!==inboxSearch)searchBox.value=inboxSearch;
+    const ordered=IN.filtered(career.messages,career,inboxFilter).filter(inboxMatch);
+    const countText=ordered.length+' SHOWN'+(inboxSearch.trim()?' · SEARCHED':'');
+    byId('inbox-filter-count').textContent=countText;
     const filterButton=filter=>
       '<button type="button" data-action="filter-inbox" data-filter="'+filter+
       '" aria-pressed="'+String(inboxFilter===filter)+'">'+
       IN.esc(IN.labels[filter])+
       (filter==='action'&&counts.action?' · '+counts.action:'')+'</button>';
-    const mainFilters=['all','unread','action'];
+    const mainFilters=['action','all','unread'];
     const departmentFilters=IN.categories.filter(filter=>!mainFilters.includes(filter));
     const selectedDepartment=departmentFilters.includes(inboxFilter);
     byId('inbox-filter-buttons').innerHTML=
@@ -272,13 +311,20 @@
           '<span aria-hidden="true">⌄</span></summary>'+
         '<div class="inbox-department-options">'+departmentFilters.map(filterButton).join('')+
         '</div></details>';
-    const detail=byId('inbox-detail');
+
     if(selectedMessageId===null||!ordered.some(m=>m.id===selectedMessageId))
       selectedMessageId=ordered[0]?.id??null;
     const selected=ordered.find(m=>m.id===selectedMessageId);
+    byId('inbox-list').replaceChildren(...ordered.map(m=>renderMessageRow(m,false)));
+    const detail=byId('inbox-detail');
     if(!selected){
-      detail.innerHTML='<div class="inbox-empty"><strong>No messages in this category.</strong>'+
-        '<p>Use All Mail to see your communications history. New decisions and receipts appear as genuine trading events occur.</p></div>';
+      detail.dataset.tone='neutral';
+      detail.innerHTML='<div class="inbox-empty"><strong>'+
+        (inboxSearch.trim()?'NO MATCHING CORRESPONDENCE':'NOTHING TO REVIEW HERE')+
+        '</strong><p>'+(inboxSearch.trim()?
+          'Try a vehicle, employee, department or subject keyword, or clear your search.':
+          'There are no messages in this category. The team will report actual activity and important exceptions here.')+
+        '</p></div>';
       return;
     }
     const actionable=IN.needsAction(selected,career);
@@ -287,12 +333,18 @@
       (String(selected.reference||'').startsWith('wage-arrears:') && career.payrollArrears>0) ||
       (String(selected.reference||'').startsWith('premises-arrears:') && (career.premises?.arrears||0)>0)
     );
-    // Presentation only: data-tone follows existing live message and ledger state.
     detail.dataset.tone=criticalLiability?'critical':actionable?'attention':
       selected.subject.startsWith('PAID COPY')?'positive':'neutral';
+    const position=ordered.findIndex(m=>m.id===selected.id)+1;
     detail.innerHTML=
+      '<div class="ic-detail-navigation">'+
+      '<button type="button" class="ic-back-to-list" data-action="inbox-back-to-list">← MESSAGE LIST</button>'+
+      '<span class="ic-detail-label">MANAGEMENT CORRESPONDENCE / '+
+        IN.esc(IN.labels[category]||'OPERATIONS')+'</span>'+
+      '<span class="ic-detail-index">'+position+' / '+ordered.length+'</span></div>'+
       '<div class="inbox-mail-heading">'+
-        (actionable?'<span class="section-overline">ACTION REQUIRED</span>':'')+
+        (actionable?'<span class="section-overline">AUTHORISATION REQUIRED · LIVE REQUEST</span>':
+          criticalLiability?'<span class="section-overline">FINANCIAL WARNING</span>':'')+
         '<h2>'+escapeText(selected.subject)+'</h2>'+
       '</div>'+
       IN.formatMail(selected,career)+IN.quoteControls(selected,career,E);
@@ -303,7 +355,7 @@
     mark.className='secondary-button';
     mark.dataset.action='toggle-inbox-read';
     mark.dataset.id=String(selected.id);
-    mark.textContent=selected.read?'MARK UNREAD':'MARK READ';
+    mark.textContent=selected.read?'MARK AS UNREAD':'MARK AS READ';
     toolbar.appendChild(mark);
     if(selected.linkPage&&Object.prototype.hasOwnProperty.call(PAGES,selected.linkPage)){
       const action=document.createElement('button');
