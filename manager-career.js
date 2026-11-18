@@ -648,10 +648,10 @@
       {id:1,day:1,from:'BOARD OF DIRECTORS',category:'operations',
         subject:'Your appointment · '+d.name,
         preview:'You are appointed dealership manager. Monthly board expectation: '+d.monthlyTarget+' retail handovers.',
-        body:'WELCOME, '+m.managerName+'\\n\\nYour appointment as dealership manager of '+d.name+
-          ' in '+d.city+' is confirmed. The company owns its premises, vehicles, cash and staff. Your personal reputation is separate from the dealership customer trust score.\\n\\n'+
+        body:'WELCOME, '+m.managerName+'\n\nYour appointment as dealership manager of '+d.name+
+          ' in '+d.city+' is confirmed. The company owns its premises, vehicles, cash and staff. Your personal reputation is separate from the dealership customer trust score.\n\n'+
           'Initial company working cash: £'+d.openingCash.toLocaleString('en-GB')+
-          '. Board expectation: '+d.monthlyTarget+' completed retail handovers in a trading month and positive operating contribution. The board will review your actual monthly results.\\n\\n'+
+          '. Board expectation: '+d.monthlyTarget+' completed retail handovers in a trading month and positive operating contribution. The board will review your actual monthly results.\n\n'+
           'This is the first stage of Manager Career. Other dealerships are currently a career-world catalogue; interviews, transfers, resignations and dismissals are planned, not yet playable.',
         linkPage:'dashboard',read:false},
       {id:2,day:1,from:'OPERATIONS SUPERVISOR',category:'staff',
@@ -683,11 +683,11 @@
     m.reviews.push(result);
     if(m.reviews.length>100)m.reviews.shift();
     const subject='BOARD REVIEW · Month '+report.month+' · '+(achieved?'TARGET MET':'PERFORMANCE BELOW PLAN');
-    const body='Your appointment at '+d.name+' has been reviewed against real trading outcomes.\\n\\n'+
-      'Retail handovers: '+report.soldUnits+' / '+d.monthlyTarget+' expected.\\n'+
-      'Operating contribution: £'+report.operatingContribution.toLocaleString('en-GB')+'.\\n'+
-      'Board confidence: '+m.boardConfidence+'/100.\\nManager reputation: '+
-      m.reputation+'/100 ('+(delta>0?'+':'')+delta+').\\n\\n'+
+    const body='Your appointment at '+d.name+' has been reviewed against real trading outcomes.\n\n'+
+      'Retail handovers: '+report.soldUnits+' / '+d.monthlyTarget+' expected.\n'+
+      'Operating contribution: £'+report.operatingContribution.toLocaleString('en-GB')+'.\n'+
+      'Board confidence: '+m.boardConfidence+'/100.\nManager reputation: '+
+      m.reputation+'/100 ('+(delta>0?'+':'')+delta+').\n\n'+
       'Board review is active. Employment movement, sackings and rival approaches will be added in a subsequent phase.';
     window.MotorTradeInbox?.emit(state,{from:'BOARD OF DIRECTORS',category:'reports',
       subject,preview:'Company sold '+report.soldUnits+'/'+d.monthlyTarget+
