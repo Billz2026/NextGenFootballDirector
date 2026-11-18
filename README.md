@@ -6,6 +6,16 @@
 
 **Before playtesting any major update:** Export a career backup using CAREER SAVES. The original 30-day test protocol remains available at [the month-one playtest plan](docs/month-one-playtest.md), but calendar month lengths now vary.
 
+### Manager Career phase 1B — Personal CV and realistic entry profile (18 November 2026)
+
+- **Manager CV creation:** Choose a manager name, real date of birth (age 21–65 at game start), home town, most recent junior motor-trade role, 1–3 years' relevant experience and a modest qualification. Age derives from the date of birth and advances with the in-game calendar, rather than being stored inconsistently as a second age value.
+- **Conservative track record:** First-time managers have no invented previous management roles, no automatic achievements, and only 5/100 personal reputation. Their first small-dealer appointment is labelled a **90-day probationary trial**, with monthly real-performance board reviews. Formal probation decisions and dismissal are expressly not yet implemented.
+- **Manager Profile page:** A new in-game personal CV panel shows identity, age, career background, current employer, confidence, reputation and verified monthly results. Pre-CV saves stay valid and display 'not recorded' for identity details rather than fabricating them.
+- **Improved startup list:** Corrected the employer counter element ID that could prevent the entire vacancy list from rendering. Added **West London Trade Cars** as one of the 20 eligible starter dealerships, so beginner-accessible London searches are not empty.
+- **Owner-only authority guard:** Group HQ acquisitions and capital transfers are hidden and blocked for salaried manager careers; original owner careers retain their existing permissions.
+- **Validation:** All 20 initial employers were tested with user-defined CV data against the real engine save/load and company accounting. The existing owner save and board review validation also passed. Automated test cases were added for underage/invalid CV, dynamic age and historical saves. A full browser UI playtest remains outstanding.
+- **Detailed development roadmap:** See [the manager career roadmap](docs/manager-career-roadmap.md) for proper applications/interviews, salary, probation outcomes, persistent AI employers, resignation, poaching and sackings.
+
 ### Manager Career phase 1 — Your first appointment (18 November 2026)
 
 - **Football Manager-inspired career start:** New careers begin with a named dealership **manager** instead of dealership ownership registration. The fictional UK employer browser contains exactly 50 companies across five reputation tiers: 20 independents, 12 established dealers, 10 regional groups, 6 prestige groups and 2 elite specialists. All companies appear in the searchable, filterable catalogue; only the 20 entry-level employers are selectable at a new manager's 5/100 personal reputation.
