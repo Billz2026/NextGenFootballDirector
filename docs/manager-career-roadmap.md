@@ -53,6 +53,12 @@ All 50 dealerships appear in the employment catalogue, including locked firms. S
 
 ### Phase 2A — Application and interview system
 
+**Initial playable release (18 November 2026):** A new career now begins unemployed. You browse vacancies, submit a real CV, undergo deterministic shortlisting, answer a five-question interview at an independent dealer and either receive an offer or rejection. An employer can reject a weak interview; accepting a verified offer creates the company career and preserves the interview result on the manager's CV. Rejected or declined applicants can apply to another employer. The separate pre-employment application save survives refresh; older trading saves are not overwritten unless the player deliberately accepts an offer. The underlying question bank has 40 questions, with 6–10 questions configured for higher-tier interviews once those roles become accessible.
+
+**Remaining recruitment improvements:** Advance an unemployment/job-search calendar; introduce delayed board responses, realistic interview scheduling, second interviews, contractual salary/term negotiation, expiry of applications, location preferences, AI hiring decisions and periodic vacancy rotation. The present employer list is still static and there is no full company-vs-company hiring competition.
+
+### Phase 2A — Application and interview system
+
 - New careers should ultimately begin **unemployed**, with a set of actual posted first-job vacancies. Starting appointments will no longer be instant.
 - Eligibility screening should consider manager reputation, CV, role experience and preferred location; allow application to stretch roles with low probability rather than a magical hard lock.
 - Application states: submitted → shortlist/reject → interview → offer/reject → accepted or declined. No fake job offers or forced outcomes.
