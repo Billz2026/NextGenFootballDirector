@@ -8,7 +8,7 @@ const scripts=[
   'vehicle-intel.js','vehicle-photos.js','vehicle-accuracy.js',
   'vehicle-market.js','premises.js','people.js','calendar.js','monthly.js',
   'events.js','workshop.js','stock-ageing.js','showroom-traffic.js','customers.js',
-  'aftersales.js','trading.js','cashflow-forecast.js','finance-view.js',
+  'aftersales.js','empire-progression.js','motor-group.js','trading.js','cashflow-forecast.js','finance-view.js',
   'aftersales-view.js','inbox-office.js'
 ];
 for(const path of scripts)runInNewContext(
@@ -50,7 +50,7 @@ function caseCareer(){
 }
 test('new career has no invented customer complaints, money changes or clutter',()=>{
   const s=E.createStaffed('Care Baseline',[]),before=JSON.stringify(s);
-  assert.equal(s.version,20);
+  assert.equal(s.version,E.VERSION);
   assert.deepEqual(clone(A.stats(s)),{open:0,resolved:0,potentialCost:0,paid:0});
   assert.equal(V.render(s,E),'');
   assert.deepEqual(clone(E.advanceAfterSales(s)),{opened:[],diagnosed:[],escalated:[]});
