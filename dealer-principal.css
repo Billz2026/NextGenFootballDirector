@@ -28,3 +28,7 @@
 #screen-career .dp-policies small{font:700 10px/1.4 var(--body);color:#e0e6e9}
 #screen-career .dp-policies span{font:500 10px/1.45 var(--body);color:#b8c7cf}
 @media(max-width:740px){#screen-career .dp-policies{grid-template-columns:1fr}#screen-career .dp-policies button{min-height:70px}}
+
+#screen-career .dp-policy-details{margin-top:9px;border:1px solid #42505a;border-radius:5px;background:#18242d}
+#screen-career .dp-policy-details summary{cursor:pointer;color:#e2c99e;padding:9px 10px;font:800 11px/1.35 var(--body);list-style-position:inside}
+#screen-career .dp-policy-details .dp-policies{margin:0 9px 9px}
