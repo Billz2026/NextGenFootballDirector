@@ -16,7 +16,13 @@
   const sum=(list,field)=>list.reduce((n,item)=>n+item[field],0);
   const limit=(n,min,max)=>Math.max(min,Math.min(max,n));
   const completed=(sold,start,end)=>sold.filter(v=>v.day>=start&&v.day<=end);
-  const transactions=(ledger,start,end)=>ledger.filter(v=>v.day>=start&&v.day<=end);
+  // Manager Career starts with the employing company's existing capital.
+  // The signed opening allocation reconciles the legacy £45k engine basis
+  // but is not a trade receipt, expense or month-one cash movement.
+  const isEmployerOpening=(state,row)=>!!state.managerCareer&&row.day===1&&
+    row.note==='Opening employer working capital allocation: '+state.name;
+  const transactions=(state,start,end)=>state.ledger.filter(v=>
+    v.day>=start&&v.day<=end&&!isEmployerOpening(state,v));
   const targetFor=(score,days=PERIOD)=>{
     const tier=unitBase(score);
     // Two-space independent forecourt: targets rise with trust, but never
@@ -118,7 +124,7 @@
     const p=state.monthPlan;
     const sales=completed(state.sold,p.startDay,p.endDay);
     const disposals=completed(state.wholesale||[],p.startDay,p.endDay);
-    const ledger=transactions(state.ledger,p.startDay,p.endDay);
+    const ledger=transactions(state,p.startDay,p.endDay);
     const bucket=Object.fromEntries(categories.map(k=>[k,0]));
     for(const row of ledger)bucket[categorize(row.note)]+=row.delta;
     const saleCount=sales.length;
@@ -357,8 +363,8 @@
       saved.monthlyReports.length>HISTORY_LIMIT||
       !saved.monthlyReports.every(validReport))return false;
     const p=saved.monthPlan;
-    const cashSince=state.ledger.filter(l=>l.day>=p.startDay&&l.day<=state.day)
-      .reduce((n,l)=>n+l.delta,0);
+    const cashSince=state.ledger.filter(l=>l.day>=p.startDay&&l.day<=state.day&&
+      !isEmployerOpening(state,l)).reduce((n,l)=>n+l.delta,0);
     if(p.openingCash+cashSince!==state.cash)return false;
     state.monthlyReports=JSON.parse(JSON.stringify(saved.monthlyReports));
     if(saved.version<15){
