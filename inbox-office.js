@@ -35,6 +35,9 @@
         v.workshop?.stage==='quoted')||null;
   }
   function needsAction(m,state){
+    const delegation=window.MotorTradeDelegation;
+    if(delegation?.pending(state).some(r=>m.reference==='sales-approval:'+r.customerId))
+      return true;
     if(actionFor(m,state))return true;
     const complaint=/^aftersales:(\d+)$/.exec(m.reference||'');
     if(complaint&&state.afterSalesCases?.some(c=>c.id===Number(complaint[1])&&
@@ -331,6 +334,8 @@
     '</article>';
   }
   function quoteControls(message,state,engine){
+    if((message.reference||'').startsWith('sales-approval:'))
+      return window.MotorTradeDelegation?.controls(state,message)||'';
     const car=actionFor(message,state);
     const moraleEmployeeId=moraleId(message);
     if(moraleEmployeeId!==null){
