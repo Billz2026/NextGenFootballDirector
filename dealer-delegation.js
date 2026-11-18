@@ -11,6 +11,14 @@
   const gbp=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n);
   const STATUSES=['pending','approved','declined','taken-over','expired'];
   const ACTIONS=['approved','declined','taken-over','counter','sale','lost','booked','viewed','exception','stalled'];
+  const POLICIES=Object.freeze([
+    {key:'cautious',name:'PROTECT MARGINS',maxDiscount:150,minGross:1200,maxPartExchange:2500,
+      benefit:'More margin protection; more potential lost deals and supervisor requests.'},
+    {key:'balanced',name:'BALANCED TRADING',maxDiscount:350,minGross:650,maxPartExchange:5000,
+      benefit:'Moderate pricing freedom with supervisor review of unusual deals.'},
+    {key:'growth',name:'PRIORITISE SALES',maxDiscount:750,minGross:350,maxPartExchange:9000,
+      benefit:'More staff discretion and quicker stock turnover; smaller margins and higher part-ex exposure.'}
+  ]);
   const initial=()=>({enabled:true,maxDiscount:350,minGross:650,maxPartExchange:5000,
     lastRunDay:0,lastRunSession:0,approvals:[],audit:[]});
   const clone=d=>JSON.parse(JSON.stringify(d));
@@ -274,6 +282,16 @@
     log(state,'stalled',0,enabled?'Owner enabled staff-led sales.':'Owner switched to hands-on retail management.');
     return {ok:true,message:enabled?'Your active sales team will handle routine retail customers when you advance the trading session.':'Hands-on retail mode selected. You must handle customers or assign them manually. Existing supervisor decisions still require action.'};
   }
+  function setPolicy(state,key){
+    const option=POLICIES.find(p=>p.key===key);
+    if(!option)return {ok:false,message:'Choose a valid dealership sales authority policy.'};
+    const d=state.delegation;
+    d.maxDiscount=option.maxDiscount;
+    d.minGross=option.minGross;
+    d.maxPartExchange=option.maxPartExchange;
+    log(state,'stalled',0,'Dealer Principal changed pricing authority to '+option.name+'.');
+    return {ok:true,message:option.name+' is now active for new negotiations. Existing supervisor requests retain their original quoted figures. '+option.benefit};
+  }
   function controls(state,message){
     const r=requestForMessage(state,message);
     if(!r)return '';
@@ -312,7 +330,17 @@
       '<small class="dp-rules">Staff authority: maximum '+gbp(d.maxDiscount)+
       ' discount from asking, minimum '+gbp(d.minGross)+' gross margin, and part-exchange '+
       'allowance up to '+gbp(d.maxPartExchange)+
-      '. Expensive or weak-margin deals require supervisor approval. No sale is guaranteed.</small></section>';
+      '. Expensive or weak-margin deals require supervisor approval. No sale is guaranteed.</small>'+
+      '<div class="dp-policies">'+POLICIES.map(p=>{
+        const active=d.maxDiscount===p.maxDiscount&&d.minGross===p.minGross&&
+          d.maxPartExchange===p.maxPartExchange;
+        return '<button type="button" data-action="delegate-policy" data-policy="'+p.key+
+          '" class="'+(active?'dp-policy-current':'')+'">'+
+          '<strong>'+p.name+(active?' · ACTIVE':'')+'</strong>'+
+          '<small>'+gbp(p.maxDiscount)+' maximum discount · '+gbp(p.minGross)+
+          ' minimum gross margin · up to '+gbp(p.maxPartExchange)+
+          ' part-exchange allowance</small><span>'+p.benefit+'</span></button>';
+      }).join('')+'</div></section>';
   }
   function valid(d,state){
     if(!d||typeof d.enabled!=='boolean'||!num(d.maxDiscount)||
@@ -342,7 +370,7 @@
       typeof r.note==='string'&&r.note.length<=180);
   }
   window.MotorTradeDelegation=Object.freeze({
-    initial,clone,valid,process,decide,takeOver,setMode,controls,brief,pending,
+    initial,clone,valid,process,decide,takeOver,setMode,setPolicy,POLICIES,controls,brief,pending,
     requestForMessage,authority,expire
   });
 })();
