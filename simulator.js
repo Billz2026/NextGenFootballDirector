@@ -16,12 +16,14 @@
   const SITE_VIEW = window.MotorTradePremisesView;
   const DV = window.MotorTradeDashboardView;
   const CP = window.MotorTradeCareerProgression;
+  const G = window.MotorTradeGroup;
+  const GV = window.MotorTradeGroupView;
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
   const FV = window.MotorTradeFinanceView;
   const CF = window.MotorTradeCashForecast;
-  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !IN || !BV || !SV || !FV || !CF || !ASV)
+  if (!E || !PV || !MV || !EV || !WV || !CV || !SITE_VIEW || !AV || !DV || !CP || !G || !GV || !IN || !BV || !SV || !FV || !CF || !ASV)
     throw new Error('Customer, workshop and report modules must load before simulator.js');
   const P = E.people;
   const M = E.monthly;
@@ -55,6 +57,7 @@
     events: 'EVENTS & MEETINGS',
     staff: 'STAFF & RECRUITMENT',
     reputation: 'REPUTATION',
+    group: 'GROUP HEADQUARTERS',
     business: 'MY DEALERSHIP'
   });
   const money = new Intl.NumberFormat('en-GB', {
@@ -165,6 +168,8 @@
   let staffDeskRole = 'all';
   let staffDeskSelectedId = null;
   let selectedMonth = 'current'; // Current-day input, retained while opening a report.
+  let selectedGroupBranchId = 'original'; // UI selection only; no duplicate saved branch
+  let groupManagerChoice = 'm1';
 
   function gameDate(day) {
     return new Date(START_DATE_UTC + (day - 1) * MS_PER_DAY);
@@ -454,6 +459,9 @@
   }
   function renderBusiness(){
     byId('premises-view').innerHTML=SITE_VIEW.render(career,SITE);
+    const group=GV.render(career,selectedGroupBranchId,groupManagerChoice);
+    selectedGroupBranchId=group.selectedId;
+    byId('group-view').innerHTML=group.html;
   }
   function renderPeople() {
     const view=PV.staffDesk(career,P,{mode:staffDeskMode,role:staffDeskRole,
@@ -633,6 +641,7 @@
     // Close the actual calendar month BEFORE charging the next day's wage.
     // This keeps reports internally reconcilable with recorded ledger dates.
     const beforeDayReputation=career.reputationScore;
+    if(career.day===career.monthPlan.endDay)G.closeMonth(career);
     const closed=career.day===career.monthPlan.endDay?M.close(career):null;
     if(closed)SITE.sync(career);
     career.day += 1;
@@ -663,6 +672,8 @@
     const workshopEvents=E.advanceWorkshop(career);
     const customerEvents=E.advanceCustomers(career);
     const afterSalesEvents=E.advanceAfterSales(career);
+    const groupEvent=G.advance(career);
+    if(!groupEvent.ok)throw new Error('Satellite group calendar integrity failure');
     lastTradeResult = null;
     expandedReportId = null;
     career.reports = {};
@@ -712,6 +723,7 @@
     if(missedVisitors)
       eventNotice+=' SHOWROOM: '+missedVisitors+' customer'+(missedVisitors===1?'':'s')+
         ' left without being served.';
+    if(groupEvent.events.length)eventNotice+=' GROUP HQ: '+groupEvent.events.join(' ');
     if(closed){
       const id=career.messages.reduce((n,message)=>Math.max(n,message.id),0)+1;
       const status=closed.targetMet?'ACHIEVED':'MISSED';
@@ -756,6 +768,8 @@
     staffDeskMode=null;
     staffDeskRole='all';
     staffDeskSelectedId=null;
+    selectedGroupBranchId='original';
+    groupManagerChoice='m1';
     screen = 'career';
     currentPage = 'dashboard';
   }
@@ -887,6 +901,12 @@
     event.target.value = '';
     await importCareerFile(file);
   });
+  document.addEventListener('change',event=>{
+    if(event.target?.id==='group-manager'&&G.MANAGERS.some(m=>m.id===event.target.value)){
+      groupManagerChoice=event.target.value;
+      if(career&&currentPage==='group')render();
+    }
+  });
   document.addEventListener('input', event => {
     if(!career)return;
     const field=event.target?.dataset?.forecastField;
@@ -983,6 +1003,60 @@
       return;
     }
     switch (button.dataset.action) {
+      case 'group-view-original':
+        if(career)show('dashboard');
+        break;
+      case 'group-select':
+        if(career&&G.find(career,button.dataset.branch)){
+          selectedGroupBranchId=button.dataset.branch;currentPage='group';render();
+        }
+        break;
+      case 'group-open':
+        if(career){
+          const quote=G.quote(career,button.dataset.city,groupManagerChoice);
+          if(quote.ok&&window.confirm('Open '+quote.city.name+' with '+quote.manager.name+
+            '? This immediately spends '+money.format(quote.setup)+' on site setup and transfers '+
+            money.format(quote.capital)+' of existing cash to a separately managed branch. Confirm?')){
+            const result=G.open(career,button.dataset.city,groupManagerChoice);
+            if(result.ok)selectedGroupBranchId=career.group.branches.at(-1).id;
+            saveResult(result);
+          }
+        }
+        break;
+      case 'group-purchase':
+        if(career){
+          const b=G.find(career,button.dataset.branch);
+          const offer=G.offers(career,b).find(o=>o.id===button.dataset.offer);
+          if(offer&&window.confirm('Approve '+money.format(offer.cost)+' to purchase '+offer.title+
+            ' for '+b.name+'? A further '+money.format(offer.prep)+' will be spent on preparation.')){
+            selectedGroupBranchId=b.id;
+            saveResult(G.purchase(career,b.id,offer.id));
+          }
+        }
+        break;
+      case 'group-reprice':
+        if(career){
+          selectedGroupBranchId=button.dataset.branch;
+          const value=byId('group-price-'+button.dataset.id)?.value;
+          saveResult(G.price(career,button.dataset.branch,Number(button.dataset.id),
+            value===''?NaN:Number(value)));
+        }
+        break;
+      case 'group-transfer':
+        if(career&&['to','from'].includes(button.dataset.direction)){
+          const value=byId('mg-transfer-amount')?.value;
+          const amount=value===''?NaN:Number(value);
+          const b=G.find(career,button.dataset.branch);
+          if(b&&Number.isSafeInteger(amount)&&window.confirm(
+            'Transfer '+money.format(amount)+' '+(button.dataset.direction==='to'?
+            'from your original dealership to ':'from ')+b.name+
+            (button.dataset.direction==='to'?'':' back to the original dealership')+
+            '? No cash is created.')){
+            selectedGroupBranchId=b.id;
+            saveResult(G.transfer(career,b.id,amount,button.dataset.direction));
+          }
+        }
+        break;
       case 'aftersales-inspect':
         if(career){
           const id=Number(button.dataset.id);
