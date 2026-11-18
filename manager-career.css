@@ -1,0 +1,222 @@
+/* Manager Career: Football Manager-style employer selection and manager context.
+   Only the new-manager setup and the manager status strip are restyled. */
+#screen-setup.setup-screen {
+  min-height:calc(100svh - 3px);
+  background:radial-gradient(ellipse 60% 85% at 4% 20%,rgba(53,66,75,.12),transparent),#080a0d;
+  color:#f4f5f5;
+  font-family:var(--body);
+}
+#screen-setup .setup-header {
+  min-height:53px;padding:9px clamp(18px,3vw,44px);
+  border-bottom:1px solid #2e3941;background:#0b1117;
+  font:700 10px/1.25 var(--body);letter-spacing:.07em;
+}
+#screen-setup .setup-header .quiet-button {
+  color:#d8dee2;font:750 10px/1.2 var(--body);
+}
+#screen-setup .manager-setup-layout {
+  display:grid;
+  grid-template-columns:minmax(335px,.77fr) minmax(560px,1.38fr);
+  width:min(1460px,calc(100% - 52px));margin:0 auto;
+  align-items:start;gap:20px;padding:18px 0 25px;
+}
+#screen-setup .manager-setup-left,
+#screen-setup .manager-setup-right {
+  min-width:0;
+  border:1px solid #303b44;border-radius:6px;
+  background:#121a21;
+  overflow:hidden;
+}
+#screen-setup .manager-setup-left {padding:21px 24px 22px}
+#screen-setup .manager-setup-right {display:flex;flex-direction:column;max-height:calc(100svh - 94px);min-height:500px}
+#screen-setup .manager-setup-brand {
+  display:flex;align-items:center;gap:12px;margin-bottom:19px;
+}
+#screen-setup .manager-setup-brand img {
+  display:block;width:107px;max-width:107px;height:auto;
+}
+#screen-setup .manager-setup-brand span {
+  color:#d3dae0;font:800 13px/1.1 var(--body);letter-spacing:-.025em;
+}
+#screen-setup .manager-setup-brand span b {color:#b9233f}
+#screen-setup .manager-kicker {
+  color:#bca583;font:750 10px/1.3 var(--body);letter-spacing:.08em;
+}
+#screen-setup .manager-setup-left h1 {
+  margin:6px 0 12px;
+  font:800 clamp(29px,2.65vw,39px)/1.08 var(--body);
+  letter-spacing:-.045em;max-width:430px;
+}
+#screen-setup .manager-setup-left h1 em {color:#f4f5f5}
+#screen-setup .manager-setup-lead {
+  color:#bac6cd;font:500 12px/1.65 var(--body);
+  margin:0 0 20px;max-width:450px;
+}
+#screen-setup .manager-step-heading {
+  display:flex;align-items:center;gap:8px;margin:17px 0 7px;
+  color:#f0f2f2;font:800 11px/1.3 var(--body);
+}
+#screen-setup .manager-step-heading span {
+  color:#c6a980;font:750 10px/1.3 var(--mono);
+}
+#screen-setup .manager-setup-left .input-label {
+  color:#c6d0d5;margin:0 0 6px;font:700 9px/1.3 var(--body);
+}
+#screen-setup .manager-setup-left input#dealership-name {
+  height:44px;border-radius:4px;background:#0d141b;
+  border:1px solid #4b5a64;padding:9px 12px;
+  font:750 16px/1.25 var(--body);color:#f4f5f5;
+}
+#screen-setup .manager-setup-left .field-help {margin-top:6px;font:500 10px/1.35 var(--body)}
+#screen-setup .manager-choice-panel {
+  border:1px solid #63523c;border-left:3px solid #bca583;
+  background:#1c2225;border-radius:4px;padding:11px 13px;
+  min-height:65px;
+}
+#screen-setup .manager-choice-panel strong {
+  display:block;color:#f4f5f5;font:750 15px/1.35 var(--body);
+}
+#screen-setup .manager-choice-panel p {
+  color:#b9c4ca;font:500 10px/1.4 var(--body);margin:4px 0 0;
+}
+#screen-setup .manager-setup-facts {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;margin:13px 0 11px;
+}
+#screen-setup .manager-setup-facts div {
+  border:1px solid #344049;background:#172129;
+  min-width:0;border-radius:4px;padding:9px;
+}
+#screen-setup .manager-setup-facts small {
+  display:block;color:#abb8c1;font:700 9px/1.25 var(--body);
+}
+#screen-setup .manager-setup-facts strong {
+  display:block;margin-top:5px;color:#f3f4f5;
+  font:800 18px/1.15 var(--body);
+}
+#screen-setup .manager-setup-disclaimer {
+  border-top:1px solid #344049;padding-top:11px;
+  color:#a9b7c0;font:500 10px/1.6 var(--body);
+}
+#screen-setup .manager-setup-submit {
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;min-height:47px;margin-top:15px;padding:11px 16px;
+  color:#0d141b;background:#f4f5f5;border:1px solid #f4f5f5;
+  border-radius:4px;box-shadow:inset 4px 0 #b9233f;
+  font:800 11px/1.3 var(--body);letter-spacing:.07em;
+}
+#screen-setup .manager-setup-submit:hover {background:#fff}
+#screen-setup .manager-setup-right-head {
+  display:flex;justify-content:space-between;align-items:start;
+  gap:8px;padding:19px 20px 14px;border-bottom:1px solid #303b44;
+}
+#screen-setup .manager-setup-right-head h2 {
+  color:#f4f5f5;font:800 20px/1.2 var(--body);letter-spacing:-.035em;margin-top:4px;
+}
+#screen-setup .manager-setup-right-head p:last-child {
+  color:#9eacb7;font:550 10px/1.4 var(--body);margin-top:5px;
+}
+#screen-setup .manager-employer-count {
+  flex:none;border:1px solid #4b594f;background:#1b2721;
+  color:#c1dec8;padding:6px 8px;border-radius:3px;
+  font:750 10px/1.3 var(--body);
+}
+#screen-setup .manager-employer-tools {
+  display:flex;gap:8px;padding:11px 20px;border-bottom:1px solid #303b44;
+}
+#screen-setup .manager-employer-tools input,
+#screen-setup .manager-employer-tools select {
+  min-width:0;height:37px;background:#0d141b;
+  border:1px solid #4c5a63;color:#f4f5f5;border-radius:4px;
+  padding:7px 10px;font:600 11px/1.3 var(--body);
+}
+#screen-setup .manager-employer-tools input {flex:1}
+#screen-setup .manager-employer-tools select {flex:0 0 150px}
+#screen-setup .manager-employer-register {
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:10px 12px 14px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-content:start;gap:8px;
+  scrollbar-color:#4c5a63 #121a21;
+}
+#screen-setup .manager-employer {
+  position:relative;display:flex;flex-direction:column;
+  min-height:112px;min-width:0;padding:11px 12px;
+  border:1px solid #3a4750;background:#172129;color:#e6eaec;
+  border-radius:4px;text-align:left;gap:5px;
+  font:inherit;box-shadow:none;
+}
+#screen-setup .manager-employer:not(:disabled):hover {
+  background:#21303a;border-color:#b6c3cc;
+}
+#screen-setup .manager-employer[aria-pressed="true"] {
+  border-color:#c4ad87;box-shadow:inset 3px 0 #b9233f;background:#252c2d;
+}
+#screen-setup .manager-employer:disabled {
+  opacity:1;cursor:not-allowed;background:#111820;color:#a5b0b7;border-color:#2a353e;
+}
+#screen-setup .manager-employer-top {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:7px;font:700 9px/1.2 var(--body);
+  letter-spacing:.04em;color:#bac7cf;
+}
+#screen-setup .manager-employer-stars {color:#d0b489;white-space:nowrap;letter-spacing:.09em}
+#screen-setup .manager-employer-name {
+  color:#f1f2f3;font:800 13px/1.22 var(--body);
+}
+#screen-setup .manager-employer:disabled .manager-employer-name {color:#a2aeb7}
+#screen-setup .manager-employer-focus {
+  color:#9fb0b9;font:500 10px/1.35 var(--body);
+}
+#screen-setup .manager-employer-status {
+  margin-top:auto;color:#c6ad87;font:750 9px/1.25 var(--body);
+}
+#screen-setup .manager-employer:disabled .manager-employer-status {color:#9aa7ae}
+#screen-setup .manager-empty-filter {
+  grid-column:1/-1;padding:20px;text-align:center;
+  color:#b4c0c7;font:550 12px/1.5 var(--body);
+}
+#screen-setup :is(button,input,select):focus-visible {
+  outline:2px solid #f4f5f5;outline-offset:2px;
+}
+#screen-career #manager-career-strip {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;padding:7px 11px;margin-bottom:7px;
+  background:#172129;border:1px solid #35414a;border-left:3px solid #b9233f;
+  border-radius:4px;min-height:36px;
+  font:650 10px/1.3 var(--body);color:#cbd4d9;
+}
+#screen-career #manager-career-strip strong {color:#f4f5f5;font-weight:800}
+#screen-career #manager-career-strip .manager-strip-stats {
+  display:flex;gap:15px;flex-wrap:wrap;color:#b7c4cb;
+}
+#screen-career #manager-career-strip .manager-strip-stats b {
+  color:#d8c4a3;font-weight:800;
+}
+@media(max-width:1100px) {
+  #screen-setup .manager-setup-layout {grid-template-columns:minmax(275px,.75fr) minmax(440px,1.25fr);width:calc(100% - 34px);gap:12px}
+  #screen-setup .manager-setup-left {padding:17px}
+  #screen-setup .manager-setup-right-head {padding:15px}
+  #screen-setup .manager-employer-tools {padding:9px 15px}
+}
+@media(max-width:780px) {
+  #screen-setup .manager-setup-layout {display:flex;flex-direction:column;width:calc(100% - 28px);padding:14px 0 25px;gap:12px}
+  #screen-setup .manager-setup-left,#screen-setup .manager-setup-right {width:100%}
+  #screen-setup .manager-setup-left {padding:17px}
+  #screen-setup .manager-setup-right {max-height:none;min-height:0}
+  #screen-setup .manager-employer-register {max-height:440px;min-height:200px}
+  #screen-setup .manager-setup-left h1 {font-size:clamp(29px,5vw,40px)}
+  #screen-career #manager-career-strip {align-items:start;flex-direction:column}
+}
+@media(max-width:530px) {
+  #screen-setup .manager-employer-register {grid-template-columns:1fr}
+  #screen-setup .manager-employer {min-height:105px}
+  #screen-setup .manager-employer-tools select {flex-basis:116px}
+  #screen-setup .manager-setup-right-head {flex-direction:column}
+}
+@media(max-height:730px) and (min-width:781px) {
+  #screen-setup .manager-setup-left {padding-top:14px;padding-bottom:14px}
+  #screen-setup .manager-setup-brand {margin-bottom:11px}
+  #screen-setup .manager-setup-lead {margin-bottom:11px}
+  #screen-setup .manager-setup-right {min-height:390px}
+}
