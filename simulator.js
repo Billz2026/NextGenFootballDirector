@@ -1163,52 +1163,99 @@
     render();
   }
 
-  function startCareer() {
-    if(ACCOUNT?.isCloudMode()) {
-      window.alert('This account already has an active cloud career. Sign out to start a separate guest career; the account save will remain protected.');
+  function storeJobSearch(next){
+    if(!JR.save(next)){
+      recruitmentSaveWarning='This browser could not save the interview progress. '+
+        'Application was not advanced. Check your browser storage settings.';
+      window.alert(recruitmentSaveWarning);
+      return false;
+    }
+    recruitmentSaveWarning='';
+    jobSearch=next;
+    return true;
+  }
+
+  function applyForVacancy(){
+    if(ACCOUNT?.isCloudMode()){
+      window.alert('This account already has an active cloud career. Sign out to apply for a separate guest management career.');
       return;
     }
-    const input = byId('dealership-name');
-    const managerName = input.value.trim().replace(/\s+/g, ' ');
-    if (managerName.length < 2 || managerName.length > 36) {
+    const input=byId('dealership-name');
+    const managerName=input.value.trim().replace(/\s+/g,' ');
+    if(managerName.length<2||managerName.length>36){
       input.setCustomValidity('Enter a manager name between 2 and 36 characters.');
-      input.reportValidity();
-      return;
+      input.reportValidity();return;
     }
     input.setCustomValidity('');
-    const cv=managerDraftCV();
+    const cv=managerDraftCV(),employer=MC.dealer(selectedEmployerId);
     if(!MC.cvValid(cv)){
-      window.alert('Choose a valid date of birth (21–65 at career start), home town and entry-level CV.');
+      window.alert('Your CV must include a valid DOB, home town and 1–3 years of entry-level experience.');
       return;
     }
-    const employer=MC.dealer(selectedEmployerId);
     if(!MC.eligible(employer,MC.START_REPUTATION)){
-      window.alert('This company does not accept an entry-level manager. Choose an available independent.');
+      window.alert('Select an available beginner vacancy first.');return;
+    }
+    const staged=jobSearch?JSON.parse(JSON.stringify(jobSearch)):
+      JR.initial(managerName,cv);
+    if(!staged||staged.candidate.name!==managerName||
+      JSON.stringify(staged.candidate.cv)!==JSON.stringify(cv)){
+      window.alert('Your original application CV is locked. Restart the job search to change your details.');
       return;
     }
-    const existing = SAVES.status(E.normalize);
-    if ((career || existing.hasPrimary) &&
-      !window.confirm('Start a new management career at '+employer.name+'? This replaces the current browser save. '+
-        'Export your existing career first if you want to keep it; a recent valid local backup may remain available.'))return;
-    const previousAccount=ACCOUNT?.activeAccount || null;
-    if(ACCOUNT && !ACCOUNT.startGuestMode())return;
-    const newCareer = E.createStaffed(employer.name, []);
+    const result=JR.apply(staged,employer.id);
+    if(!result.ok){window.alert(result.message);return;}
+    if(!storeJobSearch(staged))return;
+    selectedInterviewAnswer=null;
+    show('recruitment');
+  }
+
+  // Called only after an applicant has received and explicitly accepted
+  // a legitimate employer decision. Rejection never creates a dealership.
+  function startCareer() {
+    if(ACCOUNT?.isCloudMode()) {
+      window.alert('This account already has an active cloud career. Sign out to start a separate guest career.');
+      return;
+    }
+    const recruitment=jobSearch&&JR.valid(jobSearch)?JR.snapshot(jobSearch):null;
+    if(!recruitment){
+      window.alert('You must complete an interview and receive a real job offer before managing a dealership.');
+      return;
+    }
+    const employer=MC.dealer(recruitment.employerId);
+    const managerName=jobSearch.candidate.name,cv=jobSearch.candidate.cv;
+    if(!employer||!MC.eligible(employer,MC.START_REPUTATION)||!MC.cvValid(cv)){
+      window.alert('This offer could not be verified. No career was created.');
+      return;
+    }
+    const existing=SAVES.status(E.normalize);
+    if((career||existing.hasPrimary)&&
+      !window.confirm('Accept the offer at '+employer.name+
+      '? This replaces the existing browser career save. Export your old career first.')){
+      return;
+    }
+    const previousAccount=ACCOUNT?.activeAccount||null;
+    if(ACCOUNT&&!ACCOUNT.startGuestMode())return;
+    const newCareer=E.createStaffed(employer.name,[]);
     const appointment=MC.enrol(newCareer,managerName,employer.id,cv);
     if(!appointment.ok){
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
-      window.alert(appointment.message);
-      return;
+      window.alert(appointment.message);return;
     }
+    newCareer.managerCareer.recruitment={...recruitment};
     newCareer.messages=MC.welcome(newCareer);
-    const result = SAVES.save(newCareer, E.normalize, {force:true, backupPrevious:true});
-    if (!result.ok) {
+    const result=SAVES.save(newCareer,E.normalize,{force:true,backupPrevious:true});
+    if(!result.ok){
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
-      saveToolsMessage = result.message;
-      window.alert(result.message + ' Your previous save has not been replaced.');
-      render();
-      return;
+      saveToolsMessage=result.message;
+      window.alert(result.message+' No job or previous save has been replaced.');
+      render();return;
     }
-    openRecoveredCareer(newCareer, 'Manager appointed at '+employer.name+'. Your career is saved on this device. Export a backup from CAREER SAVES.');
+    JR.clear();
+    jobSearch=null;
+    selectedInterviewAnswer=null;
+    openRecoveredCareer(newCareer,
+      'Employment offer accepted at '+employer.name+
+      '. Your interview record and new management career have been saved.');
   }
 
   function downloadCareer() {
@@ -1290,7 +1337,7 @@
 
   byId('career-form').addEventListener('submit', event => {
     event.preventDefault();
-    startCareer();
+    applyForVacancy();
   });
   byId('dealership-name').addEventListener('input', event => event.target.setCustomValidity(''));
   for(const id of ['manager-dob','manager-hometown','manager-experience',
@@ -1427,6 +1474,60 @@
       render();return;
     }
     switch (button.dataset.action) {
+      case 'begin-interview':{
+        const next=jobSearch?JSON.parse(JSON.stringify(jobSearch)):null;
+        if(!next)return;
+        const result=JR.beginInterview(next);
+        if(!result.ok){window.alert(result.message);return;}
+        if(storeJobSearch(next)){selectedInterviewAnswer=null;renderRecruitment();}
+        break;
+      }
+      case 'select-interview-answer':{
+        if(screen!=='recruitment'||JR.current(jobSearch)?.stage!=='interview')break;
+        const choice=Number(button.dataset.choice);
+        if(Number.isSafeInteger(choice)&&choice>=0&&choice<=3){
+          selectedInterviewAnswer=choice;
+          renderRecruitment();
+          byId('recruitment-stage').querySelector('[data-action="submit-interview-answer"]')?.focus();
+        }
+        break;
+      }
+      case 'submit-interview-answer':{
+        if(selectedInterviewAnswer===null||screen!=='recruitment')break;
+        const next=jobSearch?JSON.parse(JSON.stringify(jobSearch)):null;
+        if(!next)return;
+        const result=JR.answer(next,selectedInterviewAnswer);
+        if(!result.ok){window.alert(result.message);break;}
+        if(storeJobSearch(next)){selectedInterviewAnswer=null;renderRecruitment();}
+        break;
+      }
+      case 'accept-job-offer':
+        startCareer();
+        break;
+      case 'decline-job-offer':{
+        if(!jobSearch)break;
+        if(!window.confirm('Decline this employment offer? You cannot accept it later.'))break;
+        const next=JSON.parse(JSON.stringify(jobSearch));
+        const result=JR.decline(next);
+        if(!result.ok){window.alert(result.message);break;}
+        if(storeJobSearch(next))renderRecruitment();
+        break;
+      }
+      case 'return-to-job-search':
+        selectedInterviewAnswer=null;
+        selectedEmployerId=null;
+        show('setup');
+        break;
+      case 'restart-job-search':
+        if(!window.confirm('Erase this applicant’s saved job applications, interviews and offers? Your existing dealership career will not be changed.'))break;
+        if(!JR.clear()){
+          window.alert('Job search storage could not be cleared.');break;
+        }
+        jobSearch=null;
+        selectedEmployerId=null;
+        selectedInterviewAnswer=null;
+        show('setup');
+        break;
       case 'select-employer': {
         const candidate=MC.dealer(button.dataset.employer);
         if(screen==='setup'&&MC.eligible(candidate,MC.START_REPUTATION)){
@@ -1596,7 +1697,7 @@
         render();
         break;
       case 'new-career':
-        show('setup');
+        show(jobSearch?.activeId?'recruitment':'setup');
         break;
       case 'toggle-career-tools': {
         const panel = byId('career-tools');
