@@ -22,6 +22,8 @@
   const OPS = window.MotorTradeOperations;
   const AU = window.MotorTradeAuctionAgent;
   const MC = window.MotorTradeManagerCareer;
+  const JR = window.MotorTradeRecruitment;
+  if(!JR)throw Error('Load manager-recruitment.js before simulator.js');
   const IN = window.MotorTradeInbox;
   const BV = window.MotorTradeBuyingDeskView;
   const SV = window.MotorTradeStockView;
@@ -177,6 +179,9 @@
   let selectedGroupBranchId = 'original'; // UI selection only; no duplicate saved branch
   let groupManagerChoice = 'm1';
   let selectedEmployerId = null;
+  let jobSearch = JR.read();
+  let selectedInterviewAnswer = null;
+  let recruitmentSaveWarning = '';
 
   function gameDate(day) {
     return new Date(START_DATE_UTC + (day - 1) * MS_PER_DAY);
@@ -564,6 +569,111 @@
     renderEvents();
   }
 
+  function lockJobCandidate(){
+    if(!jobSearch)return;
+    byId('dealership-name').value=jobSearch.candidate.name;
+    byId('manager-dob').value=jobSearch.candidate.cv.dateOfBirth;
+    byId('manager-hometown').value=jobSearch.candidate.cv.hometown;
+    byId('manager-background').value=jobSearch.candidate.cv.previousRole;
+    byId('manager-experience').value=String(jobSearch.candidate.cv.experienceYears);
+    byId('manager-qualification').value=jobSearch.candidate.cv.qualification;
+  }
+  function renderRecruitment(){
+    const stage=byId('recruitment-stage'),attempt=JR.current(jobSearch);
+    if(!jobSearch||!attempt){
+      stage.innerHTML='<h2 class="recruitment-stage-title">No active application</h2>'+
+        '<p class="recruitment-stage-copy">Select an available vacancy and apply with your CV.</p>'+
+        '<button class="recruitment-primary" type="button" data-action="return-to-job-search">OPEN VACANCIES →</button>';
+      return;
+    }
+    const company=MC.dealer(attempt.employerId),candidate=jobSearch.candidate;
+    byId('recruitment-company-details').innerHTML='<small>APPOINTMENT AT</small>'+
+      '<strong>'+escapeText(company.name)+'</strong><p>'+
+      escapeText(company.city)+' · '+escapeText(company.focus)+
+      '</p><p>'+company.monthlyTarget+' retail sales / month · '+company.stars+'-star employer</p>';
+    byId('recruitment-candidate-summary').innerHTML='<small>APPLICANT CV</small><p>'+
+      escapeText(candidate.name)+' · '+MC.ageAt(candidate.cv.dateOfBirth)+' years · '+
+      escapeText(MC.BACKGROUNDS[candidate.cv.previousRole])+' · '+
+      candidate.cv.experienceYears+' years in motor trade</p><p>Application '+
+      jobSearch.attempts.length+' of 20 available entry-level employers</p>';
+    byId('recruitment-save-warning').hidden=!recruitmentSaveWarning;
+    byId('recruitment-save-warning').textContent=recruitmentSaveWarning;
+    const count=attempt.questionIds.length;
+    const header=(label,step='')=>'<div class="recruitment-eyebrow"><span>'+
+      escapeText(label)+'</span><span>'+escapeText(step)+'</span></div>';
+    let html='';
+    if(attempt.stage==='invited'){
+      html=header('CV REVIEW COMPLETE','INTERVIEW INVITATION')+
+        '<h2 class="recruitment-stage-title">You have been shortlisted.</h2>'+
+        '<p class="recruitment-stage-copy">The owner of '+escapeText(company.name)+
+        ' has reviewed your limited experience and invited you to an interview. '+
+        'You will answer '+count+' practical motor-trade questions, one at a time. '+
+        'The board assesses your decisions alongside your CV and entry-level experience.</p>'+
+        '<div class="recruitment-result positive"><strong>Interview invitation received</strong>'+
+        '<p>Shortlisting does not guarantee an offer. Your answers will be recorded and '+
+        'the employer can reject your application.</p></div>'+
+        '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
+        'data-action="begin-interview">ATTEND INTERVIEW →</button></div>';
+    }else if(attempt.stage==='interview'){
+      const index=attempt.answers.length;
+      const q=JR.displayQuestion(attempt.questionIds[index],company.id);
+      if(!q){stage.textContent='Interview question unavailable. Your application has not been changed.';return;}
+      html=header('MANAGEMENT INTERVIEW','QUESTION '+(index+1)+' OF '+count)+
+        '<div class="recruitment-progress" aria-hidden="true">'+
+        attempt.questionIds.map((_,i)=>'<span class="'+(i<=index?'complete':'')+'"></span>').join('')+
+        '</div><h2 class="recruitment-question">'+escapeText(q.text)+'</h2>'+
+        '<div class="recruitment-answer-list" role="group" aria-label="Interview answer choices">'+
+        q.options.map((option,i)=>'<button type="button" class="recruitment-answer" '+
+          'data-action="select-interview-answer" data-choice="'+i+'" aria-pressed="'+
+          String(selectedInterviewAnswer===i)+'">'+
+          '<span class="recruitment-answer-index">'+String.fromCharCode(65+i)+'</span>'+
+          '<span>'+escapeText(option)+'</span></button>').join('')+'</div>'+
+        '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
+        'data-action="submit-interview-answer" '+(selectedInterviewAnswer===null?'disabled':'')+'>'+
+        (index===count-1?'COMPLETE INTERVIEW →':'NEXT QUESTION →')+'</button></div>'+
+        '<p class="recruitment-stage-copy" style="margin-top:15px">Answers cannot be revised after submission. '+
+        'Correctness is not revealed during the interview.</p>';
+    }else if(attempt.stage==='offered'){
+      html=header('APPLICATION DECISION','FORMAL JOB OFFER')+
+        '<h2 class="recruitment-stage-title">You have received an offer.</h2>'+
+        '<p class="recruitment-stage-copy">'+escapeText(company.name)+
+        ' has offered you an acting dealership manager appointment. The company retains '+
+        'ownership of cash, stock and premises; you will manage its staff and operations.</p>'+
+        '<div class="recruitment-result positive"><strong>Employment offer — awaiting your decision</strong>'+
+        '<p>Interview assessment '+attempt.result.interviewPercent+'/100 · '+
+        'Overall application fit '+attempt.result.composite+'/100. '+
+        'Initial 90-day probation with '+company.monthlyTarget+
+        ' retail sales expected each month. Opening company working capital '+
+        money.format(company.openingCash)+'.</p></div>'+
+        '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
+        'data-action="accept-job-offer">ACCEPT EMPLOYMENT OFFER →</button>'+
+        '<button type="button" class="recruitment-secondary" data-action="decline-job-offer">'+
+        'DECLINE OFFER</button></div>';
+    }else if(attempt.stage==='rejected'){
+      html=header('APPLICATION DECISION','NOT SHORTLISTED / NOT APPOINTED')+
+        '<h2 class="recruitment-stage-title">Application unsuccessful.</h2>'+
+        '<p class="recruitment-stage-copy">'+(attempt.result.reason==='cv'?
+        'The dealership did not shortlist your CV for interview. More modest vacancies may be a closer fit.':
+        'The board reviewed your interview and CV but decided against offering you this vacancy.')+
+        ' You can apply to another eligible dealership. No job or company budget has been created.</p>'+
+        '<div class="recruitment-result negative"><strong>Unsuccessful application</strong><p>'+
+        (attempt.result.reason==='cv'?'Rejected at CV screening.':
+        'Interview assessment '+attempt.result.interviewPercent+'/100. '+
+        'This was below the employer’s appointment standard.')+
+        '</p></div><div class="recruitment-actions">'+
+        '<button type="button" class="recruitment-primary" data-action="return-to-job-search">'+
+        'VIEW OTHER VACANCIES →</button></div>';
+    }else if(attempt.stage==='declined'){
+      html=header('OFFER DECISION','DECLINED')+
+        '<h2 class="recruitment-stage-title">You declined the offer.</h2>'+
+        '<p class="recruitment-stage-copy">The appointment at '+escapeText(company.name)+
+        ' was declined. Your CV and decision history remain recorded in this job search.</p>'+
+        '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
+        'data-action="return-to-job-search">FIND ANOTHER VACANCY →</button></div>';
+    }
+    stage.innerHTML=html;
+  }
+
   function managerDraftCV(){
     return {
       dateOfBirth:byId('manager-dob').value,
@@ -581,7 +691,14 @@
       (age===null?'Age not set':age+' years')+' · '+(cv.hometown||'Home town not set')+
       ' · '+(MC.BACKGROUNDS[cv.previousRole]||'Previous role not set')+
       ' · '+cv.experienceYears+' year'+(cv.experienceYears===1?'':'s')+' trade experience';
-    byId('manager-career-submit').disabled=
+    const candidateFrozen=!!jobSearch;
+    for(const id of ['dealership-name','manager-dob','manager-hometown',
+      'manager-experience','manager-background','manager-qualification'])
+      byId(id).disabled=candidateFrozen;
+    byId('application-candidate-notice').hidden=!candidateFrozen;
+    byId('restart-job-search').hidden=!candidateFrozen;
+    const previous=jobSearch?.attempts.some(a=>a.employerId===selectedEmployerId)||false;
+    byId('manager-career-submit').disabled=previous||
       !MC.cvValid(cv)||!MC.eligible(MC.dealer(selectedEmployerId),MC.START_REPUTATION);
   }
 
@@ -632,18 +749,24 @@
   function renderManagerEmployers(){
     const search=byId('employer-search').value.trim().toLowerCase();
     const mode=byId('employer-filter').value;
+    if(jobSearch)lockJobCandidate();
     const eligible=MC.DEALERS.filter(d=>MC.eligible(d,MC.START_REPUTATION));
     const chosen=MC.dealer(selectedEmployerId);
-    const available=chosen&&MC.eligible(chosen,MC.START_REPUTATION)?chosen:null;
+    const available=chosen&&MC.eligible(chosen,MC.START_REPUTATION)&&
+      !jobSearch?.attempts.some(a=>a.employerId===chosen.id)?chosen:null;
     const matches=MC.DEALERS.filter(d=>
       (!search||[d.name,d.city,d.focus,d.tier].some(s=>s.toLowerCase().includes(search)))&&
       (mode==='all'||(mode==='available')===MC.eligible(d,MC.START_REPUTATION))
     );
-    byId('manager-employer-count').textContent=eligible.length+' AVAILABLE · '+(50-eligible.length)+' LOCKED';
+    const remaining=eligible.filter(d=>!jobSearch?.attempts.some(a=>a.employerId===d.id));
+    byId('manager-employer-count').textContent=remaining.length+
+      ' OPEN · '+(eligible.length-remaining.length)+' APPLIED · '+(50-eligible.length)+' LOCKED';
     byId('employer-list').innerHTML=matches.map(d=>{
-      const unlocked=MC.eligible(d,MC.START_REPUTATION);
+      const alreadyApplied=jobSearch?.attempts.some(a=>a.employerId===d.id)||false;
+      const unlocked=MC.eligible(d,MC.START_REPUTATION)&&!alreadyApplied;
       const stars='★'.repeat(d.stars)+'☆'.repeat(5-d.stars);
-      return '<button type="button" class="manager-employer" data-action="select-employer" data-employer="'+
+      return '<button type="button" class="manager-employer'+(alreadyApplied?' already-applied':'')+
+        '" data-action="select-employer" data-employer="'+
         escapeText(d.id)+'" '+(unlocked?'':'disabled ')+'aria-pressed="'+
         String(unlocked&&available?.id===d.id)+'">'+
         '<span class="manager-employer-top"><span>'+escapeText(d.city.toUpperCase())+
@@ -651,7 +774,8 @@
         '<strong class="manager-employer-name">'+escapeText(d.name)+'</strong>'+
         '<span class="manager-employer-focus">'+escapeText(d.focus)+'</span>'+
         '<span class="manager-employer-status">'+
-        (unlocked?'AVAILABLE · '+d.monthlyTarget+' SALES / MONTH':
+        (alreadyApplied?'APPLICATION RECORDED':
+        unlocked?'VACANCY OPEN · '+d.monthlyTarget+' SALES / MONTH':
           'LOCKED · REQUIRES '+d.requiredReputation+'/100 MANAGER REP')+
         '</span></button>';
     }).join('')||'<p class="manager-empty-filter">No matching vacancies for this city and filter. Try switching to All 50 or searching another location.</p>';
@@ -698,8 +822,10 @@
     byId('menu-setting-motion').textContent = display.motion ? 'ON' : 'OFF';
     byId('menu-setting-motion').setAttribute('aria-pressed', String(display.motion));
     byId('screen-setup').hidden = screen !== 'setup';
+    byId('screen-recruitment').hidden = screen !== 'recruitment';
     byId('screen-career').hidden = screen !== 'career';
     if(screen==='setup')renderManagerEmployers();
+    if(screen==='recruitment')renderRecruitment();
     byId('menu-continue').hidden = !career;
     byId('menu-continue').className = 'action-btn action-btn-primary';
     byId('menu-new-career').className = career ? 'action-btn action-btn-secondary' : 'action-btn action-btn-primary';
@@ -796,7 +922,7 @@
     renderTrading();
   }
   function show(pageOrScreen) {
-    if (pageOrScreen === 'menu' || pageOrScreen === 'setup') {
+    if (pageOrScreen === 'menu' || pageOrScreen === 'setup' || pageOrScreen==='recruitment') {
       screen = pageOrScreen;
       careerPromotion = null;
     } else if (career && Object.prototype.hasOwnProperty.call(PAGES, pageOrScreen)) {
