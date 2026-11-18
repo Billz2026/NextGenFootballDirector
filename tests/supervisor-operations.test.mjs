@@ -97,6 +97,19 @@ test('workshop can reassign a disabled technician without owner clicking dispatc
   assert.ok(v.workshop.method==='external'||s.staff.some(t=>t.id===v.workshop.technicianId));
   valid(s);
 });
+test('supervisor can commission external diagnosis and repair without an in-house technician',()=>{
+  const s=career('External Workshop QA');
+  const tech=s.staff.find(x=>x.role==='technician');
+  assert.ok(tech);
+  assert.ok(E.people.release(s,tech.id).ok);
+  const v=buyByOwner(s),before=s.cash;
+  O.process(s,E);
+  assert.equal(v.workshop.assessmentFee,55);
+  assert.equal(v.workshop.method,'external');
+  assert.equal(v.workshop.stage,'in-progress');
+  assert.ok(s.cash<before);
+  valid(s);
+});
 test('over-budget workshop quotation asks owner, then books real repair once',()=>{
   const s=career('Workshop Approval QA'),v=buyByOwner(s);
   s.operations.maxRepair=0;s.operations.maxStock=1;
