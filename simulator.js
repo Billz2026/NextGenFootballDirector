@@ -22,6 +22,8 @@
   const OPS = window.MotorTradeOperations;
   const AU = window.MotorTradeAuctionAgent;
   const MC = window.MotorTradeManagerCareer;
+  const WEEKEND = window.MotorTradeWeekend;
+  if(!WEEKEND)throw Error('Load manager-weekend.js before simulator.js');
   const TURN = window.MotorTradeTurnaround;
   if(!TURN)throw Error('Load manager-turnaround.js before simulator.js');
   const IND = window.MotorTradeInduction;
@@ -507,6 +509,7 @@
     byId('events-view').innerHTML=EV.render(career);
   }
   function renderDashboard(){
+    byId('dashboard-weekend').innerHTML=WEEKEND.render(career);
     byId('dashboard-turnaround').innerHTML=TURN.render(career);
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
@@ -1094,6 +1097,11 @@
       screen='induction';eventNotice='Complete the first-day staff and authority induction before trading.';
       render();return;
     }
+    if(WEEKEND.blocksContinue(career)){
+      currentPage='dashboard';
+      eventNotice='Complete the live Saturday trading session and acknowledge its results before advancing the date.';
+      render();return;
+    }
     if(career.auctionHall.phase==='payment'){
       currentPage='auctionHall';
       eventNotice='An auction hammer has fallen. Finalise the winning bid and buyer fee before advancing the game day.';
@@ -1153,6 +1161,7 @@
       SITE.sync(career);
     }
     career.day += 1;
+    WEEKEND.ensure(career);
     E.rollAuctionHall(career);
     auctionPreviewId=null;
     career.deadlineSession=0;
@@ -1184,7 +1193,9 @@
     // Run the supervisor-led sales desk at opening on the newly advanced day.
     // Arriving appointments and new walk-ins are handled without requiring
     // the proprietor to open Sales Office or allocate staff manually.
-    const openingSales=DELEG.process(career,E);
+    const openingSales=WEEKEND.blocksContinue(career)?
+      {ok:true,processed:false,served:0,completed:0,lost:0,escalated:0,assigned:0}:
+      DELEG.process(career,E);
     const afterSalesEvents=E.advanceAfterSales(career);
     const groupEvent=G.advance(career);
     if(!groupEvent.ok)throw new Error('Satellite group calendar integrity failure');
@@ -1285,7 +1296,8 @@
       const managerTurnaround=TURN.progress(career);
       if(auctionEvent.pending||DELEG.pending(career).length||OPS.pending(career).length)
         currentPage='inbox';
-      else if(managerTurnaround?.active||boardCheck)
+      else if(WEEKEND.blocksContinue(career)||WEEKEND.session(career)?.day===career.day||
+        managerTurnaround?.active||boardCheck)
         currentPage='dashboard';
       else if(career.delegation?.enabled)currentPage='inbox';
     }
@@ -1656,6 +1668,30 @@
       render();return;
     }
     switch (button.dataset.action) {
+      case 'weekend-start':
+      case 'weekend-next':
+      case 'weekend-acknowledge':{
+        if(!career?.managerCareer||screen!=='career')break;
+        const previous=E.normalize(JSON.parse(JSON.stringify(career)));
+        if(!previous){window.alert('The current career cannot be validated. No session step was applied.');break;}
+        let r;
+        if(button.dataset.action==='weekend-start')
+          r=WEEKEND.begin(career,E,button.dataset.focus);
+        else if(button.dataset.action==='weekend-next')
+          r=WEEKEND.advance(career,E);
+        else r=WEEKEND.acknowledge(career);
+        if(r.ok&&!persistCareer()){
+          career=previous;
+          window.alert('The weekend checkpoint could not be saved. Your previous state has been restored.');
+        }else{
+          eventNotice=r.message;
+          lastTradeResult={ok:r.ok,message:r.message};
+          if(r.pending)currentPage='inbox';
+          else currentPage='dashboard';
+        }
+        render();
+        break;
+      }
       case 'turnaround-reprice':
       case 'turnaround-hold':{
         if(!career?.managerCareer?.turnaround||screen!=='career')break;
