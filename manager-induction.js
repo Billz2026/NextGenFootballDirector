@@ -45,6 +45,28 @@
     i.step++;
     return {ok:true,step:i.step};
   }
+  // New managers meet a stable, employer-specific roster drawn from the
+  // actual first-day applicant pool. Older owner careers keep their team.
+  function assignOpeningTeam(state,employerId){
+    if(state?.day!==1||state.vehicles.length||state.sold.length||
+      !MC.dealer(employerId))return false;
+    const seq=Number(employerId.split('-')[1]),roster=P.openingTeam();
+    const candidates=P.applicants(1);
+    const multipliers={sales:3,buyer:5,technician:7,supervisor:11};
+    const chosen=roster.map((base,index)=>{
+      const pool=candidates.filter(p=>p.role===base.role);
+      const pick=pool[(seq*multipliers[base.role]+index)%pool.length];
+      if(!pick)throw Error('Missing starter candidate: '+base.role);
+      return {...base,name:pick.name,candidateId:pick.id,
+        skills:{...pick.skills},monthlySalary:pick.monthlySalary,
+        experience:pick.experience};
+    });
+    state.staff=chosen;
+    state.nextStaffId=5;
+    window.MotorTradeMonthly.initialize(state);
+    window.MotorTradePremises.sync(state);
+    return true;
+  }
   const team=state=>(state?.staff||[]).filter(e=>
     ['sales','buyer','technician','supervisor'].includes(e.role)
   ).map(e=>({id:e.id,name:e.name,role:e.role,
@@ -100,7 +122,7 @@
       salesPolicy:salesKey,operationsPolicy:opsKey,firstPriority:focus};
   }
   window.MotorTradeInduction=Object.freeze({STEPS,PRIORITIES,
-    initial,clone,pending,valid,advance,complete,team,
+    initial,clone,pending,valid,advance,complete,team,assignOpeningTeam,
     SALES_POLICIES:SALES.POLICIES,OPERATIONS_POLICIES:OPS.POLICIES
   });
 })();
