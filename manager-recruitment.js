@@ -650,9 +650,18 @@
   }
 ].map(q=>Object.freeze({...q,
     choices:Object.freeze(q.choices),points:Object.freeze(q.points)})));
-  const QMAP=new Map(QUESTIONS.map(q=>[q.id,q]));
+
+  const EXTRA=window.MotorTradeInterviewBank;
+  if(!Array.isArray(EXTRA)||EXTRA.length!==110)
+    throw Error('Load all 110 tiered interview questions before recruitment.');
+  const BANK=Object.freeze([...QUESTIONS,...EXTRA]);
+  if(BANK.length!==150||new Set(BANK.map(q=>q.id)).size!==150)
+    throw Error('Expected 150 unique interview questions.');
+  const QMAP=new Map(BANK.map(q=>[q.id,q]));
   const LEVEL_LENGTH=Object.freeze({INDEPENDENT:5,ESTABLISHED:6,REGIONAL:7,PRESTIGE:8,ELITE:10});
-  const STAGES=Object.freeze(['invited','interview','offered','rejected','declined']);
+  const SECOND_LENGTH=Object.freeze({INDEPENDENT:0,ESTABLISHED:0,REGIONAL:3,PRESTIGE:4,ELITE:5});
+  const STAGES=Object.freeze(['invited','interview','second-invited','second-interview',
+    'offered','rejected','declined']);
   const copy=value=>JSON.parse(JSON.stringify(value));
   const validName=name=>typeof name==='string'&&name.length>=2&&name.length<=36&&
     name===name.trim()&&!/[<>]/.test(name);
@@ -662,19 +671,63 @@
     for(const ch of String(value))n=Math.imul(n^ch.charCodeAt(0),16777619)>>>0;
     return n>>>0;
   }
-  function questionSet(employerId,ordinal){
-    const d=MC.dealer(employerId);
-    if(!d||!integer(ordinal,1,50))return [];
-    const ids=QUESTIONS.map(q=>q.id);
-    const salt=hash(d.id+':'+ordinal);
-    // Fixed Fisher-Yates permutation for selection and resumption.
-    let state=salt||1;
+  const shuffle=(items,seed)=>{
+    const ids=items.slice();
+    let state=seed||1;
     for(let i=ids.length-1;i>0;i--){
       state=(Math.imul(state,1664525)+1013904223)>>>0;
       const j=state%(i+1);
       [ids[i],ids[j]]=[ids[j],ids[i]];
     }
-    return ids.slice(0,LEVEL_LENGTH[d.tier]);
+    return ids;
+  };
+  // Legacy (version 1) interviews must retain their original 40-ID
+  // ordering, scoring and saved answer positions after a software update.
+  function legacyQuestionSet(employerId,ordinal){
+    const d=MC.dealer(employerId);
+    if(!d||!integer(ordinal,1,50))return [];
+    return shuffle(QUESTIONS.map(q=>q.id),hash(d.id+':'+ordinal))
+      .slice(0,LEVEL_LENGTH[d.tier]);
+  }
+  function requiresSecond(d){
+    if(!d)return false;
+    if(d.tier==='ELITE')return true;
+    if(d.tier==='PRESTIGE')return hash(d.id+':second-round')%2===0;
+    if(d.tier==='REGIONAL')return hash(d.id+':second-round')%3===0;
+    return false;
+  }
+  function questionPlan(employerId,ordinal){
+    const d=MC.dealer(employerId);
+    if(!d||!integer(ordinal,1,50))return null;
+    const pools={INDEPENDENT:[[1,5]],ESTABLISHED:[[1,2],[2,4]],
+      REGIONAL:[[2,2],[3,5]],PRESTIGE:[[3,2],[4,6]],
+      ELITE:[[4,3],[5,7]]};
+    const used=new Set();
+    function pick(level,count,salt){
+      const available=EXTRA.filter(q=>q.level===level&&!used.has(q.id));
+      const ordered=shuffle(available.map(q=>q.id),
+        hash(d.id+':'+ordinal+':'+level+':'+salt));
+      const selected=[],categories=new Set();
+      for(const id of ordered){
+        const category=QMAP.get(id).category;
+        if(!categories.has(category)){selected.push(id);categories.add(category);}
+        if(selected.length===count)break;
+      }
+      for(const id of ordered){
+        if(selected.length>=count)break;
+        if(!selected.includes(id))selected.push(id);
+      }
+      if(selected.length!==count)throw Error('Interview question pool exhausted.');
+      selected.forEach(id=>used.add(id));
+      return selected;
+    }
+    const firstIds=pools[d.tier].flatMap(([level,count])=>pick(level,count,'first'));
+    const secondIds=!requiresSecond(d)?[]:
+      d.tier==='REGIONAL'?pick(3,SECOND_LENGTH.REGIONAL,'second'):
+      d.tier==='PRESTIGE'?pick(4,SECOND_LENGTH.PRESTIGE,'second'):
+      [...pick(5,3,'second-elite'),...pick(4,2,'second-elite')];
+    return {firstIds,secondIds,
+      rounds:secondIds.length?2:1,tier:d.tier};
   }
   function displayQuestion(id,employerId){
     const q=QMAP.get(id);
@@ -682,7 +735,8 @@
     const start=hash(id+':'+employerId)%4;
     const order=[0,1,2,3].map(i=>(i+start)%4);
     if(hash(employerId+':'+id)%2)order.reverse();
-    return {id:q.id,text:q.text,options:order.map(i=>q.choices[i])};
+    return {id:q.id,text:q.text,options:order.map(i=>q.choices[i]),
+      topic:q.category||'management',level:q.level||1};
   }
   function pointsFor(id,employerId,choice){
     const q=QMAP.get(id);
@@ -702,7 +756,7 @@
   }
   function initial(name,cv){
     if(!validName(name)||!MC.cvValid(cv))return null;
-    return {version:1,candidate:{name,cv:copy(cv)},attempts:[],
+    return {version:2,candidate:{name,cv:copy(cv)},attempts:[],
       activeId:null};
   }
   const current=state=>state?.attempts?.find(a=>a.id===state.activeId)||null;
@@ -714,56 +768,108 @@
     if(state.attempts.some(a=>a.employerId===d.id))
       return {ok:false,message:'You have already applied to this employer for the current vacancy.'};
     const active=current(state);
-    if(active&&['invited','interview','offered'].includes(active.stage))
-      return {ok:false,message:'Finish or decline your current application first.'};
+    if(active&&['invited','interview','second-invited','second-interview','offered'].includes(active.stage))
+      return {ok:false,message:'Complete the current application process first.'};
     const ordinal=state.attempts.length+1,cvScore=screenScore(state.candidate,d);
     const shortlisted=cvScore>=48;
+    const plan=state.version===1?
+      {firstIds:legacyQuestionSet(d.id,ordinal),secondIds:[]}:
+      questionPlan(d.id,ordinal);
     const attempt={id:'A'+ordinal,employerId:d.id,ordinal,screenScore:cvScore,
       stage:shortlisted?'invited':'rejected',
-      questionIds:questionSet(d.id,ordinal),answers:[],
+      questionIds:plan.firstIds,answers:[],
+      ...(state.version===2?{secondQuestionIds:plan.secondIds,secondAnswers:[],firstResult:null}:{}),
       result:shortlisted?null:{outcome:'rejected',reason:'cv',interviewPercent:null,
         composite:null,threshold:null}};
     state.attempts.push(attempt);
     state.activeId=attempt.id;
     return {ok:true,shortlisted,attempt,
       message:shortlisted?
-        'Your CV passed the shortlisting stage. An interview invitation has been issued.':
+        'Your CV was shortlisted. Attend the first-stage management interview.':
         'Application unsuccessful at CV screening. Try an employer with a lower sales target.'};
   }
   function beginInterview(state){
     const a=current(state);
-    if(!a||a.stage!=='invited')return {ok:false,message:'No interview invitation is available.'};
-    a.stage='interview';
+    if(!a||!['invited','second-invited'].includes(a.stage))
+      return {ok:false,message:'No interview invitation is available.'};
+    if(a.stage==='second-invited'&&state.version!==2)
+      return {ok:false,message:'Second-round interview requires a current application.'};
+    a.stage=a.stage==='invited'?'interview':'second-interview';
     return {ok:true,attempt:a};
   }
-  function evaluate(state,a){
-    const d=MC.dealer(a.employerId);
-    const scored=a.questionIds.map((id,i)=>pointsFor(id,d.id,a.answers[i]));
-    const interviewPercent=Math.round(100*scored.reduce((n,v)=>n+v,0)/(3*scored.length));
-    // Entry-level candidates are evaluated against the vacancy's experience
-    // requirements, not against the reputation of an elite executive.
+  function percent(answers,ids,employerId){
+    const scored=ids.map((id,i)=>pointsFor(id,employerId,answers[i]));
+    if(scored.some(x=>!integer(x,0,3))||!ids.length)return null;
+    return Math.round(100*scored.reduce((n,v)=>n+v,0)/(3*ids.length));
+  }
+  function scoreInfo(candidate,d,screen,interviewPercent){
     const reputationFit=Math.max(0,Math.min(100,60+
       (MC.START_REPUTATION-d.requiredReputation)*2));
-    const previousPerformance=55; // neutral novice baseline: no fake career successes
+    const previousPerformance=55;
     const composite=Math.round(.4*interviewPercent+.25*reputationFit+
-      .2*previousPerformance+.15*a.screenScore);
-    // Better-resourced independents have somewhat higher standards.
+      .2*previousPerformance+.15*screen);
     const threshold=49+Math.max(0,d.monthlyTarget-2)*5;
-    const offered=composite>=threshold&&interviewPercent>=45;
-    a.result={outcome:offered?'offered':'rejected',reason:'interview',
-      interviewPercent,composite,threshold};
-    a.stage=offered?'offered':'rejected';
-    return a.result;
+    return {interviewPercent,composite,threshold};
+  }
+  function firstScore(state,a){
+    const d=MC.dealer(a.employerId);
+    const p=percent(a.answers,a.questionIds,d.id);
+    return p===null?null:scoreInfo(state.candidate,d,a.screenScore,p);
+  }
+  function finalScore(state,a){
+    const d=MC.dealer(a.employerId),first=firstScore(state,a);
+    if(!first)return null;
+    if(state.version===1||!a.secondQuestionIds.length)
+      return {...first,secondRoundPercent:null,rounds:1};
+    const second=percent(a.secondAnswers,a.secondQuestionIds,d.id);
+    if(second===null)return null;
+    const combined=Math.round(.6*first.interviewPercent+.4*second);
+    return {...scoreInfo(state.candidate,d,a.screenScore,combined),
+      secondRoundPercent:second,rounds:2};
+  }
+  function firstPass(result){
+    return !!result&&result.composite>=result.threshold&&result.interviewPercent>=45;
+  }
+  function resultFor(state,a){
+    const result=finalScore(state,a);
+    if(!result)return null;
+    const passed=firstPass(result)&&(result.rounds===1||result.secondRoundPercent>=50);
+    return {outcome:passed?'offered':'rejected',reason:'interview',
+      interviewPercent:result.interviewPercent,composite:result.composite,
+      threshold:result.threshold,
+      ...(state.version===2?{rounds:result.rounds,
+        secondRoundPercent:result.secondRoundPercent}:{} )};
   }
   function answer(state,choice){
     const a=current(state);
-    if(!a||a.stage!=='interview')return {ok:false,message:'No active interview.'};
-    if(!integer(choice,0,3)||a.answers.length>=a.questionIds.length)
-      return {ok:false,message:'Choose one of the four interview answers.'};
-    a.answers.push(choice);
-    if(a.answers.length===a.questionIds.length)
-      return {ok:true,done:true,result:evaluate(state,a)};
-    return {ok:true,done:false,index:a.answers.length};
+    if(!a||!['interview','second-interview'].includes(a.stage))
+      return {ok:false,message:'No active interview.'};
+    if(!integer(choice,0,3))return {ok:false,message:'Choose one of four interview answers.'};
+    const second=a.stage==='second-interview',responses=second?a.secondAnswers:a.answers;
+    const ids=second?a.secondQuestionIds:a.questionIds;
+    if(responses.length>=ids.length)return {ok:false,message:'Interview round already completed.'};
+    responses.push(choice);
+    if(responses.length<ids.length)return {ok:true,done:false,index:responses.length};
+    if(!second){
+      const gate=firstScore(state,a);
+      if(!gate)return {ok:false,message:'Unable to score the interview.'};
+      if(state.version===2)a.firstResult=gate;
+      if(!firstPass(gate)){
+        a.result={outcome:'rejected',reason:'interview',
+          interviewPercent:gate.interviewPercent,composite:gate.composite,
+          threshold:gate.threshold,
+          ...(state.version===2?{rounds:1,secondRoundPercent:null}:{})};
+        a.stage='rejected';
+        return {ok:true,done:true,result:a.result};
+      }
+      if(state.version===2&&a.secondQuestionIds.length){
+        a.stage='second-invited';
+        return {ok:true,done:false,secondRound:true};
+      }
+    }
+    a.result=resultFor(state,a);
+    a.stage=a.result.outcome==='offered'?'offered':'rejected';
+    return {ok:true,done:true,result:a.result};
   }
   function decline(state){
     const a=current(state);
@@ -773,15 +879,17 @@
   }
   function snapshot(state){
     const a=current(state);
-    if(!a)return null;
-    if(a.stage!=='offered')return null;
+    if(!a||a.stage!=='offered'||!valid(state))return null;
     return {employerId:a.employerId,interviewPercent:a.result.interviewPercent,
       composite:a.result.composite,threshold:a.result.threshold,
-      questionsAsked:a.questionIds.length,applications:state.attempts.length,
+      questionsAsked:a.questionIds.length+(a.secondQuestionIds?.length||0),
+      ...(state.version===2?{rounds:a.result.rounds,
+        secondRoundPercent:a.result.secondRoundPercent}:{}),
+      applications:state.attempts.length,
       rejected:state.attempts.filter(x=>x.stage==='rejected').length};
   }
-  function valid(state){
-    if(!state||state.version!==1||!state.candidate||
+  function validCommon(state){
+    if(!state||![1,2].includes(state.version)||!state.candidate||
       !validName(state.candidate.name)||!MC.cvValid(state.candidate.cv)||
       !Array.isArray(state.attempts)||state.attempts.length>20)return false;
     if(state.activeId!==null&&typeof state.activeId!=='string')return false;
@@ -792,32 +900,89 @@
         a.ordinal!==i+1||a.id!=='A'+(i+1)||
         a.screenScore!==screenScore(state.candidate,d)||
         !STAGES.includes(a.stage)||!Array.isArray(a.questionIds)||
-        a.questionIds.join(',')!==questionSet(d.id,a.ordinal).join(',')||
         !Array.isArray(a.answers)||a.answers.length>a.questionIds.length||
         !a.answers.every(c=>integer(c,0,3)))return false;
       seen.add(a.employerId);
-      const short=a.screenScore>=48;
-      const finished=a.answers.length===a.questionIds.length;
-      if((!short&&(a.stage!=='rejected'||a.answers.length!==0||
-        a.result?.reason!=='cv'))||
-        (short&&a.stage==='invited'&&
-          (a.answers.length!==0||a.result!==null))||
-        (a.stage==='interview'&&(!short||finished||a.result!==null))||
-        (['offered','declined'].includes(a.stage)&&(!finished||!short))||
-        (a.stage==='rejected'&&short&&!finished))return false;
-      if(short&&finished&&a.stage!=='interview'){
-        const evaluated=copy(a.result);
-        if(!evaluated||evaluated.reason!=='interview')return false;
-        const scratch={...a,stage:'interview',result:null};
-        const recalculated=evaluate(state,scratch);
-        if(JSON.stringify(evaluated)!==JSON.stringify(recalculated))return false;
-        if(a.stage==='rejected'&&evaluated.outcome!=='rejected')return false;
-        if(['offered','declined'].includes(a.stage)&&evaluated.outcome!=='offered')return false;
-      }
     }
     if(state.attempts.length===0)return state.activeId===null;
     return state.activeId===null||
       state.activeId===state.attempts[state.attempts.length-1].id;
+  }
+  function validLegacy(state){
+    if(!validCommon(state))return false;
+    for(const a of state.attempts){
+      if(a.questionIds.join(',')!==legacyQuestionSet(a.employerId,a.ordinal).join(',')||
+        !['invited','interview','offered','rejected','declined'].includes(a.stage))return false;
+      const shortlist=a.screenScore>=48,done=a.answers.length===a.questionIds.length;
+      if(!shortlist&&(a.stage!=='rejected'||a.answers.length||
+        a.result?.reason!=='cv'))return false;
+      if(shortlist&&a.stage==='invited'&&(a.answers.length||a.result!==null))return false;
+      if(a.stage==='interview'&&(!shortlist||done||a.result!==null))return false;
+      if(['offered','declined'].includes(a.stage)&&(!shortlist||!done))return false;
+      if(a.stage==='rejected'&&shortlist&&!done)return false;
+      if(shortlist&&done){
+        const r=resultFor(state,a);
+        if(!r||JSON.stringify(r)!==JSON.stringify(a.result))return false;
+        if(['offered','declined'].includes(a.stage)&&r.outcome!=='offered')return false;
+        if(a.stage==='rejected'&&r.outcome!=='rejected')return false;
+      }
+    }
+    return true;
+  }
+  function validV2(state){
+    if(!validCommon(state))return false;
+    for(const a of state.attempts){
+      const plan=questionPlan(a.employerId,a.ordinal);
+      if(a.questionIds.join(',')!==plan.firstIds.join(',')||
+        !Array.isArray(a.secondQuestionIds)||
+        a.secondQuestionIds.join(',')!==plan.secondIds.join(',')||
+        !Array.isArray(a.secondAnswers)||
+        a.secondAnswers.length>a.secondQuestionIds.length||
+        !a.secondAnswers.every(x=>integer(x,0,3)))return false;
+      const shortlist=a.screenScore>=48,firstDone=a.answers.length===a.questionIds.length,
+        secondDone=a.secondAnswers.length===a.secondQuestionIds.length;
+      if(!shortlist){
+        if(a.stage!=='rejected'||a.answers.length||a.secondAnswers.length||
+          a.result?.reason!=='cv'||a.firstResult!==null)return false;
+        continue;
+      }
+      if(a.stage==='invited'){
+        if(a.answers.length||a.secondAnswers.length||a.firstResult!==null||a.result!==null)return false;
+        continue;
+      }
+      if(a.stage==='interview'){
+        if(firstDone||a.firstResult!==null||a.secondAnswers.length||a.result!==null)return false;
+        continue;
+      }
+      if(!firstDone)return false;
+      const gate=firstScore(state,a),passes=firstPass(gate);
+      if(!gate||JSON.stringify(a.firstResult)!==JSON.stringify(gate))return false;
+      if(a.stage==='second-invited'||a.stage==='second-interview'){
+        if(!passes||!a.secondQuestionIds.length||a.result!==null)return false;
+        if(a.stage==='second-invited'&&a.secondAnswers.length)return false;
+        if(a.stage==='second-interview'&&secondDone)return false;
+        continue;
+      }
+      if(!['offered','rejected','declined'].includes(a.stage))return false;
+      if(!passes){
+        if(a.stage!=='rejected'||a.secondAnswers.length||
+          JSON.stringify(a.result)!==JSON.stringify({
+            outcome:'rejected',reason:'interview',
+            interviewPercent:gate.interviewPercent,composite:gate.composite,
+            threshold:gate.threshold,rounds:1,secondRoundPercent:null
+          }))return false;
+        continue;
+      }
+      if(!secondDone)return false;
+      const result=resultFor(state,a);
+      if(!result||JSON.stringify(a.result)!==JSON.stringify(result))return false;
+      if(['offered','declined'].includes(a.stage)&&result.outcome!=='offered')return false;
+      if(a.stage==='rejected'&&result.outcome!=='rejected')return false;
+    }
+    return true;
+  }
+  function valid(state){
+    return state?.version===1?validLegacy(state):validV2(state);
   }
   function read(){
     try{
@@ -836,7 +1001,8 @@
     try{localStorage.removeItem(STORAGE_KEY);return true;}catch(_){return false;}
   }
   window.MotorTradeRecruitment=Object.freeze({
-    QUESTIONS,LEVEL_LENGTH,initial,valid,current,apply,beginInterview,answer,
-    decline,snapshot,displayQuestion,pointsFor,read,save,clear,screenScore
+    QUESTIONS:BANK,LEVEL_LENGTH,SECOND_LENGTH,questionPlan,requiresSecond,
+    initial,valid,current,apply,beginInterview,answer,decline,snapshot,
+    displayQuestion,pointsFor,read,save,clear,screenScore
   });
 })();
