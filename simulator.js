@@ -1374,6 +1374,11 @@
     const previousAccount=ACCOUNT?.activeAccount||null;
     if(ACCOUNT&&!ACCOUNT.startGuestMode())return;
     const newCareer=E.createStaffed(employer.name,[]);
+    if(!IND.assignOpeningTeam(newCareer,employer.id)){
+      if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
+      window.alert('Could not initialise the employer’s real starting team. No career was created.');
+      return;
+    }
     const appointment=MC.enrol(newCareer,managerName,employer.id,cv);
     if(!appointment.ok){
       if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
