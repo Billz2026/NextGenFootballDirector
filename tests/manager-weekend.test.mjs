@@ -171,3 +171,14 @@ test('unsupported session states and fake results never pass save validation',()
  };
  assert.equal(E.normalize(fake),null);
 });
+
+test('no stock means no compulsory Saturday ceremony',()=>{
+ const d=MC.firstJobs()[0];
+ const state=E.createStaffed(d.name,[]);
+ assert.equal(MC.enrol(state,'Alex Morgan',d.id,MC.DEFAULT_CV).ok,true);
+ state.messages=MC.welcome(state);
+ state.day=6;
+ assert.equal(WEEK.ensure(state),false);
+ assert.equal(WEEK.blocksContinue(state),false);
+ assert.equal(WEEK.render(state),'');
+});
