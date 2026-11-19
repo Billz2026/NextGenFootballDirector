@@ -52,10 +52,11 @@
       !MC.dealer(employerId))return false;
     const seq=Number(employerId.split('-')[1]),roster=P.openingTeam();
     const candidates=P.applicants(1);
-    const multipliers={sales:3,buyer:5,technician:7,supervisor:11};
-    const chosen=roster.map((base,index)=>{
+    const offsets={sales:seq-1,buyer:Math.floor((seq-1)/4),
+      technician:Math.floor((seq-1)/2),supervisor:Math.floor((seq-1)/8)};
+    const chosen=roster.map(base=>{
       const pool=candidates.filter(p=>p.role===base.role);
-      const pick=pool[(seq*multipliers[base.role]+index)%pool.length];
+      const pick=pool[offsets[base.role]%pool.length];
       if(!pick)throw Error('Missing starter candidate: '+base.role);
       return {...base,name:pick.name,candidateId:pick.id,
         skills:{...pick.skills},monthlySalary:pick.monthlySalary,
