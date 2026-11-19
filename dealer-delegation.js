@@ -220,7 +220,7 @@
   function process(state,E){
     const d=state.delegation;
     expire(state);
-    const session=state.deadlineSession||0;
+    const session=window.MotorTradeWeekend?.slot(state)??(state.deadlineSession||0);
     if(!d.enabled||d.lastRunDay===state.day&&d.lastRunSession===session)
       return {ok:true,processed:false,served:0,completed:0,lost:0,escalated:0,assigned:0};
     d.lastRunDay=state.day;d.lastRunSession=session;
