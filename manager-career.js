@@ -747,7 +747,9 @@
     return !!r&&r.employerId===d.id&&
       whole(r.interviewPercent,0,100)&&whole(r.composite,0,100)&&
       whole(r.threshold,40,100)&&whole(r.questionsAsked,5,15)&&
-      (r.rounds===undefined||
+      (r.rounds===undefined?
+        r.questionsAsked===
+          ({INDEPENDENT:5,ESTABLISHED:6,REGIONAL:7,PRESTIGE:8,ELITE:10}[d.tier]):
         (whole(r.rounds,1,2)&&
           (r.rounds===1?
             (r.secondRoundPercent===null&&r.questionsAsked===
