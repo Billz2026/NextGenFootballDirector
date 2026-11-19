@@ -443,6 +443,10 @@
         (saved.version>=7? v.prepSpent<=100000 : v.prepSpent<=v.prepBudget))) &&
       cashValue(v.retail) && integer(v.acquiredDay) &&
       v.acquiredDay >= 1 && v.acquiredDay <= saved.day &&
+      // Only explicitly audited employer opening stock may carry pre-appointment age.
+      (v.openingAgeDays===undefined||
+        saved.managerCareer?.turnaround?.cars?.some(c=>
+          c.id===v.id&&c.openingAgeDays===v.openingAgeDays)) &&
       (v.status !== 'listed' || (cashValue(v.asking) && v.asking > 0)) &&
       (v.status === 'acquired' ? v.prepSpent===0 : v.prepSpent>0) &&
       (v.cashOffer === null || v.cashOffer === undefined || cashValue(v.cashOffer)) &&
