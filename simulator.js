@@ -1582,6 +1582,9 @@
   document.addEventListener('click', event => {
     const button = event.target.closest('button[data-action],button[data-page]');
     if (!button) return;
+    if(screen==='induction'&&![
+      'induction-next','induction-choice','induction-complete','menu'
+    ].includes(button.dataset.action))return;
     const destination = button.dataset.page;
     if (destination && Object.prototype.hasOwnProperty.call(PAGES, destination)) {
       if(destination==='group'&&career?.managerCareer){
@@ -1616,6 +1619,50 @@
       render();return;
     }
     switch (button.dataset.action) {
+      case 'induction-next':{
+        if(screen!=='induction'||!career||!IND.pending(career))break;
+        const previous=E.normalize(JSON.parse(JSON.stringify(career)));
+        if(!previous){window.alert('Cannot verify the current career save.');break;}
+        const result=IND.advance(career);
+        if(!result.ok){window.alert(result.message);break;}
+        if(!persistCareer()){
+          career=previous;
+          window.alert('Could not save induction progress. No change was committed.');
+        }
+        render();
+        break;
+      }
+      case 'induction-choice':{
+        if(screen!=='induction'||career?.managerCareer?.induction?.step!==3)break;
+        const key=button.dataset.option;
+        if(button.dataset.kind==='sales'&&
+          IND.SALES_POLICIES.some(p=>p.key===key))inductionSalesChoice=key;
+        if(button.dataset.kind==='operations'&&
+          IND.OPERATIONS_POLICIES.some(p=>p.key===key))inductionOpsChoice=key;
+        if(button.dataset.kind==='priority'&&
+          Object.hasOwn(IND.PRIORITIES,key))inductionPriorityChoice=key;
+        renderInduction();
+        break;
+      }
+      case 'induction-complete':{
+        if(screen!=='induction'||!career||!IND.pending(career))break;
+        const before=E.normalize(JSON.parse(JSON.stringify(career)));
+        if(!before){window.alert('Could not verify the existing career state.');break;}
+        const result=IND.complete(career,inductionSalesChoice,
+          inductionOpsChoice,inductionPriorityChoice);
+        if(!result.ok){window.alert(result.message);break;}
+        if(!persistCareer()){
+          career=before;screen='induction';
+          window.alert('Could not save the confirmed management policies. No changes were committed.');
+          render();break;
+        }
+        screen='career';currentPage='dashboard';
+        eventNotice=result.message;
+        inductionSalesChoice=null;inductionOpsChoice=null;
+        inductionPriorityChoice=null;
+        render();
+        break;
+      }
       case 'begin-interview':{
         const next=jobSearch?JSON.parse(JSON.stringify(jobSearch)):null;
         if(!next)return;
@@ -1625,7 +1672,8 @@
         break;
       }
       case 'select-interview-answer':{
-        if(screen!=='recruitment'||JR.current(jobSearch)?.stage!=='interview')break;
+        if(screen!=='recruitment'||!['interview','second-interview'].includes(
+          JR.current(jobSearch)?.stage))break;
         const choice=Number(button.dataset.choice);
         if(Number.isSafeInteger(choice)&&choice>=0&&choice<=3){
           selectedInterviewAnswer=choice;
