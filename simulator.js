@@ -856,6 +856,21 @@
       m.recruitment.interviewPercent+'/100</strong></div></div>'+
       '<p class="manager-cv-explainer">Interview passed and the employment offer accepted. The record '+
       'is saved with your career, separately from your employer’s finances.</p></section>':'';
+    const induction=m.induction?.completed?
+      '<section class="manager-cv-panel"><p class="manager-cv-kicker">INITIAL MANAGEMENT HANDOVER</p>'+
+      '<h2>Induction & authority</h2><div class="manager-cv-details">'+
+      '<div class="manager-cv-detail"><small>INDUCTION STATUS</small><strong>Completed · Day '+
+      m.induction.completedDay+'</strong></div>'+
+      '<div class="manager-cv-detail"><small>FIRST-WEEK PRIORITY</small><strong>'+
+      escapeText(IND.PRIORITIES[m.induction.firstPriority]?.title||'Not recorded')+'</strong></div>'+
+      '<div class="manager-cv-detail"><small>OPENING SALES POLICY</small><strong>'+
+      escapeText(IND.SALES_POLICIES.find(p=>p.key===m.induction.salesPolicy)?.name||'Not recorded')+
+      '</strong></div>'+
+      '<div class="manager-cv-detail"><small>OPENING BUYING/WORKSHOP POLICY</small><strong>'+
+      escapeText(IND.OPERATIONS_POLICIES.find(p=>p.key===m.induction.operationsPolicy)?.name||
+      'Not recorded')+'</strong></div></div>'+
+      '<p class="manager-cv-explainer">Current policy limits can be adjusted later through the '+
+      'Sales Office and Buying/Workshop management controls. This records your initial choice.</p></section>':'';
     node.innerHTML='<div class="manager-cv-layout">'+
       '<section class="manager-cv-panel"><p class="manager-cv-kicker">PERSONAL DETAILS & PREVIOUS EXPERIENCE</p>'+
       '<h2>'+escapeText(m.managerName)+'</h2>'+
@@ -868,7 +883,7 @@
       '<div><small>BOARD CONFIDENCE</small><strong>'+m.boardConfidence+'/100</strong></div></div>'+
       '<p class="manager-cv-probation">'+escapeText(trial)+'</p>'+
       '<p class="manager-cv-explainer">A small independent has taken a chance on you. Your CV has no prior managerial record. Board reviews are active, but sackings, contract renewal and job transfers are still planned.</p></section>'+
-      recruitment+
+      recruitment+induction+
       '<section class="manager-cv-panel"><p class="manager-cv-kicker">BOARD REVIEW HISTORY</p>'+
       '<h2>Performance record</h2>'+latest+'</section></div></div>';
   }
