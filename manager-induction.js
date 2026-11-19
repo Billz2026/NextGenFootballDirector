@@ -52,8 +52,8 @@
       !MC.dealer(employerId))return false;
     const seq=Number(employerId.split('-')[1]),roster=P.openingTeam();
     const candidates=P.applicants(1);
-    const offsets={sales:seq-1,buyer:Math.floor((seq-1)/4),
-      technician:Math.floor((seq-1)/2),supervisor:Math.floor((seq-1)/8)};
+    const offsets={sales:seq-1,buyer:Math.floor((seq-1)/8),
+      technician:Math.floor((seq-1)/4),supervisor:Math.floor((seq-1)/16)};
     const chosen=roster.map(base=>{
       const pool=candidates.filter(p=>p.role===base.role);
       const pick=pool[offsets[base.role]%pool.length];
