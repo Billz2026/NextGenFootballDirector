@@ -746,7 +746,14 @@
   function recruitmentValid(r,d){
     return !!r&&r.employerId===d.id&&
       whole(r.interviewPercent,0,100)&&whole(r.composite,0,100)&&
-      whole(r.threshold,40,100)&&whole(r.questionsAsked,5,10)&&
+      whole(r.threshold,40,100)&&whole(r.questionsAsked,5,15)&&
+      (r.rounds===undefined||
+        (whole(r.rounds,1,2)&&
+          (r.rounds===1?
+            (r.secondRoundPercent===null&&r.questionsAsked===
+              ({INDEPENDENT:5,ESTABLISHED:6,REGIONAL:7,PRESTIGE:8,ELITE:10}[d.tier])):
+            (whole(r.secondRoundPercent,50,100)&&r.questionsAsked===
+              ({REGIONAL:10,PRESTIGE:12,ELITE:15}[d.tier])))))&&
       whole(r.applications,1,20)&&whole(r.rejected,0,r.applications-1)&&
       r.interviewPercent>=45&&r.composite>=r.threshold;
   }
@@ -757,6 +764,8 @@
       !whole(m.boardConfidence,0,100)||m.startedDay!==1||
       (m.cv!==undefined&&!cvValid(m.cv))||
       (m.recruitment!==undefined&&!recruitmentValid(m.recruitment,d))||
+      (m.induction!==undefined&&
+        !window.MotorTradeInduction?.valid(m.induction,state))||
       !whole(m.lastReviewMonth,0,1200)||m.lastReviewMonth>Math.max(0,Math.ceil(state.day/28))||
       !Array.isArray(m.reviews)||m.reviews.length>100||
       !Array.isArray(m.history)||m.history.length!==1||
@@ -780,6 +789,7 @@
     startedDay:m.startedDay,boardConfidence:m.boardConfidence,
     ...(m.cv?{cv:cvCopy(m.cv)}:{}),
     ...(m.recruitment?{recruitment:{...m.recruitment}}:{}),
+    ...(m.induction?{induction:window.MotorTradeInduction.clone(m.induction)}:{}),
     lastReviewMonth:m.lastReviewMonth,reviews:m.reviews.map(r=>({...r})),
     history:m.history.map(h=>({...h}))
   }:null;
