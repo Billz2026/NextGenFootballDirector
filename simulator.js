@@ -1062,7 +1062,8 @@
     }
     byId('topbar-page').textContent = PAGES[currentPage];
     byId('continue-day').disabled = career.day >= MAX_DAY;
-    byId('continue-label').textContent=D.isDealDay(career.day)?
+    byId('continue-label').textContent=WEEKEND.blocksContinue(career)?
+      'WEEKEND TRADING':D.isDealDay(career.day)?
       (career.deadlineSession>=D.PHASES.length-1?'CLOSE MONTH':'NEXT SESSION'):'CONTINUE';
     byId('save-warning').hidden = !saveWarningText;
     byId('save-warning').textContent = saveWarningText;
