@@ -772,6 +772,8 @@
         !window.MotorTradeInduction?.valid(m.induction,state))||
       (m.turnaround!==undefined&&
         !window.MotorTradeTurnaround?.valid(m.turnaround,state))||
+      (m.weekendTrading!==undefined&&
+        !window.MotorTradeWeekend?.valid(m.weekendTrading,state))||
       !whole(m.lastReviewMonth,0,1200)||m.lastReviewMonth>Math.max(0,Math.ceil(state.day/28))||
       !Array.isArray(m.reviews)||m.reviews.length>100||
       !Array.isArray(m.history)||m.history.length!==1||
@@ -797,6 +799,7 @@
     ...(m.recruitment?{recruitment:{...m.recruitment}}:{}),
     ...(m.induction?{induction:window.MotorTradeInduction.clone(m.induction)}:{}),
     ...(m.turnaround?{turnaround:window.MotorTradeTurnaround.clone(m.turnaround)}:{}),
+    ...(m.weekendTrading?{weekendTrading:window.MotorTradeWeekend.clone(m.weekendTrading)}:{}),
     lastReviewMonth:m.lastReviewMonth,reviews:m.reviews.map(r=>({...r})),
     history:m.history.map(h=>({...h}))
   }:null;
