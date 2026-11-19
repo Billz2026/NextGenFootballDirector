@@ -11,7 +11,7 @@ const localStorage={
 };
 const window={};
 const ctx={window,localStorage,Date,Intl};
-for(const path of ['manager-career.js','manager-recruitment.js']){
+for(const path of ['manager-career.js','manager-interview-bank.js','manager-recruitment.js']){
   vm.runInNewContext(readFileSync(new URL('../'+path,import.meta.url),'utf8'),ctx,{filename:path});
 }
 const MC=window.MotorTradeManagerCareer,JR=window.MotorTradeRecruitment;
@@ -28,9 +28,13 @@ function fillInterview(state,score=3){
     assert.ok(++steps<=10);
   }
 }
-test('question bank has exactly 40 distinct motor-trade scenarios',()=>{
-  assert.equal(JR.QUESTIONS.length,40);
-  assert.equal(new Set(JR.QUESTIONS.map(q=>q.id)).size,40);
+test('question bank contains 150 nonduplicate motor-trade scenarios',()=>{
+  assert.equal(JR.QUESTIONS.length,150);
+  assert.equal(new Set(JR.QUESTIONS.map(q=>q.id)).size,150);
+  assert.equal(new Set(JR.QUESTIONS.map(q=>q.text)).size,150);
+  assert.deepEqual([1,2,3,4,5].map(level=>
+    JR.QUESTIONS.filter(q=>q.level===level).length),
+    [30,25,25,20,10]);
   assert.deepEqual({...JR.LEVEL_LENGTH},{INDEPENDENT:5,ESTABLISHED:6,
     REGIONAL:7,PRESTIGE:8,ELITE:10});
 });
@@ -138,4 +142,45 @@ test('hire certificate validates with a manager profile and survives clone',()=>
   assert.equal(MC.valid(MC.clone(dealer.managerCareer),dealer),true);
   dealer.managerCareer.recruitment.interviewPercent=0;
   assert.equal(MC.valid(dealer.managerCareer,dealer),false);
+});
+
+test('question rotation respects employer reputation and does not repeat prompts',()=>{
+  for(const d of MC.DEALERS){
+    const plan=JR.questionPlan(d.id,1);
+    assert.ok(plan);
+    assert.equal(plan.firstIds.length,JR.LEVEL_LENGTH[d.tier]);
+    assert.equal(plan.secondIds.length,
+      JR.requiresSecond(d)?JR.SECOND_LENGTH[d.tier]:0);
+    assert.equal(new Set([...plan.firstIds,...plan.secondIds]).size,
+      plan.firstIds.length+plan.secondIds.length,d.name);
+    assert.ok(plan.firstIds.every(id=>id.startsWith('N')));
+    assert.ok(plan.firstIds.every(id=>
+      JR.QUESTIONS.find(q=>q.id===id).level<=d.stars));
+    assert.deepEqual(JR.questionPlan(d.id,1),plan);
+  }
+  assert.ok(MC.DEALERS.some(d=>JR.requiresSecond(d)),
+    'higher rated employers should sometimes require another interview');
+});
+
+test('a senior final interview starts only after first round succeeds',()=>{
+  const employer=MC.DEALERS.find(d=>d.tier==='ELITE');
+  const plan=JR.questionPlan(employer.id,1);
+  const state=candidate(),attempt={
+    id:'A1',employerId:employer.id,ordinal:1,screenScore:80,
+    stage:'invited',questionIds:plan.firstIds,answers:[],
+    secondQuestionIds:plan.secondIds,secondAnswers:[],firstResult:null,result:null
+  };
+  state.attempts.push(attempt);state.activeId=attempt.id;
+  assert.equal(JR.beginInterview(state).ok,true);
+  fillInterview(state,3);
+  assert.equal(attempt.stage,'second-invited');
+  assert.equal(attempt.answers.length,10);
+  assert.equal(attempt.secondAnswers.length,0);
+  assert.equal(JR.beginInterview(state).ok,true);
+  assert.equal(attempt.stage,'second-interview');
+  fillInterview(state,3);
+  assert.equal(attempt.stage,'offered');
+  assert.equal(attempt.result.rounds,2);
+  assert.equal(attempt.result.secondRoundPercent,100);
+  assert.equal(attempt.answers.length+attempt.secondAnswers.length,15);
 });
