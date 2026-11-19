@@ -1,0 +1,58 @@
+/* Saturday Trading — gameplay-first interactive panel */
+#screen-career .weekend-desk{margin:8px 0 14px;border:1px solid #5b574e;border-left:4px solid #ba2442;
+ background:linear-gradient(120deg,#17232b,#111a21);padding:16px 18px;color:#ecf1f2;border-radius:5px}
+#screen-career .weekend-kicker{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
+ color:#d9b78c;font:800 9px/1.4 var(--body);letter-spacing:.09em}
+#screen-career .weekend-desk h2{font:850 clamp(19px,2.4vw,27px)/1.2 var(--body);
+ letter-spacing:-.04em;color:#f7f7f7;margin:9px 0 5px}
+#screen-career .weekend-lead{color:#b7c4cd;font:550 11px/1.6 var(--body);margin:0 0 12px}
+#screen-career .weekend-numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#screen-career .weekend-numbers div{border:1px solid #42535d;background:#1e2a32;
+ padding:11px 13px;border-radius:4px}
+#screen-career .weekend-numbers small{color:#adbac2;display:block;font:750 9px/1.35 var(--body)}
+#screen-career .weekend-numbers strong{color:#f3f4f5;display:block;
+ font:850 clamp(15px,2vw,23px)/1.2 var(--body);margin-top:4px}
+#screen-career .weekend-brief{font:550 11px/1.7 var(--body);color:#b9c6cc;
+ margin:13px 0 12px}
+#screen-career .weekend-brief strong{color:#e9dfd2}
+#screen-career .weekend-strategies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#screen-career .weekend-strategies button{background:#24313a;border:1px solid #68737a;
+ border-radius:4px;text-align:left;padding:12px;cursor:pointer;color:#e9eff2;
+ box-shadow:inset 3px 0 #a92b44}
+#screen-career .weekend-strategies button:hover{border-color:#dfc098;background:#30404b}
+#screen-career .weekend-strategies strong{display:block;font:850 10px/1.5 var(--body)}
+#screen-career .weekend-strategies span{display:block;color:#b9c8cf;margin-top:5px;
+ font:500 10px/1.6 var(--body)}
+#screen-career .weekend-phase{display:flex;justify-content:space-between;align-items:center;gap:8px;
+ flex-wrap:wrap;padding:11px 0;margin-top:12px;border-top:1px solid #42505a;
+ border-bottom:1px solid #42505a}
+#screen-career .weekend-phase b{color:#eacda9;font:800 12px/1.4 var(--body)}
+#screen-career .weekend-phase span{color:#aebec7;font:800 9px/1.4 var(--body)}
+#screen-career .weekend-timeline{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
+#screen-career .weekend-timeline li{display:flex;align-items:center;gap:10px;padding:7px 9px;
+ background:#1d2a34;border:1px solid #33464e;border-radius:4px}
+#screen-career .weekend-timeline strong{min-width:118px;font:850 9px/1.4 var(--body);color:#d6bf9b}
+#screen-career .weekend-timeline span{color:#c3cfd5;font:550 10px/1.5 var(--body)}
+#screen-career .weekend-empty{color:#bac8d0;font:550 11px/1.6 var(--body);margin:12px 0}
+#screen-career .weekend-warning{background:#322924;border-left:3px solid #e0b36b;
+ padding:9px 12px;font:750 11px/1.5 var(--body);color:#f2d2a5}
+#screen-career .weekend-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+#screen-career .weekend-actions button,#screen-career .weekend-complete{
+ cursor:pointer;background:#f3f4f4;border:1px solid #f3f4f4;color:#172129;
+ border-radius:3px;padding:10px 14px;font:850 10px/1.4 var(--body);
+ box-shadow:inset 3px 0 #b72342}
+#screen-career .weekend-actions .weekend-secondary{background:#24313a;border-color:#6a7880;
+ color:#e7edef;box-shadow:none}
+#screen-career .weekend-actions button:hover,#screen-career .weekend-complete:hover{filter:brightness(1.12)}
+#screen-career .weekend-actions button:focus-visible,#screen-career .weekend-strategies button:focus-visible{
+ outline:2px solid #eec58e;outline-offset:2px}
+#screen-career .weekend-result{padding:12px 14px;margin:14px 0;
+ border:1px solid #5d675a;background:#232d28;border-radius:4px}
+#screen-career .weekend-result strong{font:850 12px/1.5 var(--body);color:#e7ddc7}
+#screen-career .weekend-result p,#screen-career .weekend-finished{
+ color:#c2d1ca;font:600 11px/1.6 var(--body);margin:5px 0}
+@media(max-width:850px){#screen-career .weekend-strategies{grid-template-columns:1fr}
+ #screen-career .weekend-numbers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){#screen-career .weekend-desk{padding:12px}
+ #screen-career .weekend-timeline li{align-items:flex-start;flex-direction:column;gap:3px}
+ #screen-career .weekend-actions button{width:100%}}
