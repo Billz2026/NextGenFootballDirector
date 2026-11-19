@@ -10,7 +10,9 @@
     {from:30,until:44,label:'30+ DAYS',daily:14,discount:.04},
     {from:45,until:Infinity,label:'45+ DAYS',daily:28,discount:.07}
   ]);
-  const age=(state,v,day=state.day)=>Math.max(0,day-v.acquiredDay);
+  // Day-one employer inventory predates the player's appointment.
+  // Count its verified opening age without fabricating a negative acquisition day.
+  const age=(state,v,day=state.day)=>Math.max(0,day-v.acquiredDay+(v.openingAgeDays||0));
   const tier=days=>TIERS.findLast(t=>days>=t.from)||TIERS[0];
   const fee=days=>tier(days).daily;
   const chargeFor=(state,day=state.day)=>(state.vehicles||[])
