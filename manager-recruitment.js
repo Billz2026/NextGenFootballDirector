@@ -802,19 +802,24 @@
     if(scored.some(x=>!integer(x,0,3))||!ids.length)return null;
     return Math.round(100*scored.reduce((n,v)=>n+v,0)/(3*ids.length));
   }
-  function scoreInfo(candidate,d,screen,interviewPercent){
-    const reputationFit=Math.max(0,Math.min(100,60+
-      (MC.START_REPUTATION-d.requiredReputation)*2));
+  function scoreInfo(candidate,d,screen,interviewPercent,version=2){
+    // Older pending v1 applications retain their exact historical score.
+    // New high-tier plans use a screened baseline; they are still locked to
+    // entry-level applicants until the proper career mobility system ships.
+    const reputationFit=version===1?
+      Math.max(0,Math.min(100,60+(MC.START_REPUTATION-d.requiredReputation)*2)):
+      Math.max(55,Math.min(100,60+(MC.START_REPUTATION-d.requiredReputation)*2));
     const previousPerformance=55;
     const composite=Math.round(.4*interviewPercent+.25*reputationFit+
       .2*previousPerformance+.15*screen);
-    const threshold=49+Math.max(0,d.monthlyTarget-2)*5;
+    const threshold=version===1?49+Math.max(0,d.monthlyTarget-2)*5:
+      Math.min(70,49+Math.max(0,d.monthlyTarget-2)*5);
     return {interviewPercent,composite,threshold};
   }
   function firstScore(state,a){
     const d=MC.dealer(a.employerId);
     const p=percent(a.answers,a.questionIds,d.id);
-    return p===null?null:scoreInfo(state.candidate,d,a.screenScore,p);
+    return p===null?null:scoreInfo(state.candidate,d,a.screenScore,p,state.version);
   }
   function finalScore(state,a){
     const d=MC.dealer(a.employerId),first=firstScore(state,a);
@@ -824,7 +829,7 @@
     const second=percent(a.secondAnswers,a.secondQuestionIds,d.id);
     if(second===null)return null;
     const combined=Math.round(.6*first.interviewPercent+.4*second);
-    return {...scoreInfo(state.candidate,d,a.screenScore,combined),
+    return {...scoreInfo(state.candidate,d,a.screenScore,combined,state.version),
       secondRoundPercent:second,rounds:2};
   }
   function firstPass(result){
