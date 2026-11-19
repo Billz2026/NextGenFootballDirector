@@ -762,9 +762,10 @@
         '<div><small>COMPANY FORECOURT CAPACITY</small><strong>'+
         SITE.storageLimit(career)+' vehicles</strong></div></div>'+
         '<div class="induction-board"><strong>Opening risk review</strong>'+
-        '<p>You have no vehicle stock yet, so purchasing decisions matter. '+
-        'Buying too many cars quickly can leave the business short of payroll, '+
-        'repair money and rent. The supervisor will observe the spending caps you authorise next.</p></div>'+
+        '<p>You inherit three employer-owned vehicles, including a long-held car and one '+
+        'that still needs proper repair and QC. The opening book value is already invested; '+
+        'it is not a new cash purchase. Buying further stock can still threaten payroll, '+
+        'repair reserves and rent. Your next decisions set the team’s financial authority.</p></div>'+
         next('SET MANAGEMENT POLICIES');
     }else if(i.step===3){
       const options=(kind,items,chosen,detail)=>
