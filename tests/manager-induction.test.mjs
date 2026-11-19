@@ -80,6 +80,8 @@ test('accepted manager induction applies genuine sales and workshop policies onc
   assert.equal(s.managerCareer.induction.completedDay,1);
   const emails=s.messages.filter(x=>x.reference==='manager-induction:'+d.id);
   assert.equal(emails.length,1);
+  assert.equal(emails[0].linkPage,'manager');
+  assert.equal(emails[0].category,'operations');
   const validated=E.normalize(clone(s));
   assert.ok(validated,'completed induction must survive browser save/reload');
   assert.equal(validated.managerCareer.induction.firstPriority,'liquidity');
@@ -98,4 +100,19 @@ test('tampered unfinished induction cannot be advanced to day 2',()=>{
   const s=create(MC.firstJobs()[0]);
   s.day=2;
   assert.equal(E.normalize(clone(s)),null);
+});
+
+test('induction manager-link email survives real save validation',()=>{
+  const d=MC.firstJobs()[0],state=create(d);
+  for(let step=0;step<3;step++)assert.equal(IND.advance(state).ok,true);
+  assert.equal(IND.complete(state,'balanced','balanced','liquidity').ok,true);
+  const saved=E.normalize(clone(state));
+  assert.ok(saved,'real Inbox-generated induction email must not invalidate the save');
+  const letter=saved.messages.find(m=>m.reference==='manager-induction:'+d.id);
+  assert.ok(letter);
+  assert.equal(letter.linkPage,'manager');
+  const invalid=clone(saved);
+  invalid.messages.find(m=>m.reference==='manager-induction:'+d.id).linkPage='invalid-route';
+  assert.equal(E.normalize(invalid),null,
+    'unknown Inbox routes must remain rejected');
 });
