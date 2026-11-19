@@ -21,6 +21,16 @@
 
 Start a **new management career** (do not overwrite an old one without exporting it). Accept an offer, finish induction, return to Dashboard. Confirm 3 inherited cars, an active 48-day aged stock decision and 14-day challenge, run actual workshop and sales activity, and test both price-holding and repricing across separate test careers. Old saves remain unchanged and will not receive stock retroactively. Observe day-8 and day-15 factual board reviews. Send screenshots or report any save error.
 
+## Sprint 2 status — Interactive Saturday Trading (19 November 2026)
+
+**Playable source implementation added:** Saturday Manager's Desk briefing; three genuine 09:00/12:00/15:00 showroom checkpoints; temporary, reversible live sales-authority tactics; new arrivals and customer handling through the existing real trading engines; manager interventions for live staff approval requests; genuine sales/walkaway and gross/cash results; saved/resumable checkpoints; and compact previous-week recap. This is not a separate trading economy and no sales are guaranteed.
+
+**Compatibility:** Unmodified owner and older manager saves remain valid. Managers need at least one actually advertised car for a Saturday session; without stock the calendar does not force meaningless extra clicks. The existing month-end Deal Day remains separate even when it falls on a Saturday. A new session cannot duplicate the previous session after refresh or acknowledgement.
+
+**Tests:** Integration simulation passed 20/20 starter employers, including each checkpoint, sales/approval cases, saving and acknowledgement. A sample deterministic sweep of the 20 varied employers produced six sessions with completed retail sales and eleven with staff exceptions. These are test scenario outcomes, not target probabilities. Full visual browser/deployment QA is still outstanding.
+
+**Next milestone:** Add genuine weekly operational objectives and relationship-based staff development. This sprint provides a substantially better session loop but is not the entire Football Manager-like metagame. See Sprint 4 below.
+
 ## 1. Product north star
 
 The intended emotional loop is **one more trading week**, analogous to "one more match" in Football Manager. The player is a newly employed manager, not a business owner. They should be constantly aware of their company, staff, stock, cash, customer commitments, upcoming trading opportunities and job security.
