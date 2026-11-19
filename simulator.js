@@ -1272,14 +1272,22 @@
         status+'. Open MANAGEMENT REPORTS or your inbox for the full results. '+
         eventNotice;
     }
+    const boardCheck=TURN.checkpoint(career);
+    if(boardCheck)eventNotice='Board check-in received. Your actual first-fortnight results are ready on the Manager’s Desk. '+eventNotice;
     const promotion=CP.promotion(beforeDayReputation,career.reputationScore);
     if(promotion)careerPromotion=promotion;
     // Return the Dealer Principal to Inbox after each normal trading day.
     // Preserve Events only when a NEW month-end report, Deal Day or an
     // outstanding compulsory meeting genuinely needs management attention.
     const mandatoryEvent=!!closed||enteringDealDay||D.meetingBlocksContinue(career);
-    if(!mandatoryEvent&&(career.delegation?.enabled||auctionEvent.pending))
-      currentPage='inbox';
+    if(!mandatoryEvent){
+      const managerTurnaround=TURN.progress(career);
+      if(auctionEvent.pending||DELEG.pending(career).length||OPS.pending(career).length)
+        currentPage='inbox';
+      else if(managerTurnaround?.active||boardCheck)
+        currentPage='dashboard';
+      else if(career.delegation?.enabled)currentPage='inbox';
+    }
     persistCareer();
     render();
   }
