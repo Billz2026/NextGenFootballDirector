@@ -178,7 +178,15 @@
  }
  function render(state){
    const c=session(state);
-   if(!c||c.day!==state.day)return '';
+   if(!c)return '';
+   if(c.day!==state.day){
+     if(c.status!=='complete'||!c.result)return '';
+     return '<section class="weekend-recap" aria-label="Previous Saturday trading results">'+
+       '<strong>LAST SATURDAY · DAY '+c.day+'</strong><span>'+
+       c.result.sales+' genuine handovers · '+money(c.result.gross)+' gross · '+
+       c.result.served+' visitors served · '+c.result.missed+' missed. '+
+       'Next Saturday, you can adjust your retail strategy.</span></section>';
+   }
    const m=metrics(state),title=c.status==='briefing'?'SATURDAY SALES BRIEFING':
      c.status==='live'?'LIVE TRADING SESSION':
      c.status==='review'?'TRADING RESULTS':'SATURDAY REVIEW COMPLETE';
@@ -201,7 +209,12 @@
        '<div class="weekend-strategies">'+OPTIONS.map(o=>
          '<button type="button" data-action="weekend-start" data-focus="'+o.key+'">'+
          '<strong>'+o.title+'</strong><span>'+o.detail+'</span></button>').join('')+
-       '</div></section>';
+       '</div>'+
+       (state.managerCareer.weekendTrading.history.length?
+         '<p class="weekend-previous">PREVIOUS SATURDAY · '+
+         state.managerCareer.weekendTrading.history.at(-1).completedSales+
+         ' handovers · '+money(state.managerCareer.weekendTrading.history.at(-1).gross)+
+         ' gross.</p>':'')+'</section>';
    }
    if(c.status==='live'){
      const events=state.customerHistory.slice(c.openingHistory)
