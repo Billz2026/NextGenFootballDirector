@@ -587,42 +587,53 @@
       return;
     }
     byId('recruitment-vacancies-link').hidden=
-      ['invited','interview','offered'].includes(attempt.stage);
+      ['invited','interview','second-invited','second-interview','offered'].includes(attempt.stage);
     const company=MC.dealer(attempt.employerId),candidate=jobSearch.candidate;
-    byId('recruitment-company-details').innerHTML='<small>APPOINTMENT AT</small>'+
+    byId('recruitment-company-details').innerHTML='<small>APPLICATION AT</small>'+
       '<strong>'+escapeText(company.name)+'</strong><p>'+
       escapeText(company.city)+' · '+escapeText(company.focus)+
-      '</p><p>'+company.monthlyTarget+' retail sales / month · '+company.stars+'-star employer</p>';
+      '</p><p>'+company.monthlyTarget+' retail sales / month · '+
+      company.stars+'-star dealership</p>';
     byId('recruitment-candidate-summary').innerHTML='<small>APPLICANT CV</small><p>'+
       escapeText(candidate.name)+' · '+MC.ageAt(candidate.cv.dateOfBirth)+' years · '+
       escapeText(MC.BACKGROUNDS[candidate.cv.previousRole])+' · '+
       candidate.cv.experienceYears+' years in motor trade</p><p>Application '+
-      jobSearch.attempts.length+' of 20 available entry-level employers</p>';
+      jobSearch.attempts.length+' of 20 accessible initial dealerships</p>';
     byId('recruitment-save-warning').hidden=!recruitmentSaveWarning;
     byId('recruitment-save-warning').textContent=recruitmentSaveWarning;
-    const count=attempt.questionIds.length;
+    const second=['second-invited','second-interview'].includes(attempt.stage);
+    const ids=second?attempt.secondQuestionIds:attempt.questionIds;
+    const responses=second?attempt.secondAnswers:attempt.answers;
+    const count=ids.length;
     const header=(label,step='')=>'<div class="recruitment-eyebrow"><span>'+
       escapeText(label)+'</span><span>'+escapeText(step)+'</span></div>';
     let html='';
-    if(attempt.stage==='invited'){
-      html=header('CV REVIEW COMPLETE','INTERVIEW INVITATION')+
-        '<h2 class="recruitment-stage-title">You have been shortlisted.</h2>'+
-        '<p class="recruitment-stage-copy">The owner of '+escapeText(company.name)+
-        ' has reviewed your limited experience and invited you to an interview. '+
-        'You will answer '+count+' practical motor-trade questions, one at a time. '+
-        'The board assesses your decisions alongside your CV and entry-level experience.</p>'+
-        '<div class="recruitment-result positive"><strong>Interview invitation received</strong>'+
-        '<p>Shortlisting does not guarantee an offer. Your answers will be recorded and '+
-        'the employer can reject your application.</p></div>'+
+    if(attempt.stage==='invited'||attempt.stage==='second-invited'){
+      html=header(second?'FIRST INTERVIEW PASSED':'CV REVIEW COMPLETE',
+        second?'FINAL INTERVIEW INVITATION':'INTERVIEW INVITATION')+
+        '<h2 class="recruitment-stage-title">'+(second?
+          'The board requests a final interview.':'You have been shortlisted.')+'</h2>'+
+        '<p class="recruitment-stage-copy">The leadership team at '+escapeText(company.name)+
+        (second?
+          ' has reviewed your first-round answers and requests a second, more demanding interview.':
+          ' has reviewed your CV and invited you to a management interview.')+
+        ' You will answer '+count+' practical questions, one at a time. '+
+        'The assessment is combined with your CV, reputation and previous track record.</p>'+
+        '<div class="recruitment-result positive"><strong>'+
+        (second?'Final-stage interview invitation':'First-stage interview invitation')+
+        '</strong><p>No job has been offered yet. '+
+        'The board may reject the application after any required round.</p></div>'+
         '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
-        'data-action="begin-interview">ATTEND INTERVIEW →</button></div>';
-    }else if(attempt.stage==='interview'){
-      const index=attempt.answers.length;
-      const q=JR.displayQuestion(attempt.questionIds[index],company.id);
-      if(!q){stage.textContent='Interview question unavailable. Your application has not been changed.';return;}
-      html=header('MANAGEMENT INTERVIEW','QUESTION '+(index+1)+' OF '+count)+
+        'data-action="begin-interview">'+
+        (second?'ATTEND FINAL INTERVIEW →':'ATTEND INTERVIEW →')+'</button></div>';
+    }else if(attempt.stage==='interview'||attempt.stage==='second-interview'){
+      const index=responses.length;
+      const q=JR.displayQuestion(ids[index],company.id);
+      if(!q){stage.textContent='Interview question unavailable. Your saved application was not changed.';return;}
+      html=header(second?'FINAL-STAGE MANAGEMENT INTERVIEW':'MANAGEMENT INTERVIEW',
+        'ROUND '+(second?'2':'1')+' · QUESTION '+(index+1)+' OF '+count)+
         '<div class="recruitment-progress" aria-hidden="true">'+
-        attempt.questionIds.map((_,i)=>'<span class="'+(i<=index?'complete':'')+'"></span>').join('')+
+        ids.map((_,i)=>'<span class="'+(i<=index?'complete':'')+'"></span>').join('')+
         '</div><h2 class="recruitment-question">'+escapeText(q.text)+'</h2>'+
         '<div class="recruitment-answer-list" role="group" aria-label="Interview answer choices">'+
         q.options.map((option,i)=>'<button type="button" class="recruitment-answer" '+
@@ -632,46 +643,46 @@
           '<span>'+escapeText(option)+'</span></button>').join('')+'</div>'+
         '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
         'data-action="submit-interview-answer" '+(selectedInterviewAnswer===null?'disabled':'')+'>'+
-        (index===count-1?'COMPLETE INTERVIEW →':'NEXT QUESTION →')+'</button></div>'+
-        '<p class="recruitment-stage-copy" style="margin-top:15px">Answers cannot be revised after submission. '+
-        'Correctness is not revealed during the interview.</p>';
+        (index===count-1?'COMPLETE THIS ROUND →':'NEXT QUESTION →')+'</button></div>'+
+        '<p class="recruitment-stage-copy" style="margin-top:15px">Answers cannot be revised once submitted. '+
+        'Your score is not shown between interview rounds.</p>';
     }else if(attempt.stage==='offered'){
       html=header('APPLICATION DECISION','FORMAL JOB OFFER')+
         '<h2 class="recruitment-stage-title">You have received an offer.</h2>'+
         '<p class="recruitment-stage-copy">'+escapeText(company.name)+
-        ' has offered you an acting dealership manager appointment. The company retains '+
-        'ownership of cash, stock and premises; you will manage its staff and operations.</p>'+
-        '<div class="recruitment-result positive"><strong>Employment offer — awaiting your decision</strong>'+
+        ' has offered you an acting dealership manager appointment. The company owns '+
+        'its cash, vehicles and staff; you are being employed to manage its operations.</p>'+
+        '<div class="recruitment-result positive"><strong>Employment offer · awaiting your response</strong>'+
         '<p>Interview assessment '+attempt.result.interviewPercent+'/100 · '+
-        'Overall application fit '+attempt.result.composite+'/100. '+
+        (attempt.result.rounds===2?'Two rounds completed · ':'')+
+        'Overall application assessment '+attempt.result.composite+'/100. '+
         'Initial 90-day probation with '+company.monthlyTarget+
-        ' retail sales expected each month. Opening company working capital '+
+        ' retail handovers expected per month. Company operating cash '+
         money.format(company.openingCash)+'.</p></div>'+
         '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
-        'data-action="accept-job-offer">ACCEPT EMPLOYMENT OFFER →</button>'+
+        'data-action="accept-job-offer">ACCEPT OFFER & BEGIN INDUCTION →</button>'+
         '<button type="button" class="recruitment-secondary" data-action="decline-job-offer">'+
         'DECLINE OFFER</button></div>';
     }else if(attempt.stage==='rejected'){
-      html=header('APPLICATION DECISION','NOT SHORTLISTED / NOT APPOINTED')+
+      html=header('APPLICATION DECISION','NOT APPOINTED')+
         '<h2 class="recruitment-stage-title">Application unsuccessful.</h2>'+
         '<p class="recruitment-stage-copy">'+(attempt.result.reason==='cv'?
-        'The dealership did not shortlist your CV for interview. More modest vacancies may be a closer fit.':
-        'The board reviewed your interview and CV but decided against offering you this vacancy.')+
-        ' You can apply to another eligible dealership. No job or company budget has been created.</p>'+
+        'This employer did not shortlist your CV. Consider vacancies with more suitable entry requirements.':
+        'The board reviewed your interview answers and CV, but did not offer you the position.')+
+        ' You remain unemployed and can apply elsewhere. No employer assets have been created.</p>'+
         '<div class="recruitment-result negative"><strong>Unsuccessful application</strong><p>'+
         (attempt.result.reason==='cv'?'Rejected at CV screening.':
         'Interview assessment '+attempt.result.interviewPercent+'/100. '+
-        'This was below the employer’s appointment standard.')+
-        '</p></div><div class="recruitment-actions">'+
-        '<button type="button" class="recruitment-primary" data-action="return-to-job-search">'+
-        'VIEW OTHER VACANCIES →</button></div>';
+        'The board’s appointment standard was not met.')+
+        '</p></div><div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
+        'data-action="return-to-job-search">VIEW OTHER VACANCIES →</button></div>';
     }else if(attempt.stage==='declined'){
       html=header('OFFER DECISION','DECLINED')+
         '<h2 class="recruitment-stage-title">You declined the offer.</h2>'+
         '<p class="recruitment-stage-copy">The appointment at '+escapeText(company.name)+
-        ' was declined. Your CV and decision history remain recorded in this job search.</p>'+
+        ' was declined. Your application history stays on the current job search.</p>'+
         '<div class="recruitment-actions"><button type="button" class="recruitment-primary" '+
-        'data-action="return-to-job-search">FIND ANOTHER VACANCY →</button></div>';
+        'data-action="return-to-job-search">SEARCH AGAIN →</button></div>';
     }
     stage.innerHTML=html;
   }
