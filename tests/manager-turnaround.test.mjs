@@ -125,3 +125,15 @@ test('legacy owner saves and earlier managers without fortnight field still load
   assert.ok(E.normalize(copy(old)));
   assert.equal(T.progress(old),null);
 });
+
+test('new Manager Desk presents actionable real pricing and workshop controls',()=>{
+  const state=create(M.firstJobs()[0]);
+  const html=T.render(state);
+  assert.match(html,/MANAGER’S DESK/);
+  assert.match(html,/data-action="turnaround-reprice"/);
+  assert.match(html,/data-action="turnaround-hold"/);
+  assert.match(html,/data-page="workshop"/);
+  assert.match(html,/14 DAYS LEFT/);
+  const legacy=E.createStaffed('Old Operator Ltd',[]);
+  assert.equal(T.render(legacy),'','legacy owners have no synthetic manager challenge');
+});
