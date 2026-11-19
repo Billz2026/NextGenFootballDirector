@@ -1,0 +1,65 @@
+/* Immersive Manager's Desk: a decision-first fortnight above the KPI dashboard. */
+#screen-career .turnaround{
+  margin:9px 0 13px;border:1px solid #475258;border-left:4px solid #b58b58;
+  border-radius:5px;background:linear-gradient(115deg,#1a2228,#141b22 60%,#172026);
+  color:#f0f3f3;padding:15px 17px;
+}
+#screen-career .turnaround-topline{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  color:#cbb08b;font:800 9px/1.5 var(--body);letter-spacing:.09em;
+}
+#screen-career .turnaround-head{display:flex;justify-content:space-between;gap:15px;
+  align-items:center;margin:8px 0 13px}
+#screen-career .turnaround-head h2{font:800 clamp(18px,2vw,24px)/1.15 var(--body);
+  letter-spacing:-.035em;color:#f4f5f6;margin:0}
+#screen-career .turnaround-head p{color:#acbbc4;font:550 11px/1.5 var(--body);margin:4px 0 0}
+#screen-career .turnaround-progress{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;
+  padding:7px 14px;border:1px solid #504736;border-radius:4px;background:#252820;
+}
+#screen-career .turnaround-progress b{color:#f2d4a3;font:800 21px/1 var(--body)}
+#screen-career .turnaround-progress small{margin-top:3px;max-width:110px;text-align:center;
+  color:#c9c2b3;font:650 9px/1.3 var(--body)}
+#screen-career .turnaround-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;margin:0 0 12px}
+#screen-career .turnaround-metrics>div{border:1px solid #3b4951;border-radius:3px;
+  padding:8px 10px;background:#192630;min-width:0}
+#screen-career .turnaround-metrics small{
+  color:#aabac3;display:block;font:700 9px/1.3 var(--body)}
+#screen-career .turnaround-metrics strong{display:block;margin-top:5px;
+  color:#f0f3f4;font:800 clamp(13px,1.6vw,18px)/1.15 var(--body);overflow-wrap:anywhere}
+#screen-career .turnaround-decision{border-top:1px solid #38444d;padding:11px 0 2px}
+#screen-career .turnaround-decision-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#screen-career .turnaround-decision-top strong{font:800 13px/1.4 var(--body);color:#e7eaea}
+#screen-career .turnaround-decision-top span{color:#f0c995;font:750 10px/1.4 var(--body)}
+#screen-career .turnaround-decision p,#screen-career .turnaround-next p{
+  color:#b4c1c9;font:550 11px/1.6 var(--body);margin:5px 0 9px}
+#screen-career .turnaround-actions{display:flex;gap:8px;flex-wrap:wrap}
+#screen-career .turnaround-actions button,#screen-career .turnaround-next button{
+  border:1px solid #f1f1f1;border-radius:3px;background:#f1f1f1;color:#10171b;
+  padding:9px 12px;min-height:36px;font:800 10px/1.35 var(--body);
+  cursor:pointer;box-shadow:inset 3px 0 #b9233f;
+}
+#screen-career .turnaround-actions .turnaround-secondary,
+#screen-career .turnaround-next button{
+  background:#24313a;border:1px solid #586771;box-shadow:none;color:#e5eaee;
+}
+#screen-career .turnaround-actions button:hover,#screen-career .turnaround-next button:hover{
+  filter:brightness(1.16)}
+#screen-career .turnaround-actions button:focus-visible,#screen-career .turnaround-next button:focus-visible{
+  outline:2px solid #e9d0a7;outline-offset:2px}
+#screen-career .turnaround-next{margin-top:10px;padding:11px;background:#1b262d;
+  border:1px solid #394851;border-radius:3px}
+#screen-career .turnaround-next strong{font:800 11px/1.4 var(--body);color:#e2d1b9}
+#screen-career .turnaround-review{margin-top:12px;padding:11px;border:1px solid #5c594d;
+  color:#ddd1bc;background:#262821;border-radius:3px;font:600 11px/1.6 var(--body)}
+@media(max-width:900px){
+ #screen-career .turnaround-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:530px){
+ #screen-career .turnaround{padding:12px}
+ #screen-career .turnaround-head{align-items:start;flex-direction:column}
+ #screen-career .turnaround-progress{align-items:start}
+ #screen-career .turnaround-topline{flex-wrap:wrap}
+ #screen-career .turnaround-actions button{width:100%}
+}
