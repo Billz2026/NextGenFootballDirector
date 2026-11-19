@@ -166,3 +166,12 @@
   #screen-recruitment .recruitment-main {padding:17px}
   #screen-recruitment .recruitment-company h1 {font-size:30px}
 }
+
+#screen-recruitment .recruitment-reset{
+  display:block;width:100%;margin-top:8px;
+  border-color:#594a42;background:transparent;
+  color:#bbab9e;font-size:9px;
+}
+#screen-recruitment .recruitment-reset:hover{
+  background:#2b211d;border-color:#8b6b58;
+}
