@@ -22,6 +22,8 @@
   const OPS = window.MotorTradeOperations;
   const AU = window.MotorTradeAuctionAgent;
   const MC = window.MotorTradeManagerCareer;
+  const IND = window.MotorTradeInduction;
+  if(!IND)throw Error('Load manager-induction.js before simulator.js');
   const JR = window.MotorTradeRecruitment;
   if(!JR)throw Error('Load manager-recruitment.js before simulator.js');
   const IN = window.MotorTradeInbox;
@@ -182,6 +184,9 @@
   let jobSearch = JR.read();
   let selectedInterviewAnswer = null;
   let recruitmentSaveWarning = '';
+  let inductionSalesChoice = null;
+  let inductionOpsChoice = null;
+  let inductionPriorityChoice = null;
 
   function gameDate(day) {
     return new Date(START_DATE_UTC + (day - 1) * MS_PER_DAY);
@@ -687,6 +692,103 @@
     stage.innerHTML=html;
   }
 
+  function renderInduction(){
+    const m=career?.managerCareer,i=m?.induction;
+    const node=byId('induction-content');
+    if(!m||!i){node.textContent='No induction appointment available.';return;}
+    const d=MC.dealer(m.employerId);
+    if(!d){node.textContent='The selected employer could not be verified.';return;}
+    byId('induction-company-summary').innerHTML=
+      '<small>APPOINTMENT CONFIRMED</small><strong>'+escapeText(d.name)+
+      '</strong><span>'+escapeText(d.city)+' · '+
+      escapeText(m.managerName)+' · Acting Dealership Manager</span>';
+    const names=['Board welcome','Meet your team','Opening business review','Agree management authority'];
+    byId('induction-progress-list').innerHTML=names.map((n,index)=>
+      '<div class="induction-progress-item '+(index===i.step?'active':index<i.step?'done':'')+
+      '"><span>'+String(index+1).padStart(2,'0')+' · '+escapeText(n)+'</span>'+
+      '<b>'+(index<i.step?'✓':index===i.step?'CURRENT':'—')+'</b></div>').join('');
+    const heading=(eyebrow,title,copy)=>'<div class="induction-eyebrow"><span>'+
+      escapeText(eyebrow)+'</span><span>STEP '+(i.step+1)+' OF 4</span></div>'+
+      '<h2 class="induction-stage-title">'+title+'</h2>'+
+      '<p class="induction-intro">'+copy+'</p>';
+    const next=label=>'<div class="induction-actions"><button type="button" '+
+      'class="induction-primary" data-action="induction-next">'+label+' →</button></div>';
+    if(i.step===0){
+      node.innerHTML=heading('BOARD HANDOVER','Welcome to '+escapeText(d.name),
+        'Your interview was successful. The owner is giving you a probationary appointment to manage the business—not its ownership.')+
+        '<div class="induction-board"><strong>BOARD OF DIRECTORS · APPOINTMENT BRIEF</strong>'+
+        '<p>We need '+d.monthlyTarget+' genuine completed retail handovers per month '+
+        'and positive operating contribution. Protect the company’s funds, maintain '+
+        'proper vehicle preparation and let the staff do their jobs within clear authority limits.</p>'+
+        '<p>Your first 90 game days form your trial period. Your personal reputation '+
+        'will respond to recorded trading performance, not the value of cars you merely buy.</p>'+
+        '</div>'+next('MEET YOUR TEAM');
+    }else if(i.step===1){
+      const jobs={sales:'SALES EXECUTIVE',buyer:'VEHICLE BUYER',
+        technician:'WORKSHOP & QC TECHNICIAN',supervisor:'OPERATIONS SUPERVISOR'};
+      const descriptions={
+        sales:'Handles actual walk-ins, appointments and retail negotiations within your authority limits.',
+        buyer:'Researches private seller stock and recommends acquisition opportunities.',
+        technician:'Assesses vehicles, completes booked repair work and prepares stock for final QC.',
+        supervisor:'Coordinates customer allocation, buying, workshop and daily operational exceptions.'};
+      node.innerHTML=heading('PEOPLE & RESPONSIBILITIES','Meet your starting team',
+        'These are the actual employees on the company payroll. They are not newly hired placeholders. The team will handle routine work when you set your limits.')+
+        '<div class="induction-team">'+IND.team(career).map(e=>
+        '<div class="induction-employee"><small>'+jobs[e.role]+'</small>'+
+        '<strong>'+escapeText(e.name)+'</strong>'+
+        '<p>'+descriptions[e.role]+'</p>'+
+        '<p>Monthly salary '+money.format(e.monthlySalary)+
+        ' · Experience '+escapeText(String(e.experience))+'</p></div>').join('')+
+        '</div>'+next('REVIEW BUSINESS POSITION');
+    }else if(i.step===2){
+      const wages=career.staff.reduce((sum,e)=>sum+e.monthlySalary,0);
+      const overhead=SITE.costs(career).total;
+      node.innerHTML=heading('ACCOUNTS & OPERATIONS','Review the company you inherit',
+        'Your starting team is already employed. This is an owner-funded operating business with live payroll and premises obligations. The opening balances are not personal savings.')+
+        '<div class="induction-financial-grid">'+
+        '<div><small>OPENING COMPANY CASH</small><strong>'+
+        money.format(career.cash)+'</strong></div>'+
+        '<div><small>EXISTING MONTHLY PAYROLL</small><strong>'+
+        money.format(wages)+'</strong></div>'+
+        '<div><small>VEHICLES IN STOCK</small><strong>'+career.vehicles.length+
+        '</strong></div>'+
+        '<div><small>PREMISES COST · DAILY</small><strong>'+
+        money.format(overhead)+'</strong></div>'+
+        '<div><small>BOARD SALES TARGET</small><strong>'+
+        d.monthlyTarget+' handovers</strong></div>'+
+        '<div><small>COMPANY FORECOURT CAPACITY</small><strong>'+
+        SITE.storageLimit(career)+' vehicles</strong></div></div>'+
+        '<div class="induction-board"><strong>Opening risk review</strong>'+
+        '<p>You have no vehicle stock yet, so purchasing decisions matter. '+
+        'Buying too many cars quickly can leave the business short of payroll, '+
+        'repair money and rent. The supervisor will observe the spending caps you authorise next.</p></div>'+
+        next('SET MANAGEMENT POLICIES');
+    }else if(i.step===3){
+      const options=(kind,items,chosen,detail)=>
+        '<div class="induction-policy-group"><h3>'+escapeText(detail)+'</h3>'+
+        '<div class="induction-policy-list">'+items.map(p=>
+          '<button type="button" class="induction-policy" data-action="induction-choice" '+
+          'data-kind="'+kind+'" data-option="'+p.key+
+          '" aria-pressed="'+String(chosen===p.key)+'"><strong>'+
+          escapeText(p.name||p.title)+'</strong><span>'+
+          escapeText(p.note||p.benefit||p.detail)+'</span></button>').join('')+'</div></div>';
+      const selected=!!inductionSalesChoice&&!!inductionOpsChoice&&!!inductionPriorityChoice;
+      node.innerHTML=heading('MANAGEMENT AUTHORITY','Set your first-day operating policy',
+        'Choose how much authority to delegate. Your decisions change real spending, repair, stock and discount limits in the trading engine; they are not cosmetic personality choices.')+
+        options('sales',IND.SALES_POLICIES,inductionSalesChoice,'01 · SALES DISCOUNTS & NEGOTIATION')+
+        options('operations',IND.OPERATIONS_POLICIES,inductionOpsChoice,'02 · BUYING & WORKSHOP SPENDING')+
+        options('priority',Object.entries(IND.PRIORITIES).map(([key,v])=>({...v,key})),
+          inductionPriorityChoice,'03 · FIRST-WEEK MANAGEMENT FOCUS')+
+        '<p class="induction-intro">The first-week focus is recorded in your management brief. '+
+        'Financial authority changes are active immediately after confirmation; staff will still require approval for exceptions.</p>'+
+        '<div class="induction-actions"><button type="button" class="induction-primary" '+
+        'data-action="induction-complete" '+(selected?'':'disabled')+'>'+
+        'AUTHORISE POLICIES & OPEN DEALERSHIP →</button></div>';
+    }else{
+      node.textContent='Induction completed. Your dashboard is ready.';
+    }
+  }
+
   function managerDraftCV(){
     return {
       dateOfBirth:byId('manager-dob').value,
@@ -840,6 +942,8 @@
   }
 
   function render() {
+    if(career&&IND.pending(career)&&screen==='career')screen='induction';
+    if(career&&!IND.pending(career)&&screen==='induction')screen='career';
     const menu = byId('screen-menu');
     menu.hidden = screen !== 'menu';
     menu.className = 'menu-screen' + (display.showroom ? '' : ' menu-no-showroom') +
@@ -850,9 +954,11 @@
     byId('menu-setting-motion').setAttribute('aria-pressed', String(display.motion));
     byId('screen-setup').hidden = screen !== 'setup';
     byId('screen-recruitment').hidden = screen !== 'recruitment';
+    byId('screen-induction').hidden = screen !== 'induction';
     byId('screen-career').hidden = screen !== 'career';
     if(screen==='setup')renderManagerEmployers();
     if(screen==='recruitment')renderRecruitment();
+    if(screen==='induction')renderInduction();
     byId('menu-continue').hidden = !career;
     byId('menu-continue').className = 'action-btn action-btn-primary';
     byId('menu-new-career').className = career ? 'action-btn action-btn-secondary' : 'action-btn action-btn-primary';
@@ -949,7 +1055,8 @@
     renderTrading();
   }
   function show(pageOrScreen) {
-    if (pageOrScreen === 'menu' || pageOrScreen === 'setup' || pageOrScreen==='recruitment') {
+    if (pageOrScreen === 'menu' || pageOrScreen === 'setup' ||
+      pageOrScreen==='recruitment'||pageOrScreen==='induction') {
       screen = pageOrScreen;
       careerPromotion = null;
     } else if (career && Object.prototype.hasOwnProperty.call(PAGES, pageOrScreen)) {
@@ -964,6 +1071,10 @@
   }
   function advanceDay() {
     if (!career || career.day >= MAX_DAY) return;
+    if(IND.pending(career)){
+      screen='induction';eventNotice='Complete the first-day staff and authority induction before trading.';
+      render();return;
+    }
     if(career.auctionHall.phase==='payment'){
       currentPage='auctionHall';
       eventNotice='An auction hammer has fallen. Finalise the winning bid and buyer fee before advancing the game day.';
@@ -1269,6 +1380,7 @@
       window.alert(appointment.message);return;
     }
     newCareer.managerCareer.recruitment={...recruitment};
+    newCareer.managerCareer.induction=IND.initial();
     newCareer.messages=MC.welcome(newCareer);
     const result=SAVES.save(newCareer,E.normalize,{force:true,backupPrevious:true});
     if(!result.ok){
@@ -1280,6 +1392,9 @@
     JR.clear();
     jobSearch=null;
     selectedInterviewAnswer=null;
+    inductionSalesChoice=null;
+    inductionOpsChoice=null;
+    inductionPriorityChoice=null;
     openRecoveredCareer(newCareer,
       'Employment offer accepted at '+employer.name+
       '. Your interview record and new management career have been saved.');
