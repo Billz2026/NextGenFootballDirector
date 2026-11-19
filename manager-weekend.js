@@ -85,7 +85,7 @@
      typeof c.originalDelegationEnabled!=='boolean'||
      (c.originalPolicy!==null&&!OPTIONS.some(x=>x.key===c.originalPolicy))||
      (c.manualPolicy!==null&&typeof c.manualPolicy!=='object'))return false;
-   if(c.status==='live'&&c.result!==null)return true;
+   if(c.status==='live')return c.result===null;
    if(!['review','complete'].includes(c.status)||c.phase!==2)return false;
    const r=c.result;
    return r&&whole(r.sales,0,100)&&Number.isSafeInteger(r.gross)&&
