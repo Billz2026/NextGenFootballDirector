@@ -384,7 +384,7 @@
       (m.decision===undefined||['approved','declined','taken-over'].includes(m.decision))&&
       (m.reference===undefined||m.reference===null||
         (typeof m.reference==='string'&&m.reference.length>0&&m.reference.length<=150))&&
-      (m.linkPage === null || ['dashboard','inbox','auctions','stock','sales','finance','staff','reputation','reports','business','workshop','events','auctionHall'].includes(m.linkPage)));
+      (m.linkPage === null || ['dashboard','inbox','manager','auctions','stock','sales','finance','staff','reputation','reports','business','workshop','events','auctionHall'].includes(m.linkPage)));
     if (!validMessages) return null;
     const messages = saved.messages.map(m => ({
       id:m.id,day:m.day,from:m.from,subject:m.subject,preview:m.preview,
