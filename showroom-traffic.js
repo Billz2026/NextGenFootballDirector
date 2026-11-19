@@ -12,7 +12,8 @@
  const LAST=['Patel','Jones','Ahmed','Williams','Singh','Brown','Khan','Evans','Wilson','Taylor','Clarke','Morgan','Shah','Davies','Ali'];
  function hash(text){let h=2166136261;for(const ch of String(text))h=Math.imul(h^ch.charCodeAt(0),16777619)>>>0;
   h=Math.imul(h^(h>>>15),2246822507)>>>0;return(h^(h>>>13))>>>0;}
- const slot=s=>D.isDealDay(s.day)?s.deadlineSession:0;
+ const slot=s=>D.isDealDay(s.day)?s.deadlineSession:
+   (window.MotorTradeWeekend?.slot(s)??0);
  const initial=day=>({day,session:0,turn:0,ownerUsed:0,staffUsed:[],leads:[]});
  const waiting=s=>(s.showroom?.leads||[]).filter(q=>q.status==='waiting');
  function record(s,q,type,detail,day=s.day){
