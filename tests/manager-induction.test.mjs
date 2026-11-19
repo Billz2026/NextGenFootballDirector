@@ -34,7 +34,7 @@ test('the 20 starter dealerships employ different valid actual rosters',()=>{
     assert.equal(s.cash,d.openingCash);
     assert.ok(E.normalize(clone(s)),d.name+' start must reload');
   }
-  assert.ok(seen.size>=5,'all employers should not have an identical team');
+  assert.equal(seen.size,20,'each beginner employer should have its own opening team combination');
 });
 test('no sales policy, cash or jobs change when only reading induction stages',()=>{
   const s=create(MC.firstJobs()[0]);
