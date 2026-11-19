@@ -56,3 +56,11 @@
 @media(max-width:560px){#screen-career .weekend-desk{padding:12px}
  #screen-career .weekend-timeline li{align-items:flex-start;flex-direction:column;gap:3px}
  #screen-career .weekend-actions button{width:100%}}
+
+#screen-career .weekend-recap{margin:8px 0 12px;padding:10px 14px;display:flex;
+ align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #48555e;
+ border-radius:4px;background:#172129}
+#screen-career .weekend-recap strong{color:#e7c49b;font:800 10px/1.5 var(--body)}
+#screen-career .weekend-recap span{color:#bac8ce;font:600 11px/1.5 var(--body)}
+#screen-career .weekend-previous{padding-top:8px;color:#c8b79f;
+ font:650 10px/1.5 var(--body)}
