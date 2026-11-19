@@ -49,9 +49,17 @@ All 50 dealerships appear in the employment catalogue, including locked firms. S
 7. Later, qualify for interviews, negotiate employment offers, change employers, resign or be dismissed without taking any old employer assets.
 8. Work toward elite appointments based on verified multi-year achievements, not merely elapsed days.
 
-## 4. Next system to build: genuine employment
+## 4. Recruitment and induction — current release / next work
 
-### Phase 2A — Application and interview system
+**Playable now (19 November 2026):** A new applicant uses 110 fresh, tiered questions drawn from the full 150-question catalogue; historic pending interviews still use the original 40-question bank so saves do not break. The opening independent interview contains five questions. Higher tiers are configured for 6/7/8/10 first-round questions and deterministic optional/required final rounds, but those employers remain correctly locked for beginners. Interview answers, shortlisting, rejections and offers are stored between browser sessions, and a company starts only after accepting an offer.
+
+**Initial employer induction (playable now):** Board briefing → actual staff introductions → opening cash/stock/payroll review → real sales and buying/workshop authority policies. Four stages must be completed and saved before advancing time. Each new independent has a varied roster built from the actual candidate pool, rather than all 20 having the exact same four names. Initial policies are applied through the trading engines and recorded as management decisions.
+
+**Important missing depth:** Company-specific interviewers and personalities, tailored employee biographies, appointment scheduling/delays, factual induction issues inherited from an AI trading employer, full salaries/contracts, board probation outcomes, resignations, job applications after the first appointment and autonomous trading competitors are not implemented. The opening employer still has the present engine's opening cash and no stock. A real persistent 50-dealer market remains necessary before later career transfers.
+
+## 5. Next systems to build: genuine employment
+
+### Further recruitment depth — applications, scheduling and negotiation
 
 **Initial playable release (18 November 2026):** A new career now begins unemployed. You browse vacancies, submit a real CV, undergo deterministic shortlisting, answer a five-question interview at an independent dealer and either receive an offer or rejection. An employer can reject a weak interview; accepting a verified offer creates the company career and preserves the interview result on the manager's CV. Rejected or declined applicants can apply to another employer. The separate pre-employment application save survives refresh; older trading saves are not overwritten unless the player deliberately accepts an offer. The underlying question bank has 40 questions, with 6–10 questions configured for higher-tier interviews once those roles become accessible.
 
