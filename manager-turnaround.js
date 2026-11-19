@@ -119,6 +119,38 @@
    t.decisions.push({day:state.day,vehicleId:id,kind:'hold',before:v.asking,after:v.asking});
    return {ok:true,changed:true,message:'Asking price retained. Holding costs and unsold-stock risk continue.'};
  }
+ function checkpoint(state){
+   const t=state.managerCareer?.turnaround;
+   if(!t||![8,15].includes(state.day))return false;
+   const ref='manager-fortnight:'+t.employerId+':'+state.day;
+   if(state.messages.some(m=>m.reference===ref))return false;
+   const p=progress(state),statement=window.MotorTradeMonthly.statement(state);
+   const completed=p.retail.length,profitable=p.retail.filter(v=>v.profit>0).length;
+   const title=state.day===8?'Day 7 · first-week owner check-in':'Day 14 · initial turnaround review';
+   const preview=completed+' opening cars handed over, '+profitable+
+     ' profitable, company cash '+money(state.cash)+'.';
+   const body='MANAGEMENT BOARD · '+title.toUpperCase()+'\n\n'+
+     'Inherited stock originally assigned: 3 vehicles.\n'+
+     'Real completed retail handovers: '+completed+'.\n'+
+     'Profitable handovers: '+profitable+'.\n'+
+     'Realised opening-stock gross: '+money(p.realisedGross)+'.\n'+
+     'Unsold inherited cars: '+p.remaining.length+'.\n'+
+     'Company cash balance: '+money(state.cash)+'.\n'+
+     'Actual month-to-date operating contribution: '+money(statement.operatingContribution)+
+     '.\n\n'+(profitable?
+       'A profitable opening-stock handover has been achieved.':
+       'A profitable opening-stock handover is still outstanding.')+
+     '\n\nThis is an observed business checkpoint, not a fabricated sale or an automatic reputation award.';
+   const entry={from:'BOARD OF DIRECTORS',category:'reports',subject:title,
+     preview,body,linkPage:'dashboard',reference:ref};
+   if(window.MotorTradeInbox?.emit){
+     window.MotorTradeInbox.emit(state,entry);
+   }else{
+     state.messages.push({id:state.messages.reduce((n,m)=>Math.max(n,m.id),0)+1,
+       day:state.day,read:false,...entry});
+   }
+   return true;
+ }
  function render(state){
    const t=state.managerCareer?.turnaround,p=progress(state);
    if(!t||!p)return '';
@@ -166,5 +198,5 @@
        '<div><small>MONTHLY OPERATING CONTRIBUTION</small><strong>'+money(report.operatingContribution)+'</strong></div>'+
      '</div>'+action+conclusion+'</section>';
  }
- window.MotorTradeTurnaround=Object.freeze({initialize,valid,clone,progress,reprice,hold,render});
+ window.MotorTradeTurnaround=Object.freeze({initialize,valid,clone,progress,reprice,hold,checkpoint,render});
 })();
