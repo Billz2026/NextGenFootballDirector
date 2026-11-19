@@ -698,6 +698,8 @@
         body:'WELCOME, '+m.managerName+'\n\nYour initial appointment as acting dealership manager of '+d.name+
           ' in '+d.city+' is confirmed. The company owns its premises, vehicles, cash and staff. Your personal reputation is separate from the dealership customer trust score.\n\n'+
           'Your first 90 game days form a probationary appointment. You have no previous manager posts on your CV, and the board expects evidence of competence rather than instant promotion.\n\n'+
+          (m.turnaround?
+            'FIRST 14-DAY CHALLENGE: You inherit three employer-owned vehicles, including ageing stock and a workshop job. Their recorded book cost is existing company inventory, not a new cash purchase. Your first task is a profitable opening-stock handover without compromising liquidity.\n\n':'')+
           'Initial company working cash: £'+d.openingCash.toLocaleString('en-GB')+
           '. Board expectation: '+d.monthlyTarget+' completed retail handovers in a trading month and positive operating contribution. The board will review your actual monthly results.\n\n'+
           'You successfully completed the recruitment interview and accepted a management appointment. Your original CV and recruitment outcome are retained on your Manager Profile. Transfers, resignations and dismissals are planned but are not yet playable.',
