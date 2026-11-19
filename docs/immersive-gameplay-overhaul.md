@@ -5,6 +5,22 @@
 **Product:** NextGen Sessions — The Motor Trade  
 **Primary objective:** Replace the "keep pressing Continue" experience with a credible, consequential, repeatable motor-dealership management loop.
 
+## Implementation status — Sprint 1 playable foundation (19 November 2026)
+
+**Now implemented for newly accepted manager appointments:**
+- Three inherited employer vehicles with book costs, non-cash opening-capital evidence, real catalogue specs, two advertised cars and one requiring the workshop/QC pipeline.
+- One 48-day aged car whose age is carried into actual holding costs and market pricing, without illegal negative acquisition days.
+- First-14-day Manager's Desk objective with real sales/profit/cash metrics and reprice-versus-hold management decisions.
+- Daily navigation to Manager's Desk when no urgent exception takes priority.
+- Board check-ins on game days 8 and 15, derived from actual transaction, stock and cash records.
+- Validated, backward-compatible save data. All 20 new starter employer integration flows passed simulated creation, induction, repricing, hold, and save/reload.
+
+**Explicitly NOT yet implemented:** dedicated Weekend Trading session with live checkpoints, persistent weekly tactics, expanded staff relationship model, full 90-day probation/dismissal and autonomous 50-company rival simulation. A 14-day goal does not by itself ensure long-term engagement. Do not confuse this foundational sprint with the complete design.
+
+### Player test gate
+
+Start a **new management career** (do not overwrite an old one without exporting it). Accept an offer, finish induction, return to Dashboard. Confirm 3 inherited cars, an active 48-day aged stock decision and 14-day challenge, run actual workshop and sales activity, and test both price-holding and repricing across separate test careers. Old saves remain unchanged and will not receive stock retroactively. Observe day-8 and day-15 factual board reviews. Send screenshots or report any save error.
+
 ## 1. Product north star
 
 The intended emotional loop is **one more trading week**, analogous to "one more match" in Football Manager. The player is a newly employed manager, not a business owner. They should be constantly aware of their company, staff, stock, cash, customer commitments, upcoming trading opportunities and job security.
