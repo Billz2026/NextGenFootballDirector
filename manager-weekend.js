@@ -35,7 +35,9 @@
    s.delegation.maxDiscount===p.maxDiscount&&s.delegation.minGross===p.minGross&&
    s.delegation.maxPartExchange===p.maxPartExchange)?.key||null;
  function ensure(state){
-   if(!canSession(state))return false;
+   // No empty, mandatory three-checkpoint session. Stock must actually be
+   // ready for retail or already under an open customer arrangement.
+   if(!canSession(state)||!state.vehicles.some(v=>v.status==='listed'))return false;
    const m=state.managerCareer;
    if(!m.weekendTrading)m.weekendTrading=initial();
    const t=m.weekendTrading;
@@ -125,6 +127,9 @@
      return {ok:false,message:'There is no live Saturday session to advance.'};
    if(DELEG.pending(state).length)return {ok:false,pending:true,
      message:'Resolve the live sales-authority request before advancing this session.'};
+   // When every retail vehicle has left the forecourt, avoid two
+   // meaningless extra checkpoints. Close directly on the next action.
+   if(c.phase<2&&!state.vehicles.some(v=>v.status==='listed'))c.phase=2;
    if(c.phase<2){
      c.phase++;
      const departed=Q.roll(state);
