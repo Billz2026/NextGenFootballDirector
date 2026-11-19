@@ -56,6 +56,7 @@
   <link rel="stylesheet" href="./setup-theme-2026.css?v=1">
   <link rel="stylesheet" href="./manager-career.css?v=3">
   <link rel="stylesheet" href="./manager-recruitment.css?v=1">
+  <link rel="stylesheet" href="./manager-induction.css?v=1">
   <script src="./vehicle-intel.js?v=3" defer></script>
   <script src="./vehicle-photos.js?v=5" defer></script>
   <script src="./vehicle-accuracy.js?v=1" defer></script>
@@ -77,7 +78,9 @@
   <script src="./customers.js?v=14" defer></script>
   <script src="./aftersales.js?v=1" defer></script>
   <script src="./manager-career.js?v=5" defer></script>
-  <script src="./manager-recruitment.js?v=2" defer></script>
+  <script src="./manager-interview-bank.js?v=1" defer></script>
+  <script src="./manager-recruitment.js?v=3" defer></script>
+  <script src="./manager-induction.js?v=1" defer></script>
   <script src="./trading.js?v=33" defer></script>
   <script src="./vehicle-cards.js?v=5" defer></script>
   <script src="./vehicle-view.js?v=5" defer></script>
@@ -278,6 +281,26 @@
           <div id="recruitment-stage" aria-live="polite"></div>
           <p class="recruitment-save-warning" id="recruitment-save-warning" role="status" hidden>Unable to save application progress in this browser. Keep this tab open.</p>
         </div>
+      </main>
+    </section>
+
+    <section class="induction-screen" id="screen-induction" hidden aria-labelledby="induction-title">
+      <header class="induction-topbar">
+        <button type="button" class="quiet-button" data-action="menu">← MAIN MENU</button>
+        <span>MANAGER CAREER / FIRST-DAY INDUCTION</span>
+      </header>
+      <main class="induction-shell">
+        <aside class="induction-aside">
+          <p class="manager-kicker">YOUR FIRST APPOINTMENT</p>
+          <h1 id="induction-title">MEET THE TEAM.<br><em>TAKE CONTROL.</em></h1>
+          <p>Your first day is a genuine management handover. Meet your employer's actual team, inspect the opening position and set the limits your staff will work within.</p>
+          <div id="induction-company-summary" class="induction-company-summary"></div>
+          <div id="induction-progress-list" class="induction-progress-list"></div>
+          <p class="induction-notice">No trading day advances until you complete induction. The company's cash and staff remain unchanged by introductory meetings.</p>
+        </aside>
+        <section class="induction-content">
+          <div id="induction-content" aria-live="polite"></div>
+        </section>
       </main>
     </section>
 
