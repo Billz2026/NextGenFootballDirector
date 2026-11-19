@@ -22,6 +22,8 @@
   const OPS = window.MotorTradeOperations;
   const AU = window.MotorTradeAuctionAgent;
   const MC = window.MotorTradeManagerCareer;
+  const TURN = window.MotorTradeTurnaround;
+  if(!TURN)throw Error('Load manager-turnaround.js before simulator.js');
   const IND = window.MotorTradeInduction;
   if(!IND)throw Error('Load manager-induction.js before simulator.js');
   const JR = window.MotorTradeRecruitment;
@@ -505,6 +507,7 @@
     byId('events-view').innerHTML=EV.render(career);
   }
   function renderDashboard(){
+    byId('dashboard-turnaround').innerHTML=TURN.render(career);
     const d=DV.snapshot(career,E);
     byId('dashboard-priorities').innerHTML=DV.priorities(d);
     byId('dashboard-operating-strip').innerHTML=DV.operations(d,career);
@@ -1401,6 +1404,11 @@
     }
     newCareer.managerCareer.recruitment={...recruitment};
     newCareer.managerCareer.induction=IND.initial();
+    if(!TURN.initialize(newCareer)){
+      if(previousAccount)ACCOUNT.restoreAccountMode(previousAccount);
+      window.alert('Could not establish the employing dealer’s inherited stock. No career was created.');
+      return;
+    }
     newCareer.messages=MC.welcome(newCareer);
     const result=SAVES.save(newCareer,E.normalize,{force:true,backupPrevious:true});
     if(!result.ok){
@@ -1639,6 +1647,24 @@
       render();return;
     }
     switch (button.dataset.action) {
+      case 'turnaround-reprice':
+      case 'turnaround-hold':{
+        if(!career?.managerCareer?.turnaround||screen!=='career')break;
+        const old=E.normalize(JSON.parse(JSON.stringify(career)));
+        if(!old){window.alert('Your career failed validation before the decision. No action taken.');break;}
+        const id=Number(button.dataset.id);
+        const result=button.dataset.action==='turnaround-reprice'?
+          TURN.reprice(career,id):TURN.hold(career,id);
+        if(result.ok&&!persistCareer()){
+          career=old;
+          window.alert('The management decision could not be saved. Your previous state is restored.');
+        }else{
+          eventNotice=result.message;
+          lastTradeResult={ok:result.ok,message:result.message};
+        }
+        render();
+        break;
+      }
       case 'induction-next':{
         if(screen!=='induction'||!career||!IND.pending(career))break;
         const previous=E.normalize(JSON.parse(JSON.stringify(career)));
