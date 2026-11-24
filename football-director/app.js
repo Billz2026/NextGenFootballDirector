@@ -370,7 +370,7 @@ const target=datePlus(k.date,7)>CAREER_END?CAREER_END:datePlus(k.date,7);
 for(let i=0;i<7&&k.date<target;i++){
 const oldSeason=s.season,oldWindow=windowStatus(k.date);
 k.date=datePlus(k.date,1);syncCalendar(s);
-if(s.season!==oldSeason){if(s.world.league)s.world.seasonHistory.push(s.world.league);ensureLeague(s);calendarEvent(s,"season:"+s.season,"New season begins","Season "+s.season+" has begun. Career season "+k.number+" of 40.");for(const [name,status] of Object.entries(s.applications)){if(status==="Rejected"||status==="Declined"){delete s.applications[name];delete s.employment[name]}}}
+if(s.season!==oldSeason){if(s.world.league)s.world.seasonHistory.push({...s.world.league,fixtures:s.world.league.fixtures.map(({events,stats,...f})=>f)});ensureLeague(s);calendarEvent(s,"season:"+s.season,"New season begins","Season "+s.season+" has begun. Career season "+k.number+" of 40.");for(const [name,status] of Object.entries(s.applications)){if(status==="Rejected"||status==="Declined"){delete s.applications[name];delete s.employment[name]}}}
 const currentWindow=windowStatus(k.date);if(currentWindow!==oldWindow)calendarEvent(s,"window:"+k.date,"Transfer window update",currentWindow==="Closed"?"The transfer window has closed.":currentWindow+".","Football administration");
 if(!k.finished){for(const c of s.world.clubs)for(const p of [...c.players,...c.academyPlayers])p.fitness=Math.min(100,p.fitness+2);staffTick(s);if(i===0||s.season!==oldSeason)aiRecruitment(s);playerTick(s,s.season!==oldSeason);if(s.season!==oldSeason)aiRecruitment(s)}
 if(s.club&&!k.finished)relationshipReview(s);
