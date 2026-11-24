@@ -114,3 +114,6 @@ body:has(#menu:not([hidden])) .tiles{gap:8px}
  body:has(#menu:not([hidden])) main{width:min(1000px,88%);padding:12px 0}
  body:has(#menu:not([hidden])) .tile{min-height:clamp(76px,12.5vh,94px);padding:10px 14px}
 }
+
+/* Landing header is intentionally absent, including cached markup. */
+body > header{display:none!important}
