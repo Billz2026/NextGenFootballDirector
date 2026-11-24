@@ -197,8 +197,8 @@ function sidePower(state, db, side) {
   const profile = tacticalProfile(tactics);
   const clubId = side === 'home' ? state.homeClubId : state.awayClubId;
   const reputation = clamp(((club(db, clubId)?.reputation || 7000) - 7000) / 5000, -.15, .15);
-  const ability = averageAbility(state, db, side) / 120;
-  const home = side === 'home' ? .035 : 0;
+  const ability = averageAbility(state, db, side) / 120 * (0.55 + 0.45 * lineupsFor(state,side).length/11);
+  const home = side === 'home' ? .075 : 0;
   return {
     attack: Math.max(.45, ability * profile.attack + reputation + home),
     defense: Math.max(.45, ability * profile.defense + reputation + home * .35),
@@ -290,7 +290,7 @@ function attackSequence(state, db, side, random, attackPower, defensePower) {
   const roll = random();
 
   state.stats[side].shots += 1;
-  if (roll < .145 * quality) {
+  if (roll < .115 * quality) {
     state.stats[side].onTarget += 1;
     if (side === 'home') state.homeGoals += 1; else state.awayGoals += 1;
     addRating(state, shooter?.id, .82);
@@ -325,7 +325,6 @@ function attackSequence(state, db, side, random, attackPower, defensePower) {
   }
 
   if (roll < .58) {
-    state.stats[side].onTarget += 1;
     addRating(state, shooter?.id, .04);
     return recordEvent(state, {
       type: 'woodwork', clubId: teamId, playerId: shooter?.id,
@@ -928,7 +927,7 @@ function applyDiscipline(state, db, baseEvents, random) {
     }));
   }
 
-  if (random() < .0013) {
+  if (random() < .00065) {
     const side = random() < .5 ? 'home' : 'away';
     const available = lineupFor(state, side).filter(id => !state.sentOffIds.includes(id));
     const offender = choosePlayer(available, db, random, ['DEF', 'MID']);
@@ -1582,7 +1581,7 @@ function improveInjuryAndOwnership(state,events,db){
   for(const event of events || []){
     const person=event.playerId ? playerById(db,event.playerId) : null;
     if(person?.clubId===state.homeClubId || person?.clubId===state.awayClubId) event.clubId=person.clubId;
-    if(event.type!=='injury' || !person)return;
+    if(event.type!=='injury' || !person)continue;
     const team=clubById(db,event.clubId)?.shortName || clubById(db,event.clubId)?.name || 'the team';
     event.lines=(event.lines || [event.text]).filter(Boolean).map((line,index)=>{
       if(index>0 && !String(line).includes(person.name)) return `${person.name} looks in real trouble. ${team} may need to make a change.`;
