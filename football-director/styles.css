@@ -60,3 +60,28 @@ body:has(#menu:not([hidden])) .tile.primary{background:linear-gradient(145deg,#2
 .game-lockup .season-mark{font-size:12px;margin:0 0 10px;padding:4px 0 4px 9px;white-space:nowrap}
 .publisher{gap:4px}.publisher img{width:112px;max-height:44px}
 @media(max-height:550px) and (min-width:701px){.game-lockup img{max-height:92px}.publisher img{max-height:28px}}
+
+/* Executive black / champagne identity — v0.2 */
+:root{--bg:#0c0c0e;--panel:#19191c;--line:#423c32;--ink:#f4f1ea;--muted:#bcb8b0;--accent:#c7a76b}
+body{background:#0c0c0e}
+body:has(#menu:not([hidden])){background:linear-gradient(0deg,rgba(8,8,9,.82) 0%,rgba(8,8,9,.32) 57%,rgba(8,8,9,.44) 100%),url("boardroom.webp?v=2") center center/cover no-repeat #0c0c0e;background-attachment:fixed}
+body:has(#menu:not([hidden])) header,body:has(#menu:not([hidden])) footer{background:#0c0c0e99;border-color:#c7a76b38}
+.brand,.edition{color:#d5c6a8}
+body:has(#menu:not([hidden])) .intro{text-align:center}
+body:has(#menu:not([hidden])) .publisher{justify-content:center;gap:9px}
+.publisher span{color:#d2c6af}
+body:has(#menu:not([hidden])) .intro .game-lockup{margin:6px auto 9px;justify-content:center}
+.game-lockup img{width:min(520px,84vw);max-height:clamp(84px,17vh,136px);object-position:center}
+body:has(#menu:not([hidden])) .intro p{color:#e0dcd4;text-shadow:0 2px 8px #000}
+body:has(#menu:not([hidden])) .tile{display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-rows:auto auto;align-content:center;align-items:center;column-gap:12px;row-gap:4px;background:linear-gradient(140deg,#242321da,#131313d9);border:1px solid #bfa16b57;border-radius:7px;backdrop-filter:blur(5px);box-shadow:0 8px 24px #0004}
+body:has(#menu:not([hidden])) .tile .symbol{grid-row:1/3;display:grid;place-items:center;width:36px;height:36px;border:1px solid #c7a76b50;border-radius:5px;color:var(--accent);background:#c7a76b0c}
+.symbol svg{width:22px;height:22px}
+body:has(#menu:not([hidden])) .tile strong{grid-column:2;color:#f4f1ea;padding-right:10px}
+body:has(#menu:not([hidden])) .tile small{grid-column:2;color:#c5bfb5;line-height:1.35}
+body:has(#menu:not([hidden])) .tile.primary{background:linear-gradient(130deg,#55432bdc,#282217e8);border-color:#d2b47b;box-shadow:0 0 0 1px #c7a76b20,0 8px 28px #0005}
+body:has(#menu:not([hidden])) .tile:hover:not(:disabled){background:#30291fed;border-color:#e5cb96}
+body:has(#menu:not([hidden])) .tile:disabled{opacity:.62}
+.arrow{color:#d9bd87;right:12px;top:12px}
+input,select,button.action{background:#171615}button.action.main{background:#58462b;border-color:#c7a76b;color:#f4f1ea}
+@media(min-width:701px){body:has(#menu:not([hidden])) .tile{min-height:clamp(85px,15vh,112px)}body:has(#menu:not([hidden])) .intro{margin-bottom:clamp(16px,4vh,34px)}}
+@media(max-width:700px){body:has(#menu:not([hidden])) .tile{display:flex;align-items:flex-start;gap:5px;min-height:120px}body:has(#menu:not([hidden])) .tile .symbol{width:28px;height:28px}.symbol svg{width:19px;height:19px}}
