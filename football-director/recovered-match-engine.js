@@ -952,6 +952,7 @@ function applyInjury(state, db, random) {
   if (!injured) return null;
   state.injuredIds.push(injured.id);
   const serious = random() < .3;
+  state.injurySeverity ||= {}; state.injurySeverity[injured.id] = serious ? 'serious' : 'knock';
   state.conditions[injured.id] = Math.min(state.conditions[injured.id] ?? 100, serious ? 38 : 55);
   state.ratings[injured.id] = clamp((state.ratings[injured.id] ?? 6.5) - .08, 4, 10);
   return recordEvent(state, {
