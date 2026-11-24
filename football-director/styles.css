@@ -159,3 +159,6 @@ body:has(#menu[hidden]) .intro{display:none}
 .background-option small{font-size:12px}
 .setup-warning{margin-top:12px!important;color:#e0c28a}
 @media(max-width:600px){.setup-fields,.setup-review{grid-template-columns:1fr}.setup-progress>div{flex-direction:column;align-items:flex-start;gap:3px;font-size:10px}.setup-facts{gap:5px}.setup-facts>div{padding:8px}.setup-facts strong{font-size:12px}}
+
+/* Expanded director profile */
+.setup-progress{grid-template-columns:repeat(5,minmax(0,1fr))}.setup-note{margin:12px 0 0!important;color:#d0b783!important}.setup-review{gap:8px}.setup-review>div{padding:9px 12px}.setup-review small{font-size:11px}.setup-review strong{font-size:13px}.career-setup .setup-fields select{padding:10px}.setup-progress>div{min-width:0}.setup-progress strong{overflow-wrap:anywhere}@media(min-width:900px){.setup-review{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.setup-progress{gap:4px}.setup-progress>div{font-size:10px}}
