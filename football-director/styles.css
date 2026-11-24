@@ -122,3 +122,6 @@ body > header{display:none!important}
 body:has(#menu:not([hidden])) .game-lockup img{aspect-ratio:620/150;width:min(470px,86vw);max-height:clamp(72px,15vh,118px)}
 body:has(#menu:not([hidden])) .tile strong{padding-right:0}
 @media(max-height:550px) and (min-width:701px){body:has(#menu:not([hidden])) .game-lockup img{max-height:76px}}
+
+/* Temporary wordmark without FD shield. */
+body:has(#menu:not([hidden])) .game-lockup img{aspect-ratio:470/150;width:min(370px,82vw)}
