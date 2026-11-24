@@ -161,7 +161,7 @@ const w=ensurePlayers(s.world,s.calendar.date),date=s.calendar.date;
 for(const c of w.clubs){
 for(const key of ["players","academyPlayers"]){
 const keep=[];for(const p of c[key]){
-if(newSeason)p.age++;
+if(newSeason){p.age++;const old=p.ability;const delta=p.age<=23?Math.min(3,Math.max(0,p.potential-p.ability)):p.age>=32?-(p.age>=35?3:1):0;p.ability=Math.max(10,Math.min(p.potential,p.ability+delta));const shift=Math.round(p.ability/5)-Math.round(old/5);if(shift)for(const key of Object.keys(p.attributes)){if(key==="goalkeeping"&&p.position!=="GK")continue;p.attributes[key]=Math.max(1,Math.min(20,p.attributes[key]+shift))}p.value=Math.max(1000,Math.round(p.value*(p.ability/Math.max(1,old))**2*(p.age>=32?.85:1)/100)*100)}
 if(p.injuryDays>0)p.injuryDays--;
 if(p.contractEnd<=date||p.age>=38){
 const retired=p.age>=38;c.playerHistory.push({id:p.id,name:p.name,date,status:retired?"Retired":"Contract expired"});
@@ -293,10 +293,34 @@ return {db,career,lineups,home,away};
 function startSpectator(s,f){const ctx=matchContext(s,f);if(ctx.lineups[f.homeClubId].length<11||ctx.lineups[f.awayClubId].length<11||[f.homeClubId,f.awayClubId].some(id=>!ctx.lineups[id].some(pid=>ctx.db.players.find(p=>p.id===pid)?.positionGroup==="GK")))return null;
 const state=NGMatchEngine.createInteractiveMatch(ctx.career,ctx.db);state.awayLineupIds=ctx.lineups[f.awayClubId];state.directorOpponentTactics=matchTactics(ctx.away);for(const p of ctx.db.players){state.conditions[p.id]=p.fitness;state.ratings[p.id]??=6.5;state.minutesPlayed[p.id]??=0}return {fixtureId:f.id,state,ctx,walkout:null,aiSubs:{home:[],away:[]}}}
 function spectatorStep(m){
-const {ctx}=m;let result=NGMatchEngine.advanceInteractiveMatch(m.state,ctx.career,ctx.db);m.state=result.state;const st=m.state;
-if([60,72,82].includes(st.minute)){for(const side of ["home","away"]){const ids=st[side+"LineupIds"],clubId=st[side+"ClubId"],out=ids.map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&p.positionGroup!=="GK").sort((a,b)=>(st.conditions[a.id]||100)-(st.conditions[b.id]||100))[0];if(!out)continue;const incoming=ctx.db.players.filter(p=>p.clubId===clubId&&p.positionGroup===out.positionGroup&&!ids.includes(p.id)&&!m.aiSubs[side].includes(p.id)&&!(st.sentOffIds||[]).includes(p.id)).sort((a,b)=>b.currentAbility-a.currentAbility)[0];if(!incoming)continue;st[side+"LineupIds"]=ids.map(id=>id===out.id?incoming.id:id);m.aiSubs[side].push(out.id);st.events.push({minute:st.minute,type:"substitution",clubId,playerId:incoming.id,text:incoming.name+" replaces "+out.name+"."})}}
-if(st.minute===70){for(const side of ["home","away"]){const trailing=side==="home"?st.homeGoals<st.awayGoals:st.awayGoals<st.homeGoals;if(trailing){const key=side==="home"?"tactics":"directorOpponentTactics";st[key]={...st[key],mentality:"Attacking",pressing:"High"}}}}
-return st.minute>=90;
+const {ctx}=m;const result=NGMatchEngine.advanceInteractiveMatch(m.state,ctx.career,ctx.db);m.state=result.state;const st=m.state;
+m.aiWindows||={home:[],away:[]};
+m.aiBench||=Object.fromEntries(["home","away"].map(side=>[side,ctx.db.players.filter(p=>p.clubId===st[side+"ClubId"]&&!ctx.lineups[st[side+"ClubId"]].includes(p.id)).sort((a,b)=>b.currentAbility-a.currentAbility).slice(0,9).map(p=>p.id)]));
+if(st.minute>=90)return true;
+for(const side of ["home","away"]){
+const ids=st[side+"LineupIds"],clubId=st[side+"ClubId"];
+const injured=new Set(st.injuredIds||[]),sent=new Set(st.sentOffIds||[]),windows=m.aiWindows[side],used=m.aiSubs[side];
+const trailing=side==="home"?st.homeGoals<st.awayGoals:st.awayGoals<st.homeGoals;
+const leading=side==="home"?st.homeGoals>st.awayGoals:st.awayGoals>st.homeGoals;
+const key=side==="home"?"tactics":"directorOpponentTactics";
+if(st.minute>=55&&st.minute%5===0){const original=matchTactics(side==="home"?ctx.home:ctx.away);st[key]={...st[key],mentality:trailing?"Attacking":leading&&st.minute>=75?"Defensive":original.mentality,pressing:trailing?"High":leading&&st.minute>=75?"Low":original.pressing}}
+const available=()=>m.aiBench[side].map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&!st[side+"LineupIds"].includes(p.id)&&!used.includes(p.id)&&!injured.has(p.id)&&!sent.has(p.id));
+const urgent=ids.some(id=>injured.has(id));
+if(!(st.minute===45||windows.includes(st.minute)||windows.length<3)||used.length>=5)continue;
+const candidates=ids.map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&!sent.has(p.id)&&(injured.has(p.id)||p.positionGroup!=="GK")).sort((a,b)=>Number(injured.has(b.id))-Number(injured.has(a.id))||(st.conditions[a.id]??100)-(st.conditions[b.id]??100));
+let changed=0;
+for(const out of candidates){
+if(used.length>=5||changed>=2)break;
+const injuredOut=injured.has(out.id),fatigue=st.conditions[out.id]??100,threshold=st.minute>=78?94:st.minute>=62?92:88;
+if(!injuredOut&&(urgent||st.minute<55||st.minute%5!==0||fatigue>threshold))continue;
+const incoming=available().filter(p=>p.positionGroup===out.positionGroup).sort((a,b)=>Number(b.position===out.position)-Number(a.position===out.position)+(b.currentAbility*(st.conditions[b.id]??100)-a.currentAbility*(st.conditions[a.id]??100))/10000)[0];
+if(!incoming)continue;
+st[side+"LineupIds"]=st[side+"LineupIds"].map(id=>id===out.id?incoming.id:id);used.push(out.id);changed++;
+if(st.minute!==45&&!windows.includes(st.minute))windows.push(st.minute);
+st.events.push({minute:st.minute,type:"substitution",clubId,playerId:incoming.id,outId:out.id,reason:injuredOut?"injury":"fatigue",text:incoming.name+" replaces "+out.name+(injuredOut?" after an injury.":".")});
+}
+}
+return false;
 }
 function finishSpectator(s,f,m){
 if(f.played)return;
