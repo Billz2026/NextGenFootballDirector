@@ -85,3 +85,23 @@ body:has(#menu:not([hidden])) .tile:disabled{opacity:.62}
 input,select,button.action{background:#171615}button.action.main{background:#58462b;border-color:#c7a76b;color:#f4f1ea}
 @media(min-width:701px){body:has(#menu:not([hidden])) .tile{min-height:clamp(85px,15vh,112px)}body:has(#menu:not([hidden])) .intro{margin-bottom:clamp(16px,4vh,34px)}}
 @media(max-width:700px){body:has(#menu:not([hidden])) .tile{display:flex;align-items:flex-start;gap:5px;min-height:120px}body:has(#menu:not([hidden])) .tile .symbol{width:28px;height:28px}.symbol svg{width:19px;height:19px}}
+
+/* Compact landing page: publisher and game mark form one lockup. */
+body:has(#menu:not([hidden])) .intro{margin-bottom:clamp(16px,3vh,26px)}
+body:has(#menu:not([hidden])) .publisher{margin:0;gap:0}
+body:has(#menu:not([hidden])) .publisher img{width:108px;max-height:40px;object-position:center}
+body:has(#menu:not([hidden])) .intro .game-lockup{margin:3px auto 0;line-height:1}
+body:has(#menu:not([hidden])) .game-lockup img{width:min(500px,86vw);height:auto;max-height:clamp(72px,15vh,118px);aspect-ratio:780/150}
+body:has(#menu:not([hidden])) .tiles{gap:9px}
+body:has(#menu:not([hidden])) .tile{background:linear-gradient(140deg,#242321ce,#131313d6);box-shadow:0 5px 20px #0004}
+body:has(#menu:not([hidden])) .tile.primary{background:linear-gradient(130deg,#55432bd4,#282217dd)}
+body:has(#menu:not([hidden])) .tiles:has(#resume:not(:disabled)) .tile.primary{background:linear-gradient(140deg,#242321ce,#131313d6);border-color:#bfa16b57;box-shadow:0 5px 20px #0004}
+body:has(#menu:not([hidden])) .tiles:has(#resume:not(:disabled)) #resume{background:linear-gradient(130deg,#55432bd4,#282217dd);border-color:#d2b47b;box-shadow:0 0 0 1px #c7a76b20,0 8px 28px #0005}
+body:has(#menu:not([hidden])) .tiles:has(#resume:not(:disabled)) .tile.primary:hover{background:#30291fed;border-color:#e5cb96}
+@media(min-width:701px){
+ body:has(#menu:not([hidden])) main{width:min(1020px,88%);padding:clamp(12px,2vh,24px) 0}
+ body:has(#menu:not([hidden])) header{padding:10px 5%}
+ body:has(#menu:not([hidden])) footer{padding:8px 5%}
+ body:has(#menu:not([hidden])) .tile{min-height:clamp(78px,13vh,98px);padding:12px 14px;column-gap:11px}
+}
+@media(max-height:550px) and (min-width:701px){body:has(#menu:not([hidden])) .publisher img{max-height:28px}body:has(#menu:not([hidden])) .game-lockup img{max-height:76px}body:has(#menu:not([hidden])) .intro{margin-bottom:12px}}
