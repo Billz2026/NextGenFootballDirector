@@ -311,9 +311,9 @@ const candidates=ids.map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&!se
 let changed=0;
 for(const out of candidates){
 if(used.length>=5||changed>=2)break;
-const injuredOut=injured.has(out.id),fatigue=st.conditions[out.id]??100,threshold=st.minute>=78?94:st.minute>=62?92:88;
-if(!injuredOut&&(urgent||st.minute<55||st.minute%5!==0||fatigue>threshold))continue;
-const incoming=available().filter(p=>p.positionGroup===out.positionGroup).sort((a,b)=>Number(b.position===out.position)-Number(a.position===out.position)+(b.currentAbility*(st.conditions[b.id]??100)-a.currentAbility*(st.conditions[a.id]??100))/10000)[0];
+const injuredOut=injured.has(out.id),fatigue=st.conditions[out.id]??100,threshold=st.minute>=80?91:st.minute>=65?88:84;
+if(!injuredOut&&(urgent||st.minute<60||st.minute%5!==0||fatigue>threshold||used.length>=4||windows.length>=2&&st.minute<82))continue;
+const incoming=available().filter(p=>p.positionGroup===out.positionGroup||(injuredOut&&out.positionGroup!=="GK"&&p.positionGroup!=="GK")).sort((a,b)=>3*(Number(b.positionGroup===out.positionGroup)-Number(a.positionGroup===out.positionGroup))+Number(b.position===out.position)-Number(a.position===out.position)+(b.currentAbility*(st.conditions[b.id]??100)-a.currentAbility*(st.conditions[a.id]??100))/10000)[0];
 if(!incoming)continue;
 st[side+"LineupIds"]=st[side+"LineupIds"].map(id=>id===out.id?incoming.id:id);used.push(out.id);changed++;
 if(st.minute!==45&&!windows.includes(st.minute))windows.push(st.minute);
