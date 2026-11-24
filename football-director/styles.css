@@ -51,7 +51,7 @@
 @media(min-width:701px) and (max-height:550px){body:has(#menu:not([hidden])) .intro h1{font-size:38px;line-height:1}.publisher img{max-height:30px}}
 
 /* Executive suite artwork and vector identity. */
-body:has(#menu:not([hidden])){background:linear-gradient(90deg,rgba(5,12,20,.78),rgba(5,12,20,.26) 70%),linear-gradient(0deg,#080f19e8 0%,#080f1940 65%),url("boardroom.webp") center center / cover no-repeat,#0b111a;background-attachment:fixed}
+body:has(#menu:not([hidden])){background:linear-gradient(90deg,rgba(5,12,20,.68),rgba(5,12,20,.12) 70%),linear-gradient(0deg,#080f19c9 0%,#080f1920 65%),url("boardroom.webp?v=2") center center / cover no-repeat,#0b111a;background-attachment:fixed}
 body:has(#menu:not([hidden])) header,body:has(#menu:not([hidden])) footer{background:#080f19a6}
 body:has(#menu:not([hidden])) .tile{background:linear-gradient(145deg,#192534e8,#101923e8);backdrop-filter:blur(8px)}
 body:has(#menu:not([hidden])) .tile.primary{background:linear-gradient(145deg,#20533eef,#123629ed)}
