@@ -292,11 +292,21 @@ return {db,career,lineups,home,away};
 }
 function startSpectator(s,f){const ctx=matchContext(s,f);if(ctx.lineups[f.homeClubId].length<11||ctx.lineups[f.awayClubId].length<11||[f.homeClubId,f.awayClubId].some(id=>!ctx.lineups[id].some(pid=>ctx.db.players.find(p=>p.id===pid)?.positionGroup==="GK")))return null;
 const state=NGMatchEngine.createInteractiveMatch(ctx.career,ctx.db);state.awayLineupIds=ctx.lineups[f.awayClubId];state.directorOpponentTactics=matchTactics(ctx.away);for(const p of ctx.db.players){state.conditions[p.id]=p.fitness;state.ratings[p.id]??=6.5;state.minutesPlayed[p.id]??=0}return {fixtureId:f.id,state,ctx,walkout:null,aiSubs:{home:[],away:[]}}}
+function emergencyCover(m,side){
+const st=m.state,ids=st[side+"LineupIds"],db=m.ctx.db,clubId=st[side+"ClubId"],used=m.aiSubs[side],windows=m.aiWindows[side],injured=new Set(st.injuredIds||[]);
+const keeper=ids.find(id=>db.players.find(p=>p.id===id)?.positionGroup==="GK");
+if(keeper)return;
+const bench=m.aiBench[side].map(id=>db.players.find(p=>p.id===id)).find(p=>p?.positionGroup==="GK"&&!ids.includes(p.id)&&!used.includes(p.id)&&!injured.has(p.id)&&!(st.sentOffIds||[]).includes(p.id));
+const out=ids.map(id=>db.players.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>Number(injured.has(b.id))-Number(injured.has(a.id))||a.currentAbility-b.currentAbility)[0];
+if(!out)return;
+if(bench&&used.length<5&&(st.minute===45||windows.includes(st.minute)||windows.length<3)&&st.minute<90){st[side+"LineupIds"]=ids.map(id=>id===out.id?bench.id:id);used.push(out.id);if(st.minute!==45&&!windows.includes(st.minute))windows.push(st.minute);st.events.push({minute:st.minute,type:"substitution",clubId,playerId:bench.id,outId:out.id,reason:"goalkeeper emergency",text:bench.name+" replaces "+out.name+" to cover in goal."});return}
+const standIn=ids.map(id=>db.players.find(p=>p.id===id)).filter(p=>p&&!injured.has(p.id)).sort((a,b)=>(b.attributes?.goalkeeping||0)-(a.attributes?.goalkeeping||0)||b.currentAbility-a.currentAbility)[0];
+if(standIn){standIn.positionGroup="GK";standIn.primaryPosition="GK";standIn.currentAbility=Math.max(20,Math.round(standIn.currentAbility*.4));st.events.push({minute:st.minute,type:"instruction",clubId,playerId:standIn.id,text:standIn.name+" takes over in goal as an emergency goalkeeper."})}
+}
 function spectatorStep(m){
 const {ctx}=m;const result=NGMatchEngine.advanceInteractiveMatch(m.state,ctx.career,ctx.db);m.state=result.state;const st=m.state;
 m.aiWindows||={home:[],away:[]};
-m.aiBench||=Object.fromEntries(["home","away"].map(side=>[side,ctx.db.players.filter(p=>p.clubId===st[side+"ClubId"]&&!ctx.lineups[st[side+"ClubId"]].includes(p.id)).sort((a,b)=>b.currentAbility-a.currentAbility).slice(0,9).map(p=>p.id)]));
-if(st.minute>=90)return true;
+m.aiBench||=Object.fromEntries(["home","away"].map(side=>[side,ctx.db.players.filter(p=>p.clubId===st[side+"ClubId"]&&!ctx.lineups[st[side+"ClubId"]].includes(p.id)).sort((a,b)=>Number(b.positionGroup==="GK")-Number(a.positionGroup==="GK")||b.currentAbility-a.currentAbility).slice(0,9).map(p=>p.id)]));
 for(const side of ["home","away"]){
 const ids=st[side+"LineupIds"],clubId=st[side+"ClubId"];
 const injured=new Set(st.injuredIds||[]),sent=new Set(st.sentOffIds||[]),windows=m.aiWindows[side],used=m.aiSubs[side];
@@ -306,7 +316,7 @@ const key=side==="home"?"tactics":"directorOpponentTactics";
 if(st.minute>=55&&st.minute%5===0){const original=matchTactics(side==="home"?ctx.home:ctx.away);st[key]={...st[key],mentality:trailing?"Attacking":leading&&st.minute>=75?"Defensive":original.mentality,pressing:trailing?"High":leading&&st.minute>=75?"Low":original.pressing}}
 const available=()=>m.aiBench[side].map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&!st[side+"LineupIds"].includes(p.id)&&!used.includes(p.id)&&!injured.has(p.id)&&!sent.has(p.id));
 const urgent=ids.some(id=>injured.has(id));
-if(!(st.minute===45||windows.includes(st.minute)||windows.length<3)||used.length>=5)continue;
+if(st.minute<90&&(st.minute===45||windows.includes(st.minute)||windows.length<3)&&used.length<5){
 const candidates=ids.map(id=>ctx.db.players.find(p=>p.id===id)).filter(p=>p&&!sent.has(p.id)&&(injured.has(p.id)||p.positionGroup!=="GK")).sort((a,b)=>Number(injured.has(b.id))-Number(injured.has(a.id))||(st.conditions[a.id]??100)-(st.conditions[b.id]??100));
 let changed=0;
 for(const out of candidates){
@@ -320,13 +330,15 @@ if(st.minute!==45&&!windows.includes(st.minute))windows.push(st.minute);
 st.events.push({minute:st.minute,type:"substitution",clubId,playerId:incoming.id,outId:out.id,reason:injuredOut?"injury":"fatigue",text:incoming.name+" replaces "+out.name+(injuredOut?" after an injury.":".")});
 }
 }
-return false;
+const serious=st[side+"LineupIds"].filter(id=>st.injurySeverity?.[id]==="serious");for(const id of serious){st[side+"LineupIds"]=st[side+"LineupIds"].filter(x=>x!==id);st.events.push({minute:st.minute,type:"injury-withdrawal",clubId,playerId:id,text:(ctx.db.players.find(p=>p.id===id)?.name||"Player")+" cannot continue."})}if(st.minute<90)emergencyCover(m,side);
+}
+return st.minute>=90;
 }
 function finishSpectator(s,f,m){
 if(f.played)return;
 if(!m){const ctx=matchContext(s,f),ok=id=>ctx.lineups[id].length===11&&ctx.lineups[id].some(pid=>ctx.db.players.find(p=>p.id===pid)?.positionGroup==="GK");f.homeGoals=ok(f.homeClubId)&&!ok(f.awayClubId)?3:0;f.awayGoals=ok(f.awayClubId)&&!ok(f.homeClubId)?3:0;f.events=[];f.forfeit=true}
 else{const st=m.state;f.homeGoals=st.homeGoals;f.awayGoals=st.awayGoals;f.events=st.events.filter(e=>["goal","red","yellow","injury","substitution"].includes(e.type)).map(e=>({minute:e.minute,type:e.type,text:e.text,playerId:e.playerId,clubId:e.clubId}));f.stats=st.stats;
-for(const c of [m.ctx.home,m.ctx.away]){const real=s.world.clubs.find(x=>x.id===c.id);for(const p of [...real.players,...real.academyPlayers]){if(st.minutesPlayed[p.id]>0){p.appearances=(p.appearances||0)+1;p.goals=(p.goals||0)+st.events.filter(e=>e.type==="goal"&&e.playerId===p.id).length;p.fitness=Math.max(20,Math.round(st.conditions[p.id]||p.fitness));if((st.injuredIds||[]).includes(p.id))p.injuryDays=Math.max(p.injuryDays,7)}}}}
+for(const c of [m.ctx.home,m.ctx.away]){const real=s.world.clubs.find(x=>x.id===c.id);for(const p of [...real.players,...real.academyPlayers]){if(st.minutesPlayed[p.id]>0){p.appearances=(p.appearances||0)+1;p.goals=(p.goals||0)+st.events.filter(e=>e.type==="goal"&&e.playerId===p.id).length;p.fitness=Math.max(20,Math.round(st.conditions[p.id]||p.fitness));if((st.injuredIds||[]).includes(p.id))p.injuryDays=Math.max(p.injuryDays,st.injurySeverity?.[p.id]==="serious"?28:3)}}}}
 f.played=true;const own=s.world.clubs.find(c=>c.name===s.club);if(own&&[f.homeClubId,f.awayClubId].includes(own.id)){const home=own.id===f.homeClubId,gf=home?f.homeGoals:f.awayGoals,ga=home?f.awayGoals:f.homeGoals,r=relationships(s,own);r.board=clampConfidence(r.board+(gf>ga?3:gf<ga?-3:0));calendarEvent(s,"result:"+f.id,"Full time",s.world.clubs.find(c=>c.id===f.homeClubId).name+" "+f.homeGoals+" – "+f.awayGoals+" "+s.world.clubs.find(c=>c.id===f.awayClubId).name,own.name)}
 }
 function pendingMatch(s){const c=s.world.clubs.find(c=>c.name===s.club);return c&&ensureLeague(s).fixtures.find(f=>!f.played&&f.date<=s.calendar.date&&[f.homeClubId,f.awayClubId].includes(c.id))}
@@ -348,7 +360,7 @@ panel.querySelectorAll("[data-speed]").forEach(b=>b.onclick=()=>{speed=Number(b.
 panel.querySelector("#walkout").onclick=()=>{if(!confirm("Leave the directors’ box? The match will continue and the media may report your departure."))return;active=false;clearTimeout(timer);const own=s.world.clubs.find(c=>c.name===s.club),home=own.id===f.homeClubId,gf=home?st.homeGoals:st.awayGoals,ga=home?st.awayGoals:st.homeGoals;
 m.walkout={minute:st.minute,score:[gf,ga]};const headline=gf<ga?"Director walks out as "+own.name+" struggle under "+own.manager.name:gf===ga?"Questions raised as director leaves during tense match":"Director makes surprise early exit despite "+own.name+" leading";calendarEvent(s,"walkout:"+f.id,headline,"The director left in minute "+st.minute+" with the club "+gf+"–"+ga+". The reason has not been confirmed.","Football press");const r=relationships(s,own);r.manager=clampConfidence(r.manager-(gf<ga?6:3));r.board=clampConfidence(r.board-2);while(!spectatorStep(m)){}finishSpectator(s,f,m);delete s.liveMatch;if(save(s))career()};
 }
-function schedule(){if(!active)return;timer=setTimeout(()=>{if(spectatorStep(m)){finish();return}if(m.state.minute%5===0&&!save(s)){active=false;return}render();schedule()},Math.max(35,900/speed))}
+function schedule(){if(!active)return;timer=setTimeout(()=>{if(spectatorStep(m)){finish();return}if(!save(s)){active=false;return}render();schedule()},Math.max(35,900/speed))}
 render();schedule();
 }
 function leagueScreen(tier=1){const s=load();if(!s)return home();const l=ensureLeague(s),rows=leagueTable(s,tier);show("League & Fixtures",'<div class="world-tabs">'+DIVISIONS.map((d,i)=>'<button class="action '+(tier===i+1?"main":"")+'" data-league="'+(i+1)+'">'+d+'</button>').join("")+'</div><div class="world-table-wrap"><table class="world-table"><thead><tr><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+escapeHtml(r.name)+'</td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.d+'</td><td>'+r.l+'</td><td>'+r.gf+'</td><td>'+r.ga+'</td><td>'+r.pts+'</td></tr>').join("")+'</tbody></table></div><h3>Fixtures & results</h3>'+l.fixtures.filter(f=>f.tier===tier).sort((a,b)=>a.date.localeCompare(b.date)).map(f=>'<div class="club"><div><strong>'+escapeHtml(s.world.clubs.find(c=>c.id===f.homeClubId).name)+' v '+escapeHtml(s.world.clubs.find(c=>c.id===f.awayClubId).name)+'</strong><small>'+f.date+'</small></div><span>'+(f.played?f.homeGoals+" – "+f.awayGoals:"Scheduled")+'</span></div>').join(""));panel.querySelector("#back").textContent="Back to office";panel.querySelector("#back").onclick=career;panel.querySelectorAll("[data-league]").forEach(b=>b.onclick=()=>leagueScreen(Number(b.dataset.league)))}
