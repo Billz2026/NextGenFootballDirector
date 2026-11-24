@@ -180,3 +180,6 @@ body:has(#panel.office-panel:not([hidden])) main{width:min(1280px,94%);padding:1
 
 /* Staff market */
 .staff-candidate{padding:12px 0;border-top:1px solid #494132}.staff-candidate small,.office-card>small{display:block;margin:5px 0}.staff-attributes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.staff-attributes span{background:#25221c;border:1px solid #494132;padding:5px 8px;font-size:11px;border-radius:4px;text-transform:capitalize}.staff-attributes b{color:#e4c990}.staff-delegate{display:flex;flex-direction:row;align-items:center;gap:8px;margin:8px 0}.staff-delegate input{accent-color:#c7a76b}
+
+/* Squad management */
+#squad-filter{max-width:220px;margin:6px 0 12px}.world-table td{font-variant-numeric:tabular-nums}.world-table td:first-child{min-width:145px}.world-table-wrap{scrollbar-color:#c7a76b #19191c}.world-table tbody tr:nth-child(even){background:#ffffff03}.world-table tbody tr:hover{background:#292319}
