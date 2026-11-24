@@ -117,3 +117,8 @@ body:has(#menu:not([hidden])) .tiles{gap:8px}
 
 /* Landing header is intentionally absent, including cached markup. */
 body > header{display:none!important}
+
+/* Final wordmark proportions and consistent menu labels. */
+body:has(#menu:not([hidden])) .game-lockup img{aspect-ratio:620/150;width:min(470px,86vw);max-height:clamp(72px,15vh,118px)}
+body:has(#menu:not([hidden])) .tile strong{padding-right:0}
+@media(max-height:550px) and (min-width:701px){body:has(#menu:not([hidden])) .game-lockup img{max-height:76px}}
