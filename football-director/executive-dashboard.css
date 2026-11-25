@@ -244,3 +244,6 @@
 #panel.fd-office .sq-actions .action{padding:6px;margin:3px 0;min-height:29px}
 @media(min-width:1180px) and (min-height:650px){#panel.fd-office .sq-three{height:calc(100dvh - 235px);min-height:300px}#panel.fd-office .fd-sidebar{height:100dvh;max-height:100dvh}#panel.fd-office .fd-nav-scroll .fd-nav{min-height:27px;padding-top:4px;padding-bottom:4px}#panel.fd-office .fd-nav-group{margin-top:5px}}
 @media(max-width:760px){#panel.fd-office .fd-nav-scroll{overflow:visible}#panel.fd-office .fd-sidebar{overflow:visible}}
+
+/* Build 51 */
+#panel.fd-office .tc-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:12px 0}#panel.fd-office .tc-list .sq-pane{padding:16px}#panel.fd-office .tc-list .office-card{margin:8px 0;padding:10px}#panel.fd-office .tc-list .action{margin:4px} @media(min-width:1180px) and (min-height:650px){#panel.fd-office .fd-content:has(.sq-hub){display:flex;flex-direction:column;min-height:0;overflow:hidden}#panel.fd-office .sq-hub{flex:1;display:flex;flex-direction:column;min-height:0}#panel.fd-office .sq-three{flex:1;height:auto;min-height:0}#panel.fd-office .sq-summary,#panel.fd-office .sq-tabs,#panel.fd-office .sq-toolbar{flex-shrink:0}}
