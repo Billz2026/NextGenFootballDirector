@@ -171,3 +171,41 @@
 #panel.fd-office .sq-dossier .setup-review>div{background:#111214;border:1px solid #d4b78030;padding:10px}
 @media(max-width:1100px){#panel.fd-office .sq-summary{grid-template-columns:repeat(3,minmax(0,1fr))}#panel.fd-office .sq-table-wrap{max-height:calc(100dvh - 350px)}}
 @media(max-width:650px){#panel.fd-office .sq-summary{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .sq-table-wrap{max-height:55dvh}#panel.fd-office .sq-dossier .setup-review{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .sq-toolbar input,#panel.fd-office .sq-toolbar select{width:130px}}
+
+/* Build 49 — integrated squad control centre */
+#panel.fd-office .sq-three{display:grid;grid-template-columns:minmax(300px,1.45fr) minmax(230px,1fr) minmax(190px,.8fr);gap:9px;min-height:0;align-items:stretch}
+#panel.fd-office .sq-pane{min-width:0;background:linear-gradient(145deg,#151618,#0d0e0f);border:1px solid #d4b78035;padding:12px;overflow:auto;scrollbar-width:thin;scrollbar-color:#71634a #111214}
+#panel.fd-office .sq-pane h3{font:700 21px/1.1 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#f0ddb5;margin:0 0 10px}
+#panel.fd-office .sq-pane h4{font:700 15px 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#d4b780;margin:14px 0 6px;border-bottom:1px solid #d4b78030;padding-bottom:5px}
+#panel.fd-office .sq-roster{display:flex;flex-direction:column;padding:10px 0 0}
+#panel.fd-office .sq-roster h3{padding:0 10px}
+#panel.fd-office .sq-roster-scroll{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#71634a #111214}
+#panel.fd-office .sq-roster table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+#panel.fd-office .sq-roster th{position:sticky;top:0;background:#28231a;color:#d4b780;padding:7px 4px;text-align:left;font:700 12px 'Barlow Condensed',sans-serif;z-index:1}
+#panel.fd-office .sq-roster td{padding:5px 4px;border-bottom:1px solid #d4b78018;font-variant-numeric:tabular-nums}
+#panel.fd-office .sq-roster td:first-child{padding-left:10px;white-space:normal}
+#panel.fd-office .sq-roster td small{display:block;color:#9e998f;font-size:9px;line-height:1.15}
+#panel.fd-office .sq-roster .world-link{font-size:12px;color:#f0ddb5;font-weight:700;padding:0;text-align:left}
+#panel.fd-office .sq-roster tr.selected{background:#d4b78024;box-shadow:inset 3px 0 #d4b780}
+#panel.fd-office .sq-roster tr:hover{background:#d4b78012}
+#panel.fd-office .sq-identity{display:flex;align-items:center;gap:10px;padding:0 0 12px;border-bottom:1px solid #d4b78035}
+#panel.fd-office .sq-avatar{display:grid;place-items:center;flex:0 0 52px;height:60px;background:linear-gradient(140deg,#393122,#161616);border:1px solid #d4b78065;color:#f0ddb5;font:800 27px 'Barlow Condensed',sans-serif}
+#panel.fd-office .sq-identity h3{font-size:27px;margin:3px 0}
+#panel.fd-office .sq-identity small{font-size:10px;color:#d4b780;letter-spacing:.1em}
+#panel.fd-office .sq-identity p{font-size:11px;color:#b6afa3;margin:0}
+#panel.fd-office .sq-profile-tabs{display:flex;gap:4px;margin:10px 0;flex-wrap:wrap}
+#panel.fd-office .sq-profile-tabs .action{font-size:11px;padding:6px 8px;min-height:28px;margin:0}
+#panel.fd-office .sq-meter{display:grid;grid-template-columns:1fr auto;gap:5px;margin:9px 0;font-size:12px}
+#panel.fd-office .sq-meter b{color:#f0ddb5}
+#panel.fd-office .sq-meter>div{grid-column:1/-1;height:5px;background:#302d27;border-radius:2px;overflow:hidden}
+#panel.fd-office .sq-meter i{display:block;height:100%;background:linear-gradient(90deg,#a78b52,#e2c78e)}
+#panel.fd-office .sq-fact{display:flex;justify-content:space-between;gap:7px;padding:7px 0;border-bottom:1px solid #d4b78018;font-size:11px}
+#panel.fd-office .sq-fact span{color:#b6afa3}
+#panel.fd-office .sq-fact b{text-align:right;color:#f0ddb5}
+#panel.fd-office .sq-actions .action{width:100%;font-size:11px;padding:8px;white-space:normal;margin:5px 0}
+#panel.fd-office .sq-actions>small{font-size:10px;color:#b6afa3;display:block;line-height:1.4}
+#panel.fd-office .sq-toolbar>span{margin-left:auto;color:#b6afa3;font-size:11px;align-self:end}
+#panel.fd-office .sq-depth-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+@media(min-width:1180px) and (min-height:650px){#panel.fd-office .sq-three{height:calc(100dvh - 285px);min-height:300px}#panel.fd-office .sq-summary>div{padding:7px 10px}#panel.fd-office .sq-summary strong{font-size:28px}}
+@media(max-width:1179px){#panel.fd-office .sq-three{grid-template-columns:minmax(280px,1.2fr) minmax(220px,1fr)}#panel.fd-office .sq-actions{grid-column:1/-1}#panel.fd-office .sq-roster-scroll{max-height:420px}}
+@media(max-width:760px){#panel.fd-office .sq-three{grid-template-columns:minmax(0,1fr)}#panel.fd-office .sq-actions{grid-column:auto}#panel.fd-office .sq-roster-scroll{max-height:300px}#panel.fd-office .sq-depth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
