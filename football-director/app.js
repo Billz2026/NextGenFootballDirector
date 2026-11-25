@@ -7,18 +7,19 @@ const CLUB_SEEDS=[
 ["Kingsport United","Dunford Athletic","Elmbridge City","Ravenswick Town"],
 ["Northbridge Athletic","Eastborough FC","Oakmere Rovers","Westridge Town"],
 ["Harbourfield FC","Millhaven United","Stoneleigh Athletic","Fenwick Borough"]];
+CLUB_SEEDS.forEach((names,t)=>names.push(...[["Alderwick City","Blackmere United","Brackenford FC","Cedarport Athletic","Dalesworth City","Eastmere Rovers","Fairhaven United","Glenwick City","Hawthorn Albion","Ironhaven FC","Lakesmere United","Marlborough Vale","Norchester City","Ridgeport Athletic","Silverbrook FC","Thornwick United"],["Amberford Town","Briarcombe FC","Claymere City","Dunmere Rovers","Elderport United","Foxbridge Athletic","Greyhaven Town","Highmere Albion","Juniper City","Kestrelford FC","Larkstone United","Merewick Town","Newhaven Vale","Orchardford City","Pineborough FC","Queensmere United"],["Asterbridge Town","Birchmere Athletic","Copperfield Rovers","Draywick FC","Elmsworth City","Ferncombe United","Graniteport Town","Hollymere FC","Ingleford Athletic","Kingsmere Albion","Lowbridge Town","Millstone City","Northmere Rovers","Oakbridge Vale","Ravenport FC","Sableford United"],["Ashcombe Town","Brookmere FC","Cloverwick Rovers","Deerford Athletic","Eastwick Vale","Flintmere United","Greenport Town","Hazelbrook FC","Ivybridge Vale","Kirkmere Albion","Longmere City","Mossford Town","Newbridge Rovers","Oldwick Athletic","Pembermere FC","Roseford United"],["Aldercombe FC","Bramblemere Town","Cresswick Athletic","Dovecote Vale","Elmport Rovers","Fallowbridge FC","Gorseford Town","Heathmere United","Ivymere Albion","Juniperford FC","Kelwick Town","Lindenport Athletic","Meadowwick FC","Nettleford Rovers","Orchardmere United","Willowcombe Town"]][t]));
 const LEGACY_CLUBS={"Northbridge Athletic":[10,425000,"High pressing",42000],"Eastborough FC":[8,240000,"Direct football",35000],"Kingsport United":[25,1200000,"Possession football",85000],"Westford City":[45,8000000,"Adaptable football",210000],"Metropolitan FC":[80,45000000,"Possession football",600000]};
 const MANAGERS=["Adrian Mercer","Callum Henshaw","Martin Ellwood","Daniel Whitaker","Gareth Rowley","Simon Hartwell","Lewis Carver","Patrick Wren","Neil Ashford","Oliver Dacre","Richard Fenner","James Ridley","Thomas Vane","Andrew Hollis","Michael Brierley","David Keaton","Ben Marlow","Stephen Telford","Paul Wetherby","Chris Calder"];
 function newWorld(){return {schema:1,season:"2026/27",clubs:CLUB_SEEDS.flatMap((names,t)=>names.map((name,i)=>{
-const tier=t+1,ix=t*4+i,legacy=LEGACY_CLUBS[name];
+const tier=t+1,ix=t*20+i,legacy=LEGACY_CLUBS[name];
 const rep=legacy?legacy[0]:[75,42,23,12,5][t]+i*2;
 const budget=legacy?legacy[1]:[32000000,5500000,950000,300000,75000][t]+i*[4000000,700000,100000,35000,10000][t];
 const style=legacy?legacy[2]:["Possession football","High pressing","Counter-attacking","Direct football","Adaptable football"][(ix+t)%5];
 const salary=legacy?legacy[3]:[420000,150000,65000,38000,26000][t]+i*[25000,10000,4000,2000,1000][t];
-return {id:"club-"+tier+"-"+(i+1),name,tier,rep,budget,style,salary,stadium:name.replace(/ (FC|City|United|Athletic|Rovers|Town|Albion|Borough)$/,"")+" Park",capacity:[34000,19000,10500,6200,2800][t]+i*[2500,1200,650,400,200][t],cash:budget*3,wageBudget:[850000,190000,48000,22000,8500][t]+i*[45000,10000,3000,1500,500][t],training:Math.max(1,16-t*2+(i%3)),academy:Math.max(1,15-t*2+(i%3)),manager:{id:"manager-"+ix,name:MANAGERS[ix],style,formation:["4-3-3","4-2-3-1","4-4-2","3-5-2"][i]},boardObjective:["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][t],director:null,vacant: name==="Northbridge Athletic"||name==="Eastborough FC"||name==="Harbourfield FC"||name==="Kingsport United"||name==="Westford City"||name==="Metropolitan FC"};
+return {id:"club-"+tier+"-"+(i+1),name,tier,rep,budget,style,salary,stadium:name.replace(/ (FC|City|United|Athletic|Rovers|Town|Albion|Borough)$/,"")+" Park",capacity:[34000,19000,10500,6200,2800][t]+i*[2500,1200,650,400,200][t],cash:budget*3,wageBudget:[850000,190000,48000,22000,8500][t]+i*[45000,10000,3000,1500,500][t],training:Math.max(1,16-t*2+(i%3)),academy:Math.max(1,15-t*2+(i%3)),manager:{id:"manager-"+ix,name:i<4?MANAGERS[t*4+i]:["Aaron","Ben","Carl","Darren","Evan","Fraser","Gavin","Hugh","Ian","Jon","Kyle","Liam","Miles","Noah","Owen","Paul"][i-4]+" "+["Alderton","Bramwell","Cresswell","Denton","Everley"][t],style,formation:["4-3-3","4-2-3-1","4-4-2","3-5-2"][i%4]},boardObjective:["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][t],director:null,vacant: name==="Northbridge Athletic"||name==="Eastborough FC"||name==="Harbourfield FC"||name==="Kingsport United"||name==="Westford City"||name==="Metropolitan FC"};
 }))}}
 const clubs=newWorld().clubs;
-function careerWorld(s){if(s?.world?.schema===1&&Array.isArray(s.world.clubs)&&s.world.clubs.length===clubs.length)return s.world;const w=newWorld();if(s?.club){const c=w.clubs.find(c=>c.name===s.club);if(c){c.director=s.name;c.vacant=false}}return w}
+function careerWorld(s){if(s?.world?.schema===1&&Array.isArray(s.world.clubs)&&s.world.clubs.length===clubs.length)return s.world;if(s?.world?.clubs?.length===20)return s.world;const w=newWorld();if(s?.club){const c=w.clubs.find(c=>c.name===s.club);if(c){c.director=s.name;c.vacant=false}}return w}
 function activeClubs(s){return s?careerWorld(s).clubs:clubs}
 
 const panel=document.querySelector("#panel"),menu=document.querySelector("#menu");
@@ -93,7 +94,7 @@ if(w.staffSchema===1)return w;
 w.freeStaff=[];
 w.clubs.forEach((c,i)=>{
 c.manager=staffPerson(c.manager.id,c.manager.name,"Manager",c.tier,i,CAREER_START,c.manager);
-c.staff=STAFF_ROLES.slice(1).map((role,j)=>staffPerson(c.id+"-staff-"+j,["Alex","Robin","Jamie"][j]+" "+["Bennett","Fletcher","Morgan","Reed","Hughes","Walsh","Clarke","Dawson","Shaw","Reynolds","Mills","Carter","Brooks","Parker","Wright","Hill","Grant","West","Stone","Ford"][i],role,c.tier,i*3+j,CAREER_START));
+c.staff=STAFF_ROLES.slice(1).map((role,j)=>staffPerson(c.id+"-staff-"+j,["Alex","Robin","Jamie"][j]+" "+["Bennett","Fletcher","Morgan","Reed","Hughes","Walsh","Clarke","Dawson","Shaw","Reynolds","Mills","Carter","Brooks","Parker","Wright","Hill","Grant","West","Stone","Ford"][i%20]+" "+(Math.floor(i/20)+1),role,c.tier,i*3+j,CAREER_START));
 c.staffBudget=Math.round(c.wageBudget*52*.22);c.staffHistory=[];c.delegation={scouting:false,academy:false,staff:false};
 });
 const names=["Elliot Banks","Mark Sutton","Dean Foster","Ryan Beckett","Alan Rivers","Scott Harding","Peter Lane","Neil Cooper","Adam Marsh","Graham Cole","Liam Webb","Sean Curtis","Tom Reeves","Luke Hall","Jack Nolan","Ian Cross","Owen Blake","Sam Wood","Paul Knight","Rob Field"];
@@ -288,15 +289,31 @@ function outgoingTick(s){const c=s.world.clubs.find(x=>x.name===s.club);if(!c||s
 function outgoingDecision(s,c,l,b,accept){if(s.calendar.finished||s.club!==c.name||l.status!=="Listed"||b.status!=="Pending"||s.calendar.date>=b.deadline||windowStatus(s.calendar.date)==="Closed")return {ok:false,reason:"Offer no longer available."};if(!accept){b.status="Rejected";return {ok:true}}const result=executeTransfer(s,b.buyerId,l.playerId,b.fee,b.wage,3);if(result.ok){b.status="Accepted";l.status="Sold";for(const other of l.bids)if(other.status==="Pending")other.status="Closed"}return result}
 function saleScreen(id){return squadScreen("first","","All","position","",id)}
 
-function ensureLeague(s){
-const w=s.world;if(!Array.isArray(w.seasonHistory))w.seasonHistory=[];
-if(w.league?.season===s.season){ensurePreseason(s,w.league);return w.league;}
-const y=Number(s.season.slice(0,4)),fixtures=[];
-for(let tier=1;tier<=5;tier++){const ids=w.clubs.filter(c=>c.tier===tier).map(c=>c.id);if(ids.length!==4)continue;let rotation=ids.slice();for(let r=0;r<3;r++){for(let i=0;i<2;i++){const home=rotation[i],away=rotation[3-i];for(let leg=0;leg<2;leg++){const round=r+leg*3;fixtures.push({id:s.season+"-"+tier+"-"+round+"-"+i,round:round+1,homeClubId:leg?away:home,awayClubId:leg?home:away,date:datePlus(y+"-08-01",round*49),tier,type:"league",played:false})}}rotation=[rotation[0],rotation[3],rotation[1],rotation[2]]}}
-w.league={season:s.season,fixtures};ensurePreseason(s,w.league);return w.league;
+function roundRobin(ids){
+ if(ids.length<2||ids.length%2)throw Error("Expected an even number of clubs");
+ const rotation=ids.slice(),rounds=[];
+ for(let r=0;r<ids.length-1;r++){const pairs=[];for(let i=0;i<ids.length/2;i++){const a=rotation[i],b=rotation[rotation.length-1-i];pairs.push((r+i)%2?[b,a]:[a,b])}rounds.push(pairs);rotation.splice(1,0,rotation.pop())}
+ return rounds.concat(rounds.map(pairs=>pairs.map(([a,b])=>[b,a])));
 }
-function ensurePreseason(s,l){if(l.preseasonVersion===1)return;const y=Number(s.season.slice(0,4));for(let tier=1;tier<=5;tier++){const ids=s.world.clubs.filter(c=>c.tier===tier).map(c=>c.id);if(ids.length!==4)continue;for(let r=0;r<3;r++){const date=datePlus(y+"-07-11",r*7);if(date>=s.calendar.date)for(let i=0;i<2;i++)l.fixtures.push({id:s.season+"-friendly-"+tier+"-"+r+"-"+i,round:r+1,homeClubId:ids[i],awayClubId:ids[3-i],date,tier,type:"friendly",played:false});ids.splice(1,0,ids.pop())}}l.preseasonVersion=1}
-function leagueTable(s,tier){const l=ensureLeague(s),rows=s.world.clubs.filter(c=>c.tier===tier).map(c=>({id:c.id,name:c.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));for(const f of l.fixtures.filter(f=>f.tier===tier&&f.played&&f.type!=="friendly")){const h=rows.find(x=>x.id===f.homeClubId),a=rows.find(x=>x.id===f.awayClubId);if(!h||!a)continue;h.p++;a.p++;h.gf+=f.homeGoals;h.ga+=f.awayGoals;a.gf+=f.awayGoals;a.ga+=f.homeGoals;if(f.homeGoals===f.awayGoals){h.d++;a.d++;h.pts++;a.pts++}else{const win=f.homeGoals>f.awayGoals?h:a,lose=win===h?a:h;win.w++;lose.l++;win.pts+=3}}return rows.sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||a.name.localeCompare(b.name))}
+function ensureLeague(s){
+ const w=s.world;if(!Array.isArray(w.seasonHistory))w.seasonHistory=[];
+ if(w.league?.season===s.season){ensurePreseason(s,w.league);return w.league;}
+ const y=Number(s.season.slice(0,4)),fixtures=[];
+ const first=datePlus(y+"-08-01",(6-new Date(y+"-08-01T00:00:00Z").getUTCDay()+7)%7);
+ for(let tier=1;tier<=5;tier++){const ids=w.clubs.filter(c=>c.tier===tier).map(c=>c.id);const rounds=roundRobin(ids);
+ rounds.forEach((pairs,r)=>pairs.forEach(([home,away],i)=>fixtures.push({id:s.season+"-"+tier+"-"+r+"-"+i,round:r+1,homeClubId:home,awayClubId:away,date:datePlus(first,r*7),tier,type:"league",played:false})))}
+ w.league={season:s.season,fixtures};ensurePreseason(s,w.league);return w.league;
+}
+function ensurePreseason(s,l){if(l.preseasonVersion===1)return;const y=Number(s.season.slice(0,4));for(let tier=1;tier<=5;tier++){const ids=s.world.clubs.filter(c=>c.tier===tier).map(c=>c.id);roundRobin(ids).slice(0,3).forEach((pairs,r)=>{const date=datePlus(y+"-07-11",r*7);if(date>=s.calendar.date)pairs.forEach(([home,away],i)=>l.fixtures.push({id:s.season+"-friendly-"+tier+"-"+r+"-"+i,round:r+1,homeClubId:home,awayClubId:away,date,tier,type:"friendly",played:false}))})}l.preseasonVersion=1}
+function standings(w,l,tier){const rows=w.clubs.filter(c=>c.tier===tier).map(c=>({id:c.id,name:c.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0})),byId=new Map(rows.map(r=>[r.id,r]));for(const f of l.fixtures.filter(f=>f.tier===tier&&f.played&&f.type==="league")){const h=byId.get(f.homeClubId),a=byId.get(f.awayClubId);if(!h||!a)continue;h.p++;a.p++;h.gf+=f.homeGoals;h.ga+=f.awayGoals;a.gf+=f.awayGoals;a.ga+=f.homeGoals;if(f.homeGoals===f.awayGoals){h.d++;a.d++;h.pts++;a.pts++}else{const win=f.homeGoals>f.awayGoals?h:a,lose=win===h?a:h;win.w++;lose.l++;win.pts+=3}}return rows.sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||a.name.localeCompare(b.name))}
+function leagueTable(s,tier){return standings(s.world,ensureLeague(s),tier)}
+function closeLeagueSeason(s){
+ const w=s.world,l=w.league;if(!l||w.seasonHistory.some(h=>h.season===l.season))return;
+ const tables=Array.from({length:5},(_,i)=>standings(w,l,i+1)),complete=l.fixtures.filter(f=>f.type==="league").every(f=>f.played),moves=[];
+ if(complete&&w.clubs.length===100){for(let t=0;t<5;t++){if(t>0)for(const r of tables[t].slice(0,3))moves.push({id:r.id,from:t+1,to:t});if(t<4)for(const r of tables[t].slice(-3))moves.push({id:r.id,from:t+1,to:t+2})}}
+ w.seasonHistory.push({season:l.season,tables,moves,complete});
+ for(const move of moves){const c=w.clubs.find(x=>x.id===move.id);c.tier=move.to;c.rep=Math.max(1,Math.min(100,c.rep+(move.to<move.from?5:-5)));c.boardObjective=["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][c.tier-1];if(c.name===s.club){const promoted=move.to<move.from,r=relationships(s,c);s.rep=Math.max(0,Math.min(100,s.rep+(promoted?5:-3)));r.board=clampConfidence(r.board+(promoted?12:-12));calendarEvent(s,"movement:"+l.season,promoted?"Promotion secured":"Relegation confirmed",c.name+" will compete in "+DIVISIONS[c.tier-1]+" next season.",c.name)}}
+}
 function matchTactics(c){return {formation:c.manager.formation,mentality:c.manager.style==="Counter-attacking"?"Defensive":c.manager.style==="High pressing"?"Attacking":"Balanced",pressing:c.manager.style==="High pressing"?"High":"Standard",passing:c.manager.style==="Direct football"?"Direct":"Mixed"}}
 function matchContext(s,f){
 const clubs=s.world.clubs.filter(c=>[f.homeClubId,f.awayClubId].includes(c.id));
@@ -363,7 +380,7 @@ f.played=true;const own=s.world.clubs.find(c=>c.name===s.club);if(own&&[f.homeCl
 function pendingMatch(s){const c=s.world.clubs.find(c=>c.name===s.club);return c&&ensureLeague(s).fixtures.filter(f=>!f.played&&f.date<=s.calendar.date&&[f.homeClubId,f.awayClubId].includes(c.id)).sort((a,b)=>a.date.localeCompare(b.date))[0]}
 function matchdayTick(s){
 const l=ensureLeague(s),own=s.world.clubs.find(c=>c.name===s.club);
-for(const f of l.fixtures.filter(f=>!f.played&&f.date<=s.calendar.date)){if(own&&[f.homeClubId,f.awayClubId].includes(own.id))continue;const m=startSpectator(s,f);if(m)while(!spectatorStep(m)){}finishSpectator(s,f,m)}
+for(const f of l.fixtures.filter(f=>!f.played&&f.date<=s.calendar.date)){if(own&&[f.homeClubId,f.awayClubId].includes(own.id))continue;const ctx=matchContext(s,f);const valid=id=>ctx.lineups[id].length===11&&ctx.lineups[id].some(pid=>ctx.db.players.find(p=>p.id===pid)?.positionGroup==="GK");if(!valid(f.homeClubId)||!valid(f.awayClubId)){finishSpectator(s,f,null);continue}const power=id=>ctx.db.players.filter(p=>ctx.lineups[id].includes(p.id)).reduce((n,p)=>n+p.ability*p.fitness/100,0)/11;const diff=(power(f.homeClubId)-power(f.awayClubId))/25;const goals=(lambda,key)=>{let n=0,p=1;while(p>Math.exp(-lambda)&&n<12){p*=Math.max(.001,(dilemmaRoll(f.id+":"+key+":"+n)+.5)/100);n++}return Math.max(0,n-1)};f.homeGoals=goals(Math.max(.25,Math.min(4,1.55+diff)),"home");f.awayGoals=goals(Math.max(.25,Math.min(4,1.15-diff)),"away");f.played=true}
 return !!pendingMatch(s);
 }
 function spectatorScreen(s,f){
@@ -390,13 +407,13 @@ const days=1;const target=datePlus(k.date,days)>CAREER_END?CAREER_END:datePlus(k
 for(let i=0;i<days&&k.date<target;i++){
 const oldSeason=s.season,oldWindow=windowStatus(k.date);
 k.date=datePlus(k.date,1);syncCalendar(s);
-if(s.season!==oldSeason){legacySeasonResult(s,oldSeason);if(s.world.league)s.world.seasonHistory.push({...s.world.league,fixtures:s.world.league.fixtures.map(({events,stats,...f})=>f)});ensureLeague(s);calendarEvent(s,"season:"+s.season,"New season begins","Season "+s.season+" has begun.");for(const [name,status] of Object.entries(s.applications)){if(status==="Rejected"||status==="Declined"||status==="Expired"){delete s.applications[name];delete s.employment[name]}}}
+if(s.season!==oldSeason){legacySeasonResult(s,oldSeason);closeLeagueSeason(s);ensureLeague(s);calendarEvent(s,"season:"+s.season,"New season begins","Season "+s.season+" has begun.");for(const [name,status] of Object.entries(s.applications)){if(status==="Rejected"||status==="Declined"||status==="Expired"){delete s.applications[name];delete s.employment[name]}}}
 const currentWindow=windowStatus(k.date);if(currentWindow!==oldWindow)calendarEvent(s,"window:"+k.date,"Transfer window update",currentWindow==="Closed"?"The transfer window has closed.":currentWindow+".","Football administration");
 if(!k.finished){for(const c of s.world.clubs)for(const p of [...c.players,...c.academyPlayers])p.fitness=Math.min(100,p.fitness+2);staffTick(s);if(i===0||s.season!==oldSeason)aiRecruitment(s);playerTick(s,s.season!==oldSeason);if(s.season!==oldSeason)aiRecruitment(s)}
 if(s.club&&!k.finished)relationshipReview(s);
 if(s.club&&s.contract?.endDate&&k.date>=s.contract.endDate&&!k.finished){const name=s.club;endAppointment(s,"Contract expired");calendarEvent(s,"expiry:"+k.date,"Contract expired","Your contract with "+name+" has expired. You may apply for another position.",name)}
 correspondenceTick(s);if(!k.finished&&matchdayTick(s))break;
-if(k.finished){legacySeasonResult(s,s.season);if(s.club)endAppointment(s,"Retired");calendarEvent(s,"retirement","Career complete","You have completed 40 seasons and retired aged 70. Your career history remains available.");break}
+if(k.finished){legacySeasonResult(s,s.season);closeLeagueSeason(s);if(s.club)endAppointment(s,"Retired");calendarEvent(s,"retirement","Career complete","You have completed 40 seasons and retired aged 70. Your career history remains available.");break}
 }
 return true;
 }
@@ -457,7 +474,7 @@ function world(initialTier=1,fromOffice=false){
 const s=load(),w=careerWorld(s);let tier=initialTier;
 function render(){
 const rows=w.clubs.filter(c=>c.tier===tier);
-show("Football World",'<p>'+w.season+' · Fictional English pyramid · '+w.clubs.length+' clubs · Database prototype</p><div class="world-tabs">'+DIVISIONS.map((d,i)=>'<button class="action '+(tier===i+1?'main':'')+'" data-tier="'+(i+1)+'" aria-pressed="'+(tier===i+1)+'">'+d+'</button>').join("")+'</div><div class="world-table-wrap"><table class="world-table"><thead><tr><th>Club</th><th>Reputation</th><th>Transfer budget</th><th>Manager</th><th>Director role</th></tr></thead><tbody>'+rows.map(c=>'<tr><td><button class="world-link" data-club="'+c.id+'">'+escapeHtml(c.name)+'</button></td><td>'+c.rep+'/100</td><td>'+money(c.budget)+'</td><td>'+escapeHtml(c.manager.name)+'</td><td>'+escapeHtml(c.director||(c.vacant?"Vacant":"Occupied"))+'</td></tr>').join("")+'</tbody></table></div><p class="setup-note">Club profiles are persistent within a career. Matches, squads, league standings and changing finances are not simulated yet.</p>');
+show("Football World",'<p>'+w.season+' · Fictional English pyramid · '+w.clubs.length+' clubs · Database prototype</p><div class="world-tabs">'+DIVISIONS.map((d,i)=>'<button class="action '+(tier===i+1?'main':'')+'" data-tier="'+(i+1)+'" aria-pressed="'+(tier===i+1)+'">'+d+'</button>').join("")+'</div><div class="world-table-wrap"><table class="world-table"><thead><tr><th>Club</th><th>Reputation</th><th>Transfer budget</th><th>Manager</th><th>Director role</th></tr></thead><tbody>'+rows.map(c=>'<tr><td><button class="world-link" data-club="'+c.id+'">'+escapeHtml(c.name)+'</button></td><td>'+c.rep+'/100</td><td>'+money(c.budget)+'</td><td>'+escapeHtml(c.manager.name)+'</td><td>'+escapeHtml(c.director||(c.vacant?"Vacant":"Occupied"))+'</td></tr>').join("")+'</tbody></table></div><p class="setup-note">Club profiles, squads and league standings persist within each career.</p>');
 panel.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>{tier=+b.dataset.tier;render()});panel.querySelectorAll("[data-club]").forEach(b=>b.onclick=()=>clubProfile(w.clubs.find(c=>c.id===b.dataset.club),render));if(fromOffice){panel.querySelector("#back").textContent="Back to office";panel.querySelector("#back").onclick=career}
 }render()}
 function clubProfile(c,back){if(!c)return back();const fields=[["Division",DIVISIONS[c.tier-1]],["Reputation",c.rep+"/100"],["Stadium",c.stadium],["Capacity",c.capacity.toLocaleString("en-GB")],["Club cash",money(c.cash)],["Transfer budget",money(c.budget)],["Weekly wage budget",money(c.wageBudget)],["Training facilities",c.training+"/20"],["Academy facilities",c.academy+"/20"],["Manager",c.manager.name],["Manager formation",c.manager.formation],["Football philosophy",c.style],["Board objective",c.boardObjective],["Director role",c.director||(c.vacant?"Vacant":"Occupied")]];
