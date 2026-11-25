@@ -1,0 +1,53 @@
+"use strict";
+(()=>{
+const originalWorld=careerWorld, originalLoad=load, originalShow=show, originalTick=advanceCalendar, originalCandidates=dilemmaCandidates, originalResolve=dilemmaResolve;
+function expand(s){
+ const w=s.world,date=s.calendar?.date||CAREER_START,year=Number(date.slice(0,4))-(Number(date.slice(5,7))<7?1:0),season=year+"/"+String(year+1).slice(-2);
+ if(w.clubs.length!==20||s.liveMatch||date>(year+1)+"-04-30")return w;
+ const fresh=newWorld();ensureStaff(fresh);ensureStaff(w);ensurePlayers(w,date);ensureTransfers(w);
+ const existing=new Set(w.clubs.map(c=>c.id)),added=fresh.clubs.filter(c=>!existing.has(c.id));
+ const ids=new Set([...w.clubs.flatMap(c=>[c.manager.id,...c.staff.map(p=>p.id)]),...w.freeStaff.map(p=>p.id)]);
+ const nums=[...w.clubs.flatMap(c=>[...c.players,...c.academyPlayers]),...w.freePlayers].map(p=>Number(p.id.split("-").at(-1))).filter(Number.isFinite);
+ w.nextPlayerId=Math.max(w.nextPlayerId||0,0,...nums.map(n=>n+1));
+ for(const c of added){for(const p of [c.manager,...c.staff]){if(ids.has(p.id))p.id="expanded-"+c.id+"-"+p.role.replace(/ /g,"-");ids.add(p.id);p.endDate=contractEnd(date,2)}
+ c.players=Array.from({length:25},()=>makePlayer(c,w.nextPlayerId++,false,date));c.academyPlayers=Array.from({length:5},()=>makePlayer(c,w.nextPlayerId++,true,date));c.recruitmentRequests=[];c.playerHistory=[];c.nextRecruitment=datePlus(date,28);c.shortlist=[];w.clubs.push(c)}
+ const old=w.league?.season===season?w.league.fixtures:[];delete w.league;
+ const shadow={...s,world:w,season,calendar:{...s.calendar,date,events:s.calendar?.events||[]}},l=ensureLeague(shadow),byPair=new Map(old.filter(f=>f.played&&f.type!=="friendly").map(f=>[f.homeClubId+":"+f.awayClubId,f]));
+ const first=l.fixtures.find(f=>f.type==="league").date,start=date>=first?datePlus(date,1):first,step=Math.min(7,Math.max(1,Math.floor((Date.parse((year+1)+"-06-29")-Date.parse(start))/86400000/37)));
+ for(const f of l.fixtures.filter(f=>f.type==="league")){const prior=byPair.get(f.homeClubId+":"+f.awayClubId);if(prior)Object.assign(f,prior,{id:f.id,round:f.round,type:"league"});else f.date=datePlus(start,(f.round-1)*step)}
+ if(old.length){l.fixtures=l.fixtures.filter(f=>f.type!=="friendly");l.fixtures.push(...old.filter(f=>f.type==="friendly"));for(let t=1;t<=5;t++)roundRobin(added.filter(c=>c.tier===t).map(c=>c.id)).slice(0,3).forEach((pairs,r)=>{const day=datePlus(year+"-07-11",r*7);if(day>=date)pairs.forEach(([home,away],i)=>l.fixtures.push({id:season+"-expanded-friendly-"+t+"-"+r+"-"+i,round:r+1,homeClubId:home,awayClubId:away,date:day,tier:t,type:"friendly",played:false}))})}
+ w.expansionVersion=1;calendarEvent(shadow,"pyramid-upgrade:"+season,"Football world expanded","Your career now contains 100 clubs. Existing club records and played results were retained; remaining league fixtures were rescheduled.");return w;
+}
+careerWorld=function(s){return s?.world?.clubs?.length===20?expand(s):originalWorld(s)};
+load=function(){const s=originalLoad();if(s?.world.expansionVersion===1&&!s.expansionSaved){s.expansionSaved=true;if(!save(s))s.expansionSaved=false;}return s};
+advanceCalendar=function(s){const result=originalTick(s);if(s.world.clubs.length===20&&!s.calendar.finished&&!s.liveMatch)s.world=expand(s);return result};
+leagueScreen=function(tier=1,round=0,mode="league"){
+ const s=load();if(!s)return home();const l=ensureLeague(s),rows=leagueTable(s,tier),esc=escapeHtml,own=s.world.clubs.find(c=>c.name===s.club),all=l.fixtures.filter(f=>f.tier===tier&&f.type===mode),rounds=[...new Set(all.map(f=>f.round))].sort((a,b)=>a-b);
+ round=rounds.includes(round)?round:(all.find(f=>!f.played&&f.date>=s.calendar.date)?.round||rounds.at(-1)||1);
+ const fixtures=all.filter(f=>f.round===round),club=id=>s.world.clubs.find(c=>c.id===id);
+ const content='<div class="world-tabs">'+DIVISIONS.map((d,i)=>'<button class="action '+(tier===i+1?"main":"")+'" data-league="'+(i+1)+'">'+d+'</button>').join("")+'</div>'+(rows.length===4?'<p class="setup-note">Legacy competition: expansion will apply after the current match or at the next season boundary.</p>':'')+'<div class="fd-kpis">'+[["Competition",DIVISIONS[tier-1]],["Clubs",rows.length],["League matches",l.fixtures.filter(f=>f.tier===tier&&f.type==="league"&&f.played).length+" / "+rows.length*(rows.length-1)]].map(([k,v])=>'<div class="fd-kpi"><small>'+k+'</small><strong>'+v+'</strong></div>').join("")+'</div><div class="fd-league-grid"><section class="office-card"><h3>League table</h3><div class="world-table-wrap"><table class="world-table"><thead><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead><tbody>'+rows.map((r,i)=>'<tr class="'+(r.id===own?.id?"fd-own ":"")+(rows.length===20&&tier>1&&i<3?"fd-promote":rows.length===20&&tier<5&&i>=17?"fd-relegate":"")+'"><td>'+(i+1)+'</td><td><span class="fd-table-club">'+dashboardCrest(club(r.id))+esc(r.name)+'</span></td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.d+'</td><td>'+r.l+'</td><td>'+(r.gf-r.ga)+'</td><td><b>'+r.pts+'</b></td></tr>').join("")+'</tbody></table></div><small>Green: promotion · Red: relegation</small></section><section class="office-card"><h3>Fixtures & results</h3><div class="world-tabs"><button class="action '+(mode==="league"?"main":"")+'" data-mode="league">League</button><button class="action '+(mode==="friendly"?"main":"")+'" data-mode="friendly">Preseason</button></div><div class="fd-round"><button class="action" id="round-prev" '+(round===rounds[0]?"disabled":"")+'>‹</button><strong>Matchweek '+round+'</strong><button class="action" id="round-next" '+(round===rounds.at(-1)?"disabled":"")+'>›</button></div>'+fixtures.map(f=>'<div class="fd-league-fixture"><small>'+esc(prettyDate(f.date))+'</small><div><span>'+esc(club(f.homeClubId).name)+'</span><b>'+(f.played?f.homeGoals+" – "+f.awayGoals:"v")+'</b><span>'+esc(club(f.awayClubId).name)+'</span></div></div>').join("")+'</section></div>';
+ originalShow("League & Fixtures",officeShell(s,"league","Fixtures & tables",content));wireOfficeShell(s);
+ panel.querySelectorAll("[data-league]").forEach(b=>b.onclick=()=>leagueScreen(Number(b.dataset.league),0,mode));panel.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>leagueScreen(tier,0,b.dataset.mode));panel.querySelector("#round-prev").onclick=()=>leagueScreen(tier,rounds[rounds.indexOf(round)-1],mode);panel.querySelector("#round-next").onclick=()=>leagueScreen(tier,rounds[rounds.indexOf(round)+1],mode);
+};
+const screens={"Manager & Staff":"staff","Squad Management":"squad","Transfer Centre":"transfers","Football World":"world","Job Centre":"jobs","Career History":"history"};
+show=function(title,content){const key=screens[title];if(key&&!content.includes("fd-shell")){const s=load();if(s){originalShow(title,officeShell(s,key,title,content));wireOfficeShell(s);return}}return originalShow(title,content)};
+dilemmaCandidates=function(s){const out=originalCandidates(s),c=dilemmaClub(s);if(!c)return out;
+ const injured=c.players.filter(p=>p.injuryDays>7),unhappy=c.players.filter(p=>p.morale<55);
+ if(injured.length)out.push({key:"medical",title:"Injury cover strategy",from:"Medical department",body:injured.length+" senior players are out for more than a week. The manager requests cover.",choices:[["Authorise urgent recruitment review","cover"],["Promote best eligible academy prospect","academy-cover"],["Protect the budget and wait","wait-cover"]]});
+ if(unhappy.length)out.push({key:"morale",title:"First-team morale concern",from:"Assistant manager",body:unhappy.length+" senior players have morale below 55. The captain requests a meeting.",choices:[["Hold a joint captain meeting","captain"],["Delegate to manager","delegate-morale"],["Demand improved professionalism","discipline"]]});
+ if(windowStatus(s.calendar.date)!=="Closed"&&c.budget>0)out.push({key:"allocation",title:"Recruitment budget allocation",from:"Finance department",body:"The remaining transfer budget is "+money(c.budget)+". Approve a reserve or release existing funds.",choices:[["Ring-fence 20% of remaining budget","reserve"],["Release existing reserve","full-budget"],["Maintain current allocation","hold-budget"]]});
+ return out;
+};
+dilemmaResolve=function(s,e){const special=["cover","academy-cover","wait-cover","captain","delegate-morale","discipline","reserve","full-budget","hold-budget"];if(!special.includes(e.choice))return originalResolve(s,e);if(e.status!=="scheduled")return false;const c=dilemmaClub(s);if(!c||e.club!==c.id){e.status="closed";return false}e.status="resolved";const rel=relationships(s,c);let body="";
+ switch(e.choice){
+ case "cover":c.nextRecruitment=s.calendar.date;rel.manager=clampConfidence(rel.manager+3);body="Recruitment review scheduled.";break;
+ case "academy-cover":{const p=c.academyPlayers.filter(p=>p.age>=17).sort((a,b)=>b.ability-a.ability)[0];body=p&&promotePlayer(s,p.id)?p.name+" promoted to senior squad.":"No eligible prospect or squad space.";break;}
+ case "wait-cover":rel.manager=clampConfidence(rel.manager-4);body="No additional cover authorised.";break;
+ case "captain":case "delegate-morale":case "discipline":{const delta=e.choice==="captain"?8:e.choice==="delegate-morale"?3:-4;for(const p of c.players.filter(p=>p.morale<55))p.morale=clampConfidence(p.morale+delta);body="Affected players' morale changed by "+delta+".";break;}
+ case "reserve":{const amount=Math.round(c.budget*.2);c.budget-=amount;c.recruitmentReserve=(c.recruitmentReserve||0)+amount;body=money(amount)+" moved into a protected reserve.";break;}
+ case "full-budget":c.budget+=c.recruitmentReserve||0;c.recruitmentReserve=0;body="Reserved funds returned to the available transfer budget.";break;
+ default:body="Current allocation retained.";
+ }calendarEvent(s,"dilemma-outcome:"+e.id,"Decision outcome — "+e.title,body,e.from);return true;
+};
+if(!menu.hidden)home();
+})();
