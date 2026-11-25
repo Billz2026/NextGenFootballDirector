@@ -44,3 +44,14 @@ body:has(#menu:not([hidden])) .intro .game-lockup{margin:0;justify-content:flex-
 body:has(#menu:not([hidden])) #menu #resume:disabled .symbol{color:#9b8b6b}
 @media(min-width:761px) and (max-height:550px){body:has(#menu:not([hidden])) main{padding:10px 0;gap:12px 28px}body:has(#menu:not([hidden])) .intro .game-lockup{max-width:270px}body:has(#menu:not([hidden])) .publisher img{max-height:30px}body:has(#menu:not([hidden])) #menu button.tile{min-height:34px;padding:4px 12px}body:has(#menu:not([hidden])) #menu #resume:not(:disabled),body:has(#menu:not([hidden])) #menu:has(#resume:disabled) [data-action='new']{min-height:40px}}
 @media(prefers-reduced-motion:no-preference){body:has(#menu:not([hidden])) .intro,body:has(#menu:not([hidden])) #menu,body:has(#menu:not([hidden])) .career-profile{animation:fd-cinematic-enter .45s ease-out both}@keyframes fd-cinematic-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}}
+
+/* Build 37: authoritative, restrained sports-management typography. */
+body:has(#menu:not([hidden])) .intro h1.game-title{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;width:100%;max-width:435px;margin:0;font-family:'Barlow Condensed','Arial Narrow',Impact,sans-serif;font-weight:800;font-size:clamp(66px,6.25vw,104px);font-style:normal;line-height:.84;letter-spacing:-.018em;text-transform:uppercase;text-shadow:0 4px 20px #0007;font-synthesis:none}
+body:has(#menu:not([hidden])) .intro h1.game-title span,body:has(#menu:not([hidden])) .intro h1.game-title em{display:block;font:inherit;white-space:nowrap}
+body:has(#menu:not([hidden])) .intro h1.game-title span{color:#f5f1e8}
+body:has(#menu:not([hidden])) .intro h1.game-title em{color:#d4b780}
+@media(min-width:761px) and (max-width:1000px){body:has(#menu:not([hidden])) .intro h1.game-title{font-size:clamp(57px,7vw,73px)}}
+@media(min-width:761px) and (max-height:690px){body:has(#menu:not([hidden])) .intro h1.game-title{font-size:clamp(58px,5.6vw,82px);gap:3px}}
+@media(min-width:761px) and (max-height:550px){body:has(#menu:not([hidden])) .intro h1.game-title{font-size:60px;gap:2px}}
+@media(max-width:760px){body:has(#menu:not([hidden])) .intro h1.game-title{font-size:clamp(54px,12vw,78px);gap:3px}}
+@media(max-width:360px){body:has(#menu:not([hidden])) .intro h1.game-title{font-size:clamp(44px,14vw,54px)}}
