@@ -12,11 +12,11 @@ const LEGACY_CLUBS={"Northbridge Athletic":[10,425000,"High pressing",42000],"Ea
 const MANAGERS=["Adrian Mercer","Callum Henshaw","Martin Ellwood","Daniel Whitaker","Gareth Rowley","Simon Hartwell","Lewis Carver","Patrick Wren","Neil Ashford","Oliver Dacre","Richard Fenner","James Ridley","Thomas Vane","Andrew Hollis","Michael Brierley","David Keaton","Ben Marlow","Stephen Telford","Paul Wetherby","Chris Calder"];
 function newWorld(){return {schema:1,season:"2026/27",clubs:CLUB_SEEDS.flatMap((names,t)=>names.map((name,i)=>{
 const tier=t+1,ix=t*20+i,legacy=LEGACY_CLUBS[name];
-const rep=legacy?legacy[0]:[75,42,23,12,5][t]+i*2;
-const budget=legacy?legacy[1]:[32000000,5500000,950000,300000,75000][t]+i*[4000000,700000,100000,35000,10000][t];
+const rep=legacy?legacy[0]:Math.min(100,[75,42,23,12,5][t]+Math.round(i*6/19));
+const budget=legacy?legacy[1]:[32000000,5500000,950000,300000,75000][t]+Math.round(i*3/19*[4000000,700000,100000,35000,10000][t]);
 const style=legacy?legacy[2]:["Possession football","High pressing","Counter-attacking","Direct football","Adaptable football"][(ix+t)%5];
-const salary=legacy?legacy[3]:[420000,150000,65000,38000,26000][t]+i*[25000,10000,4000,2000,1000][t];
-return {id:"club-"+tier+"-"+(i+1),name,tier,rep,budget,style,salary,stadium:name.replace(/ (FC|City|United|Athletic|Rovers|Town|Albion|Borough)$/,"")+" Park",capacity:[34000,19000,10500,6200,2800][t]+i*[2500,1200,650,400,200][t],cash:budget*3,wageBudget:[850000,190000,48000,22000,8500][t]+i*[45000,10000,3000,1500,500][t],training:Math.max(1,16-t*2+(i%3)),academy:Math.max(1,15-t*2+(i%3)),manager:{id:"manager-"+ix,name:i<4?MANAGERS[t*4+i]:["Aaron","Ben","Carl","Darren","Evan","Fraser","Gavin","Hugh","Ian","Jon","Kyle","Liam","Miles","Noah","Owen","Paul"][i-4]+" "+["Alderton","Bramwell","Cresswell","Denton","Everley"][t],style,formation:["4-3-3","4-2-3-1","4-4-2","3-5-2"][i%4]},boardObjective:["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][t],director:null,vacant: name==="Northbridge Athletic"||name==="Eastborough FC"||name==="Harbourfield FC"||name==="Kingsport United"||name==="Westford City"||name==="Metropolitan FC"};
+const salary=legacy?legacy[3]:[420000,150000,65000,38000,26000][t]+Math.round(i*3/19*[25000,10000,4000,2000,1000][t]);
+return {id:"club-"+tier+"-"+(i+1),name,tier,rep,budget,style,salary,stadium:name.replace(/ (FC|City|United|Athletic|Rovers|Town|Albion|Borough)$/,"")+" Park",capacity:[34000,19000,10500,6200,2800][t]+Math.round(i*3/19*[2500,1200,650,400,200][t]),cash:budget*3,wageBudget:[850000,190000,48000,22000,8500][t]+Math.round(i*3/19*[45000,10000,3000,1500,500][t]),training:Math.max(1,16-t*2+(i%3)),academy:Math.max(1,15-t*2+(i%3)),manager:{id:"manager-"+ix,name:i<4?MANAGERS[t*4+i]:["Aaron","Ben","Carl","Darren","Evan","Fraser","Gavin","Hugh","Ian","Jon","Kyle","Liam","Miles","Noah","Owen","Paul"][i-4]+" "+["Alderton","Bramwell","Cresswell","Denton","Everley"][t],style,formation:["4-3-3","4-2-3-1","4-4-2","3-5-2"][i%4]},boardObjective:["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][t],director:null,vacant: name==="Northbridge Athletic"||name==="Eastborough FC"||name==="Harbourfield FC"||name==="Kingsport United"||name==="Westford City"||name==="Metropolitan FC"};
 }))}}
 const clubs=newWorld().clubs;
 function careerWorld(s){if(s?.world?.schema===1&&Array.isArray(s.world.clubs)&&s.world.clubs.length===clubs.length)return s.world;if(s?.world?.clubs?.length===20)return s.world;const w=newWorld();if(s?.club){const c=w.clubs.find(c=>c.name===s.club);if(c){c.director=s.name;c.vacant=false}}return w}
@@ -133,11 +133,11 @@ const SQUAD_POS=["GK","GK","GK","RB","RB","CB","CB","CB","CB","LB","LB","DM","DM
 const FIRST_NAMES=["Aaron","Adam","Alex","Ben","Callum","Charlie","Daniel","Dylan","Ethan","Finley","George","Harry","Isaac","Jack","Jacob","Jamie","Joe","Josh","Kai","Liam","Leo","Lewis","Lucas","Mason","Nathan","Noah","Oliver","Oscar","Ryan","Sam","Theo","Thomas","Tyler","Zak"];
 const LAST_NAMES=["Abbott","Barker","Brooks","Campbell","Clarke","Cole","Cooper","Davies","Dawson","Edwards","Evans","Fisher","Foster","Grant","Gray","Green","Hall","Harris","Hayes","Hill","Hughes","Jackson","Jones","Kelly","King","Lane","Lewis","Marshall","Mason","Mills","Mitchell","Moore","Morgan","Morris","Nolan","Parker","Reed","Roberts","Ross","Scott","Shaw","Smith","Taylor","Turner","Walker","Ward","White","Wilson","Wood"];
 function playerRoll(n,salt){return ((Math.imul(n+1,2654435761)^Math.imul(salt+17,1597334677))>>>0)%1000}
-function makePlayer(c,n,academy,date){
+function makePlayer(c,n,academy,date,requiredPosition=null){
 const seed=n+1, age=academy?16+playerRoll(seed,2)%3:19+playerRoll(seed,2)%16;
 const ability=Math.max(20,Math.min(90,84-c.tier*12+playerRoll(seed,3)%19-9-(academy?20:0)));
 const potential=Math.min(96,ability+(academy?15+playerRoll(seed,4)%17:Math.max(2,32-age)+playerRoll(seed,4)%8));
-const position=academy?POSITIONS[playerRoll(seed,5)%10]:SQUAD_POS[n%25];
+const position=requiredPosition||(academy?POSITIONS[playerRoll(seed,5)%10]:SQUAD_POS[n%25]);
 const salary=academy?Math.round(c.wageBudget*.002):Math.max(100,Math.round(c.wageBudget/29*(.6+playerRoll(seed,6)%90/100)/10)*10);
 const attrs={pace:Math.min(20,Math.max(1,Math.round(ability/5)+playerRoll(seed,7)%5-2)),technical:Math.min(20,Math.max(1,Math.round(ability/5)+playerRoll(seed,8)%5-2)),passing:Math.min(20,Math.max(1,Math.round(ability/5)+playerRoll(seed,9)%5-2)),defending:Math.min(20,Math.max(1,Math.round(ability/5)+(["CB","RB","LB","DM"].includes(position)?3:-3))),finishing:Math.min(20,Math.max(1,Math.round(ability/5)+(position==="ST"?3:-3))),goalkeeping:position==="GK"?Math.round(ability/5):1,mentality:Math.min(20,Math.max(1,Math.round(ability/5)+playerRoll(seed,10)%5-2))};
 return {id:"player-"+n,name:FIRST_NAMES[playerRoll(seed,11)%FIRST_NAMES.length]+" "+LAST_NAMES[playerRoll(seed,12)%LAST_NAMES.length],age,position,nationality:["English","English","English","Scottish","Welsh","Irish","French","Dutch"][playerRoll(seed,13)%8],personality:["Professional","Ambitious","Balanced","Determined","Reserved"][playerRoll(seed,14)%5],ability,potential,attributes:attrs,wage:salary,value:Math.round(Math.max(1000,c.budget/12*(ability/50)**2*(age<25?1.3:age>30?.55:1))/100)*100,contractEnd:contractEnd(date,academy?2:1+playerRoll(seed,15)%4),morale:65+playerRoll(seed,16)%21,fitness:90+playerRoll(seed,17)%11,injuryDays:0,academy};
@@ -165,7 +165,7 @@ const keep=[];for(const p of c[key]){
 if(newSeason){p.age++;const old=p.ability;const delta=p.age<=23?Math.min(3,Math.max(0,p.potential-p.ability)):p.age>=32?-(p.age>=35?3:1):0;p.ability=Math.max(10,Math.min(p.potential,p.ability+delta));const shift=Math.round(p.ability/5)-Math.round(old/5);if(shift)for(const key of Object.keys(p.attributes)){if(key==="goalkeeping"&&p.position!=="GK")continue;p.attributes[key]=Math.max(1,Math.min(20,p.attributes[key]+shift))}p.value=Math.max(1000,Math.round(p.value*(p.ability/Math.max(1,old))**2*(p.age>=32?.85:1)/100)*100)}
 if(p.injuryDays>0)p.injuryDays--;
 if(p.contractEnd<=date||p.age>=38){
-const retired=p.age>=38;c.playerHistory.push({id:p.id,name:p.name,date,status:retired?"Retired":"Contract expired"});
+const retired=p.age>=38;c.playerHistory.push({id:p.id,name:p.name,date,status:retired?"Retired":"Contract expired"});if(c.name!==s.club&&!s.history?.some(h=>h.club===c.name)&&c.playerHistory.length>100)c.playerHistory.splice(0,c.playerHistory.length-100);
 if(!retired)w.freePlayers.push({...p,contractEnd:null,academy:false});
 if(c.name===s.club)calendarEvent(s,"player-exit:"+p.id+":"+date,retired?"Player retired":"Player contract expired",p.name+" has left the club.",c.name);
 }else keep.push(p)
@@ -252,7 +252,7 @@ const available=w.freePlayers.filter(p=>p.position===need&&p.age<36&&p.wage<=c.w
 if(available.length){const p=available[0];w.freePlayers=w.freePlayers.filter(x=>x.id!==p.id);c.players.push({...p,academy:false,contractEnd:contractEnd(date,2)});continue}
 const youth=c.academyPlayers.find(p=>p.position===need&&p.age>=17)||c.academyPlayers.find(p=>p.age>=17);
 if(youth){c.academyPlayers=c.academyPlayers.filter(p=>p.id!==youth.id);c.players.push({...youth,academy:false});continue}
-const p=makePlayer(c,w.nextPlayerId++,false,date);p.position=need;p.wage=Math.max(100,Math.min(p.wage,c.wageBudget-squadPayroll(c)));if(squadPayroll(c)+p.wage>c.wageBudget)break;c.players.push(p);
+const p=makePlayer(c,w.nextPlayerId++,false,date,need);p.wage=Math.max(100,Math.min(p.wage,c.wageBudget-squadPayroll(c)));if(squadPayroll(c)+p.wage>c.wageBudget)break;c.players.push(p);
 }
 }
 }
@@ -309,8 +309,8 @@ function standings(w,l,tier){const rows=w.clubs.filter(c=>c.tier===tier).map(c=>
 function leagueTable(s,tier){return standings(s.world,ensureLeague(s),tier)}
 function closeLeagueSeason(s){
  const w=s.world,l=w.league;if(!l||w.seasonHistory.some(h=>h.season===l.season))return;
- const tables=Array.from({length:5},(_,i)=>standings(w,l,i+1)),complete=l.fixtures.filter(f=>f.type==="league").every(f=>f.played),moves=[];
- if(complete&&w.clubs.length===100){for(let t=0;t<5;t++){if(t>0)for(const r of tables[t].slice(0,3))moves.push({id:r.id,from:t+1,to:t});if(t<4)for(const r of tables[t].slice(-3))moves.push({id:r.id,from:t+1,to:t+2})}}
+ const tables=Array.from({length:5},(_,i)=>standings(w,l,i+1)),leagueFixtures=l.fixtures.filter(f=>f.type==="league"),complete=tables.every(rows=>rows.length>1&&rows.every(row=>row.p===2*(rows.length-1)))&&leagueFixtures.every(f=>f.played),moves=[];
+ if(complete&&w.clubs.length===100&&!s.calendar.finished){for(let t=0;t<5;t++){if(t>0)for(const r of tables[t].slice(0,3))moves.push({id:r.id,from:t+1,to:t});if(t<4)for(const r of tables[t].slice(-3))moves.push({id:r.id,from:t+1,to:t+2})}}
  w.seasonHistory.push({season:l.season,tables,moves,complete});
  for(const move of moves){const c=w.clubs.find(x=>x.id===move.id);c.tier=move.to;c.rep=Math.max(1,Math.min(100,c.rep+(move.to<move.from?5:-5)));c.boardObjective=["Challenge at the top","Compete for promotion","Consolidate league position","Maintain financial control","Establish a sustainable club"][c.tier-1];if(c.name===s.club){const promoted=move.to<move.from,r=relationships(s,c);s.rep=Math.max(0,Math.min(100,s.rep+(promoted?5:-3)));r.board=clampConfidence(r.board+(promoted?12:-12));calendarEvent(s,"movement:"+l.season,promoted?"Promotion secured":"Relegation confirmed",c.name+" will compete in "+DIVISIONS[c.tier-1]+" next season.",c.name)}}
 }
