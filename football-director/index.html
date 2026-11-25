@@ -8,12 +8,12 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NextGen Sessions">
   <meta property="og:title" content="NextGen Football Director">
-  <meta property="og:description" content="Hire the manager. Set the vision. Build your reputation.">
+  <meta property="og:description" content="A football director career simulation by NextGen Sessions.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css?v=30">
-  <link rel="stylesheet" href="./premium-main-menu.css?v=32">
+  <link rel="stylesheet" href="./premium-main-menu.css?v=33">
   <script defer src="./recovered-match-engine.js?v=3"></script>
   <script defer src="./app.js?v=32"></script>
   <title>NextGen Football Director | NextGen Sessions</title>
@@ -22,21 +22,21 @@
   <main>
     <section class="intro" aria-label="Game introduction">
       <div class="publisher"><img src="https://nextgensessions.com/assets/nextgen-header-wordmark-2026.webp" width="1600" height="663" alt="NextGen Sessions"></div>
-      <p class="menu-eyebrow">The game behind the game</p>
+
       <h1 class="game-lockup temporary-title"><span>FOOTBALL</span><em>DIRECTOR</em></h1>
-      <p class="hero-description">Appoint the manager. Shape the club. Build your legacy.</p>
+
     </section>
     <section id="menu" class="tiles executive-menu" aria-label="Main menu">
-      <div class="menu-heading"><div><span class="menu-overline">Director's office</span><h2>Main Menu</h2></div><span class="menu-build">CAREER SIMULATION</span></div>
-    <button class="tile primary" data-action="new" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><strong>New Career</strong><small>Start a new journey</small><span class="tile-chevron" aria-hidden="true">›</span></button>
+      <div class="menu-heading"><h2>Main Menu</h2></div>
+    <button class="tile primary" data-action="new" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><strong>New Career</strong><span class="tile-chevron" aria-hidden="true">›</span></button>
     <button class="tile " data-action="continue" id="resume" disabled><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 12 7-12 7Z"/></svg></span><strong>Continue Career</strong><small><span id="save-status">No saved career</span><span id="save-detail" hidden></span></small><span class="tile-chevron" aria-hidden="true">›</span></button>
-    <button class="tile " data-action="world" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/></svg></span><strong>Football World</strong><small>Clubs &amp; leagues</small><span class="tile-chevron" aria-hidden="true">›</span></button>
-    <button class="tile " data-action="saves" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><strong>Career Saves</strong><small>Manage your saves</small><span class="tile-chevron" aria-hidden="true">›</span></button>
-    <button class="tile " data-action="settings" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg></span><strong>Preferences</strong><small>Game settings</small><span class="tile-chevron" aria-hidden="true">›</span></button>
-    <button class="tile " data-action="about" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></svg></span><strong>About the Game</strong><small>Game information</small><span class="tile-chevron" aria-hidden="true">›</span></button>
+    <button class="tile " data-action="world" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/></svg></span><strong>Football World</strong><span class="tile-chevron" aria-hidden="true">›</span></button>
+    <button class="tile " data-action="saves" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><strong>Career Saves</strong><span class="tile-chevron" aria-hidden="true">›</span></button>
+    <button class="tile " data-action="settings" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg></span><strong>Preferences</strong><span class="tile-chevron" aria-hidden="true">›</span></button>
+    <button class="tile " data-action="about" ><span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></svg></span><strong>About the Game</strong><span class="tile-chevron" aria-hidden="true">›</span></button>
     </section>
     <section id="panel" hidden aria-live="polite"></section>
   </main>
-  <footer><span>© NextGen Sessions · Football Director</span><span>PRE-ALPHA · V0.1</span></footer>
+  <footer><span>© NextGen Sessions</span><span>PRE-ALPHA · V0.1</span></footer>
 </body>
 </html>
