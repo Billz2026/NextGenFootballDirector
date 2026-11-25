@@ -17,3 +17,59 @@
 @media(max-width:1100px){#panel.fd-office .fd-league-grid{grid-template-columns:1fr}#panel.fd-office .fd-league-grid .world-table-wrap{max-height:none}}
 #panel.fd-office .ng-mail-choice{white-space:normal;text-align:left;padding:12px;border:1px solid #d4b78048;background:linear-gradient(110deg,#d4b78012,#101113);margin-bottom:7px}
 #panel.fd-office .ng-mail-choice:hover{border-color:#d4b780;background:#d4b78020}
+
+
+/* Executive competition workspace — isolated from global table and dashboard rules. */
+#panel.fd-office .lx-page{--lx-line:#35312a;--lx-gold:#d4b780;--lx-muted:#a8a195;display:grid;gap:12px;min-width:0;color:#f5f1e8}
+#panel.fd-office .lx-navigation{display:flex;gap:4px;padding:4px;border:1px solid var(--lx-line);border-radius:7px;background:#101113;flex-wrap:wrap}
+#panel.fd-office .lx-tab,#panel.fd-office .lx-segment button,#panel.fd-office .lx-round-controls button{font:600 12px 'DM Sans',sans-serif;color:#c4beb3;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;padding:9px 13px;min-height:34px}
+#panel.fd-office .lx-tab.active,#panel.fd-office .lx-segment button.active{background:linear-gradient(130deg,#e9d3a4,#b99a62);color:#17130e;border-color:#e9d3a4}
+#panel.fd-office .lx-tab:hover:not(.active),#panel.fd-office .lx-segment button:hover:not(.active),#panel.fd-office .lx-round-controls button:hover:not(:disabled){color:#f0ddb5;background:#d4b78012;border-color:#d4b78045}
+#panel.fd-office .lx-page button:focus-visible{outline:2px solid #f0ddb5;outline-offset:2px}
+#panel.fd-office .lx-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#panel.fd-office .lx-metric{min-width:0;display:grid;align-content:center;gap:4px;padding:12px 14px;border:1px solid var(--lx-line);border-radius:6px;background:linear-gradient(135deg,#1b1a17,#101113 75%)}
+#panel.fd-office .lx-metric:first-child{border-top:2px solid var(--lx-gold)}
+#panel.fd-office .lx-metric small,#panel.fd-office .lx-panel-head small{font:700 10px 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#b9aa90}
+#panel.fd-office .lx-metric strong{font:700 clamp(23px,2vw,32px)/1.05 'Barlow Condensed','Arial Narrow',sans-serif;color:#f0ddb5;overflow-wrap:anywhere}
+#panel.fd-office .lx-metric>span{font-size:11px;color:var(--lx-muted)}
+#panel.fd-office .lx-grid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(0,1fr);gap:12px;align-items:stretch}
+#panel.fd-office .lx-panel{min-width:0;display:flex;flex-direction:column;background:linear-gradient(150deg,#141517,#0e0f11);border:1px solid var(--lx-line);border-radius:6px;overflow:hidden}
+#panel.fd-office .lx-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--lx-line)}
+#panel.fd-office .lx-panel-head h3{font:700 19px/1.15 'Barlow Condensed','Arial Narrow',sans-serif;margin:3px 0 0;color:#f5f1e8}
+#panel.fd-office .lx-panel-head>span{font-size:11px;color:var(--lx-muted);white-space:nowrap}
+#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{height:clamp(280px,calc(100dvh - 385px),680px);overflow:auto;scrollbar-width:thin;scrollbar-color:#8d764c #141517}
+#panel.fd-office .lx-table{width:100%;min-width:420px;border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:12px;font-variant-numeric:tabular-nums}
+#panel.fd-office .lx-table .lx-rank{width:44px}
+#panel.fd-office .lx-table .lx-number{width:7.5%}
+#panel.fd-office .lx-table th,#panel.fd-office .lx-table td{padding:6px 5px;text-align:center;border-bottom:1px solid #d4b78012;height:29px;box-sizing:border-box}
+#panel.fd-office .lx-table th:nth-child(2),#panel.fd-office .lx-table td:nth-child(2){text-align:left}
+#panel.fd-office .lx-table thead{position:sticky;top:0;z-index:1;background:#252119;color:#d4b780;font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+#panel.fd-office .lx-table tbody tr:nth-child(even){background:#ffffff03}
+#panel.fd-office .lx-table tbody tr:hover{background:#d4b7800e}
+#panel.fd-office .lx-table td:last-child{color:#f0ddb5}
+#panel.fd-office .lx-team{display:flex;align-items:center;gap:6px;min-width:0}
+#panel.fd-office .lx-team>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel.fd-office .lx-team svg,#panel.fd-office .lx-team .fd-crest{width:19px;height:22px;flex:none}
+#panel.fd-office .lx-up td:first-child{box-shadow:inset 3px 0 #75b88a;color:#91c6a1}
+#panel.fd-office .lx-down td:first-child{box-shadow:inset 3px 0 #d56f6f;color:#e18a8a}
+#panel.fd-office .lx-table .lx-own{background:#d4b7801a;color:#f0ddb5;font-weight:700}
+#panel.fd-office .lx-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:auto;padding:10px 14px;border-top:1px solid var(--lx-line);font-size:10px;color:var(--lx-muted)}
+#panel.fd-office .lx-legend span.up:before,#panel.fd-office .lx-legend span.down:before,#panel.fd-office .lx-legend span.own:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;background:#d4b780}
+#panel.fd-office .lx-legend span.up:before{background:#75b88a}
+#panel.fd-office .lx-legend span.down:before{background:#d56f6f}
+#panel.fd-office .lx-round{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--lx-line);flex-wrap:wrap}
+#panel.fd-office .lx-segment,#panel.fd-office .lx-round-controls{display:flex;align-items:center;gap:4px}
+#panel.fd-office .lx-segment{background:#0a0b0c;border:1px solid var(--lx-line);border-radius:5px;padding:2px}
+#panel.fd-office .lx-segment button,#panel.fd-office .lx-round-controls button{padding:4px 9px;min-height:28px;font-size:11px}
+#panel.fd-office .lx-round-controls strong{font-size:12px;color:#f0ddb5;min-width:48px;text-align:center}
+#panel.fd-office .lx-round-controls button{border-color:var(--lx-line);font-size:19px;line-height:1}
+#panel.fd-office .lx-round-controls button:disabled{opacity:.3;cursor:default}
+#panel.fd-office .lx-fixtures{height:clamp(232px,calc(100dvh - 433px),632px);padding:6px 9px;box-sizing:border-box}
+#panel.fd-office .lx-match{padding:8px 9px;margin:0 0 5px;border:1px solid #d4b78019;border-radius:4px;background:#18191b}
+#panel.fd-office .lx-match-own{border-color:#d4b78075;background:linear-gradient(100deg,#d4b78012,#18191b)}
+#panel.fd-office .lx-match-meta{display:flex;justify-content:space-between;font-size:9px;color:#a8a195;margin-bottom:5px;letter-spacing:.03em}
+#panel.fd-office .lx-match-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px;font-size:11px}
+#panel.fd-office .lx-match-teams>.lx-team:last-child{flex-direction:row-reverse;text-align:right}
+#panel.fd-office .lx-score{padding:4px 8px;min-width:22px;text-align:center;border:1px solid #d4b78035;border-radius:4px;background:#0e0f11;color:#f0ddb5;font-variant-numeric:tabular-nums}
+@media(max-width:1150px){#panel.fd-office .lx-grid{grid-template-columns:1fr}#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{height:auto;max-height:640px}}
+@media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .lx-tab{flex:1 1 42%;padding:7px 6px}#panel.fd-office .lx-metric{padding:10px}}
