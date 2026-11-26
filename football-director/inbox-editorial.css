@@ -1,0 +1,28 @@
+#panel.fd-office .fd-content:has(.ix-inbox){width:100%;max-width:none;box-sizing:border-box}
+#panel.fd-office .ix-header{padding:9px 15px;min-height:58px;box-sizing:border-box}
+#panel.fd-office .ix-header h3{font-size:30px;margin:0}
+#panel.fd-office .ix-counts{gap:2px}
+#panel.fd-office .ix-counts>div{padding:5px 12px}
+#panel.fd-office .ix-layout{grid-template-columns:minmax(300px,.85fr) minmax(0,1.55fr)}
+#panel.fd-office .ix-reader{padding:24px 30px}
+#panel.fd-office .ix-reader .mn-masthead{padding:9px 12px;margin:0 0 22px;border-top:0;border-right:0;border-bottom:1px solid #d4b78020;background:#ffffff03}
+#panel.fd-office .ix-reader .ng-mail-meta{font-size:10px;color:#b9a88a;letter-spacing:.08em}
+#panel.fd-office .ix-reader h3.ed-title{font:700 clamp(27px,2.2vw,36px)/1.15 'Barlow Condensed',sans-serif;color:#f3e3c6;margin:12px 0 15px;letter-spacing:.01em}
+#panel.fd-office .ed-sender{display:flex;align-items:center;gap:9px;padding:0 0 16px;border-bottom:1px solid #d4b78025;margin:0 0 20px}
+#panel.fd-office .ed-sender span{color:#9b9182;font-size:9px;letter-spacing:.1em;font-weight:700}
+#panel.fd-office .ed-sender strong{color:#d8c5a4;font-size:12px;font-weight:600}
+#panel.fd-office .ed-body{max-width:74ch;color:#e4dfd5;font:400 14px/1.8 'DM Sans',sans-serif;overflow-wrap:anywhere}
+#panel.fd-office .ed-body p{margin:0 0 17px}
+#panel.fd-office .ed-body .ed-lead{font-size:15px;line-height:1.7;color:#f0ebe1}
+#panel.fd-office .ed-body blockquote{margin:18px 0;padding:12px 18px;border-left:3px solid #d4b780;background:linear-gradient(90deg,#d4b7800d,transparent)}
+#panel.fd-office .ed-body blockquote span{display:block;color:#bba47e;font-size:9px;font-weight:700;letter-spacing:.12em;margin-bottom:7px}
+#panel.fd-office .ed-body blockquote p{font-size:17px;line-height:1.5;font-weight:500;color:#f0ddb5;margin:0}
+#panel.fd-office .ix-reader .ng-mail-action{margin-top:22px;padding:13px 0;background:transparent;border:0;border-top:1px solid #d4b78030}
+#panel.fd-office .ix-reader .ng-mail-action>small{font-size:10px;letter-spacing:.08em;color:#bda780}
+#panel.fd-office .ix-reader .ng-mail-choice.ed-choice{display:grid;grid-template-columns:25px minmax(0,1fr) 12px;align-items:center;gap:10px;padding:12px;background:#d4b78008;border:1px solid #d4b78035}
+#panel.fd-office .ed-choice-num{color:#bca67e;font-size:11px}
+#panel.fd-office .ed-choice-arrow{color:#bca67e;font-size:18px}
+#panel.fd-office .ed-next{display:block;margin:18px 0 0 auto;padding:8px 12px;border:1px solid #d4b78044;border-radius:4px;background:#d4b7800d;color:#f0ddb5;font-size:12px;cursor:pointer}
+#panel.fd-office .ix-message-copy strong{font-size:13px;font-weight:600}
+#panel.fd-office .ix-message-copy small,#panel.fd-office .ix-message-copy>span{font-size:11px}
+@media(max-width:850px){#panel.fd-office .ix-layout{grid-template-columns:1fr}#panel.fd-office .ix-reader{padding:16px}}
