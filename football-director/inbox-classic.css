@@ -136,3 +136,32 @@
 #panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:not(:disabled){background:#d4b780;color:#18140e;text-shadow:none}
 #panel.fd-office .classic-inbox .ci-summary{text-shadow:0 1px 4px #000}
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(200px,29vh,242px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
+
+/* Open news sheet: no enclosing card, compact inline report details. */
+#panel.fd-office .classic-inbox .ix-filters{border:0;border-radius:0;background:#15232bb0;padding:3px;gap:2px}
+#panel.fd-office .classic-inbox .ix-filters button{border-radius:0;padding:5px 7px}
+#panel.fd-office .classic-inbox .ix-list{border:0;border-radius:0;background:transparent;box-shadow:none}
+#panel.fd-office .classic-inbox .ix-list>header,#panel.fd-office .classic-inbox .ix-tools{background:#101a2070}
+#panel.fd-office .classic-inbox .ci-columns{background:#443925c9}
+#panel.fd-office .classic-inbox .ix-message{height:24px;min-height:24px;padding-block:2px;border:0;border-bottom:1px solid #ffffff12;border-radius:0;background:#101b206e}
+#panel.fd-office .classic-inbox .ix-message:nth-child(even){background:#101b204d}
+#panel.fd-office .classic-inbox .ix-message.selected{background:#d4b780;color:#18140e;text-shadow:none;box-shadow:none}
+#panel.fd-office .classic-inbox .ix-message.selected :is(.ci-date,.ci-dept,.ci-subject,.ci-status){color:#18140e;text-shadow:none}
+#panel.fd-office .classic-inbox .ci-status{background:none;border:0;padding:0;font-size:10px}
+#panel.fd-office .classic-inbox .ix-reader{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:8px 23px;backdrop-filter:none!important}
+#panel.fd-office .classic-inbox .ix-reader h3.ed-title{font-size:32px;line-height:1.08;margin:4px 0 8px}
+#panel.fd-office .classic-inbox .ix-reader .ed-sender{margin:0 0 7px;padding:0}
+#panel.fd-office .classic-inbox .ix-reader .ed-body{font-size:15px;line-height:1.5;text-shadow:0 1px 3px #000,0 0 5px #000}
+#panel.fd-office .classic-inbox .ix-reader .ed-body p{margin:0 0 8px}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts{display:flex;flex-wrap:wrap;gap:4px 24px;margin:7px 0 9px}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts>div{display:flex;align-items:baseline;flex:0 1 auto;gap:7px;padding:0;background:none;border:0;box-shadow:none}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts small{font-size:12px;color:#e4cc9e}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts small::after{content:":"}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts strong{font:600 14px/1.4 'DM Sans',sans-serif;color:#fff1d4}
+#panel.fd-office .classic-inbox .ed-instruction,#panel.fd-office .classic-inbox .ed-story-context,#panel.fd-office .classic-inbox .ed-change-grid{background:none;border:0;border-radius:0;padding:0;margin:8px 0}
+#panel.fd-office .classic-inbox .ed-instruction small{font-size:11px}
+#panel.fd-office .classic-inbox .ed-instruction p{margin:3px 0}
+#panel.fd-office .classic-inbox .ci-nav button{border-radius:0;background:#233039b8;border:1px solid #c7ae8350;min-height:31px}
+#panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:not(:disabled){background:#d4b780;color:#18140e}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::after{background:linear-gradient(180deg,#0a141a28,#0a141a35 42%,#0a141a66 72%,#0a141a80)}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(210px,31vh,248px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:90px minmax(0,1fr)}}
