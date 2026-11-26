@@ -105,10 +105,10 @@
 #panel.fd-office .fc-shortcuts button{padding:6px 4px;font-size:10px;text-align:center;white-space:nowrap}
 #panel.fd-office .fc-legend{padding:5px 8px;background:#1b2b31;border-top:1px solid var(--fd-line)}
 @media(min-width:1181px) and (min-height:650px){
-#panel.fd-office .fc-page{height:auto;flex:1 1 0;min-height:0;max-height:100%;gap:6px}
+#panel.fd-office .fc-page{height:calc(100dvh - 110px);flex:none;min-height:480px;max-height:none;gap:6px}
 #panel.fd-office .fc-toolbar{min-height:63px;padding:7px 14px;flex-shrink:0}
 #panel.fd-office .fc-window{padding:5px 10px;flex-shrink:0}
-#panel.fd-office .fc-layout{min-height:0;flex:1 1 0}
+#panel.fd-office .fc-layout{min-height:0;flex:1 1 auto}
 #panel.fd-office .fc-month{min-height:0}
 #panel.fd-office .fc-weekdays{flex-shrink:0}
 #panel.fd-office .fc-day{padding:4px 5px;gap:2px}
