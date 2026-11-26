@@ -91,3 +91,25 @@
 #panel.fd-office .classic-inbox .ci-dept{color:#e1c99a}
 #panel.fd-office .classic-inbox .ci-status{color:#b8c0bc}
 #panel.fd-office .classic-inbox .unread .ci-status,#panel.fd-office .classic-inbox .actionable .ci-status{color:#f0d092}
+
+/* Classic football news desk: image remains visible through readable surfaces. */
+#panel.fd-office .fd-workspace:has(.classic-inbox){background:#1e3035;overflow:hidden}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::before{position:fixed;inset:0 0 0 208px;background:url("https://images.pexels.com/photos/1657324/pexels-photo-1657324.jpeg?auto=compress&cs=tinysrgb&w=1920") center 52%/cover no-repeat;filter:blur(9px) saturate(.85);backdrop-filter:none;transform:scale(1.02);opacity:1}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#10191d36,#10191d70 65%,#10191d80)}
+#panel.fd-office .classic-inbox .ix-filters{background:rgba(20,29,33,.78);border-color:#d4b78055}
+#panel.fd-office .classic-inbox .ix-list{background:rgba(13,23,28,.72);backdrop-filter:none}
+#panel.fd-office .classic-inbox .ix-reader{background:linear-gradient(120deg,rgba(17,27,32,.76),rgba(17,27,32,.58));backdrop-filter:none;text-shadow:0 1px 2px #0008}
+#panel.fd-office .classic-inbox .ix-message{background:#101b2040;font-size:13px;height:25px;min-height:25px;box-sizing:border-box}
+#panel.fd-office .classic-inbox .ix-message:nth-child(even){background:#ffffff09}
+#panel.fd-office .classic-inbox .ix-message.selected{background:#b99a6266;color:#fff}
+#panel.fd-office .classic-inbox .ci-status{justify-self:end;min-width:52px;text-align:center;padding:2px 5px;border-radius:3px;background:#0d161a60}
+#panel.fd-office .classic-inbox .actionable .ci-status{background:#7d552c;color:#ffe4a9}
+#panel.fd-office .classic-inbox .unread:not(.actionable) .ci-status{background:#d4b780;color:#1a1710}
+#panel.fd-office .classic-inbox .ix-reader .ed-body{font-size:15px;line-height:1.6;color:#fff4e5;max-width:110ch}
+#panel.fd-office .classic-inbox .ix-reader .ed-title{color:#f5dfb6}
+#panel.fd-office .classic-inbox .ix-reader .ng-mail-meta{color:#e8d1a6}
+#panel.fd-office .classic-inbox .ng-mail-choice{background:rgba(22,32,36,.88);border-color:#c7ae8370}
+#panel.fd-office .classic-inbox .ci-nav button{background:#17262bd9}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(225px,32vh,258px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
+@media(max-width:900px){#panel.fd-office .fd-workspace:has(.classic-inbox)::before{left:178px}}
+@media(max-width:560px){#panel.fd-office .fd-workspace:has(.classic-inbox)::before{left:0}}
