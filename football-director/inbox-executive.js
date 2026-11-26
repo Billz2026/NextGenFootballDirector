@@ -5,6 +5,7 @@ const category=m=>{const id=m.id||"",from=m.from||"";if(/medical|injury/i.test(f
 mailCategory=category;
 officeMessages=function(s){const messages=baseMessages(s);for(const m of messages)m.category=category(m);return messages};
 const decisions={
+ "aff-recovery":"Four-match review: 6 points required. Meeting the target improves board confidence; failure damages it.", "aff-cautious":"Four-match review: 4 points required, with less immediate board approval.", "aff-refuse":"No formal target; damages board confidence.", "aff-save":"28-day review of retained transfer funds.", "aff-flex":"Protect recruitment flexibility at the cost of board confidence.", "aff-ring":"Moves 25% of available funds into the protected reserve.", "aff-meet":"Private discussion improves the named player’s morale.", "aff-delegate":"Manager handles the issue with a smaller morale improvement.", "aff-list":"Makes the player available for transfer.", "aff-back":"Public backing strengthens manager trust.", "aff-review":"Improves board confidence but risks manager tension.", "aff-silent":"No public statement.",
  "agent-renew":"Attempts a two-year extension with an 8% wage increase, subject to wage budget.",
  "agent-wait":"No new spending; player morale may decline.",
  "agent-list":"Places the player on the transfer list if still eligible.",
