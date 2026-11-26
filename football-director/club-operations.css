@@ -1,0 +1,37 @@
+#panel.fd-office .co-page{display:flex;flex-direction:column;gap:9px;color:var(--fd-ivory)}
+#panel.fd-office .co-hero{display:grid;grid-template-columns:62px minmax(0,1fr) minmax(180px,30%) 130px;align-items:center;gap:14px;padding:13px 15px;border:1px solid var(--fd-line);border-left:3px solid var(--fd-gold);background:linear-gradient(110deg,#39443e,#233239 55%,#19292f)}
+#panel.fd-office .co-hero>svg{width:54px;height:60px}
+#panel.fd-office .co-page small{font-size:10px;letter-spacing:.07em;font-weight:700;color:var(--fd-gold)}
+#panel.fd-office .co-identity h3{font:800 35px/1.05 'Barlow Condensed',sans-serif;color:#f0ddb5;margin:4px 0}
+#panel.fd-office .co-identity>span{font-size:12px;color:#c4bfb2}
+#panel.fd-office .co-objective,#panel.fd-office .co-security{display:flex;flex-direction:column;gap:6px;border-left:1px solid var(--fd-line);padding-left:14px}
+#panel.fd-office .co-objective strong{font-size:14px;color:#f0ddb5}
+#panel.fd-office .co-security strong{font:700 26px/1.1 'Barlow Condensed',sans-serif;color:#f0ddb5}
+#panel.fd-office .co-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;background:#233239;border:1px solid var(--fd-line);padding:10px 14px}
+#panel.fd-office .co-metrics>div{min-width:0;display:flex;flex-direction:column;gap:5px}
+#panel.fd-office .co-metrics>div>strong{font:700 24px/1.05 'Barlow Condensed',sans-serif;color:#f0ddb5}
+#panel.fd-office .co-grid{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:9px;align-items:stretch}
+#panel.fd-office .co-card{min-width:0;padding:12px 13px;background:linear-gradient(145deg,#293a41,#203037);border:1px solid var(--fd-line);border-top:2px solid #d4b78065;display:flex;flex-direction:column;gap:5px}
+#panel.fd-office .co-heading{padding-bottom:8px;border-bottom:1px solid var(--fd-line)}
+#panel.fd-office .co-heading h4{font:700 25px/1.05 'Barlow Condensed',sans-serif;color:#f0ddb5;margin:4px 0 0}
+#panel.fd-office .co-manager,#panel.fd-office .co-review{padding:9px 10px;background:#14212785;border-left:2px solid var(--fd-gold);margin:4px 0}
+#panel.fd-office .co-manager h5,#panel.fd-office .co-review h5{font:700 24px/1.1 'Barlow Condensed',sans-serif;color:#f0ddb5;margin:4px 0}
+#panel.fd-office .co-manager span,#panel.fd-office .co-review p{font-size:12px;color:#c4bfb2;line-height:1.4;margin:4px 0}
+#panel.fd-office .co-line,#panel.fd-office .co-meter>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+#panel.fd-office .co-line{padding:7px 0;border-bottom:1px solid #d4b78018}
+#panel.fd-office .co-line span,#panel.fd-office .co-meter span{color:#c4bfb2}
+#panel.fd-office .co-line b{text-align:right;color:#f5f1e8}
+#panel.fd-office .co-meter{padding:5px 0}
+#panel.fd-office .co-meter b{color:#f0ddb5}
+#panel.fd-office .co-track{height:5px;background:#142127;margin-top:6px;border-radius:2px;overflow:hidden}
+#panel.fd-office .co-track i{display:block;height:100%}
+#panel.fd-office .co-link,#panel.fd-office .co-choice,#panel.fd-office .co-resign{padding:8px 10px;border:1px solid #d4b78045;background:#142127;color:#f0ddb5;cursor:pointer;text-align:left;font-size:12px;line-height:1.25}
+#panel.fd-office .co-link:hover,#panel.fd-office .co-choice:hover{background:#41483b;border-color:var(--fd-gold)}
+#panel.fd-office .co-card>.co-link:last-child{margin-top:auto}
+#panel.fd-office .co-choice{display:block;width:100%;margin-top:5px}
+#panel.fd-office .co-resign{border-color:#ce897a55;color:#e5a79a;margin-top:auto}
+#panel.fd-office .co-footer{display:flex;align-items:center;gap:7px;padding:8px;background:#233239;border:1px solid var(--fd-line);flex-wrap:wrap}
+#panel.fd-office .co-footer .co-link{flex:1;text-align:center}
+@media(min-width:1181px) and (max-height:850px){#panel.fd-office .co-hero{padding:9px 13px}#panel.fd-office .co-card{padding:9px 11px}#panel.fd-office .co-line{padding:5px 0}#panel.fd-office .co-heading h4{font-size:23px}}
+@media(max-width:1180px){#panel.fd-office .co-grid{grid-template-columns:1fr 1fr}#panel.fd-office .co-grid>section:last-child{grid-column:1/-1}#panel.fd-office .co-hero{grid-template-columns:52px 1fr 1fr}#panel.fd-office .co-security{grid-column:2}}
+@media(max-width:650px){#panel.fd-office .co-grid,#panel.fd-office .co-metrics{grid-template-columns:1fr 1fr}#panel.fd-office .co-grid{grid-template-columns:1fr}#panel.fd-office .co-hero{grid-template-columns:46px 1fr}#panel.fd-office .co-objective,#panel.fd-office .co-security{grid-column:1/-1}}
