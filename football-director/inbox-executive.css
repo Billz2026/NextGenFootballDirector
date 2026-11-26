@@ -65,3 +65,5 @@
 #panel.fd-office .ix-layout{flex:1 1 0;min-height:0;grid-template-rows:minmax(0,1fr)}
 #panel.fd-office .ix-reader{height:auto;box-sizing:border-box}
 }
+
+#panel.fd-office .ix-story-status{display:flex;flex:none;flex-wrap:wrap;gap:12px;padding:7px 12px;border:1px solid #d4b78025;border-radius:4px;background:#121315;color:#b6afa3;font-size:11px}#panel.fd-office .ix-story-status b{color:#f0ddb5;margin-left:5px;font-variant-numeric:tabular-nums}#panel.fd-office .ix-story-status span+span{border-left:1px solid #d4b78033;padding-left:12px}
