@@ -114,3 +114,12 @@
 #panel.fd-office .ed-player-grid>div{display:grid;gap:4px;padding:9px 10px;background:#101113;border:1px solid #d4b78020;border-radius:4px}
 #panel.fd-office .ed-player-grid small{font-size:11px;color:#bdb09a}
 #panel.fd-office .ed-player-grid b{font-size:15px;color:#f1e4cc}
+
+#panel.fd-office .ed-story-context,#panel.fd-office .ed-change-grid{margin:16px 0;padding:13px 16px;border:1px solid #d4b78035;border-radius:5px;background:#151618}
+#panel.fd-office .ed-story-context{display:grid;gap:6px;border-left:3px solid #b99a62}
+#panel.fd-office .ed-story-context small,#panel.fd-office .ed-change-grid>small{font-size:10px;color:#c6b18d;letter-spacing:.1em;font-weight:700}
+#panel.fd-office .ed-story-context strong{font-size:15px;color:#f0ddb5}
+#panel.fd-office .ed-story-context span,#panel.fd-office .ed-story-context p{font-size:12px;color:#c8bfae;margin:0}
+#panel.fd-office .ed-change-grid{display:grid;gap:8px}
+#panel.fd-office .ed-change-grid>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #d4b78020;font-size:13px;color:#c8bfae}
+#panel.fd-office .ed-change-grid b{color:#f0ddb5;font-variant-numeric:tabular-nums}
