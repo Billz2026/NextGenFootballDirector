@@ -87,3 +87,13 @@
 #panel.fd-office .ix-reader .ng-mail-choice .ed-impact{border-top:1px solid #d4b78020;padding-top:7px;color:#d4c8b4;font-size:13px;line-height:1.5}
 #panel.fd-office .ix-reader .ng-mail-meta{font-size:11px}
 @media(max-width:650px){#panel.fd-office .ed-score b{font-size:30px;padding:8px}#panel.fd-office .ed-score>div{gap:7px}}
+
+#panel.fd-office .ed-instruction{border-left:3px solid #b99a62;background:#d4b7800b;padding:12px 16px;margin:16px 0}
+#panel.fd-office .ed-instruction small{color:#d4b780;font-size:11px;font-weight:700;letter-spacing:.08em}
+#panel.fd-office .ed-instruction p{margin:6px 0 0;font-size:14px;line-height:1.6}
+#panel.fd-office .ed-facts>div:has(strong){min-width:0}
+#panel.fd-office .ed-facts strong{overflow-wrap:anywhere}
+#panel.fd-office .ix-reader .ed-document{padding:9px 12px;margin-bottom:14px}
+#panel.fd-office .ix-reader .ed-title{margin-top:9px}
+#panel.fd-office .ix-reader .ed-sender{padding-bottom:12px;margin-bottom:14px}
+#panel.fd-office .ix-reader .ed-body{max-width:85ch}
