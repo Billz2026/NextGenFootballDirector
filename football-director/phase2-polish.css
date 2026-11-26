@@ -73,3 +73,43 @@
 #panel.fd-office .lx-score{padding:4px 8px;min-width:22px;text-align:center;border:1px solid #d4b78035;border-radius:4px;background:#0e0f11;color:#f0ddb5;font-variant-numeric:tabular-nums}
 @media(max-width:1150px){#panel.fd-office .lx-grid{grid-template-columns:1fr}#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{height:auto;max-height:640px}}
 @media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .lx-tab{flex:1 1 42%;padding:7px 6px}#panel.fd-office .lx-metric{padding:10px}}
+
+
+/* Compact competition workspace: scope the density changes to this page. */
+#panel.fd-office:has(.lx-page) .fd-content{padding-top:9px;padding-bottom:9px}
+#panel.fd-office .lx-page{gap:8px}
+#panel.fd-office .lx-navigation{padding:3px}
+#panel.fd-office .lx-tab{min-height:28px;padding:5px 12px}
+#panel.fd-office .lx-metrics{gap:8px}
+#panel.fd-office .lx-metric{gap:2px;padding:7px 11px}
+#panel.fd-office .lx-metric strong{font-size:clamp(20px,1.65vw,28px)}
+#panel.fd-office .lx-metric>span{font-size:10px}
+#panel.fd-office .lx-grid{gap:10px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+#panel.fd-office .lx-panel-head{padding:7px 11px}
+#panel.fd-office .lx-panel-head h3{font-size:17px;margin:1px 0 0}
+#panel.fd-office .lx-panel-head small{font-size:9px}
+#panel.fd-office .lx-table{min-width:600px;font-size:11px}
+#panel.fd-office .lx-table .lx-rank{width:34px}
+#panel.fd-office .lx-table .lx-number{width:5%}
+#panel.fd-office .lx-table .lx-form-col{width:94px}
+#panel.fd-office .lx-table th,#panel.fd-office .lx-table td{padding:2px 3px;height:24px;line-height:1.2}
+#panel.fd-office .lx-table td:nth-child(10){color:#f0ddb5}
+#panel.fd-office .lx-team svg,#panel.fd-office .lx-team .fd-crest{width:15px;height:18px}
+#panel.fd-office .lx-form{display:flex;justify-content:center;gap:2px}
+#panel.fd-office .lx-form>span{display:inline-flex;align-items:center;justify-content:center;width:15px;height:16px;border-radius:3px;font-size:9px;font-weight:700;background:#292929;color:#b6afa3}
+#panel.fd-office .lx-form .lx-form-w{background:#244635;color:#9bd4a9}
+#panel.fd-office .lx-form .lx-form-d{background:#49412b;color:#e6c77d}
+#panel.fd-office .lx-form .lx-form-l{background:#482a2d;color:#f0a0a0}
+#panel.fd-office .lx-table-scroll{height:clamp(260px,calc(100dvh - 280px),510px);max-height:none}
+#panel.fd-office .lx-fixtures{height:clamp(220px,calc(100dvh - 319px),471px);max-height:none;padding:4px 6px}
+#panel.fd-office .lx-round{padding:4px 8px}
+#panel.fd-office .lx-segment button,#panel.fd-office .lx-round-controls button{min-height:24px;padding:2px 7px}
+#panel.fd-office #lx-week{min-width:76px;width:auto;padding:3px 5px;background:#161719;border:1px solid #51452f;color:#f0ddb5;border-radius:4px;font:600 11px 'DM Sans',sans-serif}
+#panel.fd-office .lx-match{margin:0 0 3px;padding:4px 6px}
+#panel.fd-office .lx-match-meta{font-size:9px;margin-bottom:2px;line-height:1}
+#panel.fd-office .lx-match-teams{font-size:11px;gap:4px}
+#panel.fd-office .lx-score{padding:2px 5px;min-width:19px}
+#panel.fd-office .lx-legend{padding:6px 10px}
+@media(min-width:1181px){#panel.fd-office:has(.lx-page) .fd-nav{min-height:25px;padding-top:3px;padding-bottom:3px}#panel.fd-office:has(.lx-page) .fd-nav-group>small{padding-top:5px;padding-bottom:2px}#panel.fd-office:has(.lx-page) .fd-club{margin:7px 0 4px;padding:7px}}
+@media(max-width:1150px){#panel.fd-office .lx-grid{grid-template-columns:1fr}#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{height:auto;max-height:520px}}
+@media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
