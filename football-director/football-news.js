@@ -1,6 +1,6 @@
 "use strict";
 (()=>{
-const shell=officeShell,navigate=officeNavigate,inbox=inboxContent,wire=wireInbox,tick=correspondenceTick;
+const shell=officeShell,navigate=officeNavigate,inbox=inboxContent,wire=wireInbox,tick=correspondenceTick,baseMessages=officeMessages;
 const outlets=[["Football Chronicle","FC","#b99a62","National reporting"],["Transfer Wire","TW","#78a9d1","Transfer market"],["The 90th Minute","90","#d17b76","Breaking news"],["The Football Insider","FI","#b298d0","Investigation"],["Terrace Talk","TT","#8bb99a","Supporters"],["The Touchline Examiner","TE","#8db9c6","Analysis"],["Daily Football Express","DF","#d9a36d","Tabloid"]];
 const outlet=m=>outlets.find(o=>(m.from||"").startsWith(o[0]))||outlets[0];
 const esc=escapeHtml,own=s=>s.world.clubs.find(c=>c.name===s.club);
@@ -9,7 +9,8 @@ const type=m=>m.newsStatus?.toLowerCase().includes("rumour")||/linked with|specu
 const status=m=>m.newsStatus|| (type(m)==="Rumours"?"Unconfirmed report":type(m)==="Analysis"?"Analysis":"Report");
 const mark=(m)=>{const o=outlet(m);return '<span class="fn-mark" style="--outlet:'+o[2]+'">'+o[1]+'</span>'};
 const textPreview=(s,n=155)=>esc(s.length>n?s.slice(0,n).trimEnd()+"…":s);
-function allNews(s){return officeMessages(s).filter(m=>isNews(m)&&!mailAction(s,m)).sort((a,b)=>b.date.localeCompare(a.date))}
+officeMessages=function(s){return baseMessages(s).filter(m=>!m.id.startsWith("public-"))};
+function allNews(s){return baseMessages(s).filter(m=>isNews(m)&&!mailAction(s,m)).sort((a,b)=>b.date.localeCompare(a.date))}
 function publicEvent(s,id,from,subject,body,newsStatus){calendarEvent(s,id,subject,body,from);const e=s.calendar.events.find(e=>e.id===id);if(e)e.newsStatus=newsStatus}
 function worldNews(s){const d=s.calendar.date,l=s.world.league;if(!l)return;const yesterday=datePlus(d,-1);for(let tier=1;tier<=DIVISIONS.length;tier++){const fs=l.fixtures.filter(f=>f.tier===tier&&f.type==="league"&&f.played&&f.date===yesterday);if(!fs.length)continue;const key="public-roundup:"+s.season+":"+tier+":"+yesterday;if(s.calendar.events.some(e=>e.id===key))continue;const top=fs.slice().sort((a,b)=>Math.abs(b.homeGoals-b.awayGoals)-Math.abs(a.homeGoals-a.awayGoals))[0],h=s.world.clubs.find(c=>c.id===top.homeClubId),a=s.world.clubs.find(c=>c.id===top.awayClubId);if(!h||!a)continue;const table=leagueTable(s,tier),leader=s.world.clubs.find(c=>c.id===table[0]?.id);const lines=fs.map(f=>{const h=s.world.clubs.find(c=>c.id===f.homeClubId),a=s.world.clubs.find(c=>c.id===f.awayClubId);return (h?.name||"Home")+" "+f.homeGoals+"–"+f.awayGoals+" "+(a?.name||"Away")});publicEvent(s,key,tier===1?"The 90th Minute":"Football Chronicle",DIVISIONS[tier-1]+" roundup: "+h.name+" "+top.homeGoals+"–"+top.awayGoals+" "+a.name,fs.length+" league matches completed on "+prettyDate(yesterday)+". "+(leader?leader.name+" currently lead the division.":"")+"\n\n"+lines.join("\n"),"Confirmed results")}
  for(const t of s.world.transfers||[]){if(t.date!==d&&t.date!==yesterday)continue;publicEvent(s,"public-transfer:"+t.id,"Transfer Wire",t.to+" sign "+t.player,t.player+" joins "+t.to+" from "+t.from+" for "+money(t.fee)+". Contract length: "+t.years+" years.","Confirmed transfer")}
