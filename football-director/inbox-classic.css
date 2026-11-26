@@ -165,3 +165,21 @@
 #panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:not(:disabled){background:#d4b780;color:#18140e}
 #panel.fd-office .fd-workspace:has(.classic-inbox)::after{background:linear-gradient(180deg,#0a141a28,#0a141a35 42%,#0a141a66 72%,#0a141a80)}
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(210px,31vh,248px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:90px minmax(0,1fr)}}
+
+/* Stadium framing and persistent response strip. */
+#panel.fd-office .fd-workspace:has(.classic-inbox)::before{background-position:center 27%;filter:blur(2px) saturate(.94)}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::after{background:linear-gradient(180deg,#0a141a35,#0a141a38 42%,#0a141a85 85%,#0a141a90)}
+#panel.fd-office .classic-inbox .ix-reader .ed-title{font-size:29px}
+#panel.fd-office .classic-inbox .ix-reader .ed-player{background:transparent;border:0;padding:0;margin:8px 0}
+#panel.fd-office .classic-inbox .ed-player header{display:none}
+#panel.fd-office .classic-inbox .ed-player-grid{display:flex;flex-wrap:wrap;gap:5px 16px;margin:0}
+#panel.fd-office .classic-inbox .ed-player-grid>div{display:flex;gap:6px;align-items:baseline;background:none;border:0;padding:0}
+#panel.fd-office .classic-inbox .ed-player-grid b{font-size:13px}
+#panel.fd-office .classic-inbox .ed-player-grid small{color:#e4cc9e}
+#panel.fd-office .classic-inbox .ci-action-dock{display:flex;flex-wrap:wrap;gap:5px 8px;margin:0;padding:7px 0 0;border:0;border-top:1px solid #d4b78066;background:none;min-width:0}
+#panel.fd-office .classic-inbox .ci-action-dock>small,#panel.fd-office .classic-inbox .ci-action-dock>p{flex-basis:100%;margin:0;font-size:11px;color:#f1d6a3}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice{flex:1 1 180px;min-width:0;border-radius:2px;background:#17252de8;border:1px solid #c7ae8380;color:#fff0cf;text-align:left}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice:hover{background:#56492e}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice small{color:#e2d9c8}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout.ci-has-action{grid-template-rows:clamp(156px,24vh,196px) minmax(0,1fr) auto}#panel.fd-office .classic-inbox .ci-action-dock{max-height:190px;overflow:auto}}
+@media(max-width:1180px){#panel.fd-office .classic-inbox .ix-layout.ci-has-action{grid-template-rows:180px minmax(140px,1fr) auto}}
