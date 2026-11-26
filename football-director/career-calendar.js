@@ -1,0 +1,38 @@
+"use strict";
+(()=>{
+const previous=career,esc=escapeHtml;
+const iso=d=>d.toISOString().slice(0,10),dt=d=>new Date(d+"T00:00:00Z"),monthOf=d=>d.slice(0,7);
+const shift=(m,n)=>{const d=dt(m+"-01");d.setUTCMonth(d.getUTCMonth()+n);return iso(d).slice(0,7)};
+function agenda(s,month){
+const c=s.world.clubs.find(c=>c.name===s.club),st=officeState(s),out=[],seen=new Set(),today=s.calendar.date;
+const add=(date,title,kind,detail="",id="")=>{if(typeof date!=="string"||!date.startsWith(month+"-"))return;const key=date+"|"+kind+"|"+title;if(seen.has(key))return;seen.add(key);out.push({date,title,kind,detail,id})};
+const year=Number(month.slice(0,4)),m=Number(month.slice(5)),end=iso(new Date(Date.UTC(year,m,0)));
+if([1,7].includes(m))add(month+"-01",m===1?"January window opens":"Summer window opens","window","Recruitment window opens under the game's calendar rules.");
+if([1,8].includes(m))add(end,"Transfer deadline day","deadline","Transfer window closes at the end of the day.");
+if(m===7)add(month+"-01","New season","career","Season "+year+"/"+String(year+1).slice(-2));
+if(c){for(const f of s.world.league?.fixtures||[]){if(![f.homeClubId,f.awayClubId].includes(c.id))continue;const home=f.homeClubId===c.id,opp=s.world.clubs.find(x=>x.id===(home?f.awayClubId:f.homeClubId));if(!opp)continue;const gf=home?f.homeGoals:f.awayGoals,ga=home?f.awayGoals:f.homeGoals;add(f.date,opp.name+" ("+(home?"H":"A")+")"+(f.played?" "+gf+"–"+ga:""),f.played?(gf>ga?"win":gf<ga?"loss":"draw"):"fixture",f.type==="friendly"?"Pre-season friendly":DIVISIONS[f.tier-1]||"League fixture");}
+const scope=q=>(!q.club||q.club===c.id)&&(!q.appointment||q.appointment===s.contract?.startDate);
+for(const q of st.dilemmas||[]){if(!scope(q))continue;if(q.status==="pending")add(q.deadline,q.title,"deadline","Decision response due",q.id);if(q.status==="scheduled")add(q.resolveDate,q.title,"review","Decision outcome expected");}
+for(const q of c.recruitmentRequests||[]){if(q.status==="Pending")add(q.deadline,"Recruitment request: "+q.position,"deadline","Manager's response deadline",q.id);if(q.status==="Approved")add(q.fulfilmentDeadline||q.fulfillmentDeadline,"Recruitment commitment: "+q.position,"review","Agreed recruitment deadline");}
+for(const q of [...(st.storylines?.cases||[]),...(st.advancedStories?.cases||[]),...(st.affairs?.reviews||[])])if(scope(q)&&q.status==="open")add(q.due||q.deadline,({player:"Player welfare review",facility:"Facilities project review",allocation:"Financial review",budget:"Budget review",community:"Supporter engagement review",meeting:"Staff meeting"})[q.kind]||"Club commitment review","review");
+for(const q of st.advancedStories?.sponsors||[])if(scope(q)&&q.status==="active")add(q.end,"Sponsorship review","review");
+for(const q of st.advancedStories?.policies||[])if(scope(q)&&q.until>=today)add(q.until,"Recruitment policy expires","review");
+for(const p of c.players||[])add(p.contractEnd,p.name+" — contract expires","contract","Player contract expiry");
+for(const p of [c.manager,...(c.staff||[])].filter(Boolean))add(p.endDate,p.name+" — staff contract expires","contract");
+if(s.relationships?.nextReview)add(s.relationships.nextReview,"Strategic review","review","Board and manager review");
+}
+for(const q of pressState(s)||[])if(["pending","queued"].includes(q.status)&&q.club===c?.id)add(q.deadline,"Media response deadline","deadline",q.question,q.id);
+for(const [name,status] of Object.entries(s.applications||{}))if(status==="Offer")add(s.employment?.[name]?.deadline,name+" — employment offer","deadline");
+add(s.contract?.endDate,"Director contract expires","contract");add(CAREER_END,"Career ends","career");
+return out.sort((a,b)=>a.date.localeCompare(b.date)||a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title));
+}
+function calendarMarkup(s,month,selected){
+const events=agenda(s,month),today=s.calendar.date,first=dt(month+"-01"),offset=(first.getUTCDay()+6)%7,days=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth()+1,0)).getUTCDate(),weeks=Math.ceil((offset+days)/7),label=first.toLocaleDateString("en-GB",{month:"long",year:"numeric",timeZone:"UTC"}),by=new Map();for(const e of events){if(!by.has(e.date))by.set(e.date,[]);by.get(e.date).push(e)}
+const cells=Array.from({length:weeks*7},(_,i)=>{const n=i-offset+1;if(n<1||n>days)return '<div class="fc-day fc-out"></div>';const d=month+"-"+String(n).padStart(2,"0"),items=by.get(d)||[];return '<button type="button" class="fc-day '+(d===today?"fc-today ":"")+(d===selected?"fc-selected":"")+'" data-fc-day="'+d+'" aria-label="'+esc(prettyDate(d)+", "+items.length+" events")+'"><span class="fc-day-number">'+n+(d===today?'<small>Today</small>':"")+'</span>'+items.slice(0,2).map(e=>'<span class="fc-event fc-'+e.kind+'" title="'+esc(e.title)+'">'+esc(e.title)+'</span>').join("")+(items.length>2?'<span class="fc-more">+'+(items.length-2)+' more</span>':"")+'</button>'}).join("");
+const list=by.get(selected)||[],up=events.filter(e=>e.date>=today).slice(0,5);
+return '<div class="fc-page"><div class="fc-toolbar"><div><small>FOOTBALL OPERATIONS · '+esc(s.season)+'</small><h3>'+esc(label)+'</h3></div><div class="fc-month-nav"><button data-fc-nav="-1" aria-label="Previous month">‹</button><button data-fc-nav="today">Today</button><button data-fc-nav="1" aria-label="Next month">›</button></div></div><div class="fc-window"><b>'+esc(windowStatus(today)==="Closed"?"Transfer window closed":windowStatus(today))+'</b><span>'+esc(prettyDate(today))+' · Career date</span></div><div class="fc-layout"><div class="fc-month"><div class="fc-weekdays">'+["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>'<span>'+d+'</span>').join("")+'</div><div class="fc-grid" style="--weeks:'+weeks+'">'+cells+'</div></div><aside class="fc-agenda"><small>DAY AGENDA</small><h4>'+esc(prettyDate(selected))+'</h4><div class="fc-agenda-list">'+(list.length?list.map(e=>'<div class="fc-agenda-item fc-'+e.kind+'"><strong>'+esc(e.title)+'</strong><span>'+esc(e.detail||"Scheduled career event")+'</span>'+(e.id?'<button data-fc-message="'+esc(e.id)+'">Open correspondence ›</button>':"")+'</div>').join(""):'<p>No scheduled events on this date.</p>')+'</div><h4 class="fc-upcoming">Upcoming this month</h4>'+ (up.length?up.map(e=>'<div class="fc-up-item"><small>'+esc(prettyDate(e.date))+'</small><b>'+esc(e.title)+'</b></div>').join(""):'<p>No further scheduled events this month.</p>')+'</aside></div><footer class="fc-legend">'+[["fixture","Fixture"],["win","Win"],["draw","Draw"],["loss","Loss"],["review","Review"],["deadline","Deadline"],["contract","Contract"],["window","Window"]].map(([k,v])=>'<span><i class="fc-'+k+'"></i>'+v+'</span>').join("")+'</footer></div>'
+}
+function screen(s,month=monthOf(s.calendar.date),selected=s.calendar.date){if(monthOf(selected)!==month)selected=month+"-01";show("Calendar",officeShell(s,"calendar","Calendar",calendarMarkup(s,month,selected)));wireOfficeShell(s);for(const b of panel.querySelectorAll("[data-fc-day]"))b.onclick=()=>screen(s,month,b.dataset.fcDay);for(const b of panel.querySelectorAll("[data-fc-nav]"))b.onclick=()=>b.dataset.fcNav==="today"?screen(s):screen(s,shift(month,Number(b.dataset.fcNav)),shift(month,Number(b.dataset.fcNav))+"-01");for(const b of panel.querySelectorAll("[data-fc-message]"))b.onclick=()=>career("inbox",b.dataset.fcMessage,"all");}
+career=function(tab="overview",...args){if(tab!=="calendar")return previous(tab,...args);const s=load();if(!s)return home();return screen(s)};
+globalThis.fdCalendarTest={agenda,calendarMarkup,shift};
+})();
