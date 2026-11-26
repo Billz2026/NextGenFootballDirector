@@ -1,0 +1,55 @@
+"use strict";
+(()=>{
+const outlets=[
+ {id:"chronicle",name:"Football Chronicle",short:"FC",tone:"National football",cred:90,color:"#b99a62"},
+ {id:"wire",name:"Transfer Wire",short:"TW",tone:"Transfer specialist",cred:80,color:"#78a9d1"},
+ {id:"minute",name:"The 90th Minute",short:"90",tone:"Breaking news",cred:75,color:"#d17b76"},
+ {id:"insider",name:"The Football Insider",short:"FI",tone:"Investigative",cred:65,color:"#b298d0"},
+ {id:"terrace",name:"Terrace Talk",short:"TT",tone:"Supporter coverage",cred:60,color:"#8bb99a"},
+ {id:"examiner",name:"The Touchline Examiner",short:"TE",tone:"Analysis",cred:95,color:"#8db9c6"},
+ {id:"express",name:"Daily Football Express",short:"DF",tone:"Tabloid",cred:40,color:"#d9a36d"}
+];
+const get=id=>outlets.find(x=>x.id===id)||outlets[0],own=s=>s.world.clubs.find(c=>c.name===s.club),state=s=>{const o=officeState(s);return o.mediaNetwork??={stories:[],supporters:{},relationships:{}}},clip=clampConfidence;
+const oldMatch=pressMatch,oldTick=pressTick,oldChoose=pressChoose,oldCorrespondence=correspondenceTick,oldCategory=mailCategory,oldMessages=officeMessages,oldInbox=inboxContent,oldNavigate=officeNavigate;
+const fan=(s,c)=>state(s).supporters[c.id]??=60;
+const adjustFan=(s,c,delta)=>state(s).supporters[c.id]=clip(fan(s,c)+delta);
+function article(s,id,outlet,title,body,status="Confirmed"){const o=get(outlet);calendarEvent(s,"network-news:"+outlet+":"+id,title,body,o.name);const e=s.calendar.events.find(x=>x.id==="network-news:"+outlet+":"+id);if(e)e.newsStatus=status}
+function question(s,c,id,outlet,question,choices,context={}){if(pressState(s).some(q=>q.id===id))return;pressState(s).push({id,club:c.id,appointment:s.contract?.startDate,outlet,network:true,question,choices,status:"queued",date:datePlus(s.calendar.date,1),deadline:datePlus(s.calendar.date,4),...context})}
+mailCategory=function(m){if(/^network-news:|^network-question:|^network-response:/.test(m.id))return "Media";return oldCategory(m)};
+officeMessages=function(s){const ms=oldMessages(s),events=new Map(s.calendar.events.map(e=>[e.id,e]));for(const m of ms){m.category=mailCategory(m);const e=events.get(m.id);if(e?.newsStatus)m.newsStatus=e.newsStatus}return ms};
+pressMatch=function(s,f,m,c){oldMatch(s,f,m,c);const h=f.homeClubId===c.id,gf=h?f.homeGoals:f.awayGoals,ga=h?f.awayGoals:f.homeGoals,opp=s.world.clubs.find(x=>x.id===(h?f.awayClubId:f.homeClubId)),friendly=f.type==="friendly",walk=!!m?.walkout;
+const q=pressState(s).find(q=>q.id==="press-question:"+f.id);if(!q||q.network)return;
+const games=s.world.league.fixtures.filter(x=>x.played&&x.type==="league"&&[x.homeClubId,x.awayClubId].includes(c.id)).sort((a,b)=>a.date.localeCompare(b.date)).slice(-5),losses=games.filter(x=>x.homeClubId===c.id?x.homeGoals<x.awayGoals:x.awayGoals<x.homeGoals).length;
+const outlet=walk?"express":!friendly&&losses>=3?"terrace":gf<ga?"examiner":gf-ga>=3?"minute":"chronicle";
+Object.assign(q,{network:true,outlet,context:"match",question:walk?"You left before full time. Is that a public vote of no confidence in "+c.manager.name+"?":outlet==="terrace"?"Supporters have seen "+losses+" defeats in the last "+games.length+" league games. What assurance can you give them?":outlet==="examiner"?"Following the defeat to "+opp.name+", do you believe recruitment or the club's wider strategy needs reassessing?":outlet==="minute"?"A convincing win over "+opp.name+". Is the club ready to build on this momentum?":q.question,choices:[["The manager has my full support.","back"],["We will review our approach internally.","review"],["The club needs higher standards.","critical"],["No comment.","silent"]]});
+if(!friendly)adjustFan(s,c,gf>ga?3:gf<ga?-4:0);
+if(walk)adjustFan(s,c,-2);
+if(outlet!=="chronicle")article(s,f.id,outlet,walk?"Questions follow director's early departure":outlet==="terrace"?c.name+" supporters face another difficult week":outlet==="minute"?c.name+" record emphatic victory":c.name+" recruitment strategy examined",c.name+" "+gf+"–"+ga+" "+opp.name+". "+(walk?"The director left before full time.":outlet==="terrace"?"The club has lost "+losses+" of its last "+games.length+" league matches.":"The result provides another test of the club's direction."),"Analysis")
+};
+pressTick=function(s){oldTick(s);for(const q of pressState(s)){if(!q.network||q.status!=="pending")continue;const e=s.calendar.events.find(e=>e.id===q.id);if(e){e.from=get(q.outlet).name+" · Reporter";e.subject="Media enquiry — "+get(q.outlet).name;e.body=q.question;e.newsStatus="Interview"}}};
+pressChoose=function(s,id,index){const q=pressState(s).find(x=>x.id===id);if(!q?.network)return oldChoose(s,id,index);const c=own(s);if(!c||q.status!=="pending"||q.club!==c.id||q.appointment!==s.contract?.startDate||s.calendar.finished||s.calendar.date>=q.deadline||!q.choices[index])return false;
+const [quote,choice]=q.choices[index],r=relationships(s,c),o=get(q.outlet);let b=0,g=0,f=0,headline="",reaction="";
+switch(choice){
+case "back":g=c.manager.personality==="Demanding"?4:3;b=q.ga>q.gf?-1:0;f=q.ga>q.gf?-1:2;headline="Director backs "+c.manager.name;reaction="The manager welcomes the support.";break;
+case "review":b=2;g=1;f=1;headline="Director confirms internal review";reaction="The club will consider its approach privately.";break;
+case "critical":b=q.ga>q.gf?2:-1;g=-4;f=q.ga>q.gf?2:-1;headline="Director demands higher standards";reaction="The manager is disappointed by the public criticism.";break;
+case "confirm":{const story=state(s).stories.find(x=>x.id===q.storyId),target=story&&marketPlayers(s.world).find(x=>x.p.id===story.playerId);if(target&&target.club!==c){if(!c.shortlist.includes(target.p.id))c.shortlist.push(target.p.id);story.confirmed=true;headline="Director confirms interest in "+target.p.name;reaction="The player is now on the club's shortlist; no bid has been made.";f=1}else{headline="Director addresses recruitment speculation";reaction="The reported target is no longer available."}break}
+case "deny":{const story=state(s).stories.find(x=>x.id===q.storyId);if(story)story.denied=true;headline="Director denies transfer speculation";reaction="The club has issued a denial. No transfer commitment has been made.";break}
+case "private":headline="Club refuses to discuss recruitment targets";reaction="The director keeps recruitment discussions confidential.";b=1;break;
+case "silent":headline="Director declines to comment";reaction="No further statement was issued.";break;
+}
+q.status="answered";r.board=clip(r.board+b);r.manager=clip(r.manager+g);adjustFan(s,c,f);const rel=state(s).relationships;rel[o.id]=clip((rel[o.id]??60)+(choice==="silent"?-1:choice==="private"?0:2));
+officeState(s).followups.push({id:"network-response:"+q.id,date:datePlus(s.calendar.date,1),subject:headline,body:"“"+quote+"” "+reaction,from:o.name});
+if(r.board<25){s.rep=Math.max(0,s.rep-2);endAppointment(s,"Dismissed");calendarEvent(s,"press-dismissed:"+q.id,"Director dismissed","The board has terminated your appointment following a loss of confidence.",c.name)}return true};
+function rumours(s,c){const n=state(s),d=s.calendar.date;for(const t of n.stories){if(t.status!=="open")continue;if(t.club!==c?.id||t.appointment!==s.contract?.startDate){t.status="closed";continue}const transfer=(s.world.transfers||[]).find(x=>x.playerId===t.playerId&&x.to===c.name&&x.date>=t.date);if(transfer){t.status="signed";article(s,t.id+":signed","wire",c.name+" complete deal for "+t.name,"The reported interest has resulted in a completed transfer.");continue}if(d>=t.deadline||windowStatus(d)==="Closed"){t.status="closed";article(s,t.id+":closed","wire","No deal completed for "+t.name,"The reported link has not resulted in a transfer to "+c.name+". "+(t.denied?"The director previously denied the speculation.":"No completed agreement was recorded."),"Rumour update");continue}if(!t.escalated&&d>=datePlus(t.date,3)){t.escalated=true;article(s,t.id+":update","insider","Recruitment speculation continues over "+t.name,(t.confirmed?"The director has confirmed interest.":"The original report remains unconfirmed.")+" No completed transfer has been recorded.","Rumour update")}}
+if(!c||windowStatus(d)==="Closed"||n.stories.some(t=>t.club===c.id&&t.status==="open")||n.stories.some(t=>t.club===c.id&&d<datePlus(t.date,12)))return;
+if(dilemmaRoll(c.id+":"+d)%5!==0)return;
+const market=marketPlayers(s.world),short=market.find(x=>x.club!==c&&c.shortlist.includes(x.p.id)),candidate=short||clubTargets(s,c).flatMap(x=>x.targets)[0];if(!candidate)return;
+const p=candidate.p,id="link:"+c.id+":"+p.id+":"+d,outlet=short?"wire":"express";const t={id,club:c.id,appointment:s.contract?.startDate,playerId:p.id,name:p.name,date:d,deadline:datePlus(d,8),status:"open",basis:short?"shortlist":"scout fit"};n.stories.push(t);
+article(s,id,outlet,c.name+" linked with "+p.name,short?"The "+p.position+" is on the club's recruitment shortlist. No completed deal or formal bid is confirmed.":"Speculation links the club with the "+p.position+" at "+(candidate.club?.name||"free agency")+". The player fits a squad need, but no club interest or bid has been confirmed.","Rumour");
+if(!pressState(s).some(q=>q.network&&["queued","pending"].includes(q.status)))question(s,c,"network-question:"+id,outlet,"Can you clarify reports linking "+c.name+" with "+p.name+"?",[["Confirm that the player is of interest.","confirm"],["Deny the reports.","deny"],["We do not discuss recruitment targets.","private"],["No comment.","silent"]],{storyId:id,context:"transfer"})
+}
+function breaking(s){const d=s.calendar.date;for(const e of s.calendar.events.filter(e=>e.date===d&&!e.id.startsWith("network-"))){if(/dismissed|resign|appointed|appointment/i.test(e.subject)&&/manager/i.test(e.subject+" "+e.body))article(s,e.id,"minute",e.subject,e.body);else if(/^bid:/.test(e.id))article(s,e.id,"wire","Transfer interest reported","A transfer offer has been recorded. Financial terms remain confidential.","Report");else if(/^dilemma-outcome:/.test(e.id)&&/supporters/i.test(e.subject))article(s,e.id,"terrace",e.subject,e.body,"Reaction")}}
+correspondenceTick=function(s){oldCorrespondence(s);if(s.calendar.finished)return;const c=own(s);rumours(s,c);breaking(s);officeMessages(s)};
+inboxContent=function(s,messages,st,id,filter="all"){let html=oldInbox(s,messages,st,id,filter),m=messages.find(m=>m.id===id),c=own(s);if(c){html=html.replace('<div class="ix-counts">','<div class="ix-counts"><div><small>Supporters</small><strong>'+fan(s,c)+'/100</strong></div>')}if(m?.category==="Media"){const o=outlets.find(x=>m.from.startsWith(x.name))||get("chronicle"),status=m.newsStatus||(/question|enquiry/i.test(m.subject)?"Interview":"Report");const banner='<div class="mn-masthead" style="--mn-color:'+o.color+'"><span class="mn-logo">'+o.short+'</span><div><strong>'+escapeHtml(o.name)+'</strong><small>'+escapeHtml(o.tone)+' · '+escapeHtml(status)+'</small></div></div>';html=html.replace('<section class="ix-reader ng-mail-reader">','<section class="ix-reader ng-mail-reader">'+banner).replace(/<div class="ng-press-banner">[\s\S]*?<\/div>/,"")}return html};
+})();
