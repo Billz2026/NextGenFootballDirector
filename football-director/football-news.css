@@ -1,0 +1,54 @@
+#panel.fd-office .fn-page{display:flex;flex-direction:column;gap:10px;min-height:0;color:#f5f1e8}
+#panel.fd-office .fn-hero{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 16px;background:linear-gradient(105deg,#252018,#111214 75%);border:1px solid #d4b78040;border-left:3px solid #d4b780;border-radius:5px}
+#panel.fd-office .fn-hero small{font-size:10px;color:#c8b18a;letter-spacing:.08em;font-weight:700}
+#panel.fd-office .fn-hero h3{font:800 34px/1 'Barlow Condensed',sans-serif;color:#f0ddb5;margin:4px 0}
+#panel.fd-office .fn-hero p{margin:5px 0 0;font-size:12px;color:#b6afa3}
+#panel.fd-office .fn-headstats{display:flex;align-items:stretch;gap:8px}
+#panel.fd-office .fn-headstats>div,#panel.fd-office .fn-headstats>button{display:grid;gap:5px;padding:8px 12px;border:0;border-left:1px solid #d4b78035;background:transparent;text-align:left}
+#panel.fd-office .fn-headstats>button{cursor:pointer;border:1px solid #d4b78040;border-radius:4px;background:#d4b7800d}
+#panel.fd-office .fn-headstats strong{font:700 28px/1 'Barlow Condensed',sans-serif;color:#f0ddb5}
+#panel.fd-office .fn-toolbar{display:flex;gap:10px;align-items:center;background:#111214;border:1px solid #35312a;border-radius:5px;padding:5px}
+#panel.fd-office .fn-toolbar nav{display:flex;gap:3px;flex:1;flex-wrap:wrap}
+#panel.fd-office .fn-toolbar button{padding:7px 10px;border:1px solid transparent;border-radius:4px;color:#bfb9ad;background:transparent;font:600 11px 'DM Sans',sans-serif;cursor:pointer}
+#panel.fd-office .fn-toolbar button.active{background:linear-gradient(135deg,#ead7ae,#b99a62);color:#181511}
+#panel.fd-office .fn-toolbar input{width:180px;min-width:100px;padding:7px 10px;background:#0c0d0f;border:1px solid #d4b78030;border-radius:4px;color:#f5f1e8;font-size:12px}
+#panel.fd-office .fn-layout{display:grid;grid-template-columns:minmax(150px,.55fr) minmax(235px,1fr) minmax(290px,1.55fr);gap:10px;min-height:0;flex:1}
+#panel.fd-office .fn-sources,#panel.fd-office .fn-feed,#panel.fd-office .fn-reader{min-width:0;min-height:0;background:linear-gradient(145deg,#161719,#101113);border:1px solid #35312a;border-radius:5px;overflow:hidden}
+#panel.fd-office .fn-sources{overflow:auto}
+#panel.fd-office .fn-sources>header,#panel.fd-office .fn-feed>header{padding:12px 10px;border-bottom:1px solid #d4b78025;color:#f0ddb5;font-size:12px;font-weight:700}
+#panel.fd-office .fn-sources button{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:7px;width:100%;background:transparent;border:0;border-bottom:1px solid #d4b78012;text-align:left;color:#d4cfc5;padding:10px 8px;font-size:11px;cursor:pointer}
+#panel.fd-office .fn-sources button.active{background:#d4b78015;box-shadow:inset 2px 0 #d4b780}
+#panel.fd-office .fn-sources button b{font-size:10px;color:#b6afa3}
+#panel.fd-office .fn-mark{display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:4px;border:1px solid var(--outlet,#d4b780);color:var(--outlet,#d4b780);background:#0e0f11;font:800 14px/1 'Barlow Condensed',sans-serif}
+#panel.fd-office .fn-mark svg{width:16px}
+#panel.fd-office .fn-feed{display:flex;flex-direction:column}
+#panel.fd-office .fn-feed>header{display:flex;justify-content:space-between;gap:8px}
+#panel.fd-office .fn-feed>header span{font-weight:400;color:#b6afa3}
+#panel.fd-office .fn-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#8d764c #141517}
+#panel.fd-office .fn-story{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;background:transparent;border:0;border-bottom:1px solid #d4b78018;padding:12px;color:#e9e3d9;cursor:pointer}
+#panel.fd-office .fn-story.selected{background:#d4b78012;box-shadow:inset 3px 0 #d4b780}
+#panel.fd-office .fn-story:hover,#panel.fd-office .fn-sources button:hover{background:#d4b7800b}
+#panel.fd-office .fn-story-meta{display:flex;gap:6px;align-items:center;font-size:9px;color:#b6afa3}
+#panel.fd-office .fn-story-meta .fn-mark{width:22px;height:22px;font-size:11px}
+#panel.fd-office .fn-story strong{font-size:13px;line-height:1.35}
+#panel.fd-office .fn-story p{font-size:11px;line-height:1.4;margin:0;color:#b6afa3}
+#panel.fd-office .fn-tag{display:inline-block;align-self:flex-start;border:1px solid #d4b78035;border-radius:3px;padding:3px 6px;color:#d4b780;font-size:9px;text-transform:uppercase;letter-spacing:.045em}
+#panel.fd-office .fn-reader{padding:20px;overflow:auto;scrollbar-width:thin;scrollbar-color:#8d764c #141517}
+#panel.fd-office .fn-mast{display:flex;align-items:center;gap:12px;padding:12px;background:#ffffff03;border-left:3px solid var(--outlet);border-bottom:1px solid #ffffff10}
+#panel.fd-office .fn-mast .fn-mark{width:44px;height:44px;font-size:24px}
+#panel.fd-office .fn-mast>div{display:grid;gap:5px}
+#panel.fd-office .fn-mast strong{font:700 23px/1 'Barlow Condensed',sans-serif;color:var(--outlet)}
+#panel.fd-office .fn-mast small{font-size:10px;color:#b6afa3}
+#panel.fd-office .fn-article-meta{display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px;color:#b6afa3;font-size:11px}
+#panel.fd-office .fn-reader h3{font:800 clamp(25px,2.1vw,36px)/1.1 'Barlow Condensed',sans-serif;color:#f0ddb5;margin:10px 0}
+#panel.fd-office .fn-byline{font-size:11px;color:#b6afa3;border-bottom:1px solid #d4b78025;padding-bottom:12px;margin-bottom:15px}
+#panel.fd-office .fn-body{white-space:pre-line;font-size:14px;line-height:1.8;color:#ddd6c9}
+#panel.fd-office .fn-empty{padding:20px;color:#b6afa3;font-size:13px}
+#panel.fd-office .fn-empty-reader{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:100%;box-sizing:border-box}
+#panel.fd-office .fn-empty-reader svg{width:44px;height:44px;color:#d4b780}
+#panel.fd-office .fn-footer{font-size:10px;color:#a49a89;padding:3px 0}
+#panel.fd-office .fn-inbox-link{display:flex;gap:6px;align-items:center;background:#d4b7800d;border:1px solid #d4b78040;border-radius:4px;color:#f0ddb5;font-size:11px;padding:7px;cursor:pointer}
+#panel.fd-office .fn-inbox-link svg{width:15px;height:15px}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .fd-workspace:has(.fn-page){height:100dvh;display:flex;flex-direction:column;overflow:hidden;min-height:0}#panel.fd-office .fd-workspace:has(.fn-page) .fd-top{position:relative;top:auto;flex:none}#panel.fd-office .fd-content:has(.fn-page){display:flex;flex:1 1 0;flex-direction:column;overflow:hidden;min-height:0}#panel.fd-office .fn-page{flex:1 1 0;min-height:0}#panel.fd-office .fn-hero,#panel.fd-office .fn-toolbar,#panel.fd-office .fn-footer{flex:none}#panel.fd-office .fn-layout{grid-template-rows:minmax(0,1fr)}}
+@media(max-width:1050px){#panel.fd-office .fn-layout{grid-template-columns:minmax(180px,1fr) minmax(250px,1.4fr)}#panel.fd-office .fn-sources{grid-column:1/-1;display:flex;overflow:auto}#panel.fd-office .fn-sources>header{display:none}#panel.fd-office .fn-sources button{min-width:135px}#panel.fd-office .fn-scroll{max-height:500px}}
+@media(max-width:650px){#panel.fd-office .fn-layout{grid-template-columns:1fr}#panel.fd-office .fn-hero,#panel.fd-office .fn-toolbar{flex-wrap:wrap}#panel.fd-office .fn-reader{min-height:300px}#panel.fd-office .fn-scroll{max-height:260px}}
