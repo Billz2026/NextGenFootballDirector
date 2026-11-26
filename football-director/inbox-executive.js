@@ -29,7 +29,7 @@ dilemmaResolve=function(s,e){if(!/^(agent-|youth-|scout-)/.test(e.choice||""))re
  switch(e.choice){
  case "agent-renew":if(p){body=renewPlayer(s,p.id)?p.name+" agreed a new contract at "+money(p.wage)+"/week, expiring "+prettyDate(p.contractEnd)+".":"Renewal could not proceed under the current contract or wage budget."}break;
  case "agent-wait":if(p){p.morale=clampConfidence(p.morale-6);body=p.name+" remains under contract but his morale has fallen."}break;
- case "agent-list":if(p){body="Sale exploration recorded for "+p.name+". Review the player in the Transfer Centre before listing.";rel.manager=clampConfidence(rel.manager-2);c.shortlist=c.shortlist.filter(id=>id!==p.id)}break;
+ case "agent-list":if(p){body=listForSale(s,c,p)?p.name+" has been made available for transfer.":"The player is already listed or unavailable."}break;
  case "youth-promote":if(y){body=squadPayroll(c)+y.wage<=c.wageBudget&&promotePlayer(s,y.id)?y.name+" has joined the senior squad.":"Promotion blocked by squad capacity or wages."}break;
  case "youth-develop":if(y){y.morale=clampConfidence(y.morale+3);body=y.name+" remains in the academy with a development review agreed."}break;
  case "youth-hold":rel.manager=clampConfidence(rel.manager+1);body="The existing squad hierarchy remains unchanged.";break;
