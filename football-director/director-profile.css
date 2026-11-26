@@ -73,3 +73,21 @@
 }
 @media(max-width:1180px){#panel.fd-office .dp-layout{grid-template-columns:1fr 1fr}#panel.fd-office .dp-hero{grid-template-columns:64px 1fr 145px}}
 @media(max-width:650px){#panel.fd-office .dp-layout{grid-template-columns:1fr}#panel.fd-office .dp-hero{grid-template-columns:50px 1fr}#panel.fd-office .dp-avatar{width:46px;height:55px}#panel.fd-office .dp-identity h3{font-size:27px}}
+
+/* Final director dossier: readable competency bands and verified career record. */
+#panel.fd-office .dp-developing{--dp-band:#ce897a}
+#panel.fd-office .dp-moderate{--dp-band:#d4b780}
+#panel.fd-office .dp-strong{--dp-band:#83b99a}
+#panel.fd-office .dp-excellent{--dp-band:#b4dbc4}
+#panel.fd-office .dp-attr .dp-track i{background:var(--dp-band,#d4b780)}
+#panel.fd-office .dp-attr b{color:var(--dp-band,#f0ddb5)}
+#panel.fd-office .dp-scale{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 8px;padding-top:6px;font-size:10px;color:#c4bfb2}
+#panel.fd-office .dp-scale span{display:flex;align-items:center;gap:4px}
+#panel.fd-office .dp-scale i{width:7px;height:7px;background:var(--dp-band);display:inline-block}
+#panel.fd-office .dp-rep-tier{display:block;color:#e4cfa4;font-size:11px;margin:1px 0 5px;line-height:1.15}
+#panel.fd-office .dp-analysis .dp-insight b{color:#83b99a}
+#panel.fd-office .dp-analysis .dp-sub~.dp-insight b{color:#d4b780}
+#panel.fd-office .dp-career-row{display:flex;justify-content:space-between;gap:8px;padding:5px 3px;font-size:12px;border-bottom:1px solid #d4b78016}
+#panel.fd-office .dp-career-row b{color:#f0ddb5;font-variant-numeric:tabular-nums}
+#panel.fd-office .dp-avatar{box-shadow:inset 0 0 0 3px #14212760}
+@media(min-width:1181px) and (max-height:800px){#panel.fd-office .dp-attr{min-height:25px;padding:4px 0}#panel.fd-office .dp-analysis .dp-sub{margin-top:9px;padding-bottom:5px}#panel.fd-office .dp-insight{padding:5px 3px}#panel.fd-office .dp-career-row{padding:4px 3px}}
