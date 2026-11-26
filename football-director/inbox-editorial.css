@@ -76,3 +76,14 @@
 #panel.fd-office .ix-reader .ng-mail-choice{font-size:14px;line-height:1.45;padding:12px 15px}
 #panel.fd-office .ix-reader .ng-mail-choice strong{font-size:14px}
 #panel.fd-office .ix-reader .ng-mail-choice small{font-size:12px;line-height:1.5;color:#c8bfae}
+
+#panel.fd-office .ed-score{margin:16px 0 20px;padding:14px 16px;border:1px solid #d4b78038;border-radius:6px;background:linear-gradient(120deg,#232118,#121416)}
+#panel.fd-office .ed-score>small{display:block;text-align:center;font-size:10px;letter-spacing:.12em;color:#c6b18c;font-weight:700;margin-bottom:12px}
+#panel.fd-office .ed-score>div{display:grid;grid-template-columns:1fr auto 1fr;gap:15px;align-items:center;text-align:center}
+#panel.fd-office .ed-score strong{font-size:15px;color:#f0e9db;line-height:1.4}
+#panel.fd-office .ed-score b{font:800 40px/1 'Barlow Condensed',sans-serif;color:#f0ddb5;white-space:nowrap;padding:10px 20px;background:#0e0f11;border:1px solid #d4b78025;border-radius:5px}
+#panel.fd-office .ix-reader .ed-option-label{font-size:10px;letter-spacing:.1em;color:#bcaa89;font-weight:700}
+#panel.fd-office .ix-reader .ng-mail-choice:has(.ed-impact){padding:12px 15px;gap:6px;background:linear-gradient(100deg,#d4b7800c,#141517);border-left:3px solid #b99a62}
+#panel.fd-office .ix-reader .ng-mail-choice .ed-impact{border-top:1px solid #d4b78020;padding-top:7px;color:#d4c8b4;font-size:13px;line-height:1.5}
+#panel.fd-office .ix-reader .ng-mail-meta{font-size:11px}
+@media(max-width:650px){#panel.fd-office .ed-score b{font-size:30px;padding:8px}#panel.fd-office .ed-score>div{gap:7px}}
