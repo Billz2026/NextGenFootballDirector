@@ -26,3 +26,36 @@
 #panel.fd-office .ix-message-copy strong{font-size:13px;font-weight:600}
 #panel.fd-office .ix-message-copy small,#panel.fd-office .ix-message-copy>span{font-size:11px}
 @media(max-width:850px){#panel.fd-office .ix-layout{grid-template-columns:1fr}#panel.fd-office .ix-reader{padding:16px}}
+
+/* Editorial correspondence desk */
+#panel.fd-office .ix-header{min-height:54px;padding:8px 13px}
+#panel.fd-office .ix-header h3{font-size:27px}
+#panel.fd-office .ix-filters{align-items:center;gap:5px;padding:5px 8px}
+#panel.fd-office .ix-filters button{padding:7px 13px}
+#panel.fd-office #ix-department{margin-left:auto;max-width:180px;min-width:130px;background:#151619;color:#e0d4c0;border:1px solid #d4b78040;border-radius:4px;padding:6px 10px;font-size:12px}
+#panel.fd-office .ix-story-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:none;border:0;padding:0}
+#panel.fd-office .ix-story-status span,#panel.fd-office .ix-story-status span+span{display:flex;align-items:center;justify-content:space-between;background:#151618;border:1px solid #d4b78026;border-radius:4px;padding:7px 12px;font-size:11px}
+#panel.fd-office .ix-story-status b{font-size:16px}
+#panel.fd-office .ix-layout{grid-template-columns:minmax(310px,.95fr) minmax(0,1.5fr);gap:12px}
+#panel.fd-office .ix-date-group{font-size:10px;color:#bca77f;text-transform:uppercase;font-weight:700;letter-spacing:.085em;padding:8px 12px;background:#d4b78009;border-bottom:1px solid #d4b78018}
+#panel.fd-office .ix-message{grid-template-columns:35px minmax(0,1fr) auto;gap:10px;padding:11px 12px;align-items:start}
+#panel.fd-office .ix-letter{width:34px;height:34px;font-size:12px;margin-top:3px}
+#panel.fd-office .ix-letter[data-dept="Medical"]{color:#9cc4ad;border-color:#9cc4ad55}
+#panel.fd-office .ix-letter[data-dept="Recruitment"],#panel.fd-office .ix-letter[data-dept="Transfers"]{color:#9ab9cf;border-color:#9ab9cf55}
+#panel.fd-office .ix-letter[data-dept="Board"]{color:#e5c48a;border-color:#e5c48a55}
+#panel.fd-office .ix-message-copy{gap:4px}
+#panel.fd-office .ix-message-copy strong{font-size:13px;line-height:1.35}
+#panel.fd-office .ix-message-copy .ix-preview{font-size:11px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#b0aaa0}
+#panel.fd-office .ix-message-copy .ix-category{justify-self:start;font-size:9px;padding:2px 5px;border:1px solid #d4b78025;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;color:#c6b18d}
+#panel.fd-office .ix-reader{background:radial-gradient(ellipse at top left,#d4b78007,transparent 60%),linear-gradient(135deg,#17181a,#101113)}
+#panel.fd-office .ed-document{display:flex;align-items:center;gap:12px;border-left:3px solid #d4b780;border-bottom:1px solid #d4b78030;background:#d4b78007;padding:12px 14px;margin-bottom:20px}
+#panel.fd-office .ed-document>span{width:34px;height:34px;display:grid;place-items:center;color:#d4b780}
+#panel.fd-office .ed-document svg{width:24px;height:24px}
+#panel.fd-office .ed-document>div{display:grid;gap:4px}
+#panel.fd-office .ed-document strong{font-size:13px;letter-spacing:.08em;color:#e6cfaa}
+#panel.fd-office .ed-document small{font-size:9px;letter-spacing:.09em;color:#a99c86}
+#panel.fd-office .ed-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:7px;margin:16px 0}
+#panel.fd-office .ed-facts>div{display:grid;gap:5px;border:1px solid #d4b78028;background:#d4b78006;padding:10px 12px;border-radius:4px}
+#panel.fd-office .ed-facts small{font-size:10px;color:#b9a88a}
+#panel.fd-office .ed-facts strong{font:700 22px/1.1 'Barlow Condensed',sans-serif;color:#f0ddb5}
+@media(max-width:850px){#panel.fd-office .ix-layout{grid-template-columns:1fr}#panel.fd-office .ix-story-status{grid-template-columns:1fr}#panel.fd-office .ix-filters{flex-wrap:wrap}}
