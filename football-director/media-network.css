@@ -1,0 +1,7 @@
+#panel.fd-office .mn-masthead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:14px;background:linear-gradient(100deg,#242323,#151618);border:1px solid #ffffff15;border-left:3px solid var(--mn-color);border-radius:5px}
+#panel.fd-office .mn-logo{width:42px;height:42px;display:grid;place-items:center;flex:none;border:1px solid var(--mn-color);color:var(--mn-color);background:#101113;border-radius:4px;font:800 23px/1 'Barlow Condensed',sans-serif}
+#panel.fd-office .mn-masthead>div{display:grid;gap:4px}
+#panel.fd-office .mn-masthead strong{font:700 22px/1 'Barlow Condensed',sans-serif;color:var(--mn-color)}
+#panel.fd-office .mn-masthead small{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#b6afa3}
+#panel.fd-office .ix-counts>div{min-width:65px;padding:7px 9px}
+@media(max-width:650px){#panel.fd-office .ix-counts{flex-wrap:wrap}}
