@@ -68,3 +68,11 @@
 @media(min-width:1181px) and (max-height:800px){#panel.fd-office .co-page{gap:6px}#panel.fd-office .co-hero{padding:6px 12px}#panel.fd-office .co-card{padding:7px 10px}#panel.fd-office .co-line{padding:4px 0}#panel.fd-office .co-heading h4{font-size:22px}#panel.fd-office .co-metrics{padding:6px 10px}}
 @media(max-width:1180px){#panel.fd-office .co-hero{grid-template-columns:52px 1fr 1fr}}
 @media(max-width:650px){#panel.fd-office .co-hero{grid-template-columns:46px 1fr}#panel.fd-office .co-footer .co-link{white-space:normal}}
+
+#panel.fd-office .co-board-request{border:1px solid #d4b78065;background:#142127;padding:6px 9px;color:#f0ddb5;font-size:12px}
+#panel.fd-office .co-board-request summary{cursor:pointer;font-weight:700;padding:3px 0}
+#panel.fd-office .co-board-request button{display:block;width:100%;text-align:left;background:#233239;border:1px solid #d4b78040;color:#f0ddb5;padding:6px;margin:4px 0;font-size:11px;cursor:pointer}
+#panel.fd-office .co-board-request button:disabled{opacity:.45;cursor:not-allowed}
+#panel.fd-office .co-board-request button:not(:disabled):hover{border-color:#d4b780}
+#panel.fd-office .co-board-request p{font-size:11px;line-height:1.4;margin:5px 0;color:#c4bfb2}
+#panel.fd-office .co-board-history:empty{display:none}
