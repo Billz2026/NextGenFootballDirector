@@ -69,3 +69,25 @@
 #panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:disabled{background:#22211e;color:#a89c83}
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(180px,29vh,246px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
 @media(max-width:850px){#panel.fd-office .classic-inbox .ix-filters{flex-wrap:wrap}#panel.fd-office .classic-inbox .ix-filters button{flex:0 1 auto}#panel.fd-office .classic-inbox .ci-columns,#panel.fd-office .classic-inbox .ix-message{grid-template-columns:75px minmax(65px,22%) minmax(0,1fr) 52px;gap:5px;font-size:10px;padding:4px 6px}#panel.fd-office .classic-inbox .ix-tools input{width:110px}#panel.fd-office .classic-inbox .ci-nav{grid-template-columns:repeat(4,1fr)}#panel.fd-office .classic-inbox .ci-summary{grid-column:1/-1;grid-row:2}}
+
+/* Stadium atmosphere: scoped to the career inbox, not the main title menu. */
+#panel.fd-office .fd-workspace:has(.classic-inbox){background:linear-gradient(110deg,#10191dd9,#10191d75 65%,#10191d99),url("https://images.pexels.com/photos/1657324/pexels-photo-1657324.jpeg?auto=compress&cs=tinysrgb&w=1920") center 53%/cover no-repeat fixed #17252b;position:relative;isolation:isolate}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::before{content:"";position:absolute;inset:0;z-index:-1;backdrop-filter:blur(8px);pointer-events:none}
+#panel.fd-office .fd-workspace:has(.classic-inbox) .fd-top{background:rgba(18,28,32,.86);border-bottom:1px solid #c6ad7966}
+#panel.fd-office .fd-workspace:has(.classic-inbox) .fd-content{background:transparent}
+#panel.fd-office .classic-inbox .ix-filters,#panel.fd-office .classic-inbox .ix-list{background:rgba(21,33,38,.83);border-color:#c6ad7955;backdrop-filter:blur(4px)}
+#panel.fd-office .classic-inbox .ci-columns{background:rgba(73,64,46,.92)}
+#panel.fd-office .classic-inbox .ix-message{background:rgba(24,36,40,.38);border-bottom-color:#e1d9c31c}
+#panel.fd-office .classic-inbox .ix-message:nth-child(even){background:rgba(105,120,122,.09)}
+#panel.fd-office .classic-inbox .ix-message.selected{background:linear-gradient(90deg,#b99a6266,#b99a6224);box-shadow:inset 3px 0 #f0ddb5}
+#panel.fd-office .classic-inbox .ix-message:hover{background:#d4b78029}
+#panel.fd-office .classic-inbox .ix-reader{background:linear-gradient(115deg,rgba(20,30,34,.88),rgba(25,38,42,.76));border-color:#c6ad7955;border-left-color:#d4b780;backdrop-filter:blur(4px)}
+#panel.fd-office .classic-inbox .ci-nav button{background:#26363ad9;border-color:#c6ad7955}
+#panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:not(:disabled){background:linear-gradient(100deg,#f0ddb5,#c6a56d)}
+#panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:disabled{background:#26363ad9}
+#panel.fd-office .classic-inbox .ci-summary{color:#e4d8c4}
+#panel.fd-office .classic-inbox .ed-body{color:#f0ebe2}
+#panel.fd-office .classic-inbox .ci-date{color:#ddd8ce}
+#panel.fd-office .classic-inbox .ci-dept{color:#e1c99a}
+#panel.fd-office .classic-inbox .ci-status{color:#b8c0bc}
+#panel.fd-office .classic-inbox .unread .ci-status,#panel.fd-office .classic-inbox .actionable .ci-status{color:#f0d092}
