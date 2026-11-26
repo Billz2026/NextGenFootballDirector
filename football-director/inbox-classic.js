@@ -24,7 +24,7 @@ return html
 wireInbox=function(s,ms,st,id,filter){
 wire(s,ms,st,id,filter);
 const rows=[...panel.querySelectorAll(".classic-inbox .ix-message")],reader=panel.querySelector(".classic-inbox .ix-reader"),nav=panel.querySelector(".ci-nav");if(!nav)return;
-const current=rows.find(r=>ms[Number(r.dataset.message)]?.id===id);
+if(!id&&rows.length){const target=rows.find(r=>!st.read.includes(ms[Number(r.dataset.message)]?.id))||rows[0];target.click();return;} const current=rows.find(r=>ms[Number(r.dataset.message)]?.id===id);
 if(current){const list=current.closest(".ix-list-scroll");if(list){const a=current.getBoundingClientRect(),b=list.getBoundingClientRect();if(a.top<b.top)list.scrollTop-=b.top-a.top;else if(a.bottom>b.bottom)list.scrollTop+=a.bottom-b.bottom;}}
 const oldNext=reader?.querySelector(".ed-next");if(oldNext)oldNext.remove();
 const archive=reader?.querySelector("[data-mail-archive]");if(archive)archive.style.display="none";
