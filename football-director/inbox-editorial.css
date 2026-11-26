@@ -97,3 +97,20 @@
 #panel.fd-office .ix-reader .ed-title{margin-top:9px}
 #panel.fd-office .ix-reader .ed-sender{padding-bottom:12px;margin-bottom:14px}
 #panel.fd-office .ix-reader .ed-body{max-width:85ch}
+
+#panel.fd-office .ed-score strong{display:flex;flex-direction:column;align-items:center;gap:8px}
+#panel.fd-office .ed-score-crest{display:block;width:42px;height:46px}
+#panel.fd-office .ed-score-crest svg,#panel.fd-office .ed-player-crest svg{width:100%;height:100%}
+#panel.fd-office .ed-player,#panel.fd-office .ed-staff{border:1px solid #d4b78035;border-radius:6px;background:linear-gradient(120deg,#242119,#141517 80%);margin:16px 0;padding:14px 16px}
+#panel.fd-office .ed-player header,#panel.fd-office .ed-staff{display:flex;align-items:center;justify-content:flex-start;gap:12px}
+#panel.fd-office .ed-player header>div,#panel.fd-office .ed-staff>div{display:grid;gap:4px;flex:1}
+#panel.fd-office .ed-player header small,#panel.fd-office .ed-staff small{font-size:10px;letter-spacing:.09em;color:#c6b18d;font-weight:700}
+#panel.fd-office .ed-player header strong,#panel.fd-office .ed-staff strong{font:700 26px/1.15 'Barlow Condensed',sans-serif;color:#f0ddb5}
+#panel.fd-office .ed-player header div>span,#panel.fd-office .ed-staff div>span{font-size:12px;color:#c2b7a4}
+#panel.fd-office .ed-player-avatar{width:48px;height:48px;border:1px solid #d4b78035;background:#111214;display:grid;place-items:center;border-radius:5px;color:#d4b780}
+#panel.fd-office .ed-player-avatar svg{width:25px;height:25px}
+#panel.fd-office .ed-player-crest{width:40px;height:44px;flex:none}
+#panel.fd-office .ed-player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-top:14px}
+#panel.fd-office .ed-player-grid>div{display:grid;gap:4px;padding:9px 10px;background:#101113;border:1px solid #d4b78020;border-radius:4px}
+#panel.fd-office .ed-player-grid small{font-size:11px;color:#bdb09a}
+#panel.fd-office .ed-player-grid b{font-size:15px;color:#f1e4cc}
