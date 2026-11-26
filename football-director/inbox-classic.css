@@ -41,3 +41,31 @@
 #panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]{background:#d4b780;color:#18140e;font-weight:700}
 #panel.fd-office .classic-inbox .ci-summary{flex:1;text-align:center;font-size:11px;color:#a99f90}
 @media(max-width:850px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:220px auto}#panel.fd-office .classic-inbox .ci-columns,#panel.fd-office .classic-inbox .ix-message{grid-template-columns:75px 80px minmax(0,1fr) 55px;gap:5px;padding:4px 6px;font-size:10px}#panel.fd-office .classic-inbox .ci-nav{flex-wrap:wrap}#panel.fd-office .classic-inbox .ci-summary{flex-basis:100%;order:1}}
+
+/* Compact editorial desk: one toolbar, aligned columns and stable footer. */
+#panel.fd-office .classic-inbox .ix-filters{display:flex;gap:4px;padding:5px 7px}
+#panel.fd-office .classic-inbox .ix-filters button{flex:1;max-width:150px;white-space:nowrap;text-align:center;padding:7px 8px}
+#panel.fd-office .classic-inbox #ix-department{flex:0 0 155px;margin-left:auto}
+#panel.fd-office .classic-inbox .ix-list{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:34px 24px minmax(0,1fr);min-height:0}
+#panel.fd-office .classic-inbox .ix-list>header{grid-column:1;grid-row:1;display:flex;align-items:center;gap:14px;border-bottom:0}
+#panel.fd-office .classic-inbox .ix-list>header span{margin-left:12px;margin-right:auto}
+#panel.fd-office .classic-inbox .ix-tools{grid-column:2;grid-row:1;justify-content:flex-end;border:0;padding:3px 8px;gap:5px}
+#panel.fd-office .classic-inbox .ix-tools input{width:clamp(150px,20vw,270px);flex:none}
+#panel.fd-office .classic-inbox .ci-columns{grid-column:1/-1;grid-row:2}
+#panel.fd-office .classic-inbox .ix-list-scroll{grid-column:1/-1;grid-row:3;min-height:0;height:auto;max-height:none;overflow:auto}
+#panel.fd-office .classic-inbox .ci-columns,#panel.fd-office .classic-inbox .ix-message{grid-template-columns:115px minmax(155px,19%) minmax(0,1fr) 90px;gap:12px;padding:4px 13px}
+#panel.fd-office .classic-inbox .ci-columns span:last-child{text-align:right}
+#panel.fd-office .classic-inbox .ix-message{font-size:13px;height:27px;min-height:27px}
+#panel.fd-office .classic-inbox .ci-dept{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel.fd-office .classic-inbox .ci-empty-row{padding:12px 14px;color:#a79f90;font-size:12px}
+#panel.fd-office .classic-inbox .ix-list-scroll:has(.ci-empty-row){overflow:hidden}
+#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}
+#panel.fd-office .classic-inbox .ix-reader{background:radial-gradient(ellipse at 0 0,#d4b78009,transparent 65%),#141517;border-left:2px solid #b99a62;padding:14px 22px}
+#panel.fd-office .classic-inbox .ix-reader h3.ed-title{font-size:30px;line-height:1.12;margin:5px 0 8px}
+#panel.fd-office .classic-inbox .ed-body{font-size:15px;line-height:1.55}
+#panel.fd-office .classic-inbox .ix-reader-empty{min-height:0;padding:12px}
+#panel.fd-office .classic-inbox .ci-nav{display:grid;grid-template-columns:1fr .75fr 1.4fr 1fr 1fr;gap:8px;padding:0;margin:0;border:0}
+#panel.fd-office .classic-inbox .ci-nav button{width:100%;min-height:35px;font-size:12px;font-weight:600}
+#panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:disabled{background:#22211e;color:#a89c83}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(180px,29vh,246px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
+@media(max-width:850px){#panel.fd-office .classic-inbox .ix-filters{flex-wrap:wrap}#panel.fd-office .classic-inbox .ix-filters button{flex:0 1 auto}#panel.fd-office .classic-inbox .ci-columns,#panel.fd-office .classic-inbox .ix-message{grid-template-columns:75px minmax(65px,22%) minmax(0,1fr) 52px;gap:5px;font-size:10px;padding:4px 6px}#panel.fd-office .classic-inbox .ix-tools input{width:110px}#panel.fd-office .classic-inbox .ci-nav{grid-template-columns:repeat(4,1fr)}#panel.fd-office .classic-inbox .ci-summary{grid-column:1/-1;grid-row:2}}
