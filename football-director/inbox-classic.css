@@ -183,3 +183,20 @@
 #panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice small{color:#e2d9c8}
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout.ci-has-action{grid-template-rows:clamp(156px,24vh,196px) minmax(0,1fr) auto}#panel.fd-office .classic-inbox .ci-action-dock{max-height:190px;overflow:auto}}
 @media(max-width:1180px){#panel.fd-office .classic-inbox .ix-layout.ci-has-action{grid-template-rows:180px minmax(140px,1fr) auto}}
+
+/* Final classic inbox density and decision typography. */
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px;padding:9px 12px!important;line-height:1.35}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice strong{display:block;font-size:13px;line-height:1.35;color:#ffe4b4}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice small{display:block;font-size:12px;line-height:1.4;border-top:1px solid #d4b78030;padding-top:5px;margin:0;color:#e2d9c8}
+#panel.fd-office .classic-inbox .ci-action-dock .ng-mail-choice:hover strong{color:#fff4df}
+#panel.fd-office .classic-inbox .ed-player-grid{gap:6px 18px;border-top:1px solid #d4b78030;padding-top:6px}
+#panel.fd-office .classic-inbox .ed-player-grid>div{gap:5px;white-space:nowrap}
+#panel.fd-office .classic-inbox .ed-player-grid small{font-size:11px}
+#panel.fd-office .classic-inbox .ed-player-grid b{font-size:14px}
+#panel.fd-office .classic-inbox .ix-reader .ed-body .ed-lead{font-size:15px}
+#panel.fd-office .classic-inbox .ix-reader .ed-title{margin:3px 0 6px}
+#panel.fd-office .classic-inbox .ix-reader .ed-sender{margin-bottom:5px}
+#panel.fd-office .classic-inbox .ci-has-action .ix-reader{padding-block:5px}
+#panel.fd-office .classic-inbox .ci-has-action .ix-list{grid-template-rows:29px 21px minmax(0,1fr)}
+#panel.fd-office .classic-inbox .ci-has-action .ix-message{height:23px;min-height:23px}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout.ci-has-action{grid-template-rows:188px minmax(0,1fr) auto}}
