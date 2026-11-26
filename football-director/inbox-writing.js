@@ -55,8 +55,34 @@ const fixed=[
 return null
 }
 
+
+function careerCopy(m){const b=m.body||"",t=m.subject||"";let a;const out=(subject,...parts)=>({subject,body:parts.join("\n\n")});
+if(m.id.startsWith("application:")){
+const club=m.from;
+const variants={
+"Employment offer received":["The board of "+club+" has offered you the position of football director.","Please review the proposed contract, salary and response deadline before accepting or declining. The appointment will not take effect until you accept the offer."],
+"Application unsuccessful":["The board of "+club+" has decided to appoint another candidate following its consideration of your application.","You remain free to pursue other vacancies that match your experience and reputation."],
+"Offer declined":["Your decision to decline the proposed appointment at "+club+" has been received.","You have not entered into a contract with the club and remain free to consider other opportunities."],
+"Appointment confirmed":["Your appointment as football director of "+club+" has been confirmed.","Your immediate responsibilities include reviewing the club's objectives, meeting the football staff and establishing priorities for recruitment and finances. The manager remains responsible for matchday decisions."],
+"Employment offer expired":["The deadline for responding to the offer from "+club+" has passed without acceptance.","The offer is no longer available. You may continue to explore other appointments."]};if(variants[t])return out(t,...variants[t])
+}
+a=b.match(/^(.+?) appointed as (.+?)\. Compensation: (.+?)\.$/);if(m.id.startsWith("staff:")&&a)return out(a[1]+" joins football staff",a[1]+" has been appointed as "+a[2]+".","The total recorded compensation and appointment cost is "+a[3]+". The appointment is now reflected in the club's staffing arrangements.");
+a=b.match(/^(.+?) has received a one-year continuity extension at the same salary\.$/);if(a)return out(a[1]+" agrees one-year staff extension","The club has extended "+a[1]+"'s employment by a further year.","The existing salary remains unchanged.");
+a=b.match(/^(.+?) has resigned after a sustained breakdown in the working relationship\. An interim coach will oversee matches\.$/);if(a)return out(a[1]+" resigns as manager",a[1]+" has resigned following a sustained breakdown in the working relationship with the director.","An interim coach will oversee matches while the club considers its managerial arrangements.");
+a=b.match(/^(.+?) has left the club\.$/);if(m.id.startsWith("player-exit:")&&a)return out(t==="Player retired"?a[1]+" retires from football":a[1]+" leaves following contract expiry",t==="Player retired"?a[1]+" has left the club after retiring from football.":a[1]+" has departed after reaching the end of his contract.","The departure will need to be taken into account in future squad planning.");
+a=b.match(/^(.+?) joins (.+?) for (.+?)\.$/);if(t==="Player sold"&&a)return out(a[1]+" completes move to "+a[2],a[1]+" has completed a transfer to "+a[2]+" for "+a[3]+".","The deal is confirmed and the player has left the club.");
+a=b.match(/^(.+?) has been placed on the transfer list\.$/);if(a)return out(a[1]+" available for transfer","The club has made "+a[1]+" available to interested clubs.","The player remains under contract until a transfer is agreed and completed.");
+a=b.match(/^Your objective: (.+?)\. Current transfer budget: (.+?)\.$/);if(m.id.startsWith("board:")&&a)return out("Board outlines priorities for director","The board has set the following objective for the football department: "+a[1]+".","The available transfer budget at the time of this briefing is "+a[2]+". Recruitment and contract decisions should be considered alongside the club's wider financial commitments.");
+a=b.match(/^My preferred formation is (.+?) and my philosophy is (.+?)\. We will coordinate squad planning while I remain responsible for matchday decisions\.$/);if(m.id.startsWith("manager:")&&a)return out("Manager outlines football approach","I prefer to work with a "+a[1]+" formation, with an emphasis on "+a[2]+".","I'd like us to coordinate recruitment and squad planning around that approach. I'll retain responsibility for team selection, tactics and matchday decisions.");
+if(t==="Contract renewal available")return out("Board invites director to discuss extension","The board is prepared to offer an extension to your current appointment.","Review the proposal in Club Operations before making a decision on your future with the club.");
+if(t==="Contract extended")return out("Director agrees two-year contract extension","Your appointment has been extended by two years on the existing salary.","The revised expiry date is reflected in your career contract.");
+if(t==="Review missed")return out("Board concerned by missed strategic review","The board and manager have expressed concern that the previous strategic review passed without a response.","The outstanding issue has affected the working relationships within the football department.");
+return null
+}
+
 function rewrite(s,m){
 const b=m.body||"",t=m.subject||"",event=s.calendar.events.find(e=>e.id===m.id),cases=dilemmaState(s).dilemmas,e=cases.find(x=>m.id===x.id||m.id.endsWith(":"+x.id));let a;
+const career=careerCopy(m);if(career)return career;
 const result=t.match(resultPattern),round=b.match(/^The (.+?) matchday produced (\d+) other completed fixtures/);
 if(result&&round){const [,h,hg,ag,v]=result,n=Number(hg),k=Number(ag),winner=n>k?h:v,loser=n>k?v:h;const headline=n===k?h+" and "+v+" share the points":winner+(Math.abs(n-k)===1?" edge ":" defeat ")+loser;const lead=n===k?h+" and "+v+" played out a "+hg+"–"+ag+" draw in the "+round[1]+".":winner+" claimed a "+Math.max(n,k)+"–"+Math.min(n,k)+" "+(n>k?"home":"away")+" victory over "+loser+" in the "+round[1]+"." ;return {subject:headline,body:lead+(n!==k&&Math.min(n,k)===0?" The winners also kept a clean sheet.":"")+"\n\n"+(Number(round[2])+1)+" fixtures were completed across the division on that matchday.",score:{h,v,hg:n,ag:k,competition:round[1]}}}
 if(/^network-news:/.test(m.id)){
