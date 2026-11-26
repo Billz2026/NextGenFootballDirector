@@ -154,3 +154,26 @@
 #panel.fd-office .lx-table td:nth-child(10){background:#d4b78008;color:#f0ddb5}
 @media(max-width:1150px){#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{max-height:600px}}
 @media(max-width:650px){#panel.fd-office .lx-competition-band{grid-template-columns:1fr}#panel.fd-office .lx-competition{padding:10px 12px}}
+
+
+/* Final competition identity alignment and viewport containment. */
+#panel.fd-office .lx-competition{justify-content:flex-start;text-align:left;gap:12px;padding:7px 14px}
+#panel.fd-office .lx-competition-name{flex:1;min-width:0;text-align:left}
+#panel.fd-office .lx-competition h3{font-size:clamp(26px,2.4vw,36px);margin:2px 0}
+#panel.fd-office .lx-season{flex:none;display:grid;gap:3px;align-content:center;text-align:right;border-left:1px solid #d4b78030;padding-left:18px;margin-left:auto}
+#panel.fd-office .lx-season strong{font:700 29px/1 'Barlow Condensed','Arial Narrow',sans-serif;color:#f0ddb5;letter-spacing:.025em;font-variant-numeric:tabular-nums}
+#panel.fd-office .lx-competition-band .lx-own-form{min-height:0;padding:7px 12px}
+@media(min-width:1181px) and (min-height:650px){
+#panel.fd-office .fd-workspace:has(.lx-page){min-height:0;display:flex;flex-direction:column;overflow:hidden}
+#panel.fd-office .fd-workspace:has(.lx-page) .fd-top{position:relative;top:auto;flex:none}
+#panel.fd-office .fd-content:has(.lx-page){display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden;padding-top:8px;padding-bottom:8px}
+#panel.fd-office .lx-page{display:flex;flex:1;flex-direction:column;min-height:0}
+#panel.fd-office .lx-navigation,#panel.fd-office .lx-competition-band{flex:none}
+#panel.fd-office .lx-grid{flex:1;min-height:0}
+#panel.fd-office .lx-panel{min-height:0;overflow:hidden}
+#panel.fd-office .lx-panel-head,#panel.fd-office .lx-round,#panel.fd-office .lx-legend{flex:none}
+#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{flex:1 1 0;min-height:0;height:auto;max-height:none;overflow:auto}
+#panel.fd-office .lx-table th,#panel.fd-office .lx-table td{height:21px;padding:1px 4px}
+#panel.fd-office .lx-match{padding:3px 6px;margin-bottom:2px}
+}
+@media(max-width:650px){#panel.fd-office .lx-season{padding-left:8px}#panel.fd-office .lx-season strong{font-size:21px}#panel.fd-office .lx-competition-mark{width:32px;height:32px}#panel.fd-office .lx-competition{gap:8px}}
