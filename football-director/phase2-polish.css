@@ -113,3 +113,23 @@
 @media(min-width:1181px){#panel.fd-office:has(.lx-page) .fd-nav{min-height:25px;padding-top:3px;padding-bottom:3px}#panel.fd-office:has(.lx-page) .fd-nav-group>small{padding-top:5px;padding-bottom:2px}#panel.fd-office:has(.lx-page) .fd-club{margin:7px 0 4px;padding:7px}}
 @media(max-width:1150px){#panel.fd-office .lx-grid{grid-template-columns:1fr}#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{height:auto;max-height:520px}}
 @media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Final competition polish */
+#panel.fd-office .lx-metrics{grid-template-columns:1.15fr .75fr 1fr .95fr 1.15fr}
+#panel.fd-office .lx-own-form{border-color:#b99a625c;background:linear-gradient(135deg,#262117,#111214 78%)}
+#panel.fd-office .lx-own-form .lx-form{justify-content:flex-start;gap:4px;margin:3px 0}
+#panel.fd-office .lx-own-form .lx-form>span{width:24px;height:23px;font-size:12px;border-radius:4px}
+#panel.fd-office .lx-form>span{box-shadow:inset 0 0 0 1px #ffffff13}
+#panel.fd-office .lx-table tr.lx-own{background:linear-gradient(90deg,#d4b78029,#d4b7800b);color:#f5dfb3}
+#panel.fd-office .lx-table tr.lx-own td:first-child{box-shadow:inset 3px 0 #d4b780}
+#panel.fd-office .lx-table tr.lx-own td:nth-child(10){font-weight:800;color:#ffe5ae}
+#panel.fd-office .lx-table tbody tr:hover{background:#d4b78019}
+#panel.fd-office .lx-match-next{border-color:#d4b780ad;background:linear-gradient(110deg,#d4b78016,#151618 85%)}
+#panel.fd-office .lx-match-meta .lx-status{font-size:8px;font-weight:700;letter-spacing:.06em;color:#b6afa3}
+#panel.fd-office .lx-status.finished{color:#9bd4a9}
+#panel.fd-office .lx-status.next{color:#f0ddb5}
+#panel.fd-office .lx-round-controls select:hover{border-color:#d4b780}
+#panel.fd-office .lx-panel-head{background:linear-gradient(110deg,#d4b78008,transparent)}
+@media(max-width:1150px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .lx-own-form{grid-column:1/-1}}
