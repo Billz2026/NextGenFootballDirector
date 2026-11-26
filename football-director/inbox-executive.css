@@ -37,3 +37,31 @@
 #panel.fd-office .ix-empty{padding:20px;color:#b6afa3;font-size:13px}
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .fd-content:has(.ix-inbox){display:flex;flex-direction:column;overflow:hidden;min-height:0}#panel.fd-office .ix-inbox{flex:1;min-height:0}#panel.fd-office .ix-header,#panel.fd-office .ix-filters{flex:none}}
 @media(max-width:850px){#panel.fd-office .ix-layout{grid-template-columns:1fr}#panel.fd-office .ix-list-scroll{max-height:300px}#panel.fd-office .ix-header{flex-wrap:wrap}#panel.fd-office .ix-counts>div{min-width:50px}}
+
+
+/* Full-height correspondence workspace, compact executive toolbar. */
+#panel.fd-office .ix-header{padding:10px 15px;flex:none}
+#panel.fd-office .ix-header h3{font-size:29px}
+#panel.fd-office .ix-header p{margin-top:3px}
+#panel.fd-office .ix-filters{gap:3px;padding:4px;flex:none}
+#panel.fd-office .ix-filters button{padding:6px 8px}
+#panel.fd-office .ix-tools{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid #d4b78025;align-items:center}
+#panel.fd-office .ix-tools input{flex:1;min-width:0;width:100%;padding:7px 9px;background:#0d0e10;color:#f5f1e8;border:1px solid #d4b78035;border-radius:4px;font:12px 'DM Sans',sans-serif}
+#panel.fd-office .ix-tools button{flex:none;background:#d4b78012;border:1px solid #d4b78040;border-radius:4px;color:#e4c898;padding:7px 9px;font:600 11px 'DM Sans',sans-serif;cursor:pointer}
+#panel.fd-office .ix-message[hidden]{display:none!important}
+#panel.fd-office .ix-reader-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:220px;height:100%;box-sizing:border-box}
+#panel.fd-office .ix-empty-icon{display:grid;place-items:center;width:56px;height:56px;border:1px solid #d4b78040;border-radius:8px;color:#d4b780;background:#d4b78008}
+#panel.fd-office .ix-empty-icon svg{width:27px;height:27px}
+#panel.fd-office .ix-reader-empty p{max-width:360px;line-height:1.6;margin:5px 0 15px}
+#panel.fd-office .ix-read-note{padding:8px 10px;background:#d4b7800c;color:#b6afa3;font-size:11px;border-left:2px solid #d4b78055;margin-bottom:12px}
+#panel.fd-office .ix-message.unread{box-shadow:inset 2px 0 #d4b78080}
+#panel.fd-office .ix-message.selected{box-shadow:inset 3px 0 #d4b780}
+#panel.fd-office .ix-reader .ng-mail-choice:hover{border-color:#d4b780;background:#d4b78012}
+@media(min-width:1181px) and (min-height:650px){
+#panel.fd-office .fd-workspace:has(.ix-inbox){height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#panel.fd-office .fd-workspace:has(.ix-inbox) .fd-top{position:relative;flex:none;top:auto}
+#panel.fd-office .fd-content:has(.ix-inbox){flex:1 1 0;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+#panel.fd-office .ix-inbox{flex:1 1 0;min-height:0;height:100%}
+#panel.fd-office .ix-layout{flex:1 1 0;min-height:0;grid-template-rows:minmax(0,1fr)}
+#panel.fd-office .ix-reader{height:auto;box-sizing:border-box}
+}
