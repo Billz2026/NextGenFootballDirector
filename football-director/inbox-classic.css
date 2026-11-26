@@ -113,3 +113,26 @@
 @media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(225px,32vh,258px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
 @media(max-width:900px){#panel.fd-office .fd-workspace:has(.classic-inbox)::before{left:178px}}
 @media(max-width:560px){#panel.fd-office .fd-workspace:has(.classic-inbox)::before{left:0}}
+
+/* Classic news screen: photograph first, interface second. */
+#panel.fd-office .fd-workspace:has(.classic-inbox)::before{filter:blur(2px) saturate(.9);transform:none;background-position:center 57%}
+#panel.fd-office .fd-workspace:has(.classic-inbox)::after{background:linear-gradient(180deg,#10191d25 0%,#10191d42 45%,#080e12a0 100%)}
+#panel.fd-office .classic-inbox .ix-filters{background:#14212780;backdrop-filter:none;border-color:#d4b78055}
+#panel.fd-office .classic-inbox .ix-list{background:#101a2050;backdrop-filter:none;border-color:#d4b78060}
+#panel.fd-office .classic-inbox .ix-list>header,#panel.fd-office .classic-inbox .ix-tools{background:#101a2090}
+#panel.fd-office .classic-inbox .ci-columns{background:#3b3025d9}
+#panel.fd-office .classic-inbox .ix-message{background:#111c22a0;text-shadow:0 1px 3px #000}
+#panel.fd-office .classic-inbox .ix-message:nth-child(even){background:#25343a88}
+#panel.fd-office .classic-inbox .ix-message.selected{background:#a78446c9;box-shadow:inset 3px 0 #ffe3a8}
+#panel.fd-office .classic-inbox .ix-reader{background:linear-gradient(90deg,#07101570,#07101538 70%,#07101520);border:0;box-shadow:none;backdrop-filter:none;padding:12px 24px;text-shadow:0 1px 4px #000,0 0 8px #000}
+#panel.fd-office .classic-inbox .ix-reader h3.ed-title{text-align:center;color:#ffe3a8;font-size:29px;line-height:1.15;margin:7px 0 10px}
+#panel.fd-office .classic-inbox .ix-reader .ed-sender{border-bottom:0;padding-bottom:0;margin-bottom:8px}
+#panel.fd-office .classic-inbox .ix-reader .ed-body{max-width:none;color:#fff7ea;font-size:15px;line-height:1.55}
+#panel.fd-office .classic-inbox .ix-reader .ed-body .ed-lead{font-weight:500}
+#panel.fd-office .classic-inbox .ix-reader .ed-facts>div{background:#101b2266;border:0;border-left:2px solid #d4b780;padding:5px 10px}
+#panel.fd-office .classic-inbox .ed-instruction,#panel.fd-office .classic-inbox .ed-story-context,#panel.fd-office .classic-inbox .ed-change-grid{background:#101b2259;border-color:#d4b78055}
+#panel.fd-office .classic-inbox .ix-reader-empty{background:none;text-shadow:0 2px 5px #000}
+#panel.fd-office .classic-inbox .ci-nav button{background:#1a2930c9;border-color:#d4b78066}
+#panel.fd-office .classic-inbox .ci-nav [data-ci="unread"]:not(:disabled){background:#d4b780;color:#18140e;text-shadow:none}
+#panel.fd-office .classic-inbox .ci-summary{text-shadow:0 1px 4px #000}
+@media(min-width:1181px) and (min-height:650px){#panel.fd-office .classic-inbox .ix-layout{grid-template-rows:clamp(200px,29vh,242px) minmax(0,1fr)}#panel.fd-office .classic-inbox .ix-layout:has(.ci-empty-row){grid-template-rows:100px minmax(0,1fr)}}
