@@ -1,0 +1,16 @@
+"use strict";
+(()=>{
+const previous=inboxContent,oldWire=wireInbox,esc=escapeHtml;
+function editorial(s,m){const raw=m.body||"",q=pressState(s).find(q=>m.id==="network-response:"+q.id||m.id==="press-response:"+q.id),club=q&&s.world.clubs.find(c=>c.id===q.club),name=club?.name||"The club";
+if(q){const match=raw.match(/^“([^”]+)”\s*([\s\S]*)$/);if(match){const quote=match[1],reaction=match[2],story=officeState(s).mediaNetwork?.stories.find(x=>x.id===q.storyId),target=story?.name;let lead=q.context==="transfer"?name+"'s director has responded to transfer speculation"+(target?" surrounding "+target:"")+".":name+"'s director has addressed questions from the media following the recent match.";let title=m.subject;
+if(/refuses to discuss recruitment/i.test(title)){title=name+" remain tight-lipped over transfer speculation";lead=name+"'s director has declined to discuss the club's recruitment plans"+(target?" amid reports linking the club with "+target:"")+".";
+return {title,lead,quote,paragraphs:["The response leaves the club's intentions in the transfer market undisclosed. No formal agreement was confirmed in the statement."]}}
+return {title,lead,quote,paragraphs:reaction?[reaction]:[]}}}
+const paragraphs=raw.split(/\n\s*\n/).flatMap(x=>x.split("\n")).filter(Boolean);
+return {title:m.subject,paragraphs};
+}
+function bodyHtml(e){return '<div class="ed-body">'+(e.lead?'<p class="ed-lead">'+esc(e.lead)+'</p>':"")+(e.quote?'<blockquote><span>DIRECTOR’S STATEMENT</span><p>“'+esc(e.quote)+'”</p></blockquote>':"")+e.paragraphs.map(p=>'<p>'+esc(p)+'</p>').join("")+'</div>'}
+inboxContent=function(s,ms,st,id,filter){let html=previous(s,ms,st,id,filter);const m=ms.find(m=>m.id===id);if(m){const e=editorial(s,m);html=html.replace('<h3>'+esc(m.subject)+'</h3>','<h3 class="ed-title">'+esc(e.title)+'</h3>').replace('<p class="ng-mail-body">'+esc(m.body)+'</p>',bodyHtml(e));html=html.replace(/<div class="ng-mail-sender">([\s\S]*?)<\/div>/,'<div class="ed-sender"><span>FROM</span><strong>$1</strong></div>');html=html.replace(/<div class="ix-read-note">[\s\S]*?<\/div>/,"");html=html.replace(/<button class="action ng-mail-choice" data-mail-press="(\d+)">([\s\S]*?)<\/button>/g,(all,i,label)=>'<button class="action ng-mail-choice ed-choice" data-mail-press="'+i+'"><span class="ed-choice-num">'+(Number(i)+1)+'</span><strong>'+label+'</strong><span class="ed-choice-arrow">›</span></button>');}
+return html.replace(/<button class="fn-inbox-link"[^>]*>[\s\S]*?<\/button>/,"").replace('<p>Club correspondence, priorities and football decisions.</p>','').replace(/<small>EXECUTIVE COMMUNICATIONS<\/small>/,"")};
+wireInbox=function(s,ms,st,id,filter){oldWire(s,ms,st,id,filter);const rows=[...panel.querySelectorAll(".ix-message")];if(filter==="unread"&&id){const m=ms.find(m=>m.id===id);if(m&&st.read.includes(id)&&!rows.some(r=>ms[Number(r.dataset.message)]?.id===id)){const note=panel.querySelector(".ix-reader");if(note){const b=document.createElement("button");b.className="ed-next";b.textContent=rows.length?"Next unread message →":"All messages →";b.onclick=()=>rows.length?rows[0].click():career("inbox",null,"all");note.appendChild(b)}}}};
+})();
