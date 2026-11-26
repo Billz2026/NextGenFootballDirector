@@ -76,3 +76,23 @@
 #panel.fd-office .co-board-request button:not(:disabled):hover{border-color:#d4b780}
 #panel.fd-office .co-board-request p{font-size:11px;line-height:1.4;margin:5px 0;color:#c4bfb2}
 #panel.fd-office .co-board-history:empty{display:none}
+
+/* Boardroom polish: existing career palette, no global overrides. */
+#panel.fd-office .co-card{border-radius:4px;box-shadow:inset 0 1px #ffffff08;background:linear-gradient(150deg,#293a41,#203037 80%)}
+#panel.fd-office .co-grid>.co-card:last-child{border:1px solid #d4b78075;border-top:2px solid var(--fd-gold);background:linear-gradient(150deg,#2e3d40,#233239 35%,#1b2b31)}
+#panel.fd-office .co-review{background:linear-gradient(115deg,#34413e,#142127);border:1px solid #d4b78045;border-left:2px solid var(--fd-gold);border-radius:3px}
+#panel.fd-office .co-card .co-link[data-co-nav="inbox"]{background:linear-gradient(100deg,#45483a,#2c3939);border-color:#d4b78090;text-align:center;font-weight:700}
+#panel.fd-office .co-board-request{background:none;border:0;padding:0;color:#f0ddb5}
+#panel.fd-office .co-board-request summary{padding:7px 2px;border-top:1px solid #d4b78038;font-size:11px;text-transform:uppercase;letter-spacing:.065em;color:var(--fd-gold)}
+#panel.fd-office .co-board-request button[data-br-kind]{display:grid;grid-template-columns:19px minmax(0,1fr) auto 9px;align-items:center;gap:7px;padding:5px 7px;margin:3px 0;min-height:28px;box-sizing:border-box;border-radius:3px;background:linear-gradient(105deg,#2b3c43,#1b2b31);border:1px solid #d4b78035;font-size:11px;color:#f5f1e8;line-height:1.25}
+#panel.fd-office .co-board-request button[data-br-kind]:not(:disabled):hover{background:#3d463d;border-color:var(--fd-gold)}
+#panel.fd-office .co-board-request button:focus-visible{outline:2px solid var(--fd-gold);outline-offset:1px}
+#panel.fd-office .co-request-icon{width:17px;height:17px;color:var(--fd-gold)}
+#panel.fd-office .co-request-label{min-width:0;overflow-wrap:anywhere}
+#panel.fd-office .co-request-label small{display:block;font-weight:400;letter-spacing:0;color:#c4bfb2;font-size:10px;margin-top:2px}
+#panel.fd-office .co-request-amount{font-size:11px;color:#f0ddb5;white-space:nowrap;font-variant-numeric:tabular-nums}
+#panel.fd-office .co-request-arrow{grid-column:4;color:var(--fd-gold);font-size:17px;line-height:1}
+#panel.fd-office .co-board-request button:disabled{opacity:.72}
+#panel.fd-office .co-squad-record>div{border:1px solid #d4b78030;border-radius:3px}
+#panel.fd-office .co-footer .co-link,#panel.fd-office .co-card>.co-link{border-radius:3px}
+@media(min-width:1181px) and (max-height:800px){#panel.fd-office .co-board-request summary{padding:5px 2px}#panel.fd-office .co-board-request button[data-br-kind]{padding:3px 6px;min-height:25px;margin:2px 0}#panel.fd-office .co-hero{padding:5px 12px}#panel.fd-office .co-metrics{padding:5px 10px}#panel.fd-office .co-card{gap:2px}#panel.fd-office .co-review{padding:5px 8px}#panel.fd-office .co-employment{padding-top:3px}}
