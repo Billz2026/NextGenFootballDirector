@@ -133,3 +133,24 @@
 #panel.fd-office .lx-panel-head{background:linear-gradient(110deg,#d4b78008,transparent)}
 @media(max-width:1150px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){#panel.fd-office .lx-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#panel.fd-office .lx-own-form{grid-column:1/-1}}
+
+
+/* Competition identity rather than redundant dashboard KPIs. */
+#panel.fd-office .lx-competition-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,240px);gap:10px;align-items:stretch}
+#panel.fd-office .lx-competition-band:not(:has(.lx-own-form)){grid-template-columns:1fr}
+#panel.fd-office .lx-competition{display:flex;align-items:center;gap:15px;min-width:0;padding:9px 18px;border:1px solid #d4b78044;border-left:3px solid #d4b780;border-radius:5px;background:linear-gradient(105deg,#242017,#131416 70%)}
+#panel.fd-office .lx-competition-mark{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid #d4b78044;border-radius:6px;background:#d4b7800d;color:#d4b780}
+#panel.fd-office .lx-competition-mark svg{width:25px;height:25px}
+#panel.fd-office .lx-competition small{display:block;color:#c5ae84;font-size:9px;font-weight:700;letter-spacing:.13em}
+#panel.fd-office .lx-competition h3{margin:1px 0;font:700 clamp(28px,2.5vw,38px)/1.05 'Barlow Condensed','Arial Narrow',sans-serif;color:#f0ddb5}
+#panel.fd-office .lx-competition span{font-size:11px;color:#b6afa3}
+#panel.fd-office .lx-competition-band .lx-own-form{padding:8px 13px}
+#panel.fd-office .lx-table th,#panel.fd-office .lx-table td{height:23px;padding:2px 4px}
+#panel.fd-office .lx-table th{font-size:10px}
+#panel.fd-office .lx-table-scroll{height:auto;max-height:calc(100dvh - 245px);min-height:0;flex:1}
+#panel.fd-office .lx-fixtures{height:auto;max-height:calc(100dvh - 282px);min-height:0;flex:1}
+#panel.fd-office .lx-grid{align-items:stretch}
+#panel.fd-office .lx-panel{min-height:0}
+#panel.fd-office .lx-table td:nth-child(10){background:#d4b78008;color:#f0ddb5}
+@media(max-width:1150px){#panel.fd-office .lx-table-scroll,#panel.fd-office .lx-fixtures{max-height:600px}}
+@media(max-width:650px){#panel.fd-office .lx-competition-band{grid-template-columns:1fr}#panel.fd-office .lx-competition{padding:10px 12px}}
