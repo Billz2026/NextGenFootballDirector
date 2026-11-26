@@ -70,3 +70,9 @@ body:has(#menu:not([hidden])) .career-profile{border-color:#b89c687d;border-top-
 @media(max-width:760px){body:has(#menu:not([hidden])) .publisher img{width:104px;max-height:44px}body:has(#menu:not([hidden])) #menu{margin-top:2px}}
 @media(min-width:761px) and (max-height:690px){body:has(#menu:not([hidden])) .publisher img{width:98px;max-height:40px}body:has(#menu:not([hidden])) #menu{margin-top:4px}}
 @media(min-width:761px) and (max-height:550px){body:has(#menu:not([hidden])) .publisher img{width:90px;max-height:30px}body:has(#menu:not([hidden])) #menu{margin-top:0}}
+
+/* Original stadium photograph: softened signage and a readable cinematic menu. */
+body:has(#menu:not([hidden])){isolation:isolate;background:#172024!important}
+body:has(#menu:not([hidden]))::before{content:"";position:fixed;inset:-14px;z-index:-2;pointer-events:none;background:url("https://images.pexels.com/photos/1657324/pexels-photo-1657324.jpeg?auto=compress&cs=tinysrgb&w=1920") center 53%/cover no-repeat;filter:blur(7px) saturate(.88);transform:scale(1.015)}
+body:has(#menu:not([hidden]))::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(8,12,15,.94),rgba(8,12,15,.77) 25%,rgba(8,12,15,.28) 60%,rgba(8,12,15,.14)),linear-gradient(0deg,rgba(8,12,15,.68),transparent 45%,rgba(8,12,15,.12))}
+@media(max-width:760px){body:has(#menu:not([hidden]))::before{background-position:center 50%}body:has(#menu:not([hidden]))::after{background:linear-gradient(0deg,#080c0fe0,#080c0f66 75%,#080c0f45)}}
