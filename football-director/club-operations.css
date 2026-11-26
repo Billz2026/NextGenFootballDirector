@@ -35,3 +35,36 @@
 @media(min-width:1181px) and (max-height:850px){#panel.fd-office .co-hero{padding:9px 13px}#panel.fd-office .co-card{padding:9px 11px}#panel.fd-office .co-line{padding:5px 0}#panel.fd-office .co-heading h4{font-size:23px}}
 @media(max-width:1180px){#panel.fd-office .co-grid{grid-template-columns:1fr 1fr}#panel.fd-office .co-grid>section:last-child{grid-column:1/-1}#panel.fd-office .co-hero{grid-template-columns:52px 1fr 1fr}#panel.fd-office .co-security{grid-column:2}}
 @media(max-width:650px){#panel.fd-office .co-grid,#panel.fd-office .co-metrics{grid-template-columns:1fr 1fr}#panel.fd-office .co-grid{grid-template-columns:1fr}#panel.fd-office .co-hero{grid-template-columns:46px 1fr}#panel.fd-office .co-objective,#panel.fd-office .co-security{grid-column:1/-1}}
+
+/* Compact executive operations, with natural height for long strategic decisions. */
+#panel.fd-office .co-page{gap:8px}
+#panel.fd-office .co-hero{padding:8px 13px;grid-template-columns:52px minmax(0,1fr) minmax(180px,30%) 130px;gap:12px}
+#panel.fd-office .co-hero>svg{width:46px;height:51px}
+#panel.fd-office .co-identity h3{font-size:33px;margin:3px 0}
+#panel.fd-office .co-metrics{padding:7px 12px;gap:14px}
+#panel.fd-office .co-metrics>div{gap:2px}
+#panel.fd-office .co-metrics .co-meter{padding:0}
+#panel.fd-office .co-meter-detail{font-size:10px;color:#c4bfb2;line-height:1.15}
+#panel.fd-office .co-track{margin-top:3px}
+#panel.fd-office .co-security.co-positive strong{color:#83b99a}
+#panel.fd-office .co-security.co-warning strong{color:#ce897a}
+#panel.fd-office .co-card{padding:9px 11px;gap:3px}
+#panel.fd-office .co-heading{padding-bottom:6px}
+#panel.fd-office .co-heading h4{font-size:24px}
+#panel.fd-office .co-manager,#panel.fd-office .co-review{padding:6px 9px;margin:3px 0}
+#panel.fd-office .co-manager h5,#panel.fd-office .co-review h5{font-size:23px;margin:3px 0}
+#panel.fd-office .co-line{padding:5px 0;line-height:1.25}
+#panel.fd-office .co-link,#panel.fd-office .co-choice,#panel.fd-office .co-resign{padding:6px 9px;line-height:1.25}
+#panel.fd-office .co-squad-record{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:5px 0 6px}
+#panel.fd-office .co-squad-record>div{background:#14212780;border-top:1px solid #d4b78040;padding:6px;display:flex;flex-direction:column;gap:5px}
+#panel.fd-office .co-squad-record small{font-size:9px;letter-spacing:0;line-height:1.15}
+#panel.fd-office .co-squad-record strong{font:700 23px/1 'Barlow Condensed',sans-serif;color:#f0ddb5}
+#panel.fd-office .co-squad-record>div:nth-child(2) strong{color:#83b99a}
+#panel.fd-office .co-employment{margin-top:auto;padding-top:6px;border-top:1px solid var(--fd-line)}
+#panel.fd-office .co-employment summary{cursor:pointer;font-size:11px;color:#c4bfb2;padding:5px 0}
+#panel.fd-office .co-employment .co-resign{width:100%;margin-top:4px}
+#panel.fd-office .co-footer{padding:6px;gap:6px}
+#panel.fd-office .co-footer .co-link{background:#1b2b31;white-space:nowrap}
+@media(min-width:1181px) and (max-height:800px){#panel.fd-office .co-page{gap:6px}#panel.fd-office .co-hero{padding:6px 12px}#panel.fd-office .co-card{padding:7px 10px}#panel.fd-office .co-line{padding:4px 0}#panel.fd-office .co-heading h4{font-size:22px}#panel.fd-office .co-metrics{padding:6px 10px}}
+@media(max-width:1180px){#panel.fd-office .co-hero{grid-template-columns:52px 1fr 1fr}}
+@media(max-width:650px){#panel.fd-office .co-hero{grid-template-columns:46px 1fr}#panel.fd-office .co-footer .co-link{white-space:normal}}
